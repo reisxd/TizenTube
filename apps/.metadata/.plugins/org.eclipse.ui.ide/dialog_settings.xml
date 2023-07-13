@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<section name="Workbench">
+	<list key="org.eclipse.ui.internal.wizards.datatransfer.SmartImportRootWizardPage.knownSources">
+		<item value="D:\TizenTube\apps"/>
+		<item value="D:\TizenTube\apps\Launcher"/>
+	</list>
+	<list key="installedFeatures">
+		<item value="org.eclipse.cdt.gdb:9.3.2.201709131603"/>
+		<item value="org.eclipse.cdt:9.3.2.201709131603"/>
+		<item value="org.eclipse.emf.common:2.13.0.v20170609-0707"/>
+		<item value="org.eclipse.emf.ecore:2.13.0.v20170609-0707"/>
+		<item value="org.eclipse.help:2.2.101.v20171009-0410"/>
+		<item value="org.eclipse.platform:4.7.1.v20171009-0410"/>
+		<item value="org.eclipse.rcp:4.7.1.v20171009-0410"/>
+		<item value="org.tizen.common.feature:2.0.0.202012030914"/>
+		<item value="org.tizen.dynamicanalysis.ide.web.eplugin.feature:2.1.0.201910160605"/>
+		<item value="org.tizen.ocf.bridge.feature:2.0.0.201906141449"/>
+		<item value="org.tizen.ocf.cert.feature:2.0.0.202004300845"/>
+		<item value="org.tizen.ocf.core.feature:2.0.0.202004300800"/>
+		<item value="org.tizen.web.tv.sec.feature:1.0.0.202203221729"/>
+	</list>
+</section>

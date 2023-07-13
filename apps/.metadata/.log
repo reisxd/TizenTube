@@ -1,0 +1,1177 @@
+!SESSION 2023-07-13 21:50:27.328 -----------------------------------------------
+eclipse.buildId=4.6 
+java.version=1.8.0_242
+java.vendor=Amazon.com Inc.
+BootLoader constants: OS=win32, ARCH=x86_64, WS=win32, NL=en
+Command-line arguments:  -os win32 -ws win32 -arch x86_64
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:43.552
+!MESSAGE Could not install bundle plugins/com.google.gson_2.7.0.v20170129-0911.jar   A bundle is already installed with the name "com.google.gson" and version "2.7.0.v20170129-0911"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:43.590
+!MESSAGE Could not install bundle plugins/com.ibm.icu_58.2.0.v20170418-1837.jar   A bundle is already installed with the name "com.ibm.icu" and version "58.2.0.v20170418-1837"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:43.614
+!MESSAGE Could not install bundle plugins/com.jcraft.jsch_0.1.54.v20170116-1932.jar   A bundle is already installed with the name "com.jcraft.jsch" and version "0.1.54.v20170116-1932"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:43.624
+!MESSAGE Could not install bundle plugins/com.sun.el_2.2.0.v201303151357.jar   A bundle is already installed with the name "com.sun.el" and version "2.2.0.v201303151357"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:43.628
+!MESSAGE Could not install bundle plugins/javaewah_1.1.6.v20160919-1400.jar   A bundle is already installed with the name "javaewah" and version "1.1.6.v20160919-1400"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:43.633
+!MESSAGE Could not install bundle plugins/javax.annotation_1.2.0.v201602091430.jar   A bundle is already installed with the name "javax.annotation" and version "1.2.0.v201602091430"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:43.637
+!MESSAGE Could not install bundle plugins/javax.el_2.2.0.v201303151357.jar   A bundle is already installed with the name "javax.el" and version "2.2.0.v201303151357"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:43.641
+!MESSAGE Could not install bundle plugins/javax.inject_1.0.0.v20091030.jar   A bundle is already installed with the name "javax.inject" and version "1.0.0.v20091030"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:43.646
+!MESSAGE Could not install bundle plugins/javax.servlet.jsp_2.2.0.v201112011158.jar   A bundle is already installed with the name "javax.servlet.jsp" and version "2.2.0.v201112011158"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:43.651
+!MESSAGE Could not install bundle plugins/javax.servlet_3.1.0.v201410161800.jar   A bundle is already installed with the name "javax.servlet" and version "3.1.0.v201410161800"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:43.655
+!MESSAGE Could not install bundle plugins/javax.xml_1.3.4.v201005080400.jar   A bundle is already installed with the name "javax.xml" and version "1.3.4.v201005080400"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:43.671
+!MESSAGE Could not install bundle plugins/org.apache.ant_1.10.1.v20170504-0840/   A bundle is already installed with the name "org.apache.ant" and version "1.10.1.v20170504-0840"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:43.676
+!MESSAGE Could not install bundle plugins/org.apache.batik.css_1.8.0.v20170214-1941.jar   A bundle is already installed with the name "org.apache.batik.css" and version "1.8.0.v20170214-1941"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:43.681
+!MESSAGE Could not install bundle plugins/org.apache.batik.util.gui_1.8.0.v20170214-1941.jar   A bundle is already installed with the name "org.apache.batik.util.gui" and version "1.8.0.v20170214-1941"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:43.688
+!MESSAGE Could not install bundle plugins/org.apache.batik.util_1.8.0.v20170214-1941.jar   A bundle is already installed with the name "org.apache.batik.util" and version "1.8.0.v20170214-1941"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:43.698
+!MESSAGE Could not install bundle plugins/org.apache.commons.codec_1.9.0.v20170208-1614.jar   A bundle is already installed with the name "org.apache.commons.codec" and version "1.9.0.v20170208-1614"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:43.704
+!MESSAGE Could not install bundle plugins/org.apache.commons.jxpath_1.3.0.v200911051830.jar   A bundle is already installed with the name "org.apache.commons.jxpath" and version "1.3.0.v200911051830"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:43.711
+!MESSAGE Could not install bundle plugins/org.apache.commons.logging_1.1.1.v201101211721.jar   A bundle is already installed with the name "org.apache.commons.logging" and version "1.1.1.v201101211721"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:43.717
+!MESSAGE Could not install bundle plugins/org.apache.felix.gogo.command_0.10.0.v201209301215.jar   A bundle is already installed with the name "org.apache.felix.gogo.command" and version "0.10.0.v201209301215"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:43.723
+!MESSAGE Could not install bundle plugins/org.apache.felix.gogo.runtime_0.10.0.v201209301036.jar   A bundle is already installed with the name "org.apache.felix.gogo.runtime" and version "0.10.0.v201209301036"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:43.729
+!MESSAGE Could not install bundle plugins/org.apache.felix.gogo.shell_0.10.0.v201212101605.jar   A bundle is already installed with the name "org.apache.felix.gogo.shell" and version "0.10.0.v201212101605"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:43.736
+!MESSAGE Could not install bundle plugins/org.apache.felix.scr_2.0.10.v20170501-2007.jar   A bundle is already installed with the name "org.apache.felix.scr" and version "2.0.10.v20170501-2007"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:43.744
+!MESSAGE Could not install bundle plugins/org.apache.httpcomponents.httpclient_4.5.2.v20170210-0925.jar   A bundle is already installed with the name "org.apache.httpcomponents.httpclient" and version "4.5.2.v20170210-0925"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:43.751
+!MESSAGE Could not install bundle plugins/org.apache.httpcomponents.httpcore_4.4.6.v20170210-0925.jar   A bundle is already installed with the name "org.apache.httpcomponents.httpcore" and version "4.4.6.v20170210-0925"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:43.759
+!MESSAGE Could not install bundle plugins/org.apache.jasper.glassfish_2.2.2.v201501141630.jar   A bundle is already installed with the name "org.apache.jasper.glassfish" and version "2.2.2.v201501141630"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:43.775
+!MESSAGE Could not install bundle plugins/org.apache.lucene.analyzers-common_6.1.0.v20161115-1612.jar   A bundle is already installed with the name "org.apache.lucene.analyzers-common" and version "6.1.0.v20161115-1612"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:43.780
+!MESSAGE Could not install bundle plugins/org.apache.lucene.analyzers-smartcn_6.1.0.v20161115-1612.jar   A bundle is already installed with the name "org.apache.lucene.analyzers-smartcn" and version "6.1.0.v20161115-1612"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:43.786
+!MESSAGE Could not install bundle plugins/org.apache.lucene.core_6.1.0.v20170814-1820.jar   A bundle is already installed with the name "org.apache.lucene.core" and version "6.1.0.v20170814-1820"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:43.792
+!MESSAGE Could not install bundle plugins/org.apache.lucene.misc_6.1.0.v20161115-1612.jar   A bundle is already installed with the name "org.apache.lucene.misc" and version "6.1.0.v20161115-1612"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:43.801
+!MESSAGE Could not install bundle plugins/org.apache.xerces_2.9.0.v201101211617.jar   A bundle is already installed with the name "org.apache.xerces" and version "2.9.0.v201101211617"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:43.807
+!MESSAGE Could not install bundle plugins/org.apache.xml.resolver_1.2.0.v201005080400.jar   A bundle is already installed with the name "org.apache.xml.resolver" and version "1.2.0.v201005080400"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:43.813
+!MESSAGE Could not install bundle plugins/org.apache.xml.serializer_2.7.1.v201005080400.jar   A bundle is already installed with the name "org.apache.xml.serializer" and version "2.7.1.v201005080400"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:43.819
+!MESSAGE Could not install bundle plugins/org.eclipse.ant.core_3.5.0.v20170509-2149.jar   A bundle is already installed with the name "org.eclipse.ant.core" and version "3.5.0.v20170509-2149"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:43.825
+!MESSAGE Could not install bundle plugins/org.eclipse.cdt.build.gcc.core_1.0.0.201709131603.jar   A bundle is already installed with the name "org.eclipse.cdt.build.gcc.core" and version "1.0.0.201709131603"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:43.833
+!MESSAGE Could not install bundle plugins/org.eclipse.cdt.codan.checkers.ui_3.2.1.201709131603.jar   A bundle is already installed with the name "org.eclipse.cdt.codan.checkers.ui" and version "3.2.1.201709131603"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:43.838
+!MESSAGE Could not install bundle plugins/org.eclipse.cdt.codan.checkers_3.2.0.201709131603.jar   A bundle is already installed with the name "org.eclipse.cdt.codan.checkers" and version "3.2.0.201709131603"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:43.846
+!MESSAGE Could not install bundle plugins/org.eclipse.cdt.codan.core.cxx_3.4.0.201709131603.jar   A bundle is already installed with the name "org.eclipse.cdt.codan.core.cxx" and version "3.4.0.201709131603"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:43.852
+!MESSAGE Could not install bundle plugins/org.eclipse.cdt.codan.core_4.0.0.201709131603.jar   A bundle is already installed with the name "org.eclipse.cdt.codan.core" and version "4.0.0.201709131603"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:43.856
+!MESSAGE Could not install bundle plugins/org.eclipse.cdt.codan.ui.cxx_3.3.0.201709131603.jar   A bundle is already installed with the name "org.eclipse.cdt.codan.ui.cxx" and version "3.3.0.201709131603"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:43.862
+!MESSAGE Could not install bundle plugins/org.eclipse.cdt.codan.ui_3.2.1.201709131603.jar   A bundle is already installed with the name "org.eclipse.cdt.codan.ui" and version "3.2.1.201709131603"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:43.867
+!MESSAGE Could not install bundle plugins/org.eclipse.cdt.core.native_5.10.0.201709131603.jar   A bundle is already installed with the name "org.eclipse.cdt.core.native" and version "5.10.0.201709131603"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:43.878
+!MESSAGE Could not install bundle plugins/org.eclipse.cdt.core.win32.x86_64_5.4.1.201709131603/   A bundle is already installed with the name "org.eclipse.cdt.core.win32.x86_64" and version "5.4.1.201709131603"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:43.883
+!MESSAGE Could not install bundle plugins/org.eclipse.cdt.core.win32_5.4.1.201709131603.jar   A bundle is already installed with the name "org.eclipse.cdt.core.win32" and version "5.4.1.201709131603"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:43.903
+!MESSAGE Could not install bundle plugins/org.eclipse.cdt.core_6.3.1.201709131603.jar   A bundle is already installed with the name "org.eclipse.cdt.core" and version "6.3.1.201709131603"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:43.909
+!MESSAGE Could not install bundle plugins/org.eclipse.cdt.debug.core_8.2.0.201709131603.jar   A bundle is already installed with the name "org.eclipse.cdt.debug.core" and version "8.2.0.201709131603"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:43.914
+!MESSAGE Could not install bundle plugins/org.eclipse.cdt.debug.ui_8.2.0.201709131603.jar   A bundle is already installed with the name "org.eclipse.cdt.debug.ui" and version "8.2.0.201709131603"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:43.923
+!MESSAGE Could not install bundle plugins/org.eclipse.cdt.doc.user_5.4.0.201709131603.jar   A bundle is already installed with the name "org.eclipse.cdt.doc.user" and version "5.4.0.201709131603"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:43.929
+!MESSAGE Could not install bundle plugins/org.eclipse.cdt.dsf.gdb.ui_2.6.0.201709131603.jar   A bundle is already installed with the name "org.eclipse.cdt.dsf.gdb.ui" and version "2.6.0.201709131603"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:43.935
+!MESSAGE Could not install bundle plugins/org.eclipse.cdt.dsf.gdb_5.3.0.201709131603.jar   A bundle is already installed with the name "org.eclipse.cdt.dsf.gdb" and version "5.3.0.201709131603"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:43.940
+!MESSAGE Could not install bundle plugins/org.eclipse.cdt.dsf.ui_2.5.0.201709131603.jar   A bundle is already installed with the name "org.eclipse.cdt.dsf.ui" and version "2.5.0.201709131603"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:43.945
+!MESSAGE Could not install bundle plugins/org.eclipse.cdt.dsf_2.8.0.201709131603.jar   A bundle is already installed with the name "org.eclipse.cdt.dsf" and version "2.8.0.201709131603"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:43.949
+!MESSAGE Could not install bundle plugins/org.eclipse.cdt.gdb.ui_7.0.0.201709131603.jar   A bundle is already installed with the name "org.eclipse.cdt.gdb.ui" and version "7.0.0.201709131603"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:43.953
+!MESSAGE Could not install bundle plugins/org.eclipse.cdt.gdb_7.0.0.201709131603.jar   A bundle is already installed with the name "org.eclipse.cdt.gdb" and version "7.0.0.201709131603"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:43.959
+!MESSAGE Could not install bundle plugins/org.eclipse.cdt.launch_9.1.0.201709131603.jar   A bundle is already installed with the name "org.eclipse.cdt.launch" and version "9.1.0.201709131603"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:43.964
+!MESSAGE Could not install bundle plugins/org.eclipse.cdt.make.core_7.3.0.201709131603.jar   A bundle is already installed with the name "org.eclipse.cdt.make.core" and version "7.3.0.201709131603"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:43.970
+!MESSAGE Could not install bundle plugins/org.eclipse.cdt.make.ui_7.3.0.201709131603.jar   A bundle is already installed with the name "org.eclipse.cdt.make.ui" and version "7.3.0.201709131603"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:44.041
+!MESSAGE Could not install bundle plugins/org.eclipse.cdt.managedbuilder.core_8.5.0.201709131603.jar   A bundle is already installed with the name "org.eclipse.cdt.managedbuilder.core" and version "8.5.0.201709131603"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:44.061
+!MESSAGE Could not install bundle plugins/org.eclipse.cdt.managedbuilder.gnu.ui_8.3.0.201709131603.jar   A bundle is already installed with the name "org.eclipse.cdt.managedbuilder.gnu.ui" and version "8.3.0.201709131603"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:44.068
+!MESSAGE Could not install bundle plugins/org.eclipse.cdt.managedbuilder.ui_9.1.0.201709131603.jar   A bundle is already installed with the name "org.eclipse.cdt.managedbuilder.ui" and version "9.1.0.201709131603"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:44.073
+!MESSAGE Could not install bundle plugins/org.eclipse.cdt.native.serial_1.1.0.201709131603.jar   A bundle is already installed with the name "org.eclipse.cdt.native.serial" and version "1.1.0.201709131603"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:44.079
+!MESSAGE Could not install bundle plugins/org.eclipse.cdt.ui_6.2.0.201709131603.jar   A bundle is already installed with the name "org.eclipse.cdt.ui" and version "6.2.0.201709131603"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:44.085
+!MESSAGE Could not install bundle plugins/org.eclipse.cdt_9.3.0.201709131603.jar   A bundle is already installed with the name "org.eclipse.cdt" and version "9.3.0.201709131603"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:44.090
+!MESSAGE Could not install bundle plugins/org.eclipse.compare.core_3.6.100.v20170516-0820.jar   A bundle is already installed with the name "org.eclipse.compare.core" and version "3.6.100.v20170516-0820"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:44.095
+!MESSAGE Could not install bundle plugins/org.eclipse.compare.win32_1.2.0.v20170517-0839.jar   A bundle is already installed with the name "org.eclipse.compare.win32" and version "1.2.0.v20170517-0839"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:44.100
+!MESSAGE Could not install bundle plugins/org.eclipse.compare_3.7.101.v20170724-1603.jar   A bundle is already installed with the name "org.eclipse.compare" and version "3.7.101.v20170724-1603"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:44.105
+!MESSAGE Could not install bundle plugins/org.eclipse.core.commands_3.9.0.v20170530-1048.jar   A bundle is already installed with the name "org.eclipse.core.commands" and version "3.9.0.v20170530-1048"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:44.109
+!MESSAGE Could not install bundle plugins/org.eclipse.core.contenttype_3.6.0.v20170207-1037.jar   A bundle is already installed with the name "org.eclipse.core.contenttype" and version "3.6.0.v20170207-1037"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:44.114
+!MESSAGE Could not install bundle plugins/org.eclipse.core.databinding.beans_1.4.0.v20170210-0856.jar   A bundle is already installed with the name "org.eclipse.core.databinding.beans" and version "1.4.0.v20170210-0856"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:44.119
+!MESSAGE Could not install bundle plugins/org.eclipse.core.databinding.observable_1.6.100.v20170515-1119.jar   A bundle is already installed with the name "org.eclipse.core.databinding.observable" and version "1.6.100.v20170515-1119"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:44.123
+!MESSAGE Could not install bundle plugins/org.eclipse.core.databinding.property_1.6.100.v20170515-1119.jar   A bundle is already installed with the name "org.eclipse.core.databinding.property" and version "1.6.100.v20170515-1119"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:44.128
+!MESSAGE Could not install bundle plugins/org.eclipse.core.databinding_1.6.100.v20170515-1119.jar   A bundle is already installed with the name "org.eclipse.core.databinding" and version "1.6.100.v20170515-1119"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:44.132
+!MESSAGE Could not install bundle plugins/org.eclipse.core.expressions_3.6.0.v20170207-1037.jar   A bundle is already installed with the name "org.eclipse.core.expressions" and version "3.6.0.v20170207-1037"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:44.137
+!MESSAGE Could not install bundle plugins/org.eclipse.core.externaltools_1.1.0.v20170113-2056.jar   A bundle is already installed with the name "org.eclipse.core.externaltools" and version "1.1.0.v20170113-2056"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:44.141
+!MESSAGE Could not install bundle plugins/org.eclipse.core.filebuffers_3.6.100.v20170203-1130.jar   A bundle is already installed with the name "org.eclipse.core.filebuffers" and version "3.6.100.v20170203-1130"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:44.145
+!MESSAGE Could not install bundle plugins/org.eclipse.core.filesystem.win32.x86_64_1.4.0.v20140124-1940.jar   A bundle is already installed with the name "org.eclipse.core.filesystem.win32.x86_64" and version "1.4.0.v20140124-1940"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:44.150
+!MESSAGE Could not install bundle plugins/org.eclipse.core.filesystem_1.7.0.v20170406-1337.jar   A bundle is already installed with the name "org.eclipse.core.filesystem" and version "1.7.0.v20170406-1337"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:44.154
+!MESSAGE Could not install bundle plugins/org.eclipse.core.jobs_3.9.1.v20170714-0547.jar   A bundle is already installed with the name "org.eclipse.core.jobs" and version "3.9.1.v20170714-0547"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:44.158
+!MESSAGE Could not install bundle plugins/org.eclipse.core.net.win32.x86_64_1.1.0.v20160323-1650.jar   A bundle is already installed with the name "org.eclipse.core.net.win32.x86_64" and version "1.1.0.v20160323-1650"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:44.163
+!MESSAGE Could not install bundle plugins/org.eclipse.core.net_1.3.100.v20170516-0820.jar   A bundle is already installed with the name "org.eclipse.core.net" and version "1.3.100.v20170516-0820"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:44.167
+!MESSAGE Could not install bundle plugins/org.eclipse.core.resources.win32.x86_64_3.5.100.v20170516-0925.jar   A bundle is already installed with the name "org.eclipse.core.resources.win32.x86_64" and version "3.5.100.v20170516-0925"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:44.172
+!MESSAGE Could not install bundle plugins/org.eclipse.core.resources_3.12.0.v20170417-1558.jar   A bundle is already installed with the name "org.eclipse.core.resources" and version "3.12.0.v20170417-1558"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:44.176
+!MESSAGE Could not install bundle plugins/org.eclipse.core.runtime_3.13.0.v20170207-1030.jar   A bundle is already installed with the name "org.eclipse.core.runtime" and version "3.13.0.v20170207-1030"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:44.180
+!MESSAGE Could not install bundle plugins/org.eclipse.core.variables_3.4.0.v20170113-2056.jar   A bundle is already installed with the name "org.eclipse.core.variables" and version "3.4.0.v20170113-2056"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:44.187
+!MESSAGE Could not install bundle plugins/org.eclipse.debug.core_3.11.0.v20170605-1534.jar   A bundle is already installed with the name "org.eclipse.debug.core" and version "3.11.0.v20170605-1534"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:44.194
+!MESSAGE Could not install bundle plugins/org.eclipse.debug.ui_3.12.50.v20170920-1329.jar   A bundle is already installed with the name "org.eclipse.debug.ui" and version "3.12.50.v20170920-1329"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:44.202
+!MESSAGE Could not install bundle plugins/org.eclipse.draw2d_3.10.100.201606061308.jar   A bundle is already installed with the name "org.eclipse.draw2d" and version "3.10.100.201606061308"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:44.209
+!MESSAGE Could not install bundle plugins/org.eclipse.e4.core.commands_0.12.100.v20170513-0428.jar   A bundle is already installed with the name "org.eclipse.e4.core.commands" and version "0.12.100.v20170513-0428"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:44.213
+!MESSAGE Could not install bundle plugins/org.eclipse.e4.core.contexts_1.6.0.v20170322-1144.jar   A bundle is already installed with the name "org.eclipse.e4.core.contexts" and version "1.6.0.v20170322-1144"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:44.217
+!MESSAGE Could not install bundle plugins/org.eclipse.e4.core.di.annotations_1.6.0.v20170119-2002.jar   A bundle is already installed with the name "org.eclipse.e4.core.di.annotations" and version "1.6.0.v20170119-2002"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:44.221
+!MESSAGE Could not install bundle plugins/org.eclipse.e4.core.di.extensions.supplier_0.15.0.v20170407-0928.jar   A bundle is already installed with the name "org.eclipse.e4.core.di.extensions.supplier" and version "0.15.0.v20170407-0928"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:44.226
+!MESSAGE Could not install bundle plugins/org.eclipse.e4.core.di.extensions_0.15.0.v20170228-1728.jar   A bundle is already installed with the name "org.eclipse.e4.core.di.extensions" and version "0.15.0.v20170228-1728"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:44.230
+!MESSAGE Could not install bundle plugins/org.eclipse.e4.core.di_1.6.100.v20170421-1418.jar   A bundle is already installed with the name "org.eclipse.e4.core.di" and version "1.6.100.v20170421-1418"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:44.235
+!MESSAGE Could not install bundle plugins/org.eclipse.e4.core.services_2.1.0.v20170407-0928.jar   A bundle is already installed with the name "org.eclipse.e4.core.services" and version "2.1.0.v20170407-0928"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:44.239
+!MESSAGE Could not install bundle plugins/org.eclipse.e4.emf.xpath_0.2.0.v20160630-0728.jar   A bundle is already installed with the name "org.eclipse.e4.emf.xpath" and version "0.2.0.v20160630-0728"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:44.243
+!MESSAGE Could not install bundle plugins/org.eclipse.e4.ui.bindings_0.12.1.v20170823-1632.jar   A bundle is already installed with the name "org.eclipse.e4.ui.bindings" and version "0.12.1.v20170823-1632"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:44.248
+!MESSAGE Could not install bundle plugins/org.eclipse.e4.ui.css.core_0.12.101.v20170712-1547.jar   A bundle is already installed with the name "org.eclipse.e4.ui.css.core" and version "0.12.101.v20170712-1547"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:44.252
+!MESSAGE Could not install bundle plugins/org.eclipse.e4.ui.css.swt.theme_0.11.0.v20170312-2302.jar   A bundle is already installed with the name "org.eclipse.e4.ui.css.swt.theme" and version "0.11.0.v20170312-2302"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:44.257
+!MESSAGE Could not install bundle plugins/org.eclipse.e4.ui.css.swt_0.13.1.v20170808-1940.jar   A bundle is already installed with the name "org.eclipse.e4.ui.css.swt" and version "0.13.1.v20170808-1940"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:44.261
+!MESSAGE Could not install bundle plugins/org.eclipse.e4.ui.dialogs_1.1.100.v20170104-1425.jar   A bundle is already installed with the name "org.eclipse.e4.ui.dialogs" and version "1.1.100.v20170104-1425"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:44.266
+!MESSAGE Could not install bundle plugins/org.eclipse.e4.ui.di_1.2.100.v20170414-1137.jar   A bundle is already installed with the name "org.eclipse.e4.ui.di" and version "1.2.100.v20170414-1137"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:44.274
+!MESSAGE Could not install bundle plugins/org.eclipse.e4.ui.model.workbench_2.0.1.v20170713-1800.jar   A bundle is already installed with the name "org.eclipse.e4.ui.model.workbench" and version "2.0.1.v20170713-1800"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:44.279
+!MESSAGE Could not install bundle plugins/org.eclipse.e4.ui.services_1.3.0.v20170307-2032.jar   A bundle is already installed with the name "org.eclipse.e4.ui.services" and version "1.3.0.v20170307-2032"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:44.283
+!MESSAGE Could not install bundle plugins/org.eclipse.e4.ui.widgets_1.2.0.v20160630-0736.jar   A bundle is already installed with the name "org.eclipse.e4.ui.widgets" and version "1.2.0.v20160630-0736"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:44.288
+!MESSAGE Could not install bundle plugins/org.eclipse.e4.ui.workbench.addons.swt_1.3.1.v20170319-1442.jar   A bundle is already installed with the name "org.eclipse.e4.ui.workbench.addons.swt" and version "1.3.1.v20170319-1442"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:44.293
+!MESSAGE Could not install bundle plugins/org.eclipse.e4.ui.workbench.renderers.swt_0.14.101.v20170713-1343.jar   A bundle is already installed with the name "org.eclipse.e4.ui.workbench.renderers.swt" and version "0.14.101.v20170713-1343"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:44.298
+!MESSAGE Could not install bundle plugins/org.eclipse.e4.ui.workbench.swt_0.14.101.v20170710-1119.jar   A bundle is already installed with the name "org.eclipse.e4.ui.workbench.swt" and version "0.14.101.v20170710-1119"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:44.304
+!MESSAGE Could not install bundle plugins/org.eclipse.e4.ui.workbench3_0.14.0.v20160630-0740.jar   A bundle is already installed with the name "org.eclipse.e4.ui.workbench3" and version "0.14.0.v20160630-0740"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:44.310
+!MESSAGE Could not install bundle plugins/org.eclipse.e4.ui.workbench_1.5.1.v20170815-1446.jar   A bundle is already installed with the name "org.eclipse.e4.ui.workbench" and version "1.5.1.v20170815-1446"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:44.316
+!MESSAGE Could not install bundle plugins/org.eclipse.ecf.filetransfer_5.0.0.v20160817-1024.jar   A bundle is already installed with the name "org.eclipse.ecf.filetransfer" and version "5.0.0.v20160817-1024"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:44.329
+!MESSAGE Could not install bundle plugins/org.eclipse.ecf.identity_3.8.0.v20161203-2153.jar   A bundle is already installed with the name "org.eclipse.ecf.identity" and version "3.8.0.v20161203-2153"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:44.340
+!MESSAGE Could not install bundle plugins/org.eclipse.ecf.provider.filetransfer.httpclient4.ssl_1.1.0.v20160817-1024.jar   A bundle is already installed with the name "org.eclipse.ecf.provider.filetransfer.httpclient4.ssl" and version "1.1.0.v20160817-1024"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:44.354
+!MESSAGE Could not install bundle plugins/org.eclipse.ecf.provider.filetransfer.httpclient4_1.1.200.v20170314-0133.jar   A bundle is already installed with the name "org.eclipse.ecf.provider.filetransfer.httpclient4" and version "1.1.200.v20170314-0133"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:44.366
+!MESSAGE Could not install bundle plugins/org.eclipse.ecf.provider.filetransfer.ssl_1.0.0.v20160817-1024.jar   A bundle is already installed with the name "org.eclipse.ecf.provider.filetransfer.ssl" and version "1.0.0.v20160817-1024"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:44.373
+!MESSAGE Could not install bundle plugins/org.eclipse.ecf.provider.filetransfer_3.2.300.v20161203-1840.jar   A bundle is already installed with the name "org.eclipse.ecf.provider.filetransfer" and version "3.2.300.v20161203-1840"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:44.379
+!MESSAGE Could not install bundle plugins/org.eclipse.ecf.ssl_1.2.0.v20160817-1024.jar   A bundle is already installed with the name "org.eclipse.ecf.ssl" and version "1.2.0.v20160817-1024"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:44.397
+!MESSAGE Could not install bundle plugins/org.eclipse.ecf_3.8.0.v20170104-0657.jar   A bundle is already installed with the name "org.eclipse.ecf" and version "3.8.0.v20170104-0657"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:44.406
+!MESSAGE Could not install bundle plugins/org.eclipse.egit.core_4.8.0.201706111038-r.jar   A bundle is already installed with the name "org.eclipse.egit.core" and version "4.8.0.201706111038-r"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:44.414
+!MESSAGE Could not install bundle plugins/org.eclipse.egit.ui_4.8.0.201706111038-r.jar   A bundle is already installed with the name "org.eclipse.egit.ui" and version "4.8.0.201706111038-r"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:44.419
+!MESSAGE Could not install bundle plugins/org.eclipse.emf.common_2.13.0.v20170609-0707.jar   A bundle is already installed with the name "org.eclipse.emf.common" and version "2.13.0.v20170609-0707"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:44.426
+!MESSAGE Could not install bundle plugins/org.eclipse.emf.ecore.change_2.11.0.v20170609-0707.jar   A bundle is already installed with the name "org.eclipse.emf.ecore.change" and version "2.11.0.v20170609-0707"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:44.434
+!MESSAGE Could not install bundle plugins/org.eclipse.emf.ecore.xmi_2.13.0.v20170609-0707.jar   A bundle is already installed with the name "org.eclipse.emf.ecore.xmi" and version "2.13.0.v20170609-0707"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:44.441
+!MESSAGE Could not install bundle plugins/org.eclipse.emf.ecore_2.13.0.v20170609-0707.jar   A bundle is already installed with the name "org.eclipse.emf.ecore" and version "2.13.0.v20170609-0707"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:44.446
+!MESSAGE Could not install bundle plugins/org.eclipse.emf.edit_2.12.0.v20170609-0928.jar   A bundle is already installed with the name "org.eclipse.emf.edit" and version "2.12.0.v20170609-0928"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:44.451
+!MESSAGE Could not install bundle plugins/org.eclipse.equinox.app_1.3.400.v20150715-1528.jar   A bundle is already installed with the name "org.eclipse.equinox.app" and version "1.3.400.v20150715-1528"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:44.456
+!MESSAGE Could not install bundle plugins/org.eclipse.equinox.bidi_1.1.0.v20160728-1031.jar   A bundle is already installed with the name "org.eclipse.equinox.bidi" and version "1.1.0.v20160728-1031"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:44.460
+!MESSAGE Could not install bundle plugins/org.eclipse.equinox.common_3.9.0.v20170207-1454.jar   A bundle is already installed with the name "org.eclipse.equinox.common" and version "3.9.0.v20170207-1454"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:44.465
+!MESSAGE Could not install bundle plugins/org.eclipse.equinox.concurrent_1.1.0.v20130327-1442.jar   A bundle is already installed with the name "org.eclipse.equinox.concurrent" and version "1.1.0.v20130327-1442"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:44.472
+!MESSAGE Could not install bundle plugins/org.eclipse.equinox.console_1.1.300.v20170512-2111.jar   A bundle is already installed with the name "org.eclipse.equinox.console" and version "1.1.300.v20170512-2111"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:44.482
+!MESSAGE Could not install bundle plugins/org.eclipse.equinox.ds_1.5.0.v20170307-1429.jar   A bundle is already installed with the name "org.eclipse.equinox.ds" and version "1.5.0.v20170307-1429"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:44.486
+!MESSAGE Could not install bundle plugins/org.eclipse.equinox.event_1.4.0.v20170105-1446.jar   A bundle is already installed with the name "org.eclipse.equinox.event" and version "1.4.0.v20170105-1446"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:44.491
+!MESSAGE Could not install bundle plugins/org.eclipse.equinox.frameworkadmin.equinox_1.0.800.v20170524-1345.jar   A bundle is already installed with the name "org.eclipse.equinox.frameworkadmin.equinox" and version "1.0.800.v20170524-1345"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:44.496
+!MESSAGE Could not install bundle plugins/org.eclipse.equinox.frameworkadmin_2.0.300.v20160504-1450.jar   A bundle is already installed with the name "org.eclipse.equinox.frameworkadmin" and version "2.0.300.v20160504-1450"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:44.500
+!MESSAGE Could not install bundle plugins/org.eclipse.equinox.http.jetty_3.4.0.v20170503-2025.jar   A bundle is already installed with the name "org.eclipse.equinox.http.jetty" and version "3.4.0.v20170503-2025"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:44.505
+!MESSAGE Could not install bundle plugins/org.eclipse.equinox.http.registry_1.1.400.v20150715-1528.jar   A bundle is already installed with the name "org.eclipse.equinox.http.registry" and version "1.1.400.v20150715-1528"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:44.509
+!MESSAGE Could not install bundle plugins/org.eclipse.equinox.http.servlet_1.4.0.v20170524-1452.jar   A bundle is already installed with the name "org.eclipse.equinox.http.servlet" and version "1.4.0.v20170524-1452"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:44.514
+!MESSAGE Could not install bundle plugins/org.eclipse.equinox.jsp.jasper.registry_1.0.300.v20130327-1442.jar   A bundle is already installed with the name "org.eclipse.equinox.jsp.jasper.registry" and version "1.0.300.v20130327-1442"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:44.518
+!MESSAGE Could not install bundle plugins/org.eclipse.equinox.jsp.jasper_1.0.500.v20150119-1358.jar   A bundle is already installed with the name "org.eclipse.equinox.jsp.jasper" and version "1.0.500.v20150119-1358"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:44.523
+!MESSAGE Could not install bundle plugins/org.eclipse.equinox.launcher.win32.win32.x86_64_1.1.550.v20170928-1359/   A bundle is already installed with the name "org.eclipse.equinox.launcher.win32.win32.x86_64" and version "1.1.550.v20170928-1359"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:44.526
+!MESSAGE Could not install bundle plugins/org.eclipse.equinox.launcher_1.4.0.v20161219-1356.jar   A bundle is already installed with the name "org.eclipse.equinox.launcher" and version "1.4.0.v20161219-1356"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:44.531
+!MESSAGE Could not install bundle plugins/org.eclipse.equinox.p2.artifact.repository_1.1.650.v20170928-1405.jar   A bundle is already installed with the name "org.eclipse.equinox.p2.artifact.repository" and version "1.1.650.v20170928-1405"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:44.535
+!MESSAGE Could not install bundle plugins/org.eclipse.equinox.p2.console_1.0.600.v20170511-1106.jar   A bundle is already installed with the name "org.eclipse.equinox.p2.console" and version "1.0.600.v20170511-1106"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:44.540
+!MESSAGE Could not install bundle plugins/org.eclipse.equinox.p2.core_2.4.101.v20170906-1259.jar   A bundle is already installed with the name "org.eclipse.equinox.p2.core" and version "2.4.101.v20170906-1259"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:44.545
+!MESSAGE Could not install bundle plugins/org.eclipse.equinox.p2.director.app_1.0.500.v20160419-0834.jar   A bundle is already installed with the name "org.eclipse.equinox.p2.director.app" and version "1.0.500.v20160419-0834"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:44.549
+!MESSAGE Could not install bundle plugins/org.eclipse.equinox.p2.directorywatcher_1.1.100.v20150423-1455.jar   A bundle is already installed with the name "org.eclipse.equinox.p2.directorywatcher" and version "1.1.100.v20150423-1455"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:44.554
+!MESSAGE Could not install bundle plugins/org.eclipse.equinox.p2.director_2.3.300.v20160504-1450.jar   A bundle is already installed with the name "org.eclipse.equinox.p2.director" and version "2.3.300.v20160504-1450"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:44.559
+!MESSAGE Could not install bundle plugins/org.eclipse.equinox.p2.engine_2.5.0.v20170319-2002.jar   A bundle is already installed with the name "org.eclipse.equinox.p2.engine" and version "2.5.0.v20170319-2002"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:44.564
+!MESSAGE Could not install bundle plugins/org.eclipse.equinox.p2.extensionlocation_1.2.300.v20160419-0834.jar   A bundle is already installed with the name "org.eclipse.equinox.p2.extensionlocation" and version "1.2.300.v20160419-0834"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:44.569
+!MESSAGE Could not install bundle plugins/org.eclipse.equinox.p2.garbagecollector_1.0.300.v20160504-1450.jar   A bundle is already installed with the name "org.eclipse.equinox.p2.garbagecollector" and version "1.0.300.v20160504-1450"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:44.576
+!MESSAGE Could not install bundle plugins/org.eclipse.equinox.p2.jarprocessor_1.0.500.v20160504-1450.jar   A bundle is already installed with the name "org.eclipse.equinox.p2.jarprocessor" and version "1.0.500.v20160504-1450"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:44.582
+!MESSAGE Could not install bundle plugins/org.eclipse.equinox.p2.metadata.repository_1.2.401.v20170906-1259.jar   A bundle is already installed with the name "org.eclipse.equinox.p2.metadata.repository" and version "1.2.401.v20170906-1259"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:44.589
+!MESSAGE Could not install bundle plugins/org.eclipse.equinox.p2.metadata_2.3.200.v20170511-1106.jar   A bundle is already installed with the name "org.eclipse.equinox.p2.metadata" and version "2.3.200.v20170511-1106"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:44.594
+!MESSAGE Could not install bundle plugins/org.eclipse.equinox.p2.operations_2.4.300.v20170511-1106.jar   A bundle is already installed with the name "org.eclipse.equinox.p2.operations" and version "2.4.300.v20170511-1106"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:44.601
+!MESSAGE Could not install bundle plugins/org.eclipse.equinox.p2.publisher.eclipse_1.2.201.v20170906-1259.jar   A bundle is already installed with the name "org.eclipse.equinox.p2.publisher.eclipse" and version "1.2.201.v20170906-1259"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:44.607
+!MESSAGE Could not install bundle plugins/org.eclipse.equinox.p2.publisher_1.4.200.v20170511-1216.jar   A bundle is already installed with the name "org.eclipse.equinox.p2.publisher" and version "1.4.200.v20170511-1216"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:44.616
+!MESSAGE Could not install bundle plugins/org.eclipse.equinox.p2.reconciler.dropins_1.1.400.v20160504-1450.jar   A bundle is already installed with the name "org.eclipse.equinox.p2.reconciler.dropins" and version "1.1.400.v20160504-1450"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:44.623
+!MESSAGE Could not install bundle plugins/org.eclipse.equinox.p2.repository.tools_2.1.400.v20170511-1216.jar   A bundle is already installed with the name "org.eclipse.equinox.p2.repository.tools" and version "2.1.400.v20170511-1216"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:44.629
+!MESSAGE Could not install bundle plugins/org.eclipse.equinox.p2.repository_2.3.301.v20170906-1259.jar   A bundle is already installed with the name "org.eclipse.equinox.p2.repository" and version "2.3.301.v20170906-1259"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:44.637
+!MESSAGE Could not install bundle plugins/org.eclipse.equinox.p2.touchpoint.eclipse_2.1.501.v20170906-1259.jar   A bundle is already installed with the name "org.eclipse.equinox.p2.touchpoint.eclipse" and version "2.1.501.v20170906-1259"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:44.648
+!MESSAGE Could not install bundle plugins/org.eclipse.equinox.p2.touchpoint.natives_1.2.200.v20170511-1216.jar   A bundle is already installed with the name "org.eclipse.equinox.p2.touchpoint.natives" and version "1.2.200.v20170511-1216"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:44.668
+!MESSAGE Could not install bundle plugins/org.eclipse.equinox.p2.transport.ecf_1.1.300.v20161004-0244.jar   A bundle is already installed with the name "org.eclipse.equinox.p2.transport.ecf" and version "1.1.300.v20161004-0244"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:44.705
+!MESSAGE Could not install bundle plugins/org.eclipse.equinox.p2.ui.importexport_1.1.301.v20170816-1007.jar   A bundle is already installed with the name "org.eclipse.equinox.p2.ui.importexport" and version "1.1.301.v20170816-1007"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:44.719
+!MESSAGE Could not install bundle plugins/org.eclipse.equinox.p2.ui.sdk.scheduler_1.3.100.v20170418-0708.jar   A bundle is already installed with the name "org.eclipse.equinox.p2.ui.sdk.scheduler" and version "1.3.100.v20170418-0708"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:44.726
+!MESSAGE Could not install bundle plugins/org.eclipse.equinox.p2.ui.sdk_1.0.500.v20170511-1216.jar   A bundle is already installed with the name "org.eclipse.equinox.p2.ui.sdk" and version "1.0.500.v20170511-1216"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:44.741
+!MESSAGE Could not install bundle plugins/org.eclipse.equinox.p2.ui_2.5.1.v20170906-1259.jar   A bundle is already installed with the name "org.eclipse.equinox.p2.ui" and version "2.5.1.v20170906-1259"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:44.750
+!MESSAGE Could not install bundle plugins/org.eclipse.equinox.p2.updatechecker_1.1.400.v20170106-2125.jar   A bundle is already installed with the name "org.eclipse.equinox.p2.updatechecker" and version "1.1.400.v20170106-2125"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:44.790
+!MESSAGE Could not install bundle plugins/org.eclipse.equinox.p2.updatesite_1.0.601.v20170906-1259.jar   A bundle is already installed with the name "org.eclipse.equinox.p2.updatesite" and version "1.0.601.v20170906-1259"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:44.825
+!MESSAGE Could not install bundle plugins/org.eclipse.equinox.preferences_3.7.0.v20170126-2132.jar   A bundle is already installed with the name "org.eclipse.equinox.preferences" and version "3.7.0.v20170126-2132"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:44.860
+!MESSAGE Could not install bundle plugins/org.eclipse.equinox.registry_3.7.0.v20170222-1344.jar   A bundle is already installed with the name "org.eclipse.equinox.registry" and version "3.7.0.v20170222-1344"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:44.866
+!MESSAGE Could not install bundle plugins/org.eclipse.equinox.security.ui_1.1.400.v20170505-1235.jar   A bundle is already installed with the name "org.eclipse.equinox.security.ui" and version "1.1.400.v20170505-1235"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:44.872
+!MESSAGE Could not install bundle plugins/org.eclipse.equinox.security.win32.x86_64_1.0.100.v20130327-1442.jar   A bundle is already installed with the name "org.eclipse.equinox.security.win32.x86_64" and version "1.0.100.v20130327-1442"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:44.879
+!MESSAGE Could not install bundle plugins/org.eclipse.equinox.security_1.2.300.v20170505-1235.jar   A bundle is already installed with the name "org.eclipse.equinox.security" and version "1.2.300.v20170505-1235"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:44.894
+!MESSAGE Could not install bundle plugins/org.eclipse.equinox.simpleconfigurator.manipulator_2.0.300.v20170515-0721.jar   A bundle is already installed with the name "org.eclipse.equinox.simpleconfigurator.manipulator" and version "2.0.300.v20170515-0721"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:44.906
+!MESSAGE Could not install bundle plugins/org.eclipse.equinox.util_1.0.500.v20130404-1337.jar   A bundle is already installed with the name "org.eclipse.equinox.util" and version "1.0.500.v20130404-1337"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:44.913
+!MESSAGE Could not install bundle plugins/org.eclipse.gef_3.11.0.201606061308.jar   A bundle is already installed with the name "org.eclipse.gef" and version "3.11.0.201606061308"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:44.943
+!MESSAGE Could not install bundle plugins/org.eclipse.help.base_4.2.101.v20171009-0410.jar   A bundle is already installed with the name "org.eclipse.help.base" and version "4.2.101.v20171009-0410"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:44.949
+!MESSAGE Could not install bundle plugins/org.eclipse.help.ui_4.1.0.v20170311-0931.jar   A bundle is already installed with the name "org.eclipse.help.ui" and version "4.1.0.v20170311-0931"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:44.958
+!MESSAGE Could not install bundle plugins/org.eclipse.help.webapp_3.9.1.v20170816-0843.jar   A bundle is already installed with the name "org.eclipse.help.webapp" and version "3.9.1.v20170816-0843"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:44.965
+!MESSAGE Could not install bundle plugins/org.eclipse.help_3.8.1.v20170815-1448.jar   A bundle is already installed with the name "org.eclipse.help" and version "3.8.1.v20170815-1448"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:44.970
+!MESSAGE Could not install bundle plugins/org.eclipse.jdt.compiler.apt_1.3.50.v20170920-0950.jar   A bundle is already installed with the name "org.eclipse.jdt.compiler.apt" and version "1.3.50.v20170920-0950"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:44.976
+!MESSAGE Could not install bundle plugins/org.eclipse.jdt.compiler.tool_1.2.50.v20170920-0950.jar   A bundle is already installed with the name "org.eclipse.jdt.compiler.tool" and version "1.2.50.v20170920-0950"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:44.989
+!MESSAGE Could not install bundle plugins/org.eclipse.jdt.core_3.13.50.v20171007-0855.jar   A bundle is already installed with the name "org.eclipse.jdt.core" and version "3.13.50.v20171007-0855"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:44.999
+!MESSAGE Could not install bundle plugins/org.eclipse.jem.util_2.1.201.v201707201954.jar   A bundle is already installed with the name "org.eclipse.jem.util" and version "2.1.201.v201707201954"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:45.005
+!MESSAGE Could not install bundle plugins/org.eclipse.jetty.continuation_9.4.5.v20170502.jar   A bundle is already installed with the name "org.eclipse.jetty.continuation" and version "9.4.5.v20170502"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:45.011
+!MESSAGE Could not install bundle plugins/org.eclipse.jetty.http_9.4.5.v20170502.jar   A bundle is already installed with the name "org.eclipse.jetty.http" and version "9.4.5.v20170502"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:45.017
+!MESSAGE Could not install bundle plugins/org.eclipse.jetty.io_9.4.5.v20170502.jar   A bundle is already installed with the name "org.eclipse.jetty.io" and version "9.4.5.v20170502"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:45.022
+!MESSAGE Could not install bundle plugins/org.eclipse.jetty.security_9.4.5.v20170502.jar   A bundle is already installed with the name "org.eclipse.jetty.security" and version "9.4.5.v20170502"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:45.030
+!MESSAGE Could not install bundle plugins/org.eclipse.jetty.server_9.4.5.v20170502.jar   A bundle is already installed with the name "org.eclipse.jetty.server" and version "9.4.5.v20170502"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:45.043
+!MESSAGE Could not install bundle plugins/org.eclipse.jetty.servlet_9.4.5.v20170502.jar   A bundle is already installed with the name "org.eclipse.jetty.servlet" and version "9.4.5.v20170502"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:45.049
+!MESSAGE Could not install bundle plugins/org.eclipse.jetty.util_9.4.5.v20170502.jar   A bundle is already installed with the name "org.eclipse.jetty.util" and version "9.4.5.v20170502"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:45.056
+!MESSAGE Could not install bundle plugins/org.eclipse.jface.databinding_1.8.100.v20170503-1507.jar   A bundle is already installed with the name "org.eclipse.jface.databinding" and version "1.8.100.v20170503-1507"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:45.065
+!MESSAGE Could not install bundle plugins/org.eclipse.jface.text_3.12.0.v20170523-1043.jar   A bundle is already installed with the name "org.eclipse.jface.text" and version "3.12.0.v20170523-1043"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:45.072
+!MESSAGE Could not install bundle plugins/org.eclipse.jface_3.13.1.v20170810-0135.jar   A bundle is already installed with the name "org.eclipse.jface" and version "3.13.1.v20170810-0135"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:45.079
+!MESSAGE Could not install bundle plugins/org.eclipse.jgit_4.8.0.201706111038-r.jar   A bundle is already installed with the name "org.eclipse.jgit" and version "4.8.0.201706111038-r"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:45.087
+!MESSAGE Could not install bundle plugins/org.eclipse.jsch.core_1.3.0.v20160422-1917.jar   A bundle is already installed with the name "org.eclipse.jsch.core" and version "1.3.0.v20160422-1917"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:45.093
+!MESSAGE Could not install bundle plugins/org.eclipse.jsch.ui_1.3.0.v20160323-1650.jar   A bundle is already installed with the name "org.eclipse.jsch.ui" and version "1.3.0.v20160323-1650"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:45.100
+!MESSAGE Could not install bundle plugins/org.eclipse.launchbar.core_2.1.1.201708231630.jar   A bundle is already installed with the name "org.eclipse.launchbar.core" and version "2.1.1.201708231630"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:45.105
+!MESSAGE Could not install bundle plugins/org.eclipse.launchbar.ui_2.1.1.201708231630.jar   A bundle is already installed with the name "org.eclipse.launchbar.ui" and version "2.1.1.201708231630"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:45.111
+!MESSAGE Could not install bundle plugins/org.eclipse.ltk.core.refactoring_3.8.0.v20170105-1156.jar   A bundle is already installed with the name "org.eclipse.ltk.core.refactoring" and version "3.8.0.v20170105-1156"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:45.119
+!MESSAGE Could not install bundle plugins/org.eclipse.ltk.ui.refactoring_3.9.0.v20170412-0825.jar   A bundle is already installed with the name "org.eclipse.ltk.ui.refactoring" and version "3.9.0.v20170412-0825"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:45.146
+!MESSAGE Could not install bundle plugins/org.eclipse.pde.build_3.9.300.v20170515-0912/   A bundle is already installed with the name "org.eclipse.pde.build" and version "3.9.300.v20170515-0912"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:45.155
+!MESSAGE Could not install bundle plugins/org.eclipse.platform.doc.user_4.7.1.v20170630-0820.jar   A bundle is already installed with the name "org.eclipse.platform.doc.user" and version "4.7.1.v20170630-0820"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:45.162
+!MESSAGE Could not install bundle plugins/org.eclipse.platform_4.7.1.v20171009-0410/   A bundle is already installed with the name "org.eclipse.platform" and version "4.7.1.v20171009-0410"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:45.168
+!MESSAGE Could not install bundle plugins/org.eclipse.rcp_4.7.1.v20171009-0410.jar   A bundle is already installed with the name "org.eclipse.rcp" and version "4.7.1.v20171009-0410"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:45.173
+!MESSAGE Could not install bundle plugins/org.eclipse.search_3.11.100.v20170515-1603.jar   A bundle is already installed with the name "org.eclipse.search" and version "3.11.100.v20170515-1603"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:45.179
+!MESSAGE Could not install bundle plugins/org.eclipse.swt.win32.win32.x86_64_3.106.1.v20170926-0519.jar   A bundle is already installed with the name "org.eclipse.swt.win32.win32.x86_64" and version "3.106.1.v20170926-0519"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:45.187
+!MESSAGE Could not install bundle plugins/org.eclipse.swt_3.106.1.v20170926-0519.jar   A bundle is already installed with the name "org.eclipse.swt" and version "3.106.1.v20170926-0519"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:45.196
+!MESSAGE Could not install bundle plugins/org.eclipse.team.core_3.8.100.v20170516-0820.jar   A bundle is already installed with the name "org.eclipse.team.core" and version "3.8.100.v20170516-0820"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:45.205
+!MESSAGE Could not install bundle plugins/org.eclipse.team.genericeditor.diff.extension_1.0.1.v20170809-1356.jar   A bundle is already installed with the name "org.eclipse.team.genericeditor.diff.extension" and version "1.0.1.v20170809-1356"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:45.211
+!MESSAGE Could not install bundle plugins/org.eclipse.team.ui_3.8.1.v20170515-1133.jar   A bundle is already installed with the name "org.eclipse.team.ui" and version "3.8.1.v20170515-1133"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:45.219
+!MESSAGE Could not install bundle plugins/org.eclipse.text_3.6.100.v20170203-0814.jar   A bundle is already installed with the name "org.eclipse.text" and version "3.6.100.v20170203-0814"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:45.226
+!MESSAGE Could not install bundle plugins/org.eclipse.tm.terminal.control_4.3.0.201706130821.jar   A bundle is already installed with the name "org.eclipse.tm.terminal.control" and version "4.3.0.201706130821"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:45.233
+!MESSAGE Could not install bundle plugins/org.eclipse.tools.templates.core_1.1.0.201702141301.jar   A bundle is already installed with the name "org.eclipse.tools.templates.core" and version "1.1.0.201702141301"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:45.239
+!MESSAGE Could not install bundle plugins/org.eclipse.tools.templates.ui_1.1.1.201702141301.jar   A bundle is already installed with the name "org.eclipse.tools.templates.ui" and version "1.1.1.201702141301"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:45.244
+!MESSAGE Could not install bundle plugins/org.eclipse.ui.browser_3.6.100.v20170418-1342.jar   A bundle is already installed with the name "org.eclipse.ui.browser" and version "3.6.100.v20170418-1342"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:45.308
+!MESSAGE Could not install bundle plugins/org.eclipse.ui.cheatsheets_3.5.100.v20170515-0748.jar   A bundle is already installed with the name "org.eclipse.ui.cheatsheets" and version "3.5.100.v20170515-0748"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:45.315
+!MESSAGE Could not install bundle plugins/org.eclipse.ui.console_3.7.1.v20170728-0806.jar   A bundle is already installed with the name "org.eclipse.ui.console" and version "3.7.1.v20170728-0806"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:45.320
+!MESSAGE Could not install bundle plugins/org.eclipse.ui.editors_3.11.0.v20170202-1823.jar   A bundle is already installed with the name "org.eclipse.ui.editors" and version "3.11.0.v20170202-1823"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:45.327
+!MESSAGE Could not install bundle plugins/org.eclipse.ui.externaltools_3.4.0.v20161212-0515.jar   A bundle is already installed with the name "org.eclipse.ui.externaltools" and version "3.4.0.v20161212-0515"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:45.333
+!MESSAGE Could not install bundle plugins/org.eclipse.ui.forms_3.7.101.v20170815-1446.jar   A bundle is already installed with the name "org.eclipse.ui.forms" and version "3.7.101.v20170815-1446"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:45.338
+!MESSAGE Could not install bundle plugins/org.eclipse.ui.genericeditor_1.0.1.v20170822-2211.jar   A bundle is already installed with the name "org.eclipse.ui.genericeditor" and version "1.0.1.v20170822-2211"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:45.346
+!MESSAGE Could not install bundle plugins/org.eclipse.ui.ide.application_1.2.0.v20170512-1452.jar   A bundle is already installed with the name "org.eclipse.ui.ide.application" and version "1.2.0.v20170512-1452"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:45.353
+!MESSAGE Could not install bundle plugins/org.eclipse.ui.ide_3.13.1.v20170822-1526.jar   A bundle is already installed with the name "org.eclipse.ui.ide" and version "3.13.1.v20170822-1526"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:45.360
+!MESSAGE Could not install bundle plugins/org.eclipse.ui.intro.quicklinks_1.0.100.v20170515-0756.jar   A bundle is already installed with the name "org.eclipse.ui.intro.quicklinks" and version "1.0.100.v20170515-0756"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:45.370
+!MESSAGE Could not install bundle plugins/org.eclipse.ui.intro.universal_3.3.100.v20170515-1335.jar   A bundle is already installed with the name "org.eclipse.ui.intro.universal" and version "3.3.100.v20170515-1335"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:45.377
+!MESSAGE Could not install bundle plugins/org.eclipse.ui.intro_3.5.100.v20170418-0710.jar   A bundle is already installed with the name "org.eclipse.ui.intro" and version "3.5.100.v20170418-0710"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:45.382
+!MESSAGE Could not install bundle plugins/org.eclipse.ui.monitoring_1.1.100.v20170131-1736.jar   A bundle is already installed with the name "org.eclipse.ui.monitoring" and version "1.1.100.v20170131-1736"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:45.389
+!MESSAGE Could not install bundle plugins/org.eclipse.ui.navigator.resources_3.6.1.v20170823-1443.jar   A bundle is already installed with the name "org.eclipse.ui.navigator.resources" and version "3.6.1.v20170823-1443"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:45.396
+!MESSAGE Could not install bundle plugins/org.eclipse.ui.navigator_3.7.0.v20170418-1342.jar   A bundle is already installed with the name "org.eclipse.ui.navigator" and version "3.7.0.v20170418-1342"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:45.402
+!MESSAGE Could not install bundle plugins/org.eclipse.ui.net_1.3.100.v20170516-0820.jar   A bundle is already installed with the name "org.eclipse.ui.net" and version "1.3.100.v20170516-0820"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:45.409
+!MESSAGE Could not install bundle plugins/org.eclipse.ui.themes_1.2.1.v20170809-1435/   A bundle is already installed with the name "org.eclipse.ui.themes" and version "1.2.1.v20170809-1435"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:45.415
+!MESSAGE Could not install bundle plugins/org.eclipse.ui.views.properties.tabbed_3.8.1.v20170713-0803.jar   A bundle is already installed with the name "org.eclipse.ui.views.properties.tabbed" and version "3.8.1.v20170713-0803"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:45.423
+!MESSAGE Could not install bundle plugins/org.eclipse.ui.views_3.9.0.v20170226-1833.jar   A bundle is already installed with the name "org.eclipse.ui.views" and version "3.9.0.v20170226-1833"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:45.429
+!MESSAGE Could not install bundle plugins/org.eclipse.ui.win32_3.3.0.v20160505-1310.jar   A bundle is already installed with the name "org.eclipse.ui.win32" and version "3.3.0.v20160505-1310"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:45.435
+!MESSAGE Could not install bundle plugins/org.eclipse.ui.workbench.texteditor_3.10.100.v20170426-2021.jar   A bundle is already installed with the name "org.eclipse.ui.workbench.texteditor" and version "3.10.100.v20170426-2021"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:45.441
+!MESSAGE Could not install bundle plugins/org.eclipse.ui.workbench_3.110.1.v20170704-1208.jar   A bundle is already installed with the name "org.eclipse.ui.workbench" and version "3.110.1.v20170704-1208"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:45.447
+!MESSAGE Could not install bundle plugins/org.eclipse.ui_3.109.0.v20170411-1742.jar   A bundle is already installed with the name "org.eclipse.ui" and version "3.109.0.v20170411-1742"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:45.454
+!MESSAGE Could not install bundle plugins/org.eclipse.update.configurator_3.3.400.v20160506-0750.jar   A bundle is already installed with the name "org.eclipse.update.configurator" and version "3.3.400.v20160506-0750"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:45.460
+!MESSAGE Could not install bundle plugins/org.eclipse.wst.common.core_1.2.0.v200908251833.jar   A bundle is already installed with the name "org.eclipse.wst.common.core" and version "1.2.0.v200908251833"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:45.466
+!MESSAGE Could not install bundle plugins/org.eclipse.wst.common.emfworkbench.integration_1.2.101.v201107081800.jar   A bundle is already installed with the name "org.eclipse.wst.common.emfworkbench.integration" and version "1.2.101.v201107081800"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:45.471
+!MESSAGE Could not install bundle plugins/org.eclipse.wst.common.emf_1.2.500.v201701191735.jar   A bundle is already installed with the name "org.eclipse.wst.common.emf" and version "1.2.500.v201701191735"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:45.480
+!MESSAGE Could not install bundle plugins/org.eclipse.wst.common.environment_1.0.400.v200912181831.jar   A bundle is already installed with the name "org.eclipse.wst.common.environment" and version "1.0.400.v200912181831"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:45.488
+!MESSAGE Could not install bundle plugins/org.eclipse.wst.common.frameworks.ui_1.2.400.v201504292002.jar   A bundle is already installed with the name "org.eclipse.wst.common.frameworks.ui" and version "1.2.400.v201504292002"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:45.493
+!MESSAGE Could not install bundle plugins/org.eclipse.wst.common.frameworks_1.2.201.v201707201954.jar   A bundle is already installed with the name "org.eclipse.wst.common.frameworks" and version "1.2.201.v201707201954"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:45.501
+!MESSAGE Could not install bundle plugins/org.eclipse.wst.common.modulecore_1.3.0.v201705041406.jar   A bundle is already installed with the name "org.eclipse.wst.common.modulecore" and version "1.3.0.v201705041406"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:45.508
+!MESSAGE Could not install bundle plugins/org.eclipse.wst.common.project.facet.core_1.4.300.v201111030423.jar   A bundle is already installed with the name "org.eclipse.wst.common.project.facet.core" and version "1.4.300.v201111030423"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:45.520
+!MESSAGE Could not install bundle plugins/org.eclipse.wst.common.project.facet.ui_1.4.601.v201707201954.jar   A bundle is already installed with the name "org.eclipse.wst.common.project.facet.ui" and version "1.4.601.v201707201954"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:45.528
+!MESSAGE Could not install bundle plugins/org.eclipse.wst.common.ui_1.1.500.v200911182011.jar   A bundle is already installed with the name "org.eclipse.wst.common.ui" and version "1.1.500.v200911182011"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:45.539
+!MESSAGE Could not install bundle plugins/org.eclipse.wst.common.uriresolver_1.2.300.v201702270556.jar   A bundle is already installed with the name "org.eclipse.wst.common.uriresolver" and version "1.2.300.v201702270556"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:45.559
+!MESSAGE Could not install bundle plugins/org.eclipse.wst.css.core_1.1.1000.v201704250120.jar   A bundle is already installed with the name "org.eclipse.wst.css.core" and version "1.1.1000.v201704250120"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:45.571
+!MESSAGE Could not install bundle plugins/org.eclipse.wst.css.ui_1.0.1100.v201704250105.jar   A bundle is already installed with the name "org.eclipse.wst.css.ui" and version "1.0.1100.v201704250105"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:45.595
+!MESSAGE Could not install bundle plugins/org.eclipse.wst.html.core_1.2.101.v201707042220.jar   A bundle is already installed with the name "org.eclipse.wst.html.core" and version "1.2.101.v201707042220"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:45.602
+!MESSAGE Could not install bundle plugins/org.eclipse.wst.html.ui_1.0.1200.v201608060428.jar   A bundle is already installed with the name "org.eclipse.wst.html.ui" and version "1.0.1200.v201608060428"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:45.609
+!MESSAGE Could not install bundle plugins/org.eclipse.wst.jsdt.core_2.0.300.v201703171536.jar   A bundle is already installed with the name "org.eclipse.wst.jsdt.core" and version "2.0.300.v201703171536"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:45.618
+!MESSAGE Could not install bundle plugins/org.eclipse.wst.jsdt.debug.core_3.2.200.v201610211901.jar   A bundle is already installed with the name "org.eclipse.wst.jsdt.debug.core" and version "3.2.200.v201610211901"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:45.626
+!MESSAGE Could not install bundle plugins/org.eclipse.wst.jsdt.debug.ui_1.0.600.v201605311817.jar   A bundle is already installed with the name "org.eclipse.wst.jsdt.debug.ui" and version "1.0.600.v201605311817"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:45.662
+!MESSAGE Could not install bundle plugins/org.eclipse.wst.jsdt.manipulation_1.0.601.v201602241911.jar   A bundle is already installed with the name "org.eclipse.wst.jsdt.manipulation" and version "1.0.601.v201602241911"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:45.675
+!MESSAGE Could not install bundle plugins/org.eclipse.wst.jsdt.ui_2.0.300.v201704191905.jar   A bundle is already installed with the name "org.eclipse.wst.jsdt.ui" and version "2.0.300.v201704191905"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:45.680
+!MESSAGE Could not install bundle plugins/org.eclipse.wst.jsdt.web.core_1.0.901.v201707142218.jar   A bundle is already installed with the name "org.eclipse.wst.jsdt.web.core" and version "1.0.901.v201707142218"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:45.686
+!MESSAGE Could not install bundle plugins/org.eclipse.wst.sse.core_1.1.1001.v201707042225.jar   A bundle is already installed with the name "org.eclipse.wst.sse.core" and version "1.1.1001.v201707042225"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:45.694
+!MESSAGE Could not install bundle plugins/org.eclipse.wst.sse.ui_1.3.600.v201707042340.jar   A bundle is already installed with the name "org.eclipse.wst.sse.ui" and version "1.3.600.v201707042340"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:45.700
+!MESSAGE Could not install bundle plugins/org.eclipse.wst.validation.ui_1.2.501.v201707142105.jar   A bundle is already installed with the name "org.eclipse.wst.validation.ui" and version "1.2.501.v201707142105"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:45.705
+!MESSAGE Could not install bundle plugins/org.eclipse.wst.validation_1.2.701.v201707142105.jar   A bundle is already installed with the name "org.eclipse.wst.validation" and version "1.2.701.v201707142105"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:45.711
+!MESSAGE Could not install bundle plugins/org.eclipse.wst.xml.core_1.1.1100.v201705012045.jar   A bundle is already installed with the name "org.eclipse.wst.xml.core" and version "1.1.1100.v201705012045"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:45.720
+!MESSAGE Could not install bundle plugins/org.eclipse.wst.xml.ui_1.1.800.v201704102213.jar   A bundle is already installed with the name "org.eclipse.wst.xml.ui" and version "1.1.800.v201704102213"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:45.726
+!MESSAGE Could not install bundle plugins/org.eclipse.wst.xsd.core_1.1.900.v201401141857.jar   A bundle is already installed with the name "org.eclipse.wst.xsd.core" and version "1.1.900.v201401141857"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:45.732
+!MESSAGE Could not install bundle plugins/org.eclipse.xsd.edit_2.8.0.v20170609-0928.jar   A bundle is already installed with the name "org.eclipse.xsd.edit" and version "2.8.0.v20170609-0928"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:45.738
+!MESSAGE Could not install bundle plugins/org.eclipse.xsd_2.13.0.v20170609-0928.jar   A bundle is already installed with the name "org.eclipse.xsd" and version "2.13.0.v20170609-0928"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:45.747
+!MESSAGE Could not install bundle plugins/org.sat4j.core_2.3.5.v201308161310.jar   A bundle is already installed with the name "org.sat4j.core" and version "2.3.5.v201308161310"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:45.754
+!MESSAGE Could not install bundle plugins/org.sat4j.pb_2.3.5.v201404071733.jar   A bundle is already installed with the name "org.sat4j.pb" and version "2.3.5.v201404071733"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:45.768
+!MESSAGE Could not install bundle plugins/org.slf4j.api_1.7.2.v20121108-1250.jar   A bundle is already installed with the name "org.slf4j.api" and version "1.7.2.v20121108-1250"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:45.775
+!MESSAGE Could not install bundle plugins/org.tizen.product.plugin_3.0.0.202010121353/   A bundle is already installed with the name "org.tizen.product.plugin" and version "3.0.0.202010121353"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:45.820
+!MESSAGE Could not install bundle plugins/org.tukaani.xz_1.5.0.v20170111-1717.jar   A bundle is already installed with the name "org.tukaani.xz" and version "1.5.0.v20170111-1717"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:45.826
+!MESSAGE Could not install bundle plugins/org.w3c.css.sac_1.3.1.v200903091627.jar   A bundle is already installed with the name "org.w3c.css.sac" and version "1.3.1.v200903091627"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:45.831
+!MESSAGE Could not install bundle plugins/org.w3c.dom.events_3.0.0.draft20060413_v201105210656.jar   A bundle is already installed with the name "org.w3c.dom.events" and version "3.0.0.draft20060413_v201105210656"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:45.837
+!MESSAGE Could not install bundle plugins/org.w3c.dom.smil_1.0.1.v200903091627.jar   A bundle is already installed with the name "org.w3c.dom.smil" and version "1.0.1.v200903091627"
+
+!ENTRY org.eclipse.update.configurator 4 0 2023-07-13 21:50:45.842
+!MESSAGE Could not install bundle plugins/org.w3c.dom.svg_1.1.0.v201011041433.jar   A bundle is already installed with the name "org.w3c.dom.svg" and version "1.1.0.v201011041433"
+
+!ENTRY mtwizard 4 0 2023-07-13 21:50:46.242
+!MESSAGE FrameworkEvent ERROR
+!STACK 0
+org.osgi.framework.BundleException: Could not resolve module: mtwizard [7647]
+  Another singleton bundle selected: osgi.identity; type="osgi.bundle"; version:Version="1.1.0.202203221729"; osgi.identity="mtwizard"; singleton:="true"
+
+	at org.eclipse.osgi.container.Module.start(Module.java:444)
+	at org.eclipse.osgi.container.ModuleContainer$ContainerStartLevel.dispatchEvent(ModuleContainer.java:1550)
+	at org.eclipse.osgi.container.ModuleContainer$ContainerStartLevel.dispatchEvent(ModuleContainer.java:1)
+	at org.eclipse.osgi.framework.eventmgr.EventManager.dispatchEvent(EventManager.java:230)
+	at org.eclipse.osgi.framework.eventmgr.EventManager$EventThread.run(EventManager.java:340)
+
+!ENTRY org.tizen.web.tv.sec.launch 4 0 2023-07-13 21:50:46.322
+!MESSAGE FrameworkEvent ERROR
+!STACK 0
+org.osgi.framework.BundleException: Could not resolve module: org.tizen.web.tv.sec.launch [7914]
+  Another singleton bundle selected: osgi.identity; type="osgi.bundle"; version:Version="1.0.2.202203221729"; osgi.identity="org.tizen.web.tv.sec.launch"; singleton:="true"
+
+	at org.eclipse.osgi.container.Module.start(Module.java:444)
+	at org.eclipse.osgi.container.ModuleContainer$ContainerStartLevel.dispatchEvent(ModuleContainer.java:1550)
+	at org.eclipse.osgi.container.ModuleContainer$ContainerStartLevel.dispatchEvent(ModuleContainer.java:1)
+	at org.eclipse.osgi.framework.eventmgr.EventManager.dispatchEvent(EventManager.java:230)
+	at org.eclipse.osgi.framework.eventmgr.EventManager$EventThread.run(EventManager.java:340)
+
+!ENTRY org.tizen.web.tv.sec.nacl.builder 4 0 2023-07-13 21:50:46.324
+!MESSAGE FrameworkEvent ERROR
+!STACK 0
+org.osgi.framework.BundleException: Could not resolve module: org.tizen.web.tv.sec.nacl.builder [7915]
+  Another singleton bundle selected: osgi.identity; type="osgi.bundle"; version:Version="1.2.0.202203221729"; osgi.identity="org.tizen.web.tv.sec.nacl.builder"; singleton:="true"
+
+	at org.eclipse.osgi.container.Module.start(Module.java:444)
+	at org.eclipse.osgi.container.ModuleContainer$ContainerStartLevel.dispatchEvent(ModuleContainer.java:1550)
+	at org.eclipse.osgi.container.ModuleContainer$ContainerStartLevel.dispatchEvent(ModuleContainer.java:1)
+	at org.eclipse.osgi.framework.eventmgr.EventManager.dispatchEvent(EventManager.java:230)
+	at org.eclipse.osgi.framework.eventmgr.EventManager$EventThread.run(EventManager.java:340)
+
+!ENTRY org.tizen.web.tv.sec.nacl.debug 4 0 2023-07-13 21:50:46.326
+!MESSAGE FrameworkEvent ERROR
+!STACK 0
+org.osgi.framework.BundleException: Could not resolve module: org.tizen.web.tv.sec.nacl.debug [7917]
+  Another singleton bundle selected: osgi.identity; type="osgi.bundle"; version:Version="1.1.0.201708241135"; osgi.identity="org.tizen.web.tv.sec.nacl.debug"; singleton:="true"
+
+	at org.eclipse.osgi.container.Module.start(Module.java:444)
+	at org.eclipse.osgi.container.ModuleContainer$ContainerStartLevel.dispatchEvent(ModuleContainer.java:1550)
+	at org.eclipse.osgi.container.ModuleContainer$ContainerStartLevel.dispatchEvent(ModuleContainer.java:1)
+	at org.eclipse.osgi.framework.eventmgr.EventManager.dispatchEvent(EventManager.java:230)
+	at org.eclipse.osgi.framework.eventmgr.EventManager$EventThread.run(EventManager.java:340)
+
+!ENTRY org.tizen.web.tv.sec.nacl.launch 4 0 2023-07-13 21:50:46.331
+!MESSAGE FrameworkEvent ERROR
+!STACK 0
+org.osgi.framework.BundleException: Could not resolve module: org.tizen.web.tv.sec.nacl.launch [7918]
+  Another singleton bundle selected: osgi.identity; type="osgi.bundle"; version:Version="1.0.1.202203221729"; osgi.identity="org.tizen.web.tv.sec.nacl.launch"; singleton:="true"
+
+	at org.eclipse.osgi.container.Module.start(Module.java:444)
+	at org.eclipse.osgi.container.ModuleContainer$ContainerStartLevel.dispatchEvent(ModuleContainer.java:1550)
+	at org.eclipse.osgi.container.ModuleContainer$ContainerStartLevel.dispatchEvent(ModuleContainer.java:1)
+	at org.eclipse.osgi.framework.eventmgr.EventManager.dispatchEvent(EventManager.java:230)
+	at org.eclipse.osgi.framework.eventmgr.EventManager$EventThread.run(EventManager.java:340)
+
+!ENTRY org.tizen.web.tv.sec.nacl.preferences 4 0 2023-07-13 21:50:46.349
+!MESSAGE FrameworkEvent ERROR
+!STACK 0
+org.osgi.framework.BundleException: Could not resolve module: org.tizen.web.tv.sec.nacl.preferences [7919]
+  Another singleton bundle selected: osgi.identity; type="osgi.bundle"; version:Version="1.1.0.202203221729"; osgi.identity="org.tizen.web.tv.sec.nacl.preferences"; singleton:="true"
+
+	at org.eclipse.osgi.container.Module.start(Module.java:444)
+	at org.eclipse.osgi.container.ModuleContainer$ContainerStartLevel.dispatchEvent(ModuleContainer.java:1550)
+	at org.eclipse.osgi.container.ModuleContainer$ContainerStartLevel.dispatchEvent(ModuleContainer.java:1)
+	at org.eclipse.osgi.framework.eventmgr.EventManager.dispatchEvent(EventManager.java:230)
+	at org.eclipse.osgi.framework.eventmgr.EventManager$EventThread.run(EventManager.java:340)
+
+!ENTRY org.tizen.web.tv.sec.nacl.ProjectWizards 4 0 2023-07-13 21:50:46.350
+!MESSAGE FrameworkEvent ERROR
+!STACK 0
+org.osgi.framework.BundleException: Could not resolve module: org.tizen.web.tv.sec.nacl.ProjectWizards [7920]
+  Another singleton bundle selected: osgi.identity; type="osgi.bundle"; version:Version="1.2.1.202203221729"; osgi.identity="org.tizen.web.tv.sec.nacl.ProjectWizards"; singleton:="true"
+
+	at org.eclipse.osgi.container.Module.start(Module.java:444)
+	at org.eclipse.osgi.container.ModuleContainer$ContainerStartLevel.dispatchEvent(ModuleContainer.java:1550)
+	at org.eclipse.osgi.container.ModuleContainer$ContainerStartLevel.dispatchEvent(ModuleContainer.java:1)
+	at org.eclipse.osgi.framework.eventmgr.EventManager.dispatchEvent(EventManager.java:230)
+	at org.eclipse.osgi.framework.eventmgr.EventManager$EventThread.run(EventManager.java:340)
+
+!ENTRY org.tizen.web.tv.sec.simulator.standalone 4 0 2023-07-13 21:50:46.353
+!MESSAGE FrameworkEvent ERROR
+!STACK 0
+org.osgi.framework.BundleException: Could not resolve module: org.tizen.web.tv.sec.simulator.standalone [7921]
+  Another singleton bundle selected: osgi.identity; type="osgi.bundle"; version:Version="1.0.0.202203221729"; osgi.identity="org.tizen.web.tv.sec.simulator.standalone"; singleton:="true"
+
+	at org.eclipse.osgi.container.Module.start(Module.java:444)
+	at org.eclipse.osgi.container.ModuleContainer$ContainerStartLevel.dispatchEvent(ModuleContainer.java:1550)
+	at org.eclipse.osgi.container.ModuleContainer$ContainerStartLevel.dispatchEvent(ModuleContainer.java:1)
+	at org.eclipse.osgi.framework.eventmgr.EventManager.dispatchEvent(EventManager.java:230)
+	at org.eclipse.osgi.framework.eventmgr.EventManager$EventThread.run(EventManager.java:340)
+
+!ENTRY org.tizen.web.tv.sec 4 0 2023-07-13 21:50:46.355
+!MESSAGE FrameworkEvent ERROR
+!STACK 0
+org.osgi.framework.BundleException: Could not resolve module: org.tizen.web.tv.sec [7922]
+  Another singleton bundle selected: osgi.identity; type="osgi.bundle"; version:Version="4.0.0.202203221729"; osgi.identity="org.tizen.web.tv.sec"; singleton:="true"
+
+	at org.eclipse.osgi.container.Module.start(Module.java:444)
+	at org.eclipse.osgi.container.ModuleContainer$ContainerStartLevel.dispatchEvent(ModuleContainer.java:1550)
+	at org.eclipse.osgi.container.ModuleContainer$ContainerStartLevel.dispatchEvent(ModuleContainer.java:1)
+	at org.eclipse.osgi.framework.eventmgr.EventManager.dispatchEvent(EventManager.java:230)
+	at org.eclipse.osgi.framework.eventmgr.EventManager$EventThread.run(EventManager.java:340)
+
+!ENTRY org.eclipse.ui 2 0 2023-07-13 21:50:53.928
+!MESSAGE Warnings while parsing the images from the 'org.eclipse.ui.commandImages' extension point.
+!SUBENTRY 1 org.eclipse.ui 2 0 2023-07-13 21:50:53.928
+!MESSAGE Cannot bind to an undefined command: plug-in='org.eclipse.egit.ui', id='org.eclipse.egit.ui.RepositoriesViewRefresh'
+!SUBENTRY 1 org.eclipse.ui 2 0 2023-07-13 21:50:53.928
+!MESSAGE Cannot bind to an undefined command: plug-in='org.eclipse.egit.ui', id='org.eclipse.egit.ui.org.eclipse.egit.ui.AbortRebase'
+!SUBENTRY 1 org.eclipse.ui 2 0 2023-07-13 21:50:53.928
+!MESSAGE Cannot bind to an undefined command: plug-in='org.eclipse.egit.ui', id='org.eclipse.egit.ui.history.RenameBranch'
+
+!ENTRY org.eclipse.egit.ui 2 0 2023-07-13 21:51:12.141
+!MESSAGE Warning: The environment variable HOME is not set. The following directory will be used to store the Git
+user global configuration and to define the default location to store repositories: 'C:\Users\İbrahim BOZKURT'. If this is
+not correct please set the HOME environment variable and restart Eclipse. Otherwise Git for Windows and
+EGit might behave differently since they see different configuration options.
+This warning can be switched off on the Team > Git > Confirmations and Warnings preference page.
+
+!ENTRY org.tizen.common.ui.Startup 1 0 2023-07-13 21:51:13.891
+!MESSAGE SDK Information: Path [D:\tizen-studio], Data Path [D:\tizen-studio\datas], Platform Path [D:\tizen-studio\platforms\tizen-6.5\wearable]
+
+!ENTRY org.tizen.web.project.initializer.AbstractLibraryLocation 4 0 2023-07-13 21:51:16.581
+!MESSAGE [2023.07.13 21:51:16][ERROR] AbstractLibraryLocation.java(111) - D:\tizen-studio\platforms\tizen-6.5\tv-samsung\widlprocxmls\tizen.widlprocxml (Sistem belirtilen dosyayı bulamıyor)
+
+!STACK 0
+java.io.FileNotFoundException: D:\tizen-studio\platforms\tizen-6.5\tv-samsung\widlprocxmls\tizen.widlprocxml (Sistem belirtilen dosyayı bulamıyor)
+	at java.io.FileInputStream.open0(Native Method)
+	at java.io.FileInputStream.open(FileInputStream.java:195)
+	at java.io.FileInputStream.<init>(FileInputStream.java:138)
+	at org.tizen.web.project.initializer.AbstractLibraryLocation.getDocument(AbstractLibraryLocation.java:141)
+	at org.tizen.web.project.initializer.AbstractLibraryLocation.convertXmlToJs(AbstractLibraryLocation.java:97)
+	at org.tizen.web.project.initializer.AbstractLibraryLocation.<init>(AbstractLibraryLocation.java:83)
+	at org.tizen.web.project.initializer.TizenLibraryInitializer$TizenLibraryLocation.<init>(TizenLibraryInitializer.java:63)
+	at org.tizen.web.project.initializer.TizenLibraryInitializer$TizenLibraryLocation.getInstance(TizenLibraryInitializer.java:76)
+	at org.tizen.web.project.initializer.TizenLibraryInitializer.getLibraryLocation(TizenLibraryInitializer.java:96)
+	at org.eclipse.wst.jsdt.core.JsGlobalScopeContainerInitializer.getIncludepathEntries(JsGlobalScopeContainerInitializer.java:181)
+	at org.eclipse.wst.jsdt.internal.core.JavaModelManager.containerPutIfInitializingWithSameEntries(JavaModelManager.java:589)
+	at org.eclipse.wst.jsdt.internal.core.SetContainerOperation.execute(SetContainerOperation.java:54)
+	at org.eclipse.wst.jsdt.core.JavaScriptCore.setJsGlobalScopeContainer(JavaScriptCore.java:3924)
+	at org.eclipse.wst.jsdt.core.JsGlobalScopeContainerInitializer.initialize(JsGlobalScopeContainerInitializer.java:85)
+	at org.tizen.web.project.initializer.AbstractLibraryInitializer.initialize(AbstractLibraryInitializer.java:19)
+	at org.eclipse.wst.jsdt.internal.core.JavaModelManager.initializeContainer(JavaModelManager.java:2216)
+	at org.eclipse.wst.jsdt.internal.core.JavaModelManager$6.run(JavaModelManager.java:2146)
+	at org.eclipse.core.internal.resources.Workspace.run(Workspace.java:2240)
+	at org.eclipse.core.internal.resources.Workspace.run(Workspace.java:2267)
+	at org.eclipse.wst.jsdt.internal.core.JavaModelManager.initializeAllContainers(JavaModelManager.java:2162)
+	at org.eclipse.wst.jsdt.internal.core.JavaModelManager.getJsGlobalScopeContainer(JavaModelManager.java:1536)
+	at org.eclipse.wst.jsdt.core.JavaScriptCore.getJsGlobalScopeContainer(JavaScriptCore.java:1342)
+	at org.eclipse.wst.jsdt.internal.core.JavaProject.resolveClasspath(JavaProject.java:2747)
+	at org.eclipse.wst.jsdt.internal.core.JavaProject.getResolvedClasspath(JavaProject.java:2026)
+	at org.eclipse.wst.jsdt.core.JavaScriptCore.initializeAfterLoad(JavaScriptCore.java:2678)
+	at org.eclipse.wst.jsdt.internal.ui.InitializeAfterLoadJob$RealJob.run(InitializeAfterLoadJob.java:32)
+	at org.eclipse.core.internal.jobs.Worker.run(Worker.java:56)
+
+!ENTRY org.tizen.web.project.initializer.AbstractLibraryLocation 4 0 2023-07-13 21:51:20.191
+!MESSAGE [2023.07.13 21:51:20][ERROR] AbstractLibraryLocation.java(111) - D:\tizen-studio\platforms\tizen-6.5\tv-samsung\widlprocxmls\html5.widlprocxml (Sistem belirtilen dosyayı bulamıyor)
+
+!STACK 0
+java.io.FileNotFoundException: D:\tizen-studio\platforms\tizen-6.5\tv-samsung\widlprocxmls\html5.widlprocxml (Sistem belirtilen dosyayı bulamıyor)
+	at java.io.FileInputStream.open0(Native Method)
+	at java.io.FileInputStream.open(FileInputStream.java:195)
+	at java.io.FileInputStream.<init>(FileInputStream.java:138)
+	at org.tizen.web.project.initializer.AbstractLibraryLocation.getDocument(AbstractLibraryLocation.java:141)
+	at org.tizen.web.project.initializer.AbstractLibraryLocation.convertXmlToJs(AbstractLibraryLocation.java:97)
+	at org.tizen.web.project.initializer.AbstractLibraryLocation.<init>(AbstractLibraryLocation.java:83)
+	at org.tizen.web.project.initializer.HTML5LibraryInitializer$HTML5LibraryLocation.<init>(HTML5LibraryInitializer.java:62)
+	at org.tizen.web.project.initializer.HTML5LibraryInitializer$HTML5LibraryLocation.getInstance(HTML5LibraryInitializer.java:75)
+	at org.tizen.web.project.initializer.HTML5LibraryInitializer.getLibraryLocation(HTML5LibraryInitializer.java:95)
+	at org.eclipse.wst.jsdt.core.JsGlobalScopeContainerInitializer.getIncludepathEntries(JsGlobalScopeContainerInitializer.java:181)
+	at org.eclipse.wst.jsdt.internal.core.JavaModelManager.containerPutIfInitializingWithSameEntries(JavaModelManager.java:589)
+	at org.eclipse.wst.jsdt.internal.core.SetContainerOperation.execute(SetContainerOperation.java:54)
+	at org.eclipse.wst.jsdt.core.JavaScriptCore.setJsGlobalScopeContainer(JavaScriptCore.java:3924)
+	at org.eclipse.wst.jsdt.core.JsGlobalScopeContainerInitializer.initialize(JsGlobalScopeContainerInitializer.java:85)
+	at org.tizen.web.project.initializer.AbstractLibraryInitializer.initialize(AbstractLibraryInitializer.java:19)
+	at org.eclipse.wst.jsdt.internal.core.JavaModelManager.initializeContainer(JavaModelManager.java:2216)
+	at org.eclipse.wst.jsdt.internal.core.JavaModelManager.getJsGlobalScopeContainer(JavaModelManager.java:1538)
+	at org.eclipse.wst.jsdt.core.JavaScriptCore.getJsGlobalScopeContainer(JavaScriptCore.java:1342)
+	at org.eclipse.wst.jsdt.internal.core.JavaProject.resolveClasspath(JavaProject.java:2747)
+	at org.eclipse.wst.jsdt.internal.core.JavaProject.getResolvedClasspath(JavaProject.java:2026)
+	at org.eclipse.wst.jsdt.internal.core.SetContainerOperation.execute(SetContainerOperation.java:96)
+	at org.eclipse.wst.jsdt.core.JavaScriptCore.setJsGlobalScopeContainer(JavaScriptCore.java:3924)
+	at org.eclipse.wst.jsdt.core.JsGlobalScopeContainerInitializer.initialize(JsGlobalScopeContainerInitializer.java:85)
+	at org.tizen.web.project.initializer.AbstractLibraryInitializer.initialize(AbstractLibraryInitializer.java:19)
+	at org.eclipse.wst.jsdt.internal.core.JavaModelManager.initializeContainer(JavaModelManager.java:2216)
+	at org.eclipse.wst.jsdt.internal.core.JavaModelManager.getJsGlobalScopeContainer(JavaModelManager.java:1538)
+	at org.eclipse.wst.jsdt.core.JavaScriptCore.getJsGlobalScopeContainer(JavaScriptCore.java:1342)
+	at org.eclipse.wst.jsdt.internal.core.JavaProject.resolveClasspath(JavaProject.java:2747)
+	at org.eclipse.wst.jsdt.internal.core.JavaProject.getResolvedClasspath(JavaProject.java:2026)
+	at org.eclipse.wst.jsdt.internal.core.SetContainerOperation.execute(SetContainerOperation.java:96)
+	at org.eclipse.wst.jsdt.core.JavaScriptCore.setJsGlobalScopeContainer(JavaScriptCore.java:3924)
+	at org.eclipse.wst.jsdt.core.JsGlobalScopeContainerInitializer.initialize(JsGlobalScopeContainerInitializer.java:85)
+	at org.eclipse.wst.jsdt.internal.core.JavaModelManager.initializeContainer(JavaModelManager.java:2216)
+	at org.eclipse.wst.jsdt.internal.core.JavaModelManager.getJsGlobalScopeContainer(JavaModelManager.java:1538)
+	at org.eclipse.wst.jsdt.core.JavaScriptCore.getJsGlobalScopeContainer(JavaScriptCore.java:1342)
+	at org.eclipse.wst.jsdt.internal.core.JavaProject.resolveClasspath(JavaProject.java:2747)
+	at org.eclipse.wst.jsdt.internal.core.JavaProject.getResolvedClasspath(JavaProject.java:2026)
+	at org.eclipse.wst.jsdt.internal.core.SetContainerOperation.execute(SetContainerOperation.java:96)
+	at org.eclipse.wst.jsdt.core.JavaScriptCore.setJsGlobalScopeContainer(JavaScriptCore.java:3924)
+	at org.eclipse.wst.jsdt.core.JsGlobalScopeContainerInitializer.initialize(JsGlobalScopeContainerInitializer.java:85)
+	at org.tizen.web.project.initializer.WebLibraryInitializer.initialize(WebLibraryInitializer.java:58)
+	at org.eclipse.wst.jsdt.internal.core.JavaModelManager.initializeContainer(JavaModelManager.java:2216)
+	at org.eclipse.wst.jsdt.internal.core.JavaModelManager.getJsGlobalScopeContainer(JavaModelManager.java:1538)
+	at org.eclipse.wst.jsdt.core.JavaScriptCore.getJsGlobalScopeContainer(JavaScriptCore.java:1342)
+	at org.eclipse.wst.jsdt.internal.core.JavaProject.resolveClasspath(JavaProject.java:2747)
+	at org.eclipse.wst.jsdt.internal.core.JavaProject.getResolvedClasspath(JavaProject.java:2026)
+	at org.eclipse.wst.jsdt.internal.core.SetContainerOperation.execute(SetContainerOperation.java:96)
+	at org.eclipse.wst.jsdt.core.JavaScriptCore.setJsGlobalScopeContainer(JavaScriptCore.java:3924)
+	at org.eclipse.wst.jsdt.launching.JREContainerInitializer.initialize(JREContainerInitializer.java:48)
+	at org.eclipse.wst.jsdt.internal.core.JavaModelManager.initializeContainer(JavaModelManager.java:2216)
+	at org.eclipse.wst.jsdt.internal.core.JavaModelManager.getJsGlobalScopeContainer(JavaModelManager.java:1538)
+	at org.eclipse.wst.jsdt.core.JavaScriptCore.getJsGlobalScopeContainer(JavaScriptCore.java:1342)
+	at org.eclipse.wst.jsdt.internal.core.JavaProject.resolveClasspath(JavaProject.java:2747)
+	at org.eclipse.wst.jsdt.internal.core.JavaProject.getResolvedClasspath(JavaProject.java:2026)
+	at org.eclipse.wst.jsdt.internal.core.SetContainerOperation.execute(SetContainerOperation.java:96)
+	at org.eclipse.wst.jsdt.core.JavaScriptCore.setJsGlobalScopeContainer(JavaScriptCore.java:3924)
+	at org.eclipse.wst.jsdt.libraries.BasicBrowserLibraryJsGlobalScopeContainerInitializer.initialize(BasicBrowserLibraryJsGlobalScopeContainerInitializer.java:135)
+	at org.eclipse.wst.jsdt.internal.core.JavaModelManager.initializeContainer(JavaModelManager.java:2216)
+	at org.eclipse.wst.jsdt.internal.core.JavaModelManager.getJsGlobalScopeContainer(JavaModelManager.java:1538)
+	at org.eclipse.wst.jsdt.core.JavaScriptCore.getJsGlobalScopeContainer(JavaScriptCore.java:1342)
+	at org.eclipse.wst.jsdt.internal.core.JavaProject.resolveClasspath(JavaProject.java:2747)
+	at org.eclipse.wst.jsdt.internal.core.JavaProject.getResolvedClasspath(JavaProject.java:2026)
+	at org.eclipse.wst.jsdt.internal.core.DeltaProcessor.createExternalArchiveDelta(DeltaProcessor.java:893)
+	at org.eclipse.wst.jsdt.internal.core.DeltaProcessor.resourceChanged(DeltaProcessor.java:1929)
+	at org.eclipse.wst.jsdt.internal.core.DeltaProcessingState.resourceChanged(DeltaProcessingState.java:389)
+	at org.eclipse.core.internal.events.NotificationManager$1.run(NotificationManager.java:299)
+	at org.eclipse.core.runtime.SafeRunner.run(SafeRunner.java:42)
+	at org.eclipse.core.internal.events.NotificationManager.notify(NotificationManager.java:289)
+	at org.eclipse.core.internal.events.NotificationManager.broadcastChanges(NotificationManager.java:152)
+	at org.eclipse.core.internal.resources.Workspace.broadcastPostChange(Workspace.java:374)
+	at org.eclipse.core.internal.resources.Workspace.endOperation(Workspace.java:1469)
+	at org.eclipse.core.internal.resources.Workspace.run(Workspace.java:2253)
+	at org.eclipse.core.internal.events.NotificationManager$NotifyJob.run(NotificationManager.java:43)
+	at org.eclipse.core.internal.jobs.Worker.run(Worker.java:56)
+
+!ENTRY org.tizen.web.project.initializer.AbstractLibraryLocation 4 0 2023-07-13 21:51:20.447
+!MESSAGE [2023.07.13 21:51:20][ERROR] AbstractLibraryLocation.java(111) - D:\tizen-studio\platforms\tizen-6.5\tv-samsung\widlprocxmls\w3cwidget.widlprocxml (Sistem belirtilen dosyayı bulamıyor)
+
+!STACK 0
+java.io.FileNotFoundException: D:\tizen-studio\platforms\tizen-6.5\tv-samsung\widlprocxmls\w3cwidget.widlprocxml (Sistem belirtilen dosyayı bulamıyor)
+	at java.io.FileInputStream.open0(Native Method)
+	at java.io.FileInputStream.open(FileInputStream.java:195)
+	at java.io.FileInputStream.<init>(FileInputStream.java:138)
+	at org.tizen.web.project.initializer.AbstractLibraryLocation.getDocument(AbstractLibraryLocation.java:141)
+	at org.tizen.web.project.initializer.AbstractLibraryLocation.convertXmlToJs(AbstractLibraryLocation.java:97)
+	at org.tizen.web.project.initializer.AbstractLibraryLocation.<init>(AbstractLibraryLocation.java:83)
+	at org.tizen.web.project.initializer.W3CLibraryInitializer$W3CLibraryLocation.<init>(W3CLibraryInitializer.java:62)
+	at org.tizen.web.project.initializer.W3CLibraryInitializer$W3CLibraryLocation.getInstance(W3CLibraryInitializer.java:75)
+	at org.tizen.web.project.initializer.W3CLibraryInitializer.getLibraryLocation(W3CLibraryInitializer.java:95)
+	at org.eclipse.wst.jsdt.core.JsGlobalScopeContainerInitializer.getIncludepathEntries(JsGlobalScopeContainerInitializer.java:181)
+	at org.eclipse.wst.jsdt.internal.core.JavaModelManager.containerPutIfInitializingWithSameEntries(JavaModelManager.java:589)
+	at org.eclipse.wst.jsdt.internal.core.SetContainerOperation.execute(SetContainerOperation.java:54)
+	at org.eclipse.wst.jsdt.core.JavaScriptCore.setJsGlobalScopeContainer(JavaScriptCore.java:3924)
+	at org.eclipse.wst.jsdt.core.JsGlobalScopeContainerInitializer.initialize(JsGlobalScopeContainerInitializer.java:85)
+	at org.tizen.web.project.initializer.AbstractLibraryInitializer.initialize(AbstractLibraryInitializer.java:19)
+	at org.eclipse.wst.jsdt.internal.core.JavaModelManager.initializeContainer(JavaModelManager.java:2216)
+	at org.eclipse.wst.jsdt.internal.core.JavaModelManager.getJsGlobalScopeContainer(JavaModelManager.java:1538)
+	at org.eclipse.wst.jsdt.core.JavaScriptCore.getJsGlobalScopeContainer(JavaScriptCore.java:1342)
+	at org.eclipse.wst.jsdt.internal.core.JavaProject.resolveClasspath(JavaProject.java:2747)
+	at org.eclipse.wst.jsdt.internal.core.JavaProject.getResolvedClasspath(JavaProject.java:2026)
+	at org.eclipse.wst.jsdt.internal.core.SetContainerOperation.execute(SetContainerOperation.java:96)
+	at org.eclipse.wst.jsdt.core.JavaScriptCore.setJsGlobalScopeContainer(JavaScriptCore.java:3924)
+	at org.eclipse.wst.jsdt.core.JsGlobalScopeContainerInitializer.initialize(JsGlobalScopeContainerInitializer.java:85)
+	at org.tizen.web.project.initializer.AbstractLibraryInitializer.initialize(AbstractLibraryInitializer.java:19)
+	at org.eclipse.wst.jsdt.internal.core.JavaModelManager.initializeContainer(JavaModelManager.java:2216)
+	at org.eclipse.wst.jsdt.internal.core.JavaModelManager.getJsGlobalScopeContainer(JavaModelManager.java:1538)
+	at org.eclipse.wst.jsdt.core.JavaScriptCore.getJsGlobalScopeContainer(JavaScriptCore.java:1342)
+	at org.eclipse.wst.jsdt.internal.core.JavaProject.resolveClasspath(JavaProject.java:2747)
+	at org.eclipse.wst.jsdt.internal.core.JavaProject.getResolvedClasspath(JavaProject.java:2026)
+	at org.eclipse.wst.jsdt.internal.core.SetContainerOperation.execute(SetContainerOperation.java:96)
+	at org.eclipse.wst.jsdt.core.JavaScriptCore.setJsGlobalScopeContainer(JavaScriptCore.java:3924)
+	at org.eclipse.wst.jsdt.core.JsGlobalScopeContainerInitializer.initialize(JsGlobalScopeContainerInitializer.java:85)
+	at org.tizen.web.project.initializer.AbstractLibraryInitializer.initialize(AbstractLibraryInitializer.java:19)
+	at org.eclipse.wst.jsdt.internal.core.JavaModelManager.initializeContainer(JavaModelManager.java:2216)
+	at org.eclipse.wst.jsdt.internal.core.JavaModelManager.getJsGlobalScopeContainer(JavaModelManager.java:1538)
+	at org.eclipse.wst.jsdt.core.JavaScriptCore.getJsGlobalScopeContainer(JavaScriptCore.java:1342)
+	at org.eclipse.wst.jsdt.internal.core.JavaProject.resolveClasspath(JavaProject.java:2747)
+	at org.eclipse.wst.jsdt.internal.core.JavaProject.getResolvedClasspath(JavaProject.java:2026)
+	at org.eclipse.wst.jsdt.internal.core.SetContainerOperation.execute(SetContainerOperation.java:96)
+	at org.eclipse.wst.jsdt.core.JavaScriptCore.setJsGlobalScopeContainer(JavaScriptCore.java:3924)
+	at org.eclipse.wst.jsdt.core.JsGlobalScopeContainerInitializer.initialize(JsGlobalScopeContainerInitializer.java:85)
+	at org.eclipse.wst.jsdt.internal.core.JavaModelManager.initializeContainer(JavaModelManager.java:2216)
+	at org.eclipse.wst.jsdt.internal.core.JavaModelManager.getJsGlobalScopeContainer(JavaModelManager.java:1538)
+	at org.eclipse.wst.jsdt.core.JavaScriptCore.getJsGlobalScopeContainer(JavaScriptCore.java:1342)
+	at org.eclipse.wst.jsdt.internal.core.JavaProject.resolveClasspath(JavaProject.java:2747)
+	at org.eclipse.wst.jsdt.internal.core.JavaProject.getResolvedClasspath(JavaProject.java:2026)
+	at org.eclipse.wst.jsdt.internal.core.SetContainerOperation.execute(SetContainerOperation.java:96)
+	at org.eclipse.wst.jsdt.core.JavaScriptCore.setJsGlobalScopeContainer(JavaScriptCore.java:3924)
+	at org.eclipse.wst.jsdt.core.JsGlobalScopeContainerInitializer.initialize(JsGlobalScopeContainerInitializer.java:85)
+	at org.tizen.web.project.initializer.WebLibraryInitializer.initialize(WebLibraryInitializer.java:58)
+	at org.eclipse.wst.jsdt.internal.core.JavaModelManager.initializeContainer(JavaModelManager.java:2216)
+	at org.eclipse.wst.jsdt.internal.core.JavaModelManager.getJsGlobalScopeContainer(JavaModelManager.java:1538)
+	at org.eclipse.wst.jsdt.core.JavaScriptCore.getJsGlobalScopeContainer(JavaScriptCore.java:1342)
+	at org.eclipse.wst.jsdt.internal.core.JavaProject.resolveClasspath(JavaProject.java:2747)
+	at org.eclipse.wst.jsdt.internal.core.JavaProject.getResolvedClasspath(JavaProject.java:2026)
+	at org.eclipse.wst.jsdt.internal.core.SetContainerOperation.execute(SetContainerOperation.java:96)
+	at org.eclipse.wst.jsdt.core.JavaScriptCore.setJsGlobalScopeContainer(JavaScriptCore.java:3924)
+	at org.eclipse.wst.jsdt.launching.JREContainerInitializer.initialize(JREContainerInitializer.java:48)
+	at org.eclipse.wst.jsdt.internal.core.JavaModelManager.initializeContainer(JavaModelManager.java:2216)
+	at org.eclipse.wst.jsdt.internal.core.JavaModelManager.getJsGlobalScopeContainer(JavaModelManager.java:1538)
+	at org.eclipse.wst.jsdt.core.JavaScriptCore.getJsGlobalScopeContainer(JavaScriptCore.java:1342)
+	at org.eclipse.wst.jsdt.internal.core.JavaProject.resolveClasspath(JavaProject.java:2747)
+	at org.eclipse.wst.jsdt.internal.core.JavaProject.getResolvedClasspath(JavaProject.java:2026)
+	at org.eclipse.wst.jsdt.internal.core.SetContainerOperation.execute(SetContainerOperation.java:96)
+	at org.eclipse.wst.jsdt.core.JavaScriptCore.setJsGlobalScopeContainer(JavaScriptCore.java:3924)
+	at org.eclipse.wst.jsdt.libraries.BasicBrowserLibraryJsGlobalScopeContainerInitializer.initialize(BasicBrowserLibraryJsGlobalScopeContainerInitializer.java:135)
+	at org.eclipse.wst.jsdt.internal.core.JavaModelManager.initializeContainer(JavaModelManager.java:2216)
+	at org.eclipse.wst.jsdt.internal.core.JavaModelManager.getJsGlobalScopeContainer(JavaModelManager.java:1538)
+	at org.eclipse.wst.jsdt.core.JavaScriptCore.getJsGlobalScopeContainer(JavaScriptCore.java:1342)
+	at org.eclipse.wst.jsdt.internal.core.JavaProject.resolveClasspath(JavaProject.java:2747)
+	at org.eclipse.wst.jsdt.internal.core.JavaProject.getResolvedClasspath(JavaProject.java:2026)
+	at org.eclipse.wst.jsdt.internal.core.DeltaProcessor.createExternalArchiveDelta(DeltaProcessor.java:893)
+	at org.eclipse.wst.jsdt.internal.core.DeltaProcessor.resourceChanged(DeltaProcessor.java:1929)
+	at org.eclipse.wst.jsdt.internal.core.DeltaProcessingState.resourceChanged(DeltaProcessingState.java:389)
+	at org.eclipse.core.internal.events.NotificationManager$1.run(NotificationManager.java:299)
+	at org.eclipse.core.runtime.SafeRunner.run(SafeRunner.java:42)
+	at org.eclipse.core.internal.events.NotificationManager.notify(NotificationManager.java:289)
+	at org.eclipse.core.internal.events.NotificationManager.broadcastChanges(NotificationManager.java:152)
+	at org.eclipse.core.internal.resources.Workspace.broadcastPostChange(Workspace.java:374)
+	at org.eclipse.core.internal.resources.Workspace.endOperation(Workspace.java:1469)
+	at org.eclipse.core.internal.resources.Workspace.run(Workspace.java:2253)
+	at org.eclipse.core.internal.events.NotificationManager$NotifyJob.run(NotificationManager.java:43)
+	at org.eclipse.core.internal.jobs.Worker.run(Worker.java:56)
+
+!ENTRY org.eclipse.launchbar.core 2 0 2023-07-13 21:52:57.612
+!MESSAGE Enablement expression is missing for descriptor type org.eclipse.cdt.debug.core.coreBuildDescriptorType
+
+!ENTRY org.eclipse.launchbar.core 2 0 2023-07-13 21:52:57.641
+!MESSAGE Enablement expression is missing for config provider for org.eclipse.cdt.debug.core.coreBuildDescriptorType
+
+!ENTRY org.tizen.common.connection.toolbar.TargetToolBarManager 4 0 2023-07-13 21:59:24.058
+!MESSAGE [2023.07.13 21:59:24][ERROR] TargetToolBarManager.java(176) - A fatal error occurred from 192.168.1.2:26101
+
+
+!ENTRY org.tizen.common.connection.toolbar.TargetToolBarManager 4 0 2023-07-13 21:59:28.922
+!MESSAGE [2023.07.13 21:59:28][ERROR] TargetToolBarManager.java(176) - A fatal error occurred from 192.168.1.2:26101
+
