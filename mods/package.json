@@ -1,0 +1,22 @@
+{
+  "name": "@tizentube/mods",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "build": "rollup -c rollup.config.js"
+  },
+  "keywords": [],
+  "author": "Reis Can, YouTube WebOs contributors",
+  "license": "GPL-3.0-only",
+  "dependencies": {
+    "@babel/preset-env": "^7.22.9",
+    "@rollup/plugin-babel": "^6.0.3",
+    "@rollup/plugin-terser": "^0.4.3",
+    "rollup": "^3.26.2",
+    "rollup-plugin-postcss": "^4.0.2",
+    "tiny-sha256": "^1.0.2",
+    "whatwg-fetch": "^3.6.2"
+  }
+}

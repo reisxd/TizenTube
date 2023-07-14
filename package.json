@@ -9,6 +9,9 @@
   },
   "keywords": [],
   "author": "Reis Can",
+  "repository": {
+    "url": "https://github.com/reisxd/TizenTube"
+  },
   "license": "GPL-3.0-only",
   "dependencies": {
     "express": "^4.18.2",
