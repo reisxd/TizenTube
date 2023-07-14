@@ -6,13 +6,8 @@
     <a style="color: white;" id="text">Please wait while TizenTube launches.</a>
     <script>
         // Change this with your own IP
-        var IP = '192.168.1.72';
-        var wsServer;
-        try {
-        	wsServer = new WebSocket('ws://' + IP + ':3000');
-        } catch (e) {
-        	document.getElementById('text').innerText = 'Could not connect.';
-        }
+        const IP = '192.168.1.72';
+        const wsServer = new WebSocket('ws://' + IP + ':3000');
         wsServer.onmessage = function (message) {
             const msg = JSON.parse(message.data);
             if (msg.ok) {
@@ -28,7 +23,7 @@
 
         setTimeout(function() {
             document.getElementById('text').innerText = 'Timed out in 10 seconds.';
-        }, 10000);
+        }, 10_000);
     </script>
 </body>
 </html>

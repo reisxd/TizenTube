@@ -6,7 +6,7 @@
     <a style="color: white;" id="text">Please wait while TizenTube launches.</a>
     <script>
         // Change this with your own IP
-        var IP = '192.168.1.72';
+        var IP = '192.168.1.7';
         var wsServer;
         try {
         	wsServer = new WebSocket('ws://' + IP + ':3000');
@@ -28,7 +28,7 @@
 
         setTimeout(function() {
             document.getElementById('text').innerText = 'Timed out in 10 seconds.';
-        }, 10000);
+        }, 10_000);
     </script>
 </body>
 </html>

@@ -1,9 +1,9 @@
-import express from 'express';
+import { WebSocketServer } from 'ws';
 import { Socket } from 'node:net';
 import startDebugging from './debuggerController.js';
 import Config from './config.json' assert { type: 'json' };
 
-const app = express();
+const wss = new WebSocketServer({ port: 3000 });
 const tvSdb = new Socket();
 let reconnectionInterval = null;
 
@@ -52,14 +52,40 @@ tvSdb.on('close', () => {
     }, 5000);
 });
 
-app.get('/launch', async (_, res) => {
-    // Launch the app with a debugger. Executes "sdb shell 0 debug app.id 0" (The last argument
-    // is for timeout, but timeout doesn't exist. And when you dont supply it, it just says
-    // "closed". Took me a little too long to figure out.).
+wss.on('connection', ws => {
 
-    const appId = Buffer.from(Config.appId).toString('hex');
-    sendData(`4f50454e250000000000000021000000f60a0000b0afbab17368656c6c3a3020646562756720${appId}203000`)
-    return res.send('Sent');
+    ws.on('message', message => {
+        let msg;
+        try {
+            msg = JSON.parse(message.toString());
+        } catch {
+            ws.send(JSON.stringify({
+                error: 'Invalid data'
+            }));
+            return;
+        }
+
+        switch (msg.e) {
+            case 'launch': {
+                ws.send(JSON.stringify({
+                    ok: true
+                }));
+
+                const appId = Buffer.from(Config.appId).toString('hex');
+                // Launch the app with a debugger. Executes "sdb shell 0 debug app.id 0" (The last argument
+                // is for timeout, but timeout doesn't exist. And when you dont supply it, it just says
+                // "closed". Took me a little too long to figure out.).
+                sendData(`4f50454e250000000000000021000000f60a0000b0afbab17368656c6c3a3020646562756720${appId}203000`)
+                break;
+            }
+
+            default: {
+                ws.send(JSON.stringify({
+                    error: 'Unknown event'
+                }));
+
+                break;
+            }
+        }
+    });
 });
-
-app.listen(3000);

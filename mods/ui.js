@@ -192,4 +192,4 @@ export function showNotification(text, time = 3000) {
 
 setTimeout(() => {
   showNotification('Press [GREEN] to open YTAF configuration screen');
-}, 5000);
+}, 2000);
