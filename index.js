@@ -11,7 +11,6 @@ const sendData = (hexData) => tvSdb.write(Buffer.from(hexData, 'hex'))
 
 tvSdb.on('data', async data => {
     const dataString = data.toString();
-
     if (dataString.includes('CLSE')) {
         // Close it and send OKAY.
         sendData('4f4b41591d000000210000000000000000000000b0b4bea6');
@@ -20,9 +19,12 @@ tvSdb.on('data', async data => {
 
     // After launching the app, request more log from the app. This is required to get the port
     if (dataString.includes('/app_launcher')) {
-        const char = dataString.substr(4, 1);
+        // Get the character byte instead of the string. When the
+        // character wasn't an ASCII character, it'd fail.
+        const char = data[4].toString(16).padStart(2, '0');
+
         // Send OKAY to the TV. This'll make the TV send more logs.
-        sendData(`4f4b415923000000${Buffer.from(char).toString('hex')}0000000000000000000000b0b4bea6`);
+        sendData(`4f4b415923000000${char}0000000000000000000000b0b4bea6`);
     }
 
     // The glorious win. Get the debugger port and start the debugger.
