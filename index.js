@@ -34,26 +34,22 @@ tvSdb.on('data', async data => {
     }
 });
 
-tvSdb.connect(26101, Config.tvIP, () => {
-    // Identify the TV.
-    sendData('434e584e00001000000004000700000032020000bcb1a7b1686f73743a3a00');
-});
-
-tvSdb.on('close', () => {
-    // Reconnect to the TV if something happens (like turning it off).
-    reconnectionInterval = setInterval(async () => {
-        tvSdb.connect(26101, Config.tvIP, () => {
-            // Identify the TV.
-            sendData('434e584e00001000000004000700000032020000bcb1a7b1686f73743a3a00');
-        });
-    }, 5000);
-});
+tvSdb.connect(26101, Config.tvIP);
 
 tvSdb.on('connect', () => {
     if (reconnectionInterval) {
         clearInterval(reconnectionInterval);
         reconnectionInterval = null;
     }
+
+    sendData('434e584e00001000000004000700000032020000bcb1a7b1686f73743a3a00');
+});
+
+tvSdb.on('close', () => {
+    // Reconnect to the TV if something happens (like turning it off).
+    reconnectionInterval = setInterval(async () => {
+        tvSdb.connect(26101, Config.tvIP);
+    }, 5000);
 });
 
 app.get('/launch', async (_, res) => {
