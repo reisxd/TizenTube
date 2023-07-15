@@ -36,9 +36,9 @@ jobs:
       - name: Clone TizenTube to assets
         working-directory: androidApp/app/src/main/assets
         run: |
-        ls
-        pwd
-        git clone https://github.com/reisxd/TizenTube.git tizentube
+          ls
+          pwd
+          git clone https://github.com/reisxd/TizenTube.git tizentube
       
       - name: Install TizenTube modules
         working-directory: androidApp/app/src/main/assets/tizentube
