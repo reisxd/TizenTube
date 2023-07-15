@@ -33,22 +33,25 @@ jobs:
       - name: Set env
         run: echo "RELEASE_VERSION=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
 
-      - name: Change directory
-        run: cd androidApp
-
-      - name: Install modules
+      - name: Clone TizenTube to assets
+        working-directory: androidApp/app/src/main/assets
+        run: git clone https://github.com/reisxd/TizenTube.git tizentube
+      
+      - name: Install TizenTube modules
+        working-directory: androidApp/app/src/main/assets/tizentube
         run: |
-          ls
-          cd app/src/main/assets
-          git clone https://github.com/reisxd/TizenTube.git tizentube
-          cd tizentube
           npm i
-          cd mods
+          rm -rf .git
+        
+      - name: Install TizenTube Mods modules and Build it
+        working-directory: androidApp/app/src/main/assets/tizentube/mods
+        run: |
           npm i
           npm run build
           rm -r node_modules
-          cd ../../../../..
+        
       - name: Build Release apk
+        working-directory: androidApp/
         run: ./gradlew build
 
       - name: Upload Release Build to Artifacts
