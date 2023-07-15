@@ -14,7 +14,6 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt -y update
-          sudo apt -y upgrade
           sudo apt -y install nodejs
 
       - name: Setup JAVA 11
@@ -39,6 +38,7 @@ jobs:
 
       - name: Install modules
         run: |
+          ls
           cd app/src/main/assets
           git clone https://github.com/reisxd/TizenTube.git tizentube
           cd tizentube
