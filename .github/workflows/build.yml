@@ -42,6 +42,7 @@ jobs:
         run: |
           npm i
           rm -rf .git
+          rm -rf apps
         
       - name: Install TizenTube Mods modules and Build it
         working-directory: androidApp/app/src/main/assets/tizentube/mods
