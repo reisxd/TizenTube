@@ -60,13 +60,11 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: release-artifacts
-          paths: |
-            androidApp/app/build/outputs/apk/debug/
+          path: androidApp/app/build/outputs/apk/debug/
    
       - name: Create Github Release
         uses: softprops/action-gh-release@v1
         with:
           generate_release_notes: true
           tag_name: ${{ env.RELEASE_VERSION }}
-          files: |
-            androidApp/app/build/outputs/apk/debug/app-debug.apk
+          files: androidApp/app/build/outputs/apk/debug/app-debug.apk
