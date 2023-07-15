@@ -89,3 +89,8 @@ wss.on('connection', ws => {
         }
     });
 });
+
+// If the server is running on Android and the CWD is /, change it (required for the Android app)
+if (process.cwd() === '/' && process.platform === 'android') {
+    process.chdir('/data/user/0/io.gh.reisxd.tizentube/files/tizentube');
+}

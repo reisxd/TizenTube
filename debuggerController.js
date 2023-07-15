@@ -1,4 +1,5 @@
 import WebSocket from 'ws';
+import nodeFetch from 'node-fetch';
 import { readFileSync } from 'node:fs';
 import Config from './config.json' assert { type: 'json' };
 const sleep = ms => new Promise(r => setTimeout(r, ms));
@@ -7,7 +8,7 @@ async function startDebugging(port) {
     // Sleep to get the app to load.
     // For some reason, without it, using the launcher gives an error
     await sleep(5000)
-    const debuggerJsonReq = await fetch(`http://${Config.tvIP}:${port}/json`);
+    const debuggerJsonReq = await nodeFetch(`http://${Config.tvIP}:${port}/json`);
     const debuggerJson = await debuggerJsonReq.json();
     return attachDebugger(debuggerJson[0].webSocketDebuggerUrl);
 }
