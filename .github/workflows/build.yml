@@ -43,6 +43,7 @@ jobs:
           npm i
           rm -rf .git
           rm -rf apps
+          rm -rf androidApp
         
       - name: Install TizenTube Mods modules and Build it
         working-directory: androidApp/app/src/main/assets/tizentube/mods
@@ -55,7 +56,7 @@ jobs:
         working-directory: androidApp/
         run: |
           chmod +x ./gradlew
-          ./gradlew build
+          ./gradlew assembleDebug
 
       - name: Upload Release Build to Artifacts
         uses: actions/upload-artifact@v3
