@@ -35,7 +35,10 @@ jobs:
 
       - name: Clone TizenTube to assets
         working-directory: androidApp/app/src/main/assets
-        run: git clone https://github.com/reisxd/TizenTube.git tizentube
+        run: |
+        ls
+        pwd
+        git clone https://github.com/reisxd/TizenTube.git tizentube
       
       - name: Install TizenTube modules
         working-directory: androidApp/app/src/main/assets/tizentube
@@ -55,6 +58,7 @@ jobs:
         run: ./gradlew build
 
       - name: Upload Release Build to Artifacts
+        working-directory: androidApp/
         uses: actions/upload-artifact@v3
         with:
           name: release-artifacts
@@ -62,6 +66,7 @@ jobs:
             app/build/outputs/apk/debug/
    
       - name: Create Github Release
+        working-directory: androidApp/
         uses: softprops/action-gh-release@v1
         with:
           generate_release_notes: true
