@@ -75,7 +75,10 @@ wss.on('connection', ws => {
                 // Launch the app with a debugger. Executes "sdb shell 0 debug app.id 0" (The last argument
                 // is for timeout, but timeout doesn't exist. And when you dont supply it, it just says
                 // "closed". Took me a little too long to figure out.).
-                sendData(`4f50454e250000000000000021000000f60a0000b0afbab17368656c6c3a3020646562756720${appId}${Config.isTizen3 ? '2030' : ''}00`)
+
+                // The first check for the Tizen 3 is for the size of the message. This took me a little too long to find out.
+                // The second check is for removing the third argument that debug was expecting on Tizen 3.0 devices. After removing it, it works on newer Tizen TVs.
+                sendData(`4f50454e250000000000000021000000${Config.isTizen3 ? 'f60a' : 'df0b' }0000b0afbab17368656c6c3a3020646562756720${appId}${Config.isTizen3 ? '2030' : ''}00`)
                 break;
             }
 
