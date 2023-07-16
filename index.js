@@ -75,7 +75,7 @@ wss.on('connection', ws => {
                 // Launch the app with a debugger. Executes "sdb shell 0 debug app.id 0" (The last argument
                 // is for timeout, but timeout doesn't exist. And when you dont supply it, it just says
                 // "closed". Took me a little too long to figure out.).
-                sendData(`4f50454e250000000000000021000000f60a0000b0afbab17368656c6c3a3020646562756720${appId}203000`)
+                sendData(`4f50454e250000000000000021000000f60a0000b0afbab17368656c6c3a3020646562756720${appId}${Config.isTizen3 ? '2030' : ''}00`)
                 break;
             }
 

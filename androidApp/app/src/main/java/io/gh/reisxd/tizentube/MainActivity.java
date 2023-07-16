@@ -8,17 +8,14 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.res.AssetManager;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.Switch;
 import android.widget.TextView;
-
-
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.handshake.ServerHandshake;
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -68,9 +65,11 @@ public class MainActivity extends AppCompatActivity {
         JSONObject object = readConfig();
         EditText appIdText = (EditText) findViewById(R.id.appIdTextField);
         EditText tvIpText = (EditText) findViewById(R.id.tvIpTextField);
+        Switch isTizen3 = (Switch) findViewById(R.id.isTizen3);
         try {
             appIdText.setText(object.getString("appId"));
             tvIpText.setText(object.getString("tvIP"));
+            isTizen3.setChecked(object.getBoolean("isTizen3"));
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -239,8 +238,10 @@ public class MainActivity extends AppCompatActivity {
             JSONObject object = readConfig();
             EditText appIdText = (EditText) findViewById(R.id.appIdTextField);
             EditText tvIpText = (EditText) findViewById(R.id.tvIpTextField);
+            Switch isTizen3 = (Switch) findViewById(R.id.isTizen3);
             object.put("appId", appIdText.getText());
             object.put("tvIP", tvIpText.getText());
+            object.put("isTizen3", isTizen3.isChecked());
             writeConfig(object);
         } catch (JSONException ex) {
             ex.printStackTrace();
