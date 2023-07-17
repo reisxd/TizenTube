@@ -7,64 +7,64 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v2.6.0
+      - uses: actions/checkout@v3
 
-      - name: Install dependencies
-        run: |
-          sudo apt -y update
-          sudo apt -y install nodejs
+      - name: Setup Node.js v18
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          check-latest: true
 
-      - name: Setup JAVA 11
+      - name: Setup Java v17
         uses: actions/setup-java@v3
         with:
           distribution: 'corretto'
-          java-version: 11
+          java-version: 17
+          check-latest: true
 
       - name: Cache Gradle and wrapper
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: |
             ~/.gradle/caches
             ~/.gradle/wrapper
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
-      
+
       - name: Set env
         run: echo "RELEASE_VERSION=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
 
       - name: Clone TizenTube to assets
         working-directory: androidApp/app/src/main/assets
         run: git clone https://github.com/reisxd/TizenTube.git tizentube
-      
+
       - name: Install TizenTube modules
         working-directory: androidApp/app/src/main/assets/tizentube
         run: |
           npm i
-          rm -rf .git
-          rm -rf apps
-          rm -rf androidApp
-        
-      - name: Install TizenTube Mods modules and Build it
+          rm -rf .git apps androidApp
+
+      - name: Install TizenTube Mods modules and build it
         working-directory: androidApp/app/src/main/assets/tizentube/mods
         run: |
           npm i
           npm run build
           rm -r node_modules
-        
+
       - name: Build Release apk
         working-directory: androidApp/
         run: |
           chmod +x ./gradlew
           ./gradlew assembleDebug
 
-      - name: Upload Release Build to Artifacts
+      - name: Upload Release build to artifacts
         uses: actions/upload-artifact@v3
         with:
           name: release-artifacts
           path: androidApp/app/build/outputs/apk/debug/
-   
-      - name: Create Github Release
+
+      - name: Create GitHub release
         uses: softprops/action-gh-release@v1
         with:
           generate_release_notes: true
