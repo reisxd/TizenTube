@@ -1,18 +1,18 @@
 # TizenTube
 
-A NodeJS script to remove YouTube ads and add support for Sponsorblock for your Tizen TV (2017 and forward).
+TizenTube is a NodeJS script that enhances your Tizen TV (2017 and newer) viewing experience by removing YouTube ads and adding support for Sponsorblock.
 
 # TizenTube Installation Guide
 
 ## Prerequisites
 
 - A PC capable of running Tizen Studio, which will be used to install TizenStudio onto your TV through SDB.
-- A PC or Single Board Computer capable of running 24/7 (for ease of use) or the Android App. Your TV connects to the debugger and sends JS code to this debugger that removes video ads.
+- A PC or Single Board Computer capable of running 24/7 (for ease of use) or the Android App. When the TizenTube app starts on your TV, it initiates a debugger session using the debug <app.id> command. This allows the TV to connect to the debugger and send JavaScript code that removes video ads.
 
 ## Installation Steps
 
 1. **Enable Developer Mode** on your TV by following [this link](https://developer.samsung.com/smarttv/develop/getting-started/using-sdk/tv-device.html).
-2. **Install Tizen Studio** by following [this guide](https://developer.samsung.com/smarttv/develop/getting-started/setting-up-sdk/installing-tv-sdk.html). To determine the appropriate version of the SDK to install, check your TV's release year and [see which SDK version is recommended](https://developer.samsung.com/smarttv/develop/specifications/tv-model-groups.html).
+2. **Install Tizen Studio** by following [this guide](https://developer.samsung.com/smarttv/develop/getting-started/setting-up-sdk/installing-tv-sdk.html). Make sure to install the Tizen SDK version 6.x.x, which is the project’s SDK version..
 3. **Connect to your TV** using [this guide](https://developer.samsung.com/smarttv/develop/getting-started/using-sdk/tv-device.html#:~:text=Connect%20the%20TV%20to%20the%20SDK%3A).
 4. **Create a Samsung certificate** using [this guide](https://developer.samsung.com/smarttv/develop/getting-started/setting-up-sdk/creating-certificates.html).
 5. **Clone/download the repository** and open the `apps` folder of the repository in Tizen Studio by restarting Tizen Studio and changing the workspace.
@@ -30,11 +30,11 @@ After completing these steps, installing apps is complete! You should be able to
 4. Install mods modules by running `cd mods` and then running `npm i`.
 5. Build mods by running `npm run build`.
 6. Navigate back to the main folder of the repository by running `cd ..`.
-7. Open `config.json` in your favorite text editor. Change `tvIP` to the IP of your TV. Make sure to leave the `appID` as it is. Change `isTizen3` to true if your TV runs on Tizen 3.
+7. Open `config.json` in your favorite text editor. Change `tvIP` to the IP of your TV. Make sure to leave the `appID` as it is (`Ad6NutHP8l.TizenTube`). Change `isTizen3` to true if your TV runs on Tizen 3.
 8. Ensure that SDB is not running by going to Tizen's device manager and disconnecting your TV.
 9. Start the node debugger/server using `node .`.
 
-And now you should have a server running! You should be able to go to your TV's apps, open either the Launcher app or TizenStudio and enjoy adless viewing.
+Once the server is up and running, you can access the Launcher app from your TV’s app menu. Please note that the TizenTube app will still display ads if it is run on its own. To remove ads, make sure to launch TizenTube through the Launcher app, which is connected to the server.
 
 ### Option 2: Use The Android App
 
