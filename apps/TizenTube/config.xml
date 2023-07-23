@@ -9,5 +9,5 @@
     <tizen:privilege name="http://tizen.org/privilege/application.launch"/>
     <tizen:profile name="tv-samsung"/>
     <tizen:setting screen-orientation="landscape" context-menu="enable" background-support="disable" encryption="disable" install-location="auto" hwkey-event="enable"/>
-    <access origin="https://www.youtube.com" subdomains="true"/>
+    <access origin="*" subdomains="true"/>
 </widget>
