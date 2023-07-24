@@ -2,12 +2,16 @@
 
 TizenTube is a NodeJS script that enhances your Tizen TV (2017 and newer) viewing experience by removing YouTube ads and adding support for Sponsorblock.
 
+## How it works
+
+TizenTube operates by initiating a debugger session upon launching the app on your Tizen TV. This is achieved through the utilization of the `debug <app.id>` command, which establishes a connection between the TV and the debugger. Once connected, the TV is able to transmit JavaScript code that effectively removes video ads.
+
 # TizenTube Installation Guide
 
 ## Prerequisites
 
 - A PC capable of running Tizen Studio, which will be used to install TizenStudio onto your TV through SDB.
-- A PC or Single Board Computer capable of running 24/7 (for ease of use) or the Android App. When the TizenTube app starts on your TV, it initiates a debugger session using the debug <app.id> command. This allows the TV to connect to the debugger and send JavaScript code that removes video ads.
+- A PC or Single Board Computer capable of running 24/7 (for ease of use) or the Android App.
 
 ## Installation Steps
 
@@ -20,11 +24,11 @@ TizenTube is a NodeJS script that enhances your Tizen TV (2017 and newer) viewin
 7. Ensure that your TV is selected at the top of Tizen Studio (the dropdown menu).
 8. Right-click the `TizenTube` app and run it as a Tizen web application. Once that is done, do the same for the `Launcher` app.
 
-After completing these steps, installing apps is complete! You should be able to see the apps on your TV. Now comes the easier part, installing the server or the debugger.
+After completing these steps, installing apps is complete! You should be able to see the apps on your TV. Now comes the easier part, installing the server or the debugger. You have two options to do this:
 
 ### Option 1: Install on PC/SBC
 
-1. Download NodeJS if you haven't already. Check by running the command `npm -v`.
+1. Download [NodeJS](https://nodejs.org/en) if you haven't already. Check by running the command `npm -v`.
 2. Clone the repository.
 3. Install modules by running `npm i` in the main folder of the repository.
 4. Install mods modules by running `cd mods` and then running `npm i`.
