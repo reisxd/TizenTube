@@ -2,6 +2,8 @@
 
 TizenTube is a NodeJS script that enhances your Tizen TV (2017 and newer) viewing experience by removing ads and adding support for Sponsorblock.
 
+[Discord Server Invite](https://discord.gg/m2P7v8Y2qR)
+
 ## How it works
 
 TizenTube operates by initiating a debugger session upon launching the app on your Tizen TV. This is achieved through the utilization of the `debug <app.id>` command, which establishes a connection between the server and the debugger. Once connected, the server is able to transmit JavaScript code that effectively removes video ads.
