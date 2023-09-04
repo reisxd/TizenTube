@@ -105,7 +105,7 @@
         android:layout_marginTop="10dp"
         android:layout_marginEnd="88dp"
         android:layout_marginBottom="9dp"
-        android:text="Tizen 3 (2017) Compatability"
+        android:text="Tizen 3 (2017) Compatibility"
         app:layout_constraintBottom_toTopOf="@+id/button"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
