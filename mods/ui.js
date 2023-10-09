@@ -27,10 +27,10 @@ uiContainer.addEventListener(
   'keydown',
   (evt) => {
     console.info('uiContainer key event:', evt.type, evt.charCode);
-    if (evt.charCode !== 404 && evt.charCode !== 172) {
+    if (evt.keyCode !== 404 && evt.keyCode !== 172) {
       if (evt.keyCode in ARROW_KEY_CODE) {
         navigate(ARROW_KEY_CODE[evt.keyCode]);
-      } else if (evt.keyCode === 13) {
+      } else if (evt.keyCode === 32) {
         // "OK" button
         document.querySelector(':focus').click();
       } else if (evt.keyCode === 27) {
@@ -136,7 +136,7 @@ const eventHandler = (evt) => {
     evt.keyCode,
     evt.defaultPrevented
   );
-  if (evt.charCode == 404 || evt.charCode == 172) {
+  if (evt.keyCode == 404 || evt.keyCode == 172) {
     console.info('Taking over!');
     evt.preventDefault();
     evt.stopPropagation();
