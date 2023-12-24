@@ -1,0 +1,9 @@
+version: '3'
+services:
+  power_tizen:
+    build: .
+    restart: always
+    image: nodetizen:v1
+    network_mode: "host"
+    command: node .
+
