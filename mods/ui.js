@@ -26,8 +26,8 @@ uiContainer.addEventListener(
 uiContainer.addEventListener(
   'keydown',
   (evt) => {
-    console.info('uiContainer key event:', evt.type, evt.charCode);
-    if (evt.charCode !== 404 && evt.charCode !== 172) {
+    console.info('uiContainer key event:', evt.type, evt.keyCode);
+    if (evt.keyCode !== 404 && evt.keyCode !== 172) {
       if (evt.keyCode in ARROW_KEY_CODE) {
         navigate(ARROW_KEY_CODE[evt.keyCode]);
       } else if (evt.keyCode === 13) {
@@ -132,11 +132,11 @@ const eventHandler = (evt) => {
   console.info(
     'Key event:',
     evt.type,
-    evt.charCode,
+    evt.keyCode,
     evt.keyCode,
     evt.defaultPrevented
   );
-  if (evt.charCode == 404 || evt.charCode == 172) {
+  if (evt.keyCode == 404 || evt.keyCode == 172) {
     console.info('Taking over!');
     evt.preventDefault();
     evt.stopPropagation();
@@ -191,5 +191,5 @@ export function showNotification(text, time = 3000) {
 }
 
 setTimeout(() => {
-  showNotification('Press [GREEN] to open YTAF configuration screen');
+  showNotification('Press [GREEN] to open YTAF configuration screen\nPress [BLUE] to open Video Speed configuration screen');
 }, 2000);

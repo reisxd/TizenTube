@@ -24,13 +24,18 @@
 }
 
 .ytaf-ui-container input[type='checkbox'] {
-  width: 2rem;
-  height: 1.5rem;
+  width: 1.4rem;
+  height: 1.4rem;
+}
+
+.ytaf-ui-container input[type='radio'] {
+  width: 1.4rem;
+  height: 1.4rem;
 }
 
 .ytaf-ui-container label {
   display: block;
-  font-size: 2rem;
+  font-size: 1.4rem;
 }
 
 .ytaf-notification-container {

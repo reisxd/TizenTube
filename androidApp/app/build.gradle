@@ -7,8 +7,8 @@ android {
 
     defaultConfig {
         applicationId "io.gh.reisxd.tizentube"
-        minSdk 26
-        targetSdk 26
+        minSdk 21
+        targetSdk 21
         compileSdk 33
         versionCode 1
         versionName "1.0.2"
