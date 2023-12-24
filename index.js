@@ -43,7 +43,6 @@ wss.on('connection', ws => {
                 shellCmd.on('data', data => {
                     const dataString = data.toString();
                     if (dataString.includes('debug')) {
-                        console.log(dataString);
                         const port = dataString.substr(dataString.indexOf(':') + 1, 6).replace(' ', '');
                         startDebugging(port)
                     }
