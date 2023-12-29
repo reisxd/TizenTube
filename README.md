@@ -39,6 +39,7 @@ After completing these steps, installing apps is complete! You should be able to
 7. Open `config.json` in your favorite text editor. Change `tvIP` to the IP of your TV. Make sure to leave the `appID` as it is (`Ad6NutHP8l.TizenTube`). Change `isTizen3` to true if your TV runs on Tizen 3.
 8. Ensure that SDB is not running by going to Tizen's device manager and disconnecting your TV.
 9. Start the node debugger/server using `node .`.
+10. Set the Developer Mode's Host IP on the TV to your nodejs server IP.
 
 Once the server is up and running, you can access the Launcher app from your TV’s app menu. Please note that the TizenTube app will still display ads if it is run on its own. To remove ads, make sure to launch TizenTube through the Launcher app, which is connected to the server.
 
