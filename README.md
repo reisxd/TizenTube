@@ -22,12 +22,12 @@ TizenTube operates by initiating a debugger session upon launching the app on yo
      - Make sure to install the Tizen TV Extensions SDK. Although project's TV Extensions SDK version is 6.x.x, version 7.0.0 works too.
      - Also install the Samsung Certificate Extension
          - Note: This extension's installation on Tizen Studio 5.5 with IDE installer for **macOS** is broken. This breaks proper certificate creation (step 6). Therefore, avoid this macOS Tizen Studio version or use Windows/Ubuntu version.
-5. **Connect to your TV** using [this guide](https://developer.samsung.com/smarttv/develop/getting-started/using-sdk/tv-device.html#:~:text=Connect%20the%20TV%20to%20the%20SDK%3A).
-6. **Create a Samsung certificate** using [this guide](https://developer.samsung.com/smarttv/develop/getting-started/setting-up-sdk/creating-certificates.html).
-7. **Clone/download the repository** and open the `apps` folder of the repository in Tizen Studio by restarting Tizen Studio and changing the workspace.
-8. In the `index.html` file of the Launcher app, change the `IP` variable to the IP of where your debugger will be installed. This could also be the IP of your android device if you plan on using that instead.
-9. Ensure that your TV is selected at the top of Tizen Studio (the dropdown menu).
-10. Right-click the `TizenTube` app and run it as a Tizen web application. Once that is done, do the same for the `Launcher` app.
+3. **Connect to your TV** using [this guide](https://developer.samsung.com/smarttv/develop/getting-started/using-sdk/tv-device.html#:~:text=Connect%20the%20TV%20to%20the%20SDK%3A).
+4. **Create a Samsung certificate** using [this guide](https://developer.samsung.com/smarttv/develop/getting-started/setting-up-sdk/creating-certificates.html).
+5. **Clone/download the repository** and open the `apps` folder of the repository in Tizen Studio by restarting Tizen Studio and changing the workspace.
+6. In the `index.html` file of the Launcher app, change the `IP` variable to the IP of where your debugger will be installed. This could also be the IP of your android device if you plan on using that instead.
+7. Ensure that your TV is selected at the top of Tizen Studio (the dropdown menu).
+8. Right-click the `TizenTube` app and run it as a Tizen web application. Once that is done, do the same for the `Launcher` app.
 
 After completing these steps, installing apps is complete! You should be able to see the apps on your TV. Now comes the easier part, installing the server or the debugger. You have two options to do this:
 
