@@ -50,7 +50,7 @@ Once the server is up and running, you can access the Launcher app from your TVâ
 ### Option 2: Use The Android App
 
 1. First, change the Developer Mode's Host IP to your device's IP.
-2. Download the latest APK compatible with your device's architecture from [here](https://github.com/reisxd/TizenTube/releases/tag/v1.1.2) (if unsure, download armeabi-v7a).
+2. Download the latest APK compatible with your device's architecture from [here](https://github.com/reisxd/TizenTube/releases/latest) (if unsure, download armeabi-v7a).
 3. Install it.
 4. After opening the app, change the configuration to suit your needs. Ensure that you set the `appID` to `Ad6NutHP8l.TizenTube` if it isn't already set. Change the IP to match that of your TV.
 5. Change the development IP address on the TV (previously set in step 1 of Installation Steps) to that of this Android device which you'll run the server on.
