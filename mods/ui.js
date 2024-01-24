@@ -30,7 +30,7 @@ uiContainer.addEventListener(
     if (evt.keyCode !== 404 && evt.keyCode !== 172) {
       if (evt.keyCode in ARROW_KEY_CODE) {
         navigate(ARROW_KEY_CODE[evt.keyCode]);
-      } else if (evt.keyCode === 13) {
+      } else if (evt.keyCode === 13 || evt.keyCode === 32) {
         // "OK" button
         document.querySelector(':focus').click();
       } else if (evt.keyCode === 27) {
