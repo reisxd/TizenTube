@@ -4,16 +4,21 @@ import { readFileSync } from 'node:fs';
 import Config from './config.json' assert { type: 'json' };
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 
-async function startDebugging(port) {
+async function startDebugging(port, adb_conn) {
     // Sleep to get the app to load.
     // For some reason, without it, using the launcher gives an error
     await sleep(5000)
-    const debuggerJsonReq = await nodeFetch(`http://${Config.tvIP}:${port}/json`);
-    const debuggerJson = await debuggerJsonReq.json();
-    return attachDebugger(debuggerJson[0].webSocketDebuggerUrl);
+    try {
+        const debuggerJsonReq = await nodeFetch(`http://${Config.tvIP}:${port}/json`);
+        const debuggerJson = await debuggerJsonReq.json();
+        return attachDebugger(debuggerJson[0].webSocketDebuggerUrl, adb_conn);
+    } catch (error) {
+        console.error('Error attaching debugger:', error.message);
+        adb_conn._stream.end();
+    }
 }
 
-async function attachDebugger(wsUrl) {
+async function attachDebugger(wsUrl, adb_conn) {
     const client = await new WebSocket(wsUrl);
     let id = 12;
     let modFile;
@@ -21,6 +26,7 @@ async function attachDebugger(wsUrl) {
         modFile = readFileSync('mods/dist/userScript.js', 'utf-8');
     } catch {
         console.error('Could not find the built mod file. Did you build it?');
+        adb_conn._stream.end();
         client.close();
         return;
     }
@@ -48,6 +54,7 @@ async function attachDebugger(wsUrl) {
 
         client.send(JSON.stringify({ "id": 7, "method": "Debugger.enable" }));
         client.send(JSON.stringify({ "id": 11, "method": "Runtime.enable" }));
+        adb_conn._stream.end();
     }
 }
 
