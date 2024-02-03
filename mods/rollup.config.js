@@ -4,7 +4,7 @@ import getBabelOutputPlugin from '@rollup/plugin-babel';
 
 export default {
     input: "userScript.js",
-    output: { file: "dist/userScript.js", format: "iife" },
+    output: { file: "../dist/userScript.js", format: "iife" },
     plugins: [
         postcss(),
         terser({
