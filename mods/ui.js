@@ -57,6 +57,11 @@ uiContainer.innerHTML = `
 <label for="__sponsorblock_selfpromo"><input type="checkbox" id="__sponsorblock_selfpromo" /> Skip Self Promotion Segments</label>
 <label for="__sponsorblock_music_offtopic"><input type="checkbox" id="__sponsorblock_music_offtopic" /> Skip Music and Off-topic Segments</label>
 </blockquote>
+<label for="__dearrow"><input type="checkbox" id="__dearrow" /> Enable DeArrow</label>
+<blockquote>
+<label for="__dearrow_thumbnails"><input type="checkbox" id="__dearrow_thumbnails" /> Enable DeArrow Thumbnails</label>
+<div><small>DeArrow Thumbnail changing might break the shelve renderer. Be warned.</small></div>
+</blockquote>
 <div><small>Sponsor segments skipping - https://sponsor.ajay.app</small></div>
 `;
 
@@ -127,6 +132,16 @@ uiContainer
   .addEventListener('change', (evt) => {
     configWrite('enableSponsorBlockMusicOfftopic', evt.target.checked);
   });
+
+uiContainer.querySelector('#__dearrow').checked = configRead('enableDeArrow');
+uiContainer.querySelector('#__dearrow').addEventListener('change', (evt) => {
+  configWrite('enableDeArrow', evt.target.checked);
+});
+
+uiContainer.querySelector('#__dearrow_thumbnails').checked = configRead('enableDeArrowThumbnails');
+uiContainer.querySelector('#__dearrow_thumbnails').addEventListener('change', (evt) => {
+  configWrite('enableDeArrowThumbnails', evt.target.checked);
+});
 
 const eventHandler = (evt) => {
   console.info(
