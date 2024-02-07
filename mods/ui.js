@@ -2,6 +2,7 @@
 import './spatial-navigation-polyfill.js';
 import './ui.css';
 import { configRead, configWrite } from './config.js';
+import updateStyle from './theme.js';
 
 // We handle key events ourselves.
 window.__spatialNavigation__.keyMode = 'NONE';
@@ -33,20 +34,22 @@ uiContainer.addEventListener(
       } else if (evt.keyCode === 13 || evt.keyCode === 32) {
         // "OK" button
         document.querySelector(':focus').click();
-      } else if (evt.keyCode === 27) {
+        // Check if the focused element is a text input.
+      } else if (evt.keyCode === 27 && document.querySelector(':focus').type !== 'text') {
         // Back button
         uiContainer.style.display = 'none';
         uiContainer.blur();
+      } else if (document.querySelector(':focus').type === 'text' && evt.keyCode === 27) {
+          const focusedElement = document.querySelector(':focus');
+          focusedElement.value = focusedElement.value.slice(0, -1);
       }
-      evt.preventDefault();
-      evt.stopPropagation();
     }
   },
   true
 );
 
 uiContainer.innerHTML = `
-<h1>webOS YouTube Extended</h1>
+<h1>TizenTube Configuration</h1>
 <label for="__adblock"><input type="checkbox" id="__adblock" /> Enable AdBlocking</label>
 <label for="__sponsorblock"><input type="checkbox" id="__sponsorblock" /> Enable SponsorBlock</label>
 <blockquote>
@@ -62,6 +65,8 @@ uiContainer.innerHTML = `
 <label for="__dearrow_thumbnails"><input type="checkbox" id="__dearrow_thumbnails" /> Enable DeArrow Thumbnails</label>
 <div><small>DeArrow Thumbnail changing might break the shelve renderer. Be warned.</small></div>
 </blockquote>
+<label for="__barColor">Navigation Bar Color: <input type="text" id="__barColor"/></label>
+<label for="__routeColor">Main Content Color: <input type="text" id="__routeColor"/></label>
 <div><small>Sponsor segments skipping - https://sponsor.ajay.app</small></div>
 `;
 
@@ -143,6 +148,18 @@ uiContainer.querySelector('#__dearrow_thumbnails').addEventListener('change', (e
   configWrite('enableDeArrowThumbnails', evt.target.checked);
 });
 
+uiContainer.querySelector('#__barColor').value = configRead('focusContainerColor');
+uiContainer.querySelector('#__barColor').addEventListener('change', (evt) => {
+  configWrite('focusContainerColor', evt.target.value);
+  updateStyle();
+});
+
+uiContainer.querySelector('#__routeColor').value = configRead('routeColor');
+uiContainer.querySelector('#__routeColor').addEventListener('change', (evt) => {
+  configWrite('routeColor', evt.target.value);
+  updateStyle();
+});
+
 const eventHandler = (evt) => {
   console.info(
     'Key event:',
@@ -206,5 +223,5 @@ export function showNotification(text, time = 3000) {
 }
 
 setTimeout(() => {
-  showNotification('Press [GREEN] to open YTAF configuration screen\nPress [BLUE] to open Video Speed configuration screen');
+  showNotification('Press [GREEN] to open TizenTube configuration screen\nPress [BLUE] to open Video Speed configuration screen');
 }, 2000);

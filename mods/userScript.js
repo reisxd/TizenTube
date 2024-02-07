@@ -4,3 +4,4 @@ import './adblock.js';
 import './sponsorblock.js';
 import './ui.js';
 import './speedUI.js';
+import './theme.js';
