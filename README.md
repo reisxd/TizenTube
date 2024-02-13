@@ -12,3 +12,12 @@ TizenTube is a TizenBrew module that enhances your favourite streaming websites 
 ```sh
 npm i @foxreis/tizentube
 ```
+
+# Features
+
+- Ad Blocker
+- [SponsorBlock](https://sponsor.ajay.app/) Support
+- Video Speed Control
+- [DeArrow](https://dearrow.ajay.app/) Support
+- Customizable Themes (Custom Coloring)
+- More to come, if you [request](https://github.com/reisxd/TizenTube/issues/new) it!
