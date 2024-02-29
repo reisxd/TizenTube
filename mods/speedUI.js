@@ -3,31 +3,13 @@ import './spatial-navigation-polyfill.js';
 import './ui.css';
 import { configRead, configWrite } from './config.js';
 
-// Observer to catch when the video element is loaded, when it is -> execute the script
-const observer = new MutationObserver((mutationsList, observer) => {
-    mutationsList.forEach(mutation => {
-        mutation.addedNodes.forEach(addedNode => {
-            if (addedNode.tagName && addedNode.tagName.toLowerCase() === 'video') {
-                execute_once_dom_loaded_speed();
-                observer.disconnect();
-            }
-        });
-    });
-});
-
-//Check if video element is already loaded. if not, wait for it once DOM is ready
-const videoElement = document.querySelector('video');
-if (videoElement) {
-    execute_once_dom_loaded_speed();
-} else {
-    if (document.readyState !== 'loading') {
-        observer.observe(document.body, { childList: true, subtree: true });
-    } else {
-        document.addEventListener('DOMContentLoaded', () => {
-            observer.observe(document.body, { childList: true, subtree: true });
-        });
+const interval = setInterval(() => {
+    const videoElement = document.querySelector('video');
+    if (videoElement) {
+        execute_once_dom_loaded_speed();
+        clearInterval(interval);
     }
-}
+}, 1000);
 
 function execute_once_dom_loaded_speed() {
 

@@ -2,32 +2,16 @@
 import './spatial-navigation-polyfill.js';
 import './ui.css';
 import { configRead, configWrite } from './config.js';
+import updateStyle from './theme.js';
 
-// Observer to catch when the video element is loaded, when it is -> execute the script
-const observer = new MutationObserver((mutationsList, observer) => {
-  mutationsList.forEach(mutation => {
-    mutation.addedNodes.forEach(addedNode => {
-      if (addedNode.tagName && addedNode.tagName.toLowerCase() === 'video') {
-        execute_once_dom_loaded();
-        observer.disconnect();
-      }
-    });
-  });
-});
-
-//Check if video element is already loaded. if not, wait for it once DOM is ready
-const videoElement = document.querySelector('video');
-if (videoElement) {
-  execute_once_dom_loaded();
-} else {
-  if (document.readyState !== 'loading') {
-    observer.observe(document.body, { childList: true, subtree: true });
-  } else {
-    document.addEventListener('DOMContentLoaded', () => {
-      observer.observe(document.body, { childList: true, subtree: true });
-    });
+// It just works, okay?
+const interval = setInterval(() => {
+  const videoElement = document.querySelector('video');
+  if (videoElement) {
+    execute_once_dom_loaded();
+    clearInterval(interval);
   }
-}
+}, 1000);
 
 function execute_once_dom_loaded() {
   // We handle key events ourselves.
@@ -60,10 +44,13 @@ function execute_once_dom_loaded() {
         } else if (evt.keyCode === 13 || evt.keyCode === 32) {
           // "OK" button
           document.querySelector(':focus').click();
-        } else if (evt.keyCode === 27) {
+        } else if (evt.keyCode === 27 && document.querySelector(':focus').type !== 'text') {
           // Back button
           uiContainer.style.display = 'none';
           uiContainer.blur();
+        } else if (document.querySelector(':focus').type === 'text' && evt.keyCode === 27) {
+          const focusedElement = document.querySelector(':focus');
+          focusedElement.value = focusedElement.value.slice(0, -1);
         }
         evt.preventDefault();
         evt.stopPropagation();
@@ -73,7 +60,7 @@ function execute_once_dom_loaded() {
   );
 
   uiContainer.innerHTML = `
-<h1>webOS YouTube Extended</h1>
+<h1>TizenTube Configuration</h1>
 <label for="__adblock"><input type="checkbox" id="__adblock" /> Enable AdBlocking</label>
 <label for="__sponsorblock"><input type="checkbox" id="__sponsorblock" /> Enable SponsorBlock</label>
 <blockquote>
@@ -84,6 +71,13 @@ function execute_once_dom_loaded() {
 <label for="__sponsorblock_selfpromo"><input type="checkbox" id="__sponsorblock_selfpromo" /> Skip Self Promotion Segments</label>
 <label for="__sponsorblock_music_offtopic"><input type="checkbox" id="__sponsorblock_music_offtopic" /> Skip Music and Off-topic Segments</label>
 </blockquote>
+<label for="__dearrow"><input type="checkbox" id="__dearrow" /> Enable DeArrow</label>
+<blockquote>
+<label for="__dearrow_thumbnails"><input type="checkbox" id="__dearrow_thumbnails" /> Enable DeArrow Thumbnails</label>
+<div><small>DeArrow Thumbnail changing might break the shelve renderer. Be warned.</small></div>
+</blockquote>
+<label for="__barColor">Navigation Bar Color: <input type="text" id="__barColor"/></label>
+<label for="__routeColor">Main Content Color: <input type="text" id="__routeColor"/></label>
 <div><small>Sponsor segments skipping - https://sponsor.ajay.app</small></div>
 `;
   document.querySelector('body').appendChild(uiContainer);
@@ -153,6 +147,29 @@ function execute_once_dom_loaded() {
     .addEventListener('change', (evt) => {
       configWrite('enableSponsorBlockMusicOfftopic', evt.target.checked);
     });
+
+  uiContainer.querySelector('#__dearrow').checked = configRead('enableDeArrow');
+  uiContainer.querySelector('#__dearrow').addEventListener('change', (evt) => {
+    configWrite('enableDeArrow', evt.target.checked);
+  });
+
+  uiContainer.querySelector('#__dearrow_thumbnails').checked = configRead('enableDeArrowThumbnails');
+  uiContainer.querySelector('#__dearrow_thumbnails').addEventListener('change', (evt) => {
+    configWrite('enableDeArrowThumbnails', evt.target.checked);
+  });
+
+  uiContainer.querySelector('#__barColor').value = configRead('focusContainerColor');
+  uiContainer.querySelector('#__barColor').addEventListener('change', (evt) => {
+    configWrite('focusContainerColor', evt.target.value);
+    updateStyle();
+  });
+
+  uiContainer.querySelector('#__routeColor').value = configRead('routeColor');
+  uiContainer.querySelector('#__routeColor').addEventListener('change', (evt) => {
+    configWrite('routeColor', evt.target.value);
+    updateStyle();
+  });
+  
   var eventHandler = (evt) => {
     // We handle key events ourselves.
     console.info(
@@ -190,7 +207,7 @@ function execute_once_dom_loaded() {
   document.addEventListener('keyup', eventHandler, true);
 
   setTimeout(() => {
-    showNotification('Press [GREEN] to open YTAF configuration screen\nPress [BLUE] to open Video Speed configuration screen');
+    showNotification('Press [GREEN] to open TizenTube configuration screen\nPress [BLUE] to open Video Speed configuration screen');
   }, 2000);
 }
 
