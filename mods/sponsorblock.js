@@ -307,7 +307,7 @@ window.addEventListener(
   () => {
     const newURL = new URL(location.hash.substring(1), location.href);
     // A hack, but it works, so...
-    const videoID = newURL.search.replace('?v=', '');
+    const videoID = newURL.search.replace('?v=', '').split('&')[0];
     const needsReload =
       videoID &&
       (!window.sponsorblock || window.sponsorblock.videoID != videoID);
