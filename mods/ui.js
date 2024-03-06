@@ -1,6 +1,6 @@
 /*global navigate*/
 import './spatial-navigation-polyfill.js';
-import './ui.css';
+import css from './ui.css';
 import { configRead, configWrite } from './config.js';
 import updateStyle from './theme.js';
 
@@ -11,9 +11,33 @@ const interval = setInterval(() => {
     execute_once_dom_loaded();
     clearInterval(interval);
   }
-}, 1000);
+}, 250);
 
 function execute_once_dom_loaded() {
+
+  // Add CSS to head.
+
+  const existingStyle = document.querySelector('style[nonce]');
+  if (existingStyle) {
+    existingStyle.textContent += css;
+  } else {
+    const style = document.createElement('style');
+    style.textContent = css;
+    document.head.appendChild(style);
+  }
+
+  // Fix UI issues.
+  const ui = configRead('enableFixedUI');
+  if (ui) {
+    try {
+      window.tectonicConfig.featureSwitches.isLimitedMemory = false;
+      window.tectonicConfig.clientData.legacyApplicationQuality = 'full-animation';
+      window.tectonicConfig.featureSwitches.enableAnimations = true;
+      window.tectonicConfig.featureSwitches.enableOnScrollLinearAnimation = true;
+      window.tectonicConfig.featureSwitches.enableListAnimations = true;
+    } catch (e) {}
+  }
+
   // We handle key events ourselves.
   window.__spatialNavigation__.keyMode = 'NONE';
 
@@ -62,6 +86,7 @@ function execute_once_dom_loaded() {
   uiContainer.innerHTML = `
 <h1>TizenTube Configuration</h1>
 <label for="__adblock"><input type="checkbox" id="__adblock" /> Enable AdBlocking</label>
+<label for="__fixedUI"><input type="checkbox" id="__fixedUI" /> Enable Fixed UI</label>
 <label for="__sponsorblock"><input type="checkbox" id="__sponsorblock" /> Enable SponsorBlock</label>
 <blockquote>
 <label for="__sponsorblock_sponsor"><input type="checkbox" id="__sponsorblock_sponsor" /> Skip Sponsor Segments</label>
@@ -169,7 +194,12 @@ function execute_once_dom_loaded() {
     configWrite('routeColor', evt.target.value);
     updateStyle();
   });
-  
+
+  uiContainer.querySelector('#__fixedUI').checked = configRead('enableFixedUI');
+  uiContainer.querySelector('#__fixedUI').addEventListener('change', (evt) => {
+    configWrite('enableFixedUI', evt.target.checked);
+  });
+
   var eventHandler = (evt) => {
     // We handle key events ourselves.
     console.info(

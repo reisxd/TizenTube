@@ -12,7 +12,8 @@ const defaultConfig = {
   enableDeArrow: true,
   enableDeArrowThumbnails: false,
   focusContainerColor: '#0f0f0f',
-  routeColor: '#0f0f0f'
+  routeColor: '#0f0f0f',
+  enableFixedUI: true
 };
 
 let localConfig;

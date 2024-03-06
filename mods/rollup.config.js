@@ -1,4 +1,4 @@
-import postcss from 'rollup-plugin-postcss'
+import { string } from 'rollup-plugin-string';
 import terser from '@rollup/plugin-terser';
 import getBabelOutputPlugin from '@rollup/plugin-babel';
 
@@ -6,7 +6,9 @@ export default {
     input: "userScript.js",
     output: { file: "../dist/userScript.js", format: "iife" },
     plugins: [
-        postcss(),
+        string({
+            include: "**/*.css",
+        }),
         terser({
             ecma: '5',
             mangle: true,
