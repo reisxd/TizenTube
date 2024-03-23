@@ -35,7 +35,7 @@ function execute_once_dom_loaded() {
       window.tectonicConfig.featureSwitches.enableAnimations = true;
       window.tectonicConfig.featureSwitches.enableOnScrollLinearAnimation = true;
       window.tectonicConfig.featureSwitches.enableListAnimations = true;
-    } catch (e) {}
+    } catch (e) { }
   }
 
   // We handle key events ourselves.
@@ -239,6 +239,20 @@ function execute_once_dom_loaded() {
   setTimeout(() => {
     showNotification('Press [GREEN] to open TizenTube configuration screen\nPress [BLUE] to open Video Speed configuration screen');
   }, 2000);
+
+  // Fix UI issues, again. Love, Googol.
+
+  if (configRead('enableFixedUI')) {
+    try {
+      const observer = new MutationObserver((_, _2) => {
+        const body = document.querySelector('body');
+        if (body.classList.contains('app-quality-root')) {
+          body.classList.remove('app-quality-root');
+        }
+      });
+      observer.observe(document.getElementsByTagName('body')[0], { attributes: true, childList: false, subtree: false });
+    } catch (e) { }
+  }
 }
 
 export function showNotification(text, time = 3000) {
