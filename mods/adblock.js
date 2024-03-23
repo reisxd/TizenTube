@@ -21,6 +21,11 @@ JSON.parse = function () {
     r.playerAds = false;
   }
 
+  // Also set adSlots to an empty array, emptying only the adPlacements won't work.
+  if (r.adSlots && configRead('enableAdBlock')) {
+    r.adSlots = [];
+  }
+  
   // Drop "masthead" ad from home screen
   if (
     r?.contents?.tvBrowseRenderer?.content?.tvSurfaceContentRenderer?.content
