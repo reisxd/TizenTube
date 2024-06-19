@@ -7,7 +7,7 @@
   "websiteURL": "https://youtube.com/tv",
   "main": "dist/userScript.js",
   "author": "Reis Can",
-  "keys": ["MediaPlayPause"],
+  "keys": ["MediaPlayPause","MediaPause","MediaPlay","MediaRewind","MediaFastForward","MediaStop","MediaTrackPrevious","MediaTrackNext"],
   "repository": {
     "url": "https://github.com/reisxd/TizenTube"
   },
