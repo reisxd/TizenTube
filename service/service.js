@@ -16,11 +16,13 @@ const apps = {
                     null,
                     null,
                     [
-                        new tizen.ApplicationControlData("module", {
-                            moduleName: '@foxreis/tizentube',
-                            moduleType: 'npm',
-                            args: launchData
-                        })
+                        new tizen.ApplicationControlData("module", [JSON.stringify(
+                            {
+                                moduleName: '@foxreis/tizentube',
+                                moduleType: 'npm',
+                                args: launchData
+                            }
+                        )])
                     ]
                 ), 'xvvl3S1bvH.TizenBrewStandalone');
         }
