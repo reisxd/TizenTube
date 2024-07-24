@@ -8,7 +8,14 @@
   "main": "dist/userScript.js",
   "author": "Reis Can",
   "serviceFile": "dist/service.js",
-  "keys": ["MediaPlayPause"],
+  "keys": ["MediaPlayPause",
+    "MediaPlay",
+    "MediaPause",
+    "MediaStop",
+    "MediaTrackPrevious",
+    "MediaTrackNext",
+    "MediaRewind",
+    "MediaFastForward"],
   "repository": {
     "url": "https://github.com/reisxd/TizenTube"
   },
