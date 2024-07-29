@@ -76,8 +76,7 @@ function execute_once_dom_loaded() {
           const focusedElement = document.querySelector(':focus');
           focusedElement.value = focusedElement.value.slice(0, -1);
         }
-        evt.preventDefault();
-        evt.stopPropagation();
+        if (evt.Uc && evt.Uc.key.length === 1) document.querySelector(':focus').value += evt.Uc.key;
       }
     },
     true

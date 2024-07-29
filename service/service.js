@@ -9,6 +9,7 @@ const apps = {
         allowStop: true,
         pid: null,
         launch(launchData) {
+            const tbPackageId = tizen.getAppInfo().packageId;
             tizen.application.launchAppControl(
                 new tizen.ApplicationControl(
                     "http://tizen.org/appcontrol/operation/view",
@@ -24,7 +25,7 @@ const apps = {
                             }
                         )])
                     ]
-                ), 'xvvl3S1bvH.TizenBrewStandalone');
+                ), `${tbPackageId}.TizenBrewStandalone`);
         }
     }
 };

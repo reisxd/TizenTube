@@ -1,9 +1,10 @@
-import { configRead, configWrite } from './config.js';
+import { configRead } from './config.js';
 
 const style = document.createElement('style');
+let css = '';
 
 function updateStyle() {
-    style.textContent = `
+    css = `
     ytlr-guide-response yt-focus-container {
         background-color: ${configRead('focusContainerColor')};
     }
@@ -20,6 +21,12 @@ function updateStyle() {
         background-color: ${configRead('routeColor')};
     }
 `;
+    const existingStyle = document.querySelector('style[nonce]');
+    if (existingStyle) {
+        existingStyle.textContent += css;
+    } else {
+        style.textContent = css;
+    }
 };
 
 document.head.appendChild(style);
