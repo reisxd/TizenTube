@@ -61,13 +61,21 @@ function execute_once_dom_loaded() {
   uiContainer.addEventListener(
     'keydown',
     (evt) => {
-      console.info('uiContainer key event:', evt.type, evt.keyCode);
+      console.info('uiContainer key event:', evt.type, evt.keyCode, evt);
       if (evt.keyCode !== 404 && evt.keyCode !== 172) {
         if (evt.keyCode in ARROW_KEY_CODE) {
           navigate(ARROW_KEY_CODE[evt.keyCode]);
         } else if (evt.keyCode === 13 || evt.keyCode === 32) {
           // "OK" button
-          document.querySelector(':focus').click();
+          console.log('OK button pressed');
+          const focusedElement = document.querySelector(':focus');
+          if (focusedElement.type === 'checkbox') {
+            focusedElement.checked = !focusedElement.checked;
+            focusedElement.dispatchEvent(new Event('change'));
+          }
+          evt.preventDefault();
+          evt.stopPropagation();
+          return;
         } else if (evt.keyCode === 27 && document.querySelector(':focus').type !== 'text') {
           // Back button
           uiContainer.style.display = 'none';
@@ -76,7 +84,14 @@ function execute_once_dom_loaded() {
           const focusedElement = document.querySelector(':focus');
           focusedElement.value = focusedElement.value.slice(0, -1);
         }
-        if (evt.Uc && evt.Uc.key.length === 1) document.querySelector(':focus').value += evt.Uc.key;
+
+
+        if (evt.key === 'Enter' || evt.Uc?.key === 'Enter') {
+          // If the focused element is a text input, emit a change event.
+          if (document.querySelector(':focus').type === 'text') {
+            document.querySelector(':focus').dispatchEvent(new Event('change'));
+          }
+        }
       }
     },
     true
