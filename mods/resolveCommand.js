@@ -22,28 +22,30 @@ export function findFunction(funcName) {
 
 // Patch resolveCommand to be able to change TizenTube settings
 
-for (const key in window._yttv) {
-    if (window._yttv[key] && window._yttv[key].instance && window._yttv[key].instance.resolveCommand) {
+export function patchResolveCommand() {
+    for (const key in window._yttv) {
+        if (window._yttv[key] && window._yttv[key].instance && window._yttv[key].instance.resolveCommand) {
 
-        const ogResolve = window._yttv[key].instance.resolveCommand;
-        window._yttv[key].instance.resolveCommand = function (cmd, _) {
-            if (cmd.setClientSettingEndpoint) {
-                // Command to change client settings. Use TizenTube configuration to change settings.
-                for (const settings of cmd.setClientSettingEndpoint.settingDatas) {
-                    if (!settings.clientSettingEnum.item.includes('_')) {
-                        for (const setting of cmd.setClientSettingEndpoint.settingDatas) {
-                            const valName = Object.keys(setting).find(key => key.includes('Value'));
-                            const value = valName === 'intValue' ? Number(setting[valName]) : setting[valName];
-                            configWrite(setting.clientSettingEnum.item, value);
+            const ogResolve = window._yttv[key].instance.resolveCommand;
+            window._yttv[key].instance.resolveCommand = function (cmd, _) {
+                if (cmd.setClientSettingEndpoint) {
+                    // Command to change client settings. Use TizenTube configuration to change settings.
+                    for (const settings of cmd.setClientSettingEndpoint.settingDatas) {
+                        if (!settings.clientSettingEnum.item.includes('_')) {
+                            for (const setting of cmd.setClientSettingEndpoint.settingDatas) {
+                                const valName = Object.keys(setting).find(key => key.includes('Value'));
+                                const value = valName === 'intValue' ? Number(setting[valName]) : setting[valName];
+                                configWrite(setting.clientSettingEnum.item, value);
+                            }
                         }
                     }
+                } else if (cmd.customAction) {
+                    customAction(cmd.customAction.action, cmd.customAction.parameters);
+                    return true;
                 }
-            } else if (cmd.customAction) {
-                customAction(cmd.customAction.action, cmd.customAction.parameters);
-                return true;
-            }
 
-            return ogResolve.call(this, cmd, _);
+                return ogResolve.call(this, cmd, _);
+            }
         }
     }
 }

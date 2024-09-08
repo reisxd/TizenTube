@@ -5,12 +5,14 @@ import { configRead, configWrite } from './config.js';
 import updateStyle from './theme.js';
 import { showToast } from './ytUI.js';
 import modernUI from './modernUI.js';
+import { patchResolveCommand } from './resolveCommand.js';
 
 // It just works, okay?
 const interval = setInterval(() => {
   const videoElement = document.querySelector('video');
   if (videoElement) {
     execute_once_dom_loaded();
+    patchResolveCommand();
     clearInterval(interval);
   }
 }, 250);
