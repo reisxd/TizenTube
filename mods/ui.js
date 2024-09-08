@@ -3,6 +3,8 @@ import './spatial-navigation-polyfill.js';
 import css from './ui.css';
 import { configRead, configWrite } from './config.js';
 import updateStyle from './theme.js';
+import { showToast } from './ytUI.js';
+import modernUI from './modernUI.js';
 
 // It just works, okay?
 const interval = setInterval(() => {
@@ -98,104 +100,12 @@ function execute_once_dom_loaded() {
   );
 
   uiContainer.innerHTML = `
-<h1>TizenTube Configuration</h1>
-<label for="__adblock"><input type="checkbox" id="__adblock" /> Enable AdBlocking</label>
-<label for="__fixedUI"><input type="checkbox" id="__fixedUI" /> Enable Fixed UI</label>
-<label for="__sponsorblock"><input type="checkbox" id="__sponsorblock" /> Enable SponsorBlock</label>
-<blockquote>
-<label for="__sponsorblock_sponsor"><input type="checkbox" id="__sponsorblock_sponsor" /> Skip Sponsor Segments</label>
-<label for="__sponsorblock_intro"><input type="checkbox" id="__sponsorblock_intro" /> Skip Intro Segments</label>
-<label for="__sponsorblock_outro"><input type="checkbox" id="__sponsorblock_outro" /> Skip Outro Segments</label>
-<label for="__sponsorblock_interaction"><input type="checkbox" id="__sponsorblock_interaction" /> Skip Interaction Reminder Segments</label>
-<label for="__sponsorblock_selfpromo"><input type="checkbox" id="__sponsorblock_selfpromo" /> Skip Self Promotion Segments</label>
-<label for="__sponsorblock_music_offtopic"><input type="checkbox" id="__sponsorblock_music_offtopic" /> Skip Music and Off-topic Segments</label>
-</blockquote>
-<label for="__dearrow"><input type="checkbox" id="__dearrow" /> Enable DeArrow</label>
-<blockquote>
-<label for="__dearrow_thumbnails"><input type="checkbox" id="__dearrow_thumbnails" /> Enable DeArrow Thumbnails</label>
-<div><small>DeArrow Thumbnail changing might break the shelve renderer. Be warned.</small></div>
-</blockquote>
+<h1>TizenTube Theme Configuration</h1>
 <label for="__barColor">Navigation Bar Color: <input type="text" id="__barColor"/></label>
 <label for="__routeColor">Main Content Color: <input type="text" id="__routeColor"/></label>
 <div><small>Sponsor segments skipping - https://sponsor.ajay.app</small></div>
 `;
   document.querySelector('body').appendChild(uiContainer);
-
-  uiContainer.querySelector('#__adblock').checked = configRead('enableAdBlock');
-  uiContainer.querySelector('#__adblock').addEventListener('change', (evt) => {
-    configWrite('enableAdBlock', evt.target.checked);
-  });
-
-  uiContainer.querySelector('#__sponsorblock').checked =
-    configRead('enableSponsorBlock');
-  uiContainer
-    .querySelector('#__sponsorblock')
-    .addEventListener('change', (evt) => {
-      configWrite('enableSponsorBlock', evt.target.checked);
-    });
-
-  uiContainer.querySelector('#__sponsorblock_sponsor').checked = configRead(
-    'enableSponsorBlockSponsor'
-  );
-  uiContainer
-    .querySelector('#__sponsorblock_sponsor')
-    .addEventListener('change', (evt) => {
-      configWrite('enableSponsorBlockSponsor', evt.target.checked);
-    });
-
-  uiContainer.querySelector('#__sponsorblock_intro').checked = configRead(
-    'enableSponsorBlockIntro'
-  );
-  uiContainer
-    .querySelector('#__sponsorblock_intro')
-    .addEventListener('change', (evt) => {
-      configWrite('enableSponsorBlockIntro', evt.target.checked);
-    });
-
-  uiContainer.querySelector('#__sponsorblock_outro').checked = configRead(
-    'enableSponsorBlockOutro'
-  );
-  uiContainer
-    .querySelector('#__sponsorblock_outro')
-    .addEventListener('change', (evt) => {
-      configWrite('enableSponsorBlockOutro', evt.target.checked);
-    });
-
-  uiContainer.querySelector('#__sponsorblock_interaction').checked = configRead(
-    'enableSponsorBlockInteraction'
-  );
-  uiContainer
-    .querySelector('#__sponsorblock_interaction')
-    .addEventListener('change', (evt) => {
-      configWrite('enableSponsorBlockInteraction', evt.target.checked);
-    });
-
-  uiContainer.querySelector('#__sponsorblock_selfpromo').checked = configRead(
-    'enableSponsorBlockSelfPromo'
-  );
-  uiContainer
-    .querySelector('#__sponsorblock_selfpromo')
-    .addEventListener('change', (evt) => {
-      configWrite('enableSponsorBlockSelfPromo', evt.target.checked);
-    });
-
-  uiContainer.querySelector('#__sponsorblock_music_offtopic').checked =
-    configRead('enableSponsorBlockMusicOfftopic');
-  uiContainer
-    .querySelector('#__sponsorblock_music_offtopic')
-    .addEventListener('change', (evt) => {
-      configWrite('enableSponsorBlockMusicOfftopic', evt.target.checked);
-    });
-
-  uiContainer.querySelector('#__dearrow').checked = configRead('enableDeArrow');
-  uiContainer.querySelector('#__dearrow').addEventListener('change', (evt) => {
-    configWrite('enableDeArrow', evt.target.checked);
-  });
-
-  uiContainer.querySelector('#__dearrow_thumbnails').checked = configRead('enableDeArrowThumbnails');
-  uiContainer.querySelector('#__dearrow_thumbnails').addEventListener('change', (evt) => {
-    configWrite('enableDeArrowThumbnails', evt.target.checked);
-  });
 
   uiContainer.querySelector('#__barColor').value = configRead('focusContainerColor');
   uiContainer.querySelector('#__barColor').addEventListener('change', (evt) => {
@@ -209,11 +119,6 @@ function execute_once_dom_loaded() {
     updateStyle();
   });
 
-  uiContainer.querySelector('#__fixedUI').checked = configRead('enableFixedUI');
-  uiContainer.querySelector('#__fixedUI').addEventListener('change', (evt) => {
-    configWrite('enableFixedUI', evt.target.checked);
-  });
-
   var eventHandler = (evt) => {
     // We handle key events ourselves.
     console.info(
@@ -223,7 +128,7 @@ function execute_once_dom_loaded() {
       evt.keyCode,
       evt.defaultPrevented
     );
-    if (evt.keyCode == 404 || evt.keyCode == 172) {
+    if (evt.keyCode == 403) {
       console.info('Taking over!');
       evt.preventDefault();
       evt.stopPropagation();
@@ -239,9 +144,11 @@ function execute_once_dom_loaded() {
         }
       }
       return false;
-    }
+    } else if (evt.keyCode == 404) {
+      modernUI();
+    };
     return true;
-  };
+  }
 
   // Red, Green, Yellow, Blue
   // 403, 404, 405, 406
@@ -251,7 +158,7 @@ function execute_once_dom_loaded() {
   document.addEventListener('keyup', eventHandler, true);
 
   setTimeout(() => {
-    showNotification('Press [GREEN] to open TizenTube configuration screen\nPress [BLUE] to open Video Speed configuration screen');
+    showToast('Welcome to TizenTube', 'Press [GREEN] to open TizenTube Settings, press [BLUE] to open Video Speed Settings and press [RED] to open TizenTube Theme Settings.');
   }, 2000);
 
   // Fix UI issues, again. Love, Googol.
@@ -259,39 +166,12 @@ function execute_once_dom_loaded() {
   if (configRead('enableFixedUI')) {
     try {
       const observer = new MutationObserver((_, _2) => {
-        const body = document.querySelector('body');
+        const body = document.body;
         if (body.classList.contains('app-quality-root')) {
           body.classList.remove('app-quality-root');
         }
       });
-      observer.observe(document.getElementsByTagName('body')[0], { attributes: true, childList: false, subtree: false });
+      observer.observe(document.body, { attributes: true, childList: false, subtree: false });
     } catch (e) { }
   }
-}
-
-export function showNotification(text, time = 3000) {
-  if (!document.querySelector('.ytaf-notification-container')) {
-    console.info('Adding notification container');
-    const c = document.createElement('div');
-    c.classList.add('ytaf-notification-container');
-    document.body.appendChild(c);
-  }
-
-  const elm = document.createElement('div');
-  const elmInner = document.createElement('div');
-  elmInner.innerText = text;
-  elmInner.classList.add('message');
-  elmInner.classList.add('message-hidden');
-  elm.appendChild(elmInner);
-  document.querySelector('.ytaf-notification-container').appendChild(elm);
-
-  setTimeout(() => {
-    elmInner.classList.remove('message-hidden');
-  }, 100);
-  setTimeout(() => {
-    elmInner.classList.add('message-hidden');
-    setTimeout(() => {
-      elm.remove();
-    }, 1000);
-  }, time);
 }

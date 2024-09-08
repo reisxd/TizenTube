@@ -1,6 +1,6 @@
 import sha256 from './tiny-sha256.js';
 import { configRead } from './config.js';
-import { showNotification } from './ui.js';
+import { showToast } from './ytUI.js';
 
 // Copied from https://github.com/ajayyy/SponsorBlock/blob/9392d16617d2d48abb6125c00e2ff6042cb7bebe/src/config.ts#L179-L233
 const barTypes = {
@@ -246,7 +246,7 @@ class SponsorBlockHandler {
 
       const skipName = barTypes[segment.category]?.name || segment.category;
       console.info(this.videoID, 'Skipping', segment);
-      showNotification(`Skipping ${skipName}`);
+      showToast('SponsorBlock', `Skipping ${skipName}`);
       this.video.currentTime = end;
       this.scheduleSkip();
     }, (start - this.video.currentTime) * 1000);
