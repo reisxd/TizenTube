@@ -147,7 +147,9 @@ function execute_once_dom_loaded() {
       }
       return false;
     } else if (evt.keyCode == 404) {
-      modernUI();
+      if (evt.type === 'keydown') {
+        modernUI();
+      }
     };
     return true;
   }
