@@ -14,29 +14,29 @@ export default function modernUI(update, parameters) {
             value: 'enableSponsorBlock'
         },
         {
-            name: 'Skipping Sponsor Segments',
+            name: 'Skip Sponsor Segments',
             icon: 'MONEY_HEART',
             value: 'enableSponsorBlockSponsor'
         },
         {
-            name: 'Skipping Intro Segments',
+            name: 'Skip Intro Segments',
             icon: 'PLAY_CIRCLE',
             value: 'enableSponsorBlockIntro'
         },
         {
-            name: 'Skipping Outro Segments',
+            name: 'Skip Outro Segments',
             value: 'enableSponsorBlockOutro'
         },
         {
-            name: 'Skipping Interaction Reminder Segments',
+            name: 'Skip Interaction Reminder Segments',
             value: 'enableSponsorBlockInteraction'
         },
         {
-            name: 'Skipping Self-Promotion Segments',
+            name: 'Skip Self-Promotion Segments',
             value: 'enableSponsorBlockSelfPromo'
         },
         {
-            name: 'Skipping Off-Topic Music Segments',
+            name: 'Skip Off-Topic Music Segments',
             value: 'enableSponsorBlockMusicOfftopic'
         },
         {
@@ -50,7 +50,7 @@ export default function modernUI(update, parameters) {
             value: 'enableDeArrowThumbnails'
         },
         {
-            name: 'Fixed UI',
+            name: 'Fix UI',
             icon: 'STAR',
             value: 'enableFixedUI'
         }
@@ -63,7 +63,7 @@ export default function modernUI(update, parameters) {
         const currentVal = configRead(setting.value);
         buttons.push(
             buttonItem(
-                { title: `${currentVal ? 'Disable' : 'Enable'} ${setting.name}`, subtitle: setting.subtitle },
+                { title: setting.name, subtitle: setting.subtitle },
                 { icon: setting.icon ? setting.icon : 'CHEVRON_DOWN', secondaryIcon: currentVal ? 'CHECK_BOX' : 'CHECK_BOX_OUTLINE_BLANK' },
                 [
                     {
