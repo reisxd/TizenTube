@@ -8,7 +8,7 @@ TizenTube is a TizenBrew module that enhances your favourite streaming websites 
 
 1. Install TizenBrew from [here](https://github.com/reisxd/TizenBrew) and follow the instructions.
 
-2. Add the module `@foxreis/tizentube` to the module manager. You can access the module manager by pressing the [GREEN] button on the remote.
+2. Add the NPM module `@foxreis/tizentube` to the module manager. You can access the module manager by pressing the [GREEN] button on the remote.
 
 # Features
 
