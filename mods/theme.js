@@ -9,15 +9,7 @@ function updateStyle() {
         background-color: ${configRead('focusContainerColor')};
     }
 
-    ytlr-surface-page {
-        background-color: ${configRead('routeColor')};
-    }
-
-    ytlr-search-container {
-        background-color: ${configRead('routeColor')};
-    }
-
-    ytlr-accounts-container {
+    #container {
         background-color: ${configRead('routeColor')};
     }
 `;
