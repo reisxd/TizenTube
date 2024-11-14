@@ -53,6 +53,11 @@ export default function modernUI(update, parameters) {
             name: 'Fix UI',
             icon: 'STAR',
             value: 'enableFixedUI'
+        },
+        {
+            name: 'High Quality Thumbnails',
+            icon: 'VIDEO_QUALITY',
+            value: 'enableHqThumbnails'
         }
     ]
 

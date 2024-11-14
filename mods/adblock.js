@@ -25,7 +25,7 @@ JSON.parse = function () {
   if (r.adSlots && configRead('enableAdBlock')) {
     r.adSlots = [];
   }
-  
+
   // Drop "masthead" ad from home screen
   if (
     r?.contents?.tvBrowseRenderer?.content?.tvSurfaceContentRenderer?.content
@@ -47,6 +47,10 @@ JSON.parse = function () {
     processShelves(r.contents.tvBrowseRenderer.content.tvSurfaceContentRenderer.content.sectionListRenderer.contents);
   }
 
+  if (r?.contents?.sectionListRenderer?.contents) {
+    processShelves(r.contents.sectionListRenderer.contents);
+  }
+
   if (r?.continuationContents?.sectionListContinuation?.contents) {
     processShelves(r.continuationContents.sectionListContinuation.contents);
   }
@@ -54,6 +58,11 @@ JSON.parse = function () {
   if (r?.continuationContents?.horizontalListContinuation?.items) {
     deArrowify(r.continuationContents.horizontalListContinuation.items);
   }
+
+  if (r?.continuationContents?.horizontalListContinuation?.items) {
+    hqify(r.continuationContents.horizontalListContinuation.items);
+  }
+
   return r;
 };
 
@@ -61,7 +70,8 @@ JSON.parse = function () {
 function processShelves(shelves) {
   for (const shelve of shelves) {
     if (shelve.shelfRenderer) {
-      deArrowify(shelve.shelfRenderer.content.horizontalListRenderer.items)
+      deArrowify(shelve.shelfRenderer.content.horizontalListRenderer.items);
+      hqify(shelve.shelfRenderer.content.horizontalListRenderer.items);
     }
   }
 }
@@ -80,7 +90,7 @@ function deArrowify(items) {
           const mostVoted = data.titles.reduce((max, title) => max.votes > title.votes ? max : title);
           item.tileRenderer.metadata.tileMetadataRenderer.title.simpleText = mostVoted.title;
         }
-  
+
         if (data.thumbnails.length > 0 && configRead('enableDeArrowThumbnails')) {
           const mostVotedThumbnail = data.thumbnails.reduce((max, thumbnail) => max.votes > thumbnail.votes ? max : thumbnail);
           if (mostVotedThumbnail.timestamp) {
@@ -94,6 +104,24 @@ function deArrowify(items) {
           }
         }
       });
+    }
+  }
+}
+
+
+function hqify(items) {
+  for (const item of items) {
+    if (item.tileRenderer.style !== 'TILE_STYLE_YTLR_DEFAULT') continue;
+    if (configRead('enableHqThumbnails')) {
+      const videoID = item.tileRenderer.contentId;
+      const queryArgs = item.tileRenderer.header.tileHeaderRenderer.thumbnail.thumbnails[0].url.split('?')[1];
+      item.tileRenderer.header.tileHeaderRenderer.thumbnail.thumbnails = [
+        {
+          url: `https://i.ytimg.com/vi/${videoID}/maxresdefault.jpg${queryArgs ? `?${queryArgs}` : ''}`,
+          width: 1280,
+          height: 720
+        }
+      ]
     }
   }
 }

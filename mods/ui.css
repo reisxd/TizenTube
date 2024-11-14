@@ -77,3 +77,9 @@
   position: absolute !important;
   width: 100% !important;
 }
+
+/* Fixes shorts having a black background */
+
+.ytlr-tile-header-renderer--shorts {
+  background-image: none !important;
+}
