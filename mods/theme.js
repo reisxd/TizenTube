@@ -10,7 +10,7 @@ function updateStyle() {
     }
 
     #container {
-        background-color: ${configRead('routeColor')};
+        background-color: ${configRead('routeColor')} !important;
     }
 `;
     const existingStyle = document.querySelector('style[nonce]');
