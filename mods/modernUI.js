@@ -194,5 +194,3 @@ export function optionShow(parameters, update) {
 
     showModal('TizenTube Settings', buttons, parameters.selectedIndex, 'tt-settings-options', update);
 }
-
-window.modernUI = modernUI;

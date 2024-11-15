@@ -119,7 +119,6 @@ function markerEntity(videoID, markers) {
 }
 
 export default function Chapters(video) {
-    console.log(video);
     const videoID = video.contents.singleColumnWatchNextResults.results.results.contents[0].itemSectionRenderer.contents[0].videoMetadataRenderer.videoId;
     const videoDescription = video.contents.singleColumnWatchNextResults.results.results.contents[0].itemSectionRenderer.contents[0].videoMetadataRenderer.description.runs[0].text;
     const chapters = parseTimestamps(videoDescription);
@@ -134,6 +133,5 @@ export default function Chapters(video) {
     }
 
     const markerEntityData = markerEntity(videoID, markers);
-    console.log(markerEntityData);
     return markerEntityData;
 }

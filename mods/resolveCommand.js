@@ -70,12 +70,13 @@ function customAction(action, parameters) {
             optionShow(parameters, parameters.update);
             break;
         case 'SKIP':
-            // Emulate ESC key press 
-            const e = new KeyboardEvent('keydown', { keyCode: 27 });
-            document.dispatchEvent(e);
-            setTimeout(() => {
-                document.querySelector('video').currentTime = parameters.time;
-            }, 100);
+            const kE = document.createEvent('Event');
+            kE.initEvent('keydown', true, true);
+            kE.keyCode = 27;
+            kE.which = 27;
+            document.dispatchEvent(kE);
+
+            document.querySelector('video').currentTime = parameters.time;
             break;
     }
 }

@@ -111,8 +111,6 @@ JSON.parse = function () {
         }
       }
       r.playerOverlays.playerOverlayRenderer.timelyActionRenderers = timelyActions;
-      console.log(timelyActions)
-      console.log(r)
     }
   }
 
@@ -184,6 +182,7 @@ function addLongPress(items) {
   if (!configRead('enableLongPress')) return;
   for (const item of items) {
     if (item.tileRenderer.style !== 'TILE_STYLE_YTLR_DEFAULT') continue;
+    if (item.tileRenderer.onLongPressCommand) continue;
     const subtitle = item.tileRenderer.metadata.tileMetadataRenderer.lines[0].lineRenderer.items[0].lineItemRenderer.text;
     const data = longPressData({
       videoId: item.tileRenderer.contentId,
