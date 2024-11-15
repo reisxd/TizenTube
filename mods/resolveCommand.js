@@ -1,5 +1,5 @@
-import { configWrite } from './config.js';
-import modernUI from './modernUI.js';
+import { configWrite, configRead } from './config.js';
+import modernUI, { optionShow } from './modernUI.js';
 
 export default function resolveCommand(cmd, _) {
     // resolveCommand function is pretty OP, it can do from opening modals, changing client settings and way more.
@@ -35,12 +35,23 @@ export function patchResolveCommand() {
                             for (const setting of cmd.setClientSettingEndpoint.settingDatas) {
                                 const valName = Object.keys(setting).find(key => key.includes('Value'));
                                 const value = valName === 'intValue' ? Number(setting[valName]) : setting[valName];
-                                configWrite(setting.clientSettingEnum.item, value);
+                                if (valName === 'arrayValue') {
+                                    const arr = configRead(setting.clientSettingEnum.item);
+                                    if (arr.includes(value)) {
+                                        arr.splice(arr.indexOf(value), 1);
+                                    } else {
+                                        arr.push(value);
+                                    }
+                                    configWrite(setting.clientSettingEnum.item, arr);
+                                } else configWrite(setting.clientSettingEnum.item, value);
                             }
                         }
                     }
                 } else if (cmd.customAction) {
                     customAction(cmd.customAction.action, cmd.customAction.parameters);
+                    return true;
+                } else if (cmd?.showEngagementPanelEndpoint?.customAction) {
+                    customAction(cmd.showEngagementPanelEndpoint.customAction.action, cmd.showEngagementPanelEndpoint.customAction.parameters);
                     return true;
                 }
 
@@ -54,6 +65,17 @@ function customAction(action, parameters) {
     switch (action) {
         case 'SETTINGS_UPDATE':
             modernUI(true, parameters);
+            break;
+        case 'OPTIONS_SHOW':
+            optionShow(parameters, parameters.update);
+            break;
+        case 'SKIP':
+            // Emulate ESC key press 
+            const e = new KeyboardEvent('keydown', { keyCode: 27 });
+            document.dispatchEvent(e);
+            setTimeout(() => {
+                document.querySelector('video').currentTime = parameters.time;
+            }, 100);
             break;
     }
 }

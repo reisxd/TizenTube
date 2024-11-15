@@ -72,7 +72,7 @@ function showModal(title, content, selectIndex, id, update) {
                 }
             },
             uniqueId: id
-            }
+        }
     }
 
     if (update) {
@@ -99,7 +99,7 @@ function buttonItem(title, icon, commands) {
             simpleText: title.title
         }
     }
-    
+
     if (title.subtitle) {
         button.compactLinkRenderer.subtitle = {
             simpleText: title.subtitle
@@ -121,8 +121,129 @@ function buttonItem(title, icon, commands) {
     return button;
 }
 
+
+function timelyAction(text, icon, command, triggerTimeMs, timeoutMs) {
+    return {
+        timelyActionRenderer: {
+            actionButtons: [
+                {
+                    buttonRenderer: {
+                        isDisabled: false,
+                        text: {
+                            runs: [
+                                {
+                                    text: text
+                                }
+                            ]
+                        },
+                        icon: {
+                            iconType: icon
+                        },
+                        trackingParams: null,
+                        command
+                    }
+                }
+            ],
+            triggerTimeMs,
+            timeoutMs,
+            type: ''
+        }
+    }
+
+}
+
+function longPressData(data) {
+    return {
+        clickTrackingParams: null,
+        showMenuCommand: {
+            contentId: data.videoId,
+            thumbnail: {
+                thumbnails: data.thumbnails
+            },
+            title: {
+                simpleText: data.title
+            },
+            subtitle: {
+                simpleText: data.subtitle
+            },
+            menu: {
+                menuRenderer: {
+                    items: [
+                        {
+                            menuNavigationItemRenderer: {
+                                text: {
+                                    runs: [
+                                        {
+                                            text: 'Play'
+                                        }
+                                    ]
+                                },
+                                navigationEndpoint: {
+                                    clickTrackingParams: null,
+                                    watchEndpoint: data.watchEndpointData
+                                },
+                                trackingParams: null
+                            }
+                        },
+                        {
+                            menuServiceItemRenderer: {
+                                text: {
+                                    runs: [
+                                        {
+                                            text: 'Save to Watch Later'
+                                        }
+                                    ]
+                                },
+                                serviceEndpoint: {
+                                    clickTrackingParams: null,
+                                    playlistEditEndpoint: {
+                                        playlistId: 'WL',
+                                        actions: [
+                                            {
+                                                addedVideoId: data.videoId,
+                                                action: 'ACTION_ADD_VIDEO'
+                                            }
+                                        ]
+                                    }
+                                },
+                                trackingParams: null
+                            }
+                        },
+                        {
+                            menuNavigationItemRenderer: {
+                                text: {
+                                    runs: [
+                                        {
+                                            text: 'Save to playlist'
+                                        }
+                                    ]
+                                },
+                                navigationEndpoint: {
+                                    clickTrackingParams: null,
+                                    addToPlaylistEndpoint: {
+                                        videoId: data.videoId
+                                    }
+                                },
+                                trackingParams: null
+                            }
+                        }
+                    ],
+                    trackingParams: null,
+                    accessibility: {
+                        accessibilityData: {
+                            label: 'Video options'
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
 export {
     showToast,
     showModal,
-    buttonItem
+    buttonItem,
+    timelyAction,
+    longPressData
 }

@@ -2,6 +2,7 @@ const CONFIG_KEY = 'ytaf-configuration';
 const defaultConfig = {
   enableAdBlock: true,
   enableSponsorBlock: true,
+  sponsorBlockManualSkips: [],
   enableSponsorBlockSponsor: true,
   enableSponsorBlockIntro: true,
   enableSponsorBlockOutro: true,
@@ -14,7 +15,10 @@ const defaultConfig = {
   focusContainerColor: '#0f0f0f',
   routeColor: '#0f0f0f',
   enableFixedUI: true,
-  enableHqThumbnails: true
+  enableHqThumbnails: true,
+  enableChapters: true,
+  enableLongPress: true,
+  enableShorts: true
 };
 
 let localConfig;

@@ -51,6 +51,7 @@ class SponsorBlockHandler {
   durationChangeHandler = null;
   segments = null;
   skippableCategories = [];
+  manualSkippableCategories = [];
 
   constructor(videoID) {
     this.videoID = videoID;
@@ -82,6 +83,7 @@ class SponsorBlockHandler {
     }
 
     this.segments = result.segments;
+    this.manualSkippableCategories = configRead('sponsorBlockManualSkips');
     this.skippableCategories = this.getSkippableCategories();
 
     this.scheduleSkipHandler = () => this.scheduleSkip();
@@ -246,9 +248,11 @@ class SponsorBlockHandler {
 
       const skipName = barTypes[segment.category]?.name || segment.category;
       console.info(this.videoID, 'Skipping', segment);
-      showToast('SponsorBlock', `Skipping ${skipName}`);
-      this.video.currentTime = end;
-      this.scheduleSkip();
+      if (!this.manualSkippableCategories.includes(segment.category)) {
+        showToast('SponsorBlock', `Skipping ${skipName}`);
+        this.video.currentTime = end;
+        this.scheduleSkip();
+      }
     }, (start - this.video.currentTime) * 1000);
   }
 

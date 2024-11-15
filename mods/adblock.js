@@ -1,4 +1,7 @@
 import { configRead } from './config.js';
+import Chapters from './chapters.js';
+import resolveCommand from './resolveCommand.js';
+import { timelyAction, longPressData } from './ytUI.js';
 
 /**
  * This is a minimal reimplementation of the following uBlock Origin rule:
@@ -57,10 +60,60 @@ JSON.parse = function () {
 
   if (r?.continuationContents?.horizontalListContinuation?.items) {
     deArrowify(r.continuationContents.horizontalListContinuation.items);
+    hqify(r.continuationContents.horizontalListContinuation.items);
+    addLongPress(r.continuationContents.horizontalListContinuation.items);
   }
 
-  if (r?.continuationContents?.horizontalListContinuation?.items) {
-    hqify(r.continuationContents.horizontalListContinuation.items);
+  if (!configRead('enableShorts') && r?.contents?.tvBrowseRenderer?.content?.tvSurfaceContentRenderer?.content) {
+    r.contents.tvBrowseRenderer.content.tvSurfaceContentRenderer.content.sectionListRenderer.contents = r.contents.tvBrowseRenderer.content.tvSurfaceContentRenderer.content.sectionListRenderer.contents.filter(shelve => shelve.shelfRenderer?.tvhtml5ShelfRendererType !== 'TVHTML5_SHELF_RENDERER_TYPE_SHORTS');
+  }
+
+  if (r?.contents?.singleColumnWatchNextResults?.results?.results?.contents && configRead('enableChapters')) {
+    const chapterData = Chapters(r);
+    r.frameworkUpdates.entityBatchUpdate.mutations.push(chapterData);
+    resolveCommand({
+      "clickTrackingParams": "null",
+      "loadMarkersCommand": {
+        "visibleOnLoadKeys": [
+          chapterData.entityKey
+        ],
+        "entityKeys": [
+          chapterData.entityKey
+        ]
+      }
+    });
+  }
+
+  if (configRead('sponsorBlockManualSkips').length > 0 && r?.playerOverlays?.playerOverlayRenderer) {
+    const manualSkippedSegments = configRead('sponsorBlockManualSkips');
+    let timelyActions = [];
+    if (window?.sponsorblock?.segments) {
+      for (const segment of window.sponsorblock.segments) {
+        if (manualSkippedSegments.includes(segment.category)) {
+          const timelyActionData = timelyAction(
+            `Skip ${segment.category}`,
+            'SKIP_NEXT',
+            {
+              clickTrackingParams: null,
+              showEngagementPanelEndpoint: {
+                customAction: {
+                  action: 'SKIP',
+                  parameters: {
+                    time: segment.segment[1]
+                  }
+                }
+              }
+            },
+            segment.segment[0] * 1000,
+            segment.segment[1] * 1000 - segment.segment[0] * 1000
+          );
+          timelyActions.push(timelyActionData);
+        }
+      }
+      r.playerOverlays.playerOverlayRenderer.timelyActionRenderers = timelyActions;
+      console.log(timelyActions)
+      console.log(r)
+    }
   }
 
   return r;
@@ -72,6 +125,7 @@ function processShelves(shelves) {
     if (shelve.shelfRenderer) {
       deArrowify(shelve.shelfRenderer.content.horizontalListRenderer.items);
       hqify(shelve.shelfRenderer.content.horizontalListRenderer.items);
+      addLongPress(shelve.shelfRenderer.content.horizontalListRenderer.items);
     }
   }
 }
@@ -123,5 +177,21 @@ function hqify(items) {
         }
       ]
     }
+  }
+}
+
+function addLongPress(items) {
+  if (!configRead('enableLongPress')) return;
+  for (const item of items) {
+    if (item.tileRenderer.style !== 'TILE_STYLE_YTLR_DEFAULT') continue;
+    const subtitle = item.tileRenderer.metadata.tileMetadataRenderer.lines[0].lineRenderer.items[0].lineItemRenderer.text;
+    const data = longPressData({
+      videoId: item.tileRenderer.contentId,
+      thumbnails: item.tileRenderer.header.tileHeaderRenderer.thumbnail.thumbnails,
+      title: item.tileRenderer.metadata.tileMetadataRenderer.title.simpleText,
+      subtitle: subtitle.runs ? subtitle.runs[0].text : subtitle.simpleText,
+      watchEndpointData: item.tileRenderer.onSelectCommand.watchEndpoint
+    });
+    item.tileRenderer.onLongPressCommand = data;
   }
 }
