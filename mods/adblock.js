@@ -129,6 +129,8 @@ function processShelves(shelves) {
 }
 
 function deArrowify(items) {
+  const fallbackThumbnail = 'https://i.ytimg.com/vi/default/mqdefault.jpg';
+  
   for (const item of items) {
     if (item.adSlotRenderer) {
       const index = items.indexOf(item);
@@ -152,28 +154,58 @@ function deArrowify(items) {
                 width: 1280,
                 height: 640
               }
-            ]
+            ];
+          } else {
+            item.tileRenderer.header.tileHeaderRenderer.thumbnail.thumbnails = [
+              {
+                url: fallbackThumbnail,
+                width: 320,
+                height: 180
+              }
+            ];
           }
         }
+      }).catch(() => {
+        item.tileRenderer.header.tileHeaderRenderer.thumbnail.thumbnails = [
+          {
+            url: fallbackThumbnail,
+            width: 320,
+            height: 180
+          }
+        ];
       });
     }
   }
 }
 
-
 function hqify(items) {
+  const fallbackThumbnail = 'https://i.ytimg.com/vi/default/mqdefault.jpg';
+  
   for (const item of items) {
     if (item.tileRenderer.style !== 'TILE_STYLE_YTLR_DEFAULT') continue;
     if (configRead('enableHqThumbnails')) {
       const videoID = item.tileRenderer.contentId;
       const queryArgs = item.tileRenderer.header.tileHeaderRenderer.thumbnail.thumbnails[0].url.split('?')[1];
+      const highQualityThumbnail = `https://i.ytimg.com/vi/${videoID}/maxresdefault.jpg${queryArgs ? `?${queryArgs}` : ''}`;
+
       item.tileRenderer.header.tileHeaderRenderer.thumbnail.thumbnails = [
         {
-          url: `https://i.ytimg.com/vi/${videoID}/maxresdefault.jpg${queryArgs ? `?${queryArgs}` : ''}`,
+          url: highQualityThumbnail,
           width: 1280,
           height: 720
         }
-      ]
+      ];
+
+      // Set fallback thumbnail
+      fetch(highQualityThumbnail).catch(() => {
+        item.tileRenderer.header.tileHeaderRenderer.thumbnail.thumbnails = [
+          {
+            url: fallbackThumbnail,
+            width: 320,
+            height: 180
+          }
+        ];
+      });
     }
   }
 }
