@@ -43,7 +43,7 @@ JSON.parse = function () {
   }
 
   // Remove shorts ads
-  if (r?.entries && configRead('enableAdBlock')) {
+  if (!Array.isArray(r) && r?.entries && configRead('enableAdBlock')) {
     r.entries = r.entries?.filter(
       (elm) => !elm?.command?.reelWatchEndpoint?.adClientParams?.isAd
     );
