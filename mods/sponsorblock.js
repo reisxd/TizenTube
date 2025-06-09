@@ -34,15 +34,15 @@ const barTypes = {
     opacity: '0.7',
     name: 'recap or preview'
   },
-  music_offtopic: {
-    color: '#ff9900',
-    opacity: '0.7',
-    name: 'non-music part'
-  },
   filler: {
     color: "#7300FF",
     opacity: "0.9",
     name: 'tangents'
+  },
+  music_offtopic: {
+    color: '#ff9900',
+    opacity: '0.7',
+    name: 'non-music part'
   }
 };
 
@@ -76,8 +76,8 @@ class SponsorBlockHandler {
       'interaction',
       'selfpromo',
       'preview',
-      'music_offtopic',
-      'filler'
+      'filler',
+      'music_offtopic'
     ];
     const resp = await fetch(
       `${sponsorblockAPI}/skipSegments/${videoHash}?categories=${encodeURIComponent(
@@ -125,11 +125,11 @@ class SponsorBlockHandler {
     if (configRead('enableSponsorBlockPreview')) {
       skippableCategories.push('preview');
     }
-    if (configRead('enableSponsorBlockMusicOfftopic')) {
-      skippableCategories.push('music_offtopic');
-    }
     if (configRead('enableSponsorBlockFiller')) {
       skippableCategories.push('filler');
+    }
+    if (configRead('enableSponsorBlockMusicOfftopic')) {
+      skippableCategories.push('music_offtopic');
     }
     return skippableCategories;
   }
