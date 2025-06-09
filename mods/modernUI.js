@@ -41,6 +41,14 @@ export default function modernUI(update, parameters) {
                     value: 'selfpromo'
                 },
                 {
+                    name: 'Skip Preview/Recap Segments',
+                    value: 'preview'
+                },
+                {
+                    name: 'Skip Tangents/Jokes Segments',
+                    value: 'filler'
+                },
+                {
                     name: 'Skip Off-Topic Music Segments',
                     value: 'music_offtopic'
                 }
@@ -67,6 +75,14 @@ export default function modernUI(update, parameters) {
         {
             name: 'Skip Self-Promotion Segments',
             value: 'enableSponsorBlockSelfPromo'
+        },
+        {
+            name: 'Skip Preview/Recap Segments',
+            value: 'enableSponsorBlockPreview'
+        },
+        {
+            name: 'Skip Tangents/Jokes Segments',
+            value: 'enableSponsorBlockFiller'
         },
         {
             name: 'Skip Off-Topic Music Segments',
