@@ -92,11 +92,11 @@ export default function modernUI(update, parameters) {
             icon: 'VIDEO_QUALITY',
             value: 'enableHqThumbnails'
         },
-        {
+        /*{
             name: 'Chapters',
             icon: 'BOOKMARK_BORDER',
             value: 'enableChapters'
-        },
+        },*/
         {
             name: 'Long Press',
             value: 'enableLongPress'

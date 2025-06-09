@@ -2,7 +2,7 @@ const CONFIG_KEY = 'ytaf-configuration';
 const defaultConfig = {
   enableAdBlock: true,
   enableSponsorBlock: true,
-  sponsorBlockManualSkips: [],
+  sponsorBlockManualSkips: ['intro', 'outro'],
   enableSponsorBlockSponsor: true,
   enableSponsorBlockIntro: true,
   enableSponsorBlockOutro: true,

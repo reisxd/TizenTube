@@ -2,6 +2,7 @@ import { configRead } from './config.js';
 import Chapters from './chapters.js';
 import resolveCommand from './resolveCommand.js';
 import { timelyAction, longPressData } from './ytUI.js';
+import { PatchSettings } from './customSettings.js';
 
 /**
  * This is a minimal reimplementation of the following uBlock Origin rule:
@@ -41,6 +42,12 @@ JSON.parse = function () {
       );
   }
 
+  // Patch settings
+
+  if (r?.title?.runs) {
+    PatchSettings(r);
+  }
+
   // DeArrow Implementation. I think this is the best way to do it. (DOM manipulation would be a pain)
 
   if (
@@ -68,6 +75,10 @@ JSON.parse = function () {
     r.contents.tvBrowseRenderer.content.tvSurfaceContentRenderer.content.sectionListRenderer.contents = r.contents.tvBrowseRenderer.content.tvSurfaceContentRenderer.content.sectionListRenderer.contents.filter(shelve => shelve.shelfRenderer?.tvhtml5ShelfRendererType !== 'TVHTML5_SHELF_RENDERER_TYPE_SHORTS');
   }
 
+  /*
+
+  Chapters are disabled due to the API removing description data which was used to generate chapters
+
   if (r?.contents?.singleColumnWatchNextResults?.results?.results?.contents && configRead('enableChapters')) {
     const chapterData = Chapters(r);
     r.frameworkUpdates.entityBatchUpdate.mutations.push(chapterData);
@@ -82,7 +93,9 @@ JSON.parse = function () {
         ]
       }
     });
-  }
+  }*/
+
+  // Manual SponsorBlock Skips
 
   if (configRead('sponsorBlockManualSkips').length > 0 && r?.playerOverlays?.playerOverlayRenderer) {
     const manualSkippedSegments = configRead('sponsorBlockManualSkips');
@@ -116,6 +129,14 @@ JSON.parse = function () {
 
   return r;
 };
+
+// Patch JSON.parse to use the custom one
+window.JSON.parse = JSON.parse;
+for (const key in window._yttv) {
+  if (window._yttv[key] && window._yttv[key].JSON && window._yttv[key].JSON.parse) {
+    window._yttv[key].JSON.parse = JSON.parse;
+  }
+}
 
 
 function processShelves(shelves) {

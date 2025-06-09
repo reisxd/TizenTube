@@ -1,5 +1,6 @@
 import { configWrite, configRead } from './config.js';
 import modernUI, { optionShow } from './modernUI.js';
+import { speedSettings } from './speedUI.js';
 
 export default function resolveCommand(cmd, _) {
     // resolveCommand function is pretty OP, it can do from opening modals, changing client settings and way more.
@@ -50,9 +51,29 @@ export function patchResolveCommand() {
                 } else if (cmd.customAction) {
                     customAction(cmd.customAction.action, cmd.customAction.parameters);
                     return true;
+                } else if (cmd?.signalAction?.customAction) {
+                    customAction(cmd.signalAction.customAction.action, cmd.signalAction.customAction.parameters);
+                    return true;
                 } else if (cmd?.showEngagementPanelEndpoint?.customAction) {
                     customAction(cmd.showEngagementPanelEndpoint.customAction.action, cmd.showEngagementPanelEndpoint.customAction.parameters);
                     return true;
+                } else if (cmd?.openPopupAction?.uniqueId === 'playback-settings') {
+                    // Patch the playback settings popup to use TizenTube speed settings
+                    const items = cmd.openPopupAction.popup.overlaySectionRenderer.overlay.overlayTwoPanelRenderer.actionPanel.overlayPanelRenderer.content.overlayPanelItemListRenderer.items;
+                    for (const item of items) {
+                        if (item?.compactLinkRenderer?.icon?.iconType === 'SLOW_MOTION_VIDEO') {
+                            item.compactLinkRenderer.subtitle && (item.compactLinkRenderer.subtitle.simpleText = 'with TizenTube');
+                            item.compactLinkRenderer.serviceEndpoint = {
+                                clickTrackingParams: "null",
+                                signalAction: {
+                                    customAction: {
+                                        action: 'TT_SPEED_SETTINGS_SHOW',
+                                        parameters: []
+                                    }
+                                }
+                            };
+                        }
+                    }
                 }
 
                 return ogResolve.call(this, cmd, _);
@@ -77,6 +98,12 @@ function customAction(action, parameters) {
             document.dispatchEvent(kE);
 
             document.querySelector('video').currentTime = parameters.time;
+            break;
+        case 'TT_SETTINGS_SHOW':
+            modernUI();
+            break;
+        case 'TT_SPEED_SETTINGS_SHOW':
+            speedSettings();
             break;
     }
 }

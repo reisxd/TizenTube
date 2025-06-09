@@ -250,7 +250,7 @@ class SponsorBlockHandler {
       console.info(this.videoID, 'Skipping', segment);
       if (!this.manualSkippableCategories.includes(segment.category)) {
         showToast('SponsorBlock', `Skipping ${skipName}`);
-        this.video.currentTime = end;
+        this.video.currentTime = end + 0.1;
         this.scheduleSkip();
       }
     }, (start - this.video.currentTime) * 1000);
