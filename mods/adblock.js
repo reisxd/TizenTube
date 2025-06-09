@@ -185,17 +185,20 @@ function deArrowify(items) {
 function hqify(items) {
   for (const item of items) {
     if (item.tileRenderer.style !== 'TILE_STYLE_YTLR_DEFAULT') continue;
+    let quality = 'sddefault';
     if (configRead('enableHqThumbnails')) {
-      const videoID = item.tileRenderer.contentId;
-      const queryArgs = item.tileRenderer.header.tileHeaderRenderer.thumbnail.thumbnails[0].url.split('?')[1];
-      item.tileRenderer.header.tileHeaderRenderer.thumbnail.thumbnails = [
-        {
-          url: `https://i.ytimg.com/vi/${videoID}/maxresdefault.jpg${queryArgs ? `?${queryArgs}` : ''}`,
-          width: 1280,
-          height: 720
-        }
-      ]
+      quality = 'maxresdefault';
     }
+
+    const videoID = item.tileRenderer.contentId;
+    const queryArgs = item.tileRenderer.header.tileHeaderRenderer.thumbnail.thumbnails[0].url.split('?')[1];
+    item.tileRenderer.header.tileHeaderRenderer.thumbnail.thumbnails = [
+      {
+        url: `https://i.ytimg.com/vi/${videoID}/${quality}.jpg${queryArgs ? `?${queryArgs}` : ''}`,
+        width: quality === 'maxresdefault' ? 1280 : 640,
+        height: quality === 'maxresdefault' ? 720 : 480
+      }
+    ];
   }
 }
 

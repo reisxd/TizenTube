@@ -15,7 +15,7 @@ const defaultConfig = {
   focusContainerColor: '#0f0f0f',
   routeColor: '#0f0f0f',
   enableFixedUI: true,
-  enableHqThumbnails: true,
+  enableHqThumbnails: false,
   enableChapters: true,
   enableLongPress: true,
   enableShorts: true
