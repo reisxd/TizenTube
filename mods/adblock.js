@@ -42,6 +42,13 @@ JSON.parse = function () {
       );
   }
 
+  // Remove shorts ads
+  if (r?.entries && configRead('enableAdBlock')) {
+    r.entries = r.entries?.filter(
+      (elm) => !elm?.command?.reelWatchEndpoint?.adClientParams?.isAd
+    );
+  }
+
   // Patch settings
 
   if (r?.title?.runs) {
