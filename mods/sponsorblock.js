@@ -2,7 +2,7 @@ import sha256 from './tiny-sha256.js';
 import { configRead } from './config.js';
 import { showToast } from './ytUI.js';
 
-// Copied from https://github.com/ajayyy/SponsorBlock/blob/9392d16617d2d48abb6125c00e2ff6042cb7bebe/src/config.ts#L179-L233
+// Copied from https://github.com/ajayyy/SponsorBlock/blob/da1a535de784540ee10166a75a3eb8537073838c/src/config.ts#L113-L134
 const barTypes = {
   sponsor: {
     color: '#00d400',
@@ -29,10 +29,20 @@ const barTypes = {
     opacity: '0.7',
     name: 'self-promotion'
   },
+  preview: {
+    color: '#008fd6',
+    opacity: '0.7',
+    name: 'recap or preview'
+  },
   music_offtopic: {
     color: '#ff9900',
     opacity: '0.7',
     name: 'non-music part'
+  },
+  filler: {
+    color: "#7300FF",
+    opacity: "0.9",
+    name: 'tangents'
   }
 };
 
@@ -65,7 +75,9 @@ class SponsorBlockHandler {
       'outro',
       'interaction',
       'selfpromo',
-      'music_offtopic'
+      'preview',
+      'music_offtopic',
+      'filler'
     ];
     const resp = await fetch(
       `${sponsorblockAPI}/skipSegments/${videoHash}?categories=${encodeURIComponent(
@@ -110,8 +122,14 @@ class SponsorBlockHandler {
     if (configRead('enableSponsorBlockSelfPromo')) {
       skippableCategories.push('selfpromo');
     }
+    if (configRead('enableSponsorBlockPreview')) {
+      skippableCategories.push('preview');
+    }
     if (configRead('enableSponsorBlockMusicOfftopic')) {
       skippableCategories.push('music_offtopic');
+    }
+    if (configRead('enableSponsorBlockFiller')) {
+      skippableCategories.push('filler');
     }
     return skippableCategories;
   }
