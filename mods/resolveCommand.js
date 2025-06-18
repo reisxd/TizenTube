@@ -113,5 +113,9 @@ function customAction(action, parameters) {
             window.h5vcc.tizentube.InstallAppFromURL(parameters);
             showToast('TizenTube Update', 'Downloading update, please wait...');
             break;
+        case 'SET_PLAYER_SPEED':
+            const speed = Number(parameters);
+            document.querySelector('video').playbackRate = speed;
+            break;
     }
 }

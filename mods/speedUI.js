@@ -62,6 +62,12 @@ function speedSettings() {
                                 }
                             ]
                         }
+                    },
+                    {
+                        customAction: {
+                            action: 'SET_PLAYER_SPEED',
+                            parameters: speed.toString()
+                        }
                     }
                 ]
             )
@@ -92,29 +98,18 @@ function speedSettings() {
                             }
                         ]
                     }
+                },
+                {
+                    customAction: {
+                        action: 'SET_PLAYER_SPEED',
+                        parameters: '1.0001'
+                    }
                 }
             ]
         )
     );
 
     showModal('Playback Speed', buttons, selectedIndex, 'tt-speed');
-
-    let observer = new MutationObserver((mutationsList, observer) => {
-        let modal = null;
-        const elements = document.getElementsByTagName('yt-formatted-string');
-        for (const element of elements) {
-            if (element.innerText === 'Playback Speed') {
-                modal = element;
-                break;
-            }
-        }
-        if (!modal) {
-            document.getElementsByTagName('video')[0].playbackRate = configRead('videoSpeed');
-            observer.disconnect();
-        }
-    }
-    );
-    observer.observe(document.body, { childList: true, subtree: true });
 }
 
 export {
