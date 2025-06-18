@@ -83,3 +83,9 @@
 .ytLrTileHeaderRendererShorts {
   background-image: none !important;
 }
+
+/* Multiline support for strings in the UI */
+
+.ytLrOverlayPanelHeaderRendererSubtitle {
+  white-space: pre-wrap !important;
+}

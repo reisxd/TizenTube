@@ -20,7 +20,8 @@ const defaultConfig = {
   enableHqThumbnails: false,
   enableChapters: true,
   enableLongPress: true,
-  enableShorts: true
+  enableShorts: true,
+  dontCheckUpdateUntil: 0
 };
 
 let localConfig;

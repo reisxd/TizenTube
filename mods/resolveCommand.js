@@ -1,6 +1,7 @@
 import { configWrite, configRead } from './config.js';
 import modernUI, { optionShow } from './modernUI.js';
 import { speedSettings } from './speedUI.js';
+import { showToast } from './ytUI.js';
 
 export default function resolveCommand(cmd, _) {
     // resolveCommand function is pretty OP, it can do from opening modals, changing client settings and way more.
@@ -104,6 +105,13 @@ function customAction(action, parameters) {
             break;
         case 'TT_SPEED_SETTINGS_SHOW':
             speedSettings();
+            break;
+        case 'UPDATE_REMIND_LATER':
+            configWrite('dontCheckUpdateUntil', parameters);
+            break;
+        case 'UPDATE_DOWNLOAD':
+            window.h5vcc.tizentube.InstallAppFromURL(parameters);
+            showToast('TizenTube Update', 'Downloading update, please wait...');
             break;
     }
 }

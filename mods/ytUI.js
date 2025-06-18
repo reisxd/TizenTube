@@ -23,7 +23,8 @@ function showToast(title, subtitle, thumbnails) {
     resolveCommand(toastCmd);
 }
 
-function showModal(title, content, selectIndex, id, update) {
+function showModal(titleAndSubtitle, content, selectIndex, id, update) {
+    const titleSubtitleObj = typeof titleAndSubtitle === 'string' ? { title: titleAndSubtitle, subtitle: '' } : titleAndSubtitle;
     const modalCmd = {
         openPopupAction: {
             popupType: 'MODAL',
@@ -36,7 +37,7 @@ function showModal(title, content, selectIndex, id, update) {
                                     header: {
                                         overlayPanelHeaderRenderer: {
                                             title: {
-                                                simpleText: title
+                                                simpleText: titleSubtitleObj.title
                                             }
                                         }
                                     },
@@ -73,6 +74,12 @@ function showModal(title, content, selectIndex, id, update) {
             },
             uniqueId: id
         }
+    }
+
+    if (titleSubtitleObj.subtitle) {
+        modalCmd.openPopupAction.popup.overlaySectionRenderer.overlay.overlayTwoPanelRenderer.actionPanel.overlayPanelRenderer.header.overlayPanelHeaderRenderer.subtitle = {
+            simpleText: titleSubtitleObj.subtitle
+        };
     }
 
     if (update) {
