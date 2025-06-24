@@ -95,3 +95,7 @@
 .ytLrProgressBarPlayhead {
   z-index: 1 !important;
 }
+
+.ytLrProgressBarPlayed {
+  z-index: 1 !important;
+}
