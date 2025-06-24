@@ -188,7 +188,7 @@ class SponsorBlockHandler {
       const elm = document.createElement('div');
       elm.style.setProperty('background', barType.color, 'important');
       elm.style.setProperty('opacity', barType.opacity, 'important');
-      elm.style.setProperty('-webkit-transform', transform, 'important');
+      elm.style.setProperty('transform', transform, 'important');
       elm.style.setProperty('height', '100%');
       elm.style.setProperty('pointer-events', 'none');
       elm.style.setProperty('position', 'absolute');
