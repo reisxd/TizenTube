@@ -170,7 +170,7 @@ class SponsorBlockHandler {
     this.segmentsoverlay.classList.add('ytLrProgressBarHost', 'ytLrProgressBarFocused', 'ytLrWatchDefaultProgressBar');
     const sliderElement = document.createElement('div');
     sliderElement.classList.add('ytLrProgressBarSlider', 'ytLrProgressBarSliderRectangularProgressBar');
-    sliderElement.style.background = 'rgb(0, 0, 0, 0) !important';
+    sliderElement.style.setProperty('background', 'rgb(0, 0, 0, 0)', 'important');
     this.segmentsoverlay.appendChild(sliderElement);
     this.segments.forEach((segment) => {
       const [start, end] = segment.segment;
@@ -179,12 +179,12 @@ class SponsorBlockHandler {
         opacity: 0.7
       };
       const transform = `translateX(${(start / videoDuration) * 100.0
-        }%) scaleX(${(end - start) / videoDuration}) !important`;
+        }%) scaleX(${(end - start) / videoDuration})`;
       const elm = document.createElement('div');
       elm.classList.add('ytLrProgressBarPlayed');
-      elm.style['background'] = `${barType.color} !important`;
-      elm.style['opacity'] = `${barType.opacity} !important`;
-      elm.style['-webkit-transform'] = transform;
+      elm.style.setProperty('background', barType.color, 'important');
+      elm.style.setProperty('opacity', barType.opacity, 'important');
+      elm.style.setProperty('-webkit-transform', transform, 'important');
       console.info('Generated element', elm, 'from', segment, transform);
       sliderElement.appendChild(elm);
     });
