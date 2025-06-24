@@ -167,6 +167,11 @@ class SponsorBlockHandler {
     const videoDuration = this.video.duration;
 
     this.segmentsoverlay = document.createElement('div');
+    this.segmentsoverlay.classList.add('ytLrProgressBarHost', 'ytLrProgressBarFocused', 'ytLrWatchDefaultProgressBar');
+    const sliderElement = document.createElement('div');
+    sliderElement.classList.add('ytLrProgressBarSlider', 'ytLrProgressBarSliderRectangularProgressBar');
+    sliderElement.style.background = 'rgb(0, 0, 0, 0)';
+    this.segmentsoverlay.appendChild(sliderElement);
     this.segments.forEach((segment) => {
       const [start, end] = segment.segment;
       const barType = barTypes[segment.category] || {
@@ -176,12 +181,12 @@ class SponsorBlockHandler {
       const transform = `translateX(${(start / videoDuration) * 100.0
         }%) scaleX(${(end - start) / videoDuration})`;
       const elm = document.createElement('div');
-      elm.classList.add('ytlr-progress-bar__played');
+      elm.classList.add('ytLrProgressBarPlayed');
       elm.style['background'] = barType.color;
       elm.style['opacity'] = barType.opacity;
       elm.style['-webkit-transform'] = transform;
       console.info('Generated element', elm, 'from', segment, transform);
-      this.segmentsoverlay.appendChild(elm);
+      sliderElement.appendChild(elm);
     });
 
     this.observer = new MutationObserver((mutations) => {
@@ -194,16 +199,23 @@ class SponsorBlockHandler {
             }
           }
         }
+
+        if (document.querySelector('ytlr-progress-bar').getAttribute('hybridnavfocusable') === 'false') {
+          this.segmentsoverlay.classList.remove('ytLrProgressBarFocused');
+        } else {
+          this.segmentsoverlay.classList.add('ytLrProgressBarFocused');
+        }
       });
     });
 
     this.sliderInterval = setInterval(() => {
-      this.slider = document.querySelector('.ytlr-progress-bar__slider');
+      this.slider = document.querySelector('ytlr-redux-connect-ytlr-progress-bar');
       if (this.slider) {
         clearInterval(this.sliderInterval);
         this.sliderInterval = null;
         this.observer.observe(this.slider, {
-          childList: true
+          childList: true,
+          subtree: true
         });
         this.slider.appendChild(this.segmentsoverlay);
       }
