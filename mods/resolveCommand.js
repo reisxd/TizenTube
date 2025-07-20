@@ -47,6 +47,17 @@ export function patchResolveCommand() {
                                     configWrite(setting.clientSettingEnum.item, arr);
                                 } else configWrite(setting.clientSettingEnum.item, value);
                             }
+                        } else if (settings.clientSettingEnum.item === 'I18N_LANGUAGE') {
+                            const lang = settings.stringValue;
+                            const date = new Date();
+                            date.setFullYear(date.getFullYear() + 10);
+                            document.cookie = `PREF=hl=${lang}; expires=${date.toUTCString()};`;
+                            resolveCommand({
+                                signalAction: {
+                                    signal: 'RELOAD_PAGE'
+                                }
+                            });
+                            return true;
                         }
                     }
                 } else if (cmd.customAction) {
