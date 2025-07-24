@@ -1,4 +1,4 @@
-import { configRead } from './config.js';
+import { configRead } from '../config.js';
 import { showModal, buttonItem } from './ytUI.js';
 
 export default function modernUI(update, parameters) {
@@ -121,6 +121,11 @@ export default function modernUI(update, parameters) {
             name: 'Shorts',
             icon: 'YOUTUBE_SHORTS_FILL_24',
             value: 'enableShorts'
+        },
+        {
+            name: 'Who\'s Watching Menu',
+            icon: 'ACCOUNT_CIRCLE',
+            value: 'enableWhoIsWatchingMenu'
         }
     ]
 

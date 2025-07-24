@@ -1,6 +1,6 @@
 // TizenTube Cobalt Update Checker
 
-import { buttonItem, showModal, showToast } from './ytUI.js';
+import { buttonItem, showModal, showToast } from './ui/ytUI.js';
 import { configRead } from './config.js';
 
 // If TizenTube is not running on Cobalt, do nothing

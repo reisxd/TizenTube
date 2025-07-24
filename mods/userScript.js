@@ -2,8 +2,9 @@ import 'whatwg-fetch';
 import './domrect-polyfill';
 import './adblock.js';
 import './sponsorblock.js';
-import './ui.js';
-import './speedUI.js';
-import './theme.js';
-import './modernUI.js';
+import './ui/ui.js';
+import './ui/speedUI.js';
+import './ui/theme.js';
+import './ui/settings.js';
+import './ui/disableWhosWatching.js'
 import './updater.js';

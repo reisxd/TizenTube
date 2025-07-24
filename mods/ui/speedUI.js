@@ -1,4 +1,4 @@
-import { configRead } from './config.js';
+import { configRead } from '../config.js';
 import { showModal, buttonItem } from './ytUI.js';
 
 const interval = setInterval(() => {

@@ -1,4 +1,4 @@
-import { configRead } from './config.js';
+import { configRead } from '../config.js';
 
 const style = document.createElement('style');
 let css = '';

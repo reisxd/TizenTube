@@ -1,8 +1,8 @@
 import { configRead } from './config.js';
-import Chapters from './chapters.js';
+import Chapters from './ui/chapters.js';
 import resolveCommand from './resolveCommand.js';
-import { timelyAction, longPressData } from './ytUI.js';
-import { PatchSettings } from './customSettings.js';
+import { timelyAction, longPressData } from './ui/ytUI.js';
+import { PatchSettings } from './ui/customYTSettings.js';
 
 /**
  * This is a minimal reimplementation of the following uBlock Origin rule:

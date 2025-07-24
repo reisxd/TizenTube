@@ -21,7 +21,8 @@ const defaultConfig = {
   enableChapters: true,
   enableLongPress: true,
   enableShorts: true,
-  dontCheckUpdateUntil: 0
+  dontCheckUpdateUntil: 0,
+  enableWhoIsWatchingMenu: false
 };
 
 let localConfig;
@@ -51,4 +52,22 @@ export function configWrite(key, value) {
   console.info('Setting key', key, 'to', value);
   localConfig[key] = value;
   window.localStorage[CONFIG_KEY] = JSON.stringify(localConfig);
+  configChangeEmitter.dispatchEvent(new CustomEvent('configChange', { detail: { key, value } }));
 }
+
+export const configChangeEmitter = {
+  listeners: {},
+  addEventListener(type, callback) {
+    if (!this.listeners[type]) this.listeners[type] = [];
+    this.listeners[type].push(callback);
+  },
+  removeEventListener(type, callback) {
+    if (!this.listeners[type]) return;
+    this.listeners[type] = this.listeners[type].filter(cb => cb !== callback);
+  },
+  dispatchEvent(event) {
+    const type = event.type;
+    if (!this.listeners[type]) return;
+    this.listeners[type].forEach(cb => cb.call(this, event));
+  }
+};

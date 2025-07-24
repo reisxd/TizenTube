@@ -1,11 +1,11 @@
 /*global navigate*/
-import './spatial-navigation-polyfill.js';
+import '../spatial-navigation-polyfill.js';
 import css from './ui.css';
-import { configRead, configWrite } from './config.js';
+import { configRead, configWrite } from '../config.js';
 import updateStyle from './theme.js';
 import { showToast } from './ytUI.js';
-import modernUI from './modernUI.js';
-import { patchResolveCommand } from './resolveCommand.js';
+import modernUI from './settings.js';
+import { patchResolveCommand } from '../resolveCommand.js';
 
 // It just works, okay?
 const interval = setInterval(() => {

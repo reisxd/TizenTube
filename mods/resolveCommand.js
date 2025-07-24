@@ -1,7 +1,7 @@
 import { configWrite, configRead } from './config.js';
-import modernUI, { optionShow } from './modernUI.js';
-import { speedSettings } from './speedUI.js';
-import { showToast } from './ytUI.js';
+import modernUI, { optionShow } from './ui/settings.js';
+import { speedSettings } from './ui/speedUI.js';
+import { showToast } from './ui/ytUI.js';
 
 export default function resolveCommand(cmd, _) {
     // resolveCommand function is pretty OP, it can do from opening modals, changing client settings and way more.

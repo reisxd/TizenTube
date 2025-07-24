@@ -1,4 +1,4 @@
-import resolveCommand from './resolveCommand.js';
+import resolveCommand from '../resolveCommand.js';
 
 function showToast(title, subtitle, thumbnails) {
     const toastCmd = {
@@ -247,10 +247,73 @@ function longPressData(data) {
     }
 }
 
+function SettingsCategory(categoryId, items, title) {
+    const category = {
+        settingCategoryCollectionRenderer: {
+            items,
+            categoryId,
+            focused: false,
+            trackingParams: "null"
+        }
+    }
+
+    if (title) {
+        category.settingCategoryCollectionRenderer.title = {
+            runs: [
+                {
+                    text: title
+                }
+            ]
+        };
+    }
+
+    return category;
+}
+
+function SettingActionRenderer(title, itemId, serviceEndpoint, summary, thumbnail) {
+    return {
+        settingActionRenderer: {
+            title: {
+                runs: [
+                    {
+                        text: title
+                    }
+                ]
+            },
+            serviceEndpoint,
+            summary: {
+                runs: [
+                    {
+                        text: summary
+                    }
+                ]
+            },
+            trackingParams: "null",
+            actionLabel: {
+                runs: [
+                    {
+                        text: title
+                    }
+                ]
+            },
+            itemId,
+            thumbnail: {
+                thumbnails: [
+                    {
+                        url: thumbnail
+                    }
+                ]
+            }
+        }
+    }
+}
+
 export {
     showToast,
     showModal,
     buttonItem,
     timelyAction,
-    longPressData
+    longPressData,
+    SettingsCategory,
+    SettingActionRenderer
 }
