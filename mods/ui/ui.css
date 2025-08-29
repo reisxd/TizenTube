@@ -99,3 +99,7 @@
 .ytLrProgressBarPlayed {
   z-index: 1 !important;
 }
+
+/* Remove Background Black Arrea When Move Down In Video */
+.ytLrWatchDefaultControlsBackground {
+  background-color: transparent !important;
