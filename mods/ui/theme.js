@@ -5,12 +5,12 @@ let css = '';
 
 function updateStyle() {
     css = `
-    ytlr-guide-response yt-focus-container,
-    .ytLrTvSecondaryNavRendererWithSideNav.ytLrTvSecondaryNavRendererWithSectionListNav .ytLrTvSecondaryNavRendererSideNav {
+    ytlr-guide-response yt-focus-container {
         background-color: ${configRead('focusContainerColor')};
     }
 
-    #container {
+    #container,
+    .ytLrTvSecondaryNavRendererWithSideNav.ytLrTvSecondaryNavRendererWithSectionListNav .ytLrTvSecondaryNavRendererSideNav {
         background-color: ${configRead('routeColor')} !important;
     }
 `;
