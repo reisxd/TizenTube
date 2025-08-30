@@ -5,7 +5,8 @@ let css = '';
 
 function updateStyle() {
     css = `
-    ytlr-guide-response yt-focus-container {
+    ytlr-guide-response yt-focus-container,
+    .ytLrTvSecondaryNavRendererWithSideNav.ytLrTvSecondaryNavRendererWithSectionListNav .ytLrTvSecondaryNavRendererSideNav {
         background-color: ${configRead('focusContainerColor')};
     }
 
