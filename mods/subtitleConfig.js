@@ -214,20 +214,6 @@ function getUserCountryCode() {
             return window.yt.config_.GL;
         }
 
-        // Fallback: try to get from other global variables
-        if (window.data && window.data.GL) {
-            return window.data.GL;
-        }
-
-        // Another fallback: try from clientData
-        if (
-            window.tectonicConfig &&
-            window.tectonicConfig.clientData &&
-            window.tectonicConfig.clientData.GL
-        ) {
-            return window.tectonicConfig.clientData.GL;
-        }
-
         console.warn(
             "TizenTube Subtitle Localization: Could not determine user country code"
         );
