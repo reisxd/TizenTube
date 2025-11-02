@@ -1,4 +1,9 @@
 import "whatwg-fetch";
+import '@formatjs/intl-getcanonicallocales/polyfill.iife'
+import '@formatjs/intl-locale/polyfill.iife'
+import '@formatjs/intl-displaynames/polyfill.iife'
+import '@formatjs/intl-displaynames/locale-data/en';
+
 import "./domrect-polyfill";
 import "./adblock.js";
 import "./sponsorblock.js";

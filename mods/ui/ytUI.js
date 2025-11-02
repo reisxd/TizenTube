@@ -23,7 +23,7 @@ function showToast(title, subtitle, thumbnails) {
     resolveCommand(toastCmd);
 }
 
-function showModal(titleAndSubtitle, content, selectIndex, id, update) {
+function showModal(titleAndSubtitle, content, id, update) {
     const titleSubtitleObj = typeof titleAndSubtitle === 'string' ? { title: titleAndSubtitle, subtitle: '' } : titleAndSubtitle;
     const modalCmd = {
         openPopupAction: {
@@ -41,12 +41,7 @@ function showModal(titleAndSubtitle, content, selectIndex, id, update) {
                                             }
                                         }
                                     },
-                                    content: {
-                                        overlayPanelItemListRenderer: {
-                                            items: content,
-                                            selectedIndex: selectIndex
-                                        }
-                                    }
+                                    content
                                 }
                             },
                             backButton: {
@@ -89,6 +84,15 @@ function showModal(titleAndSubtitle, content, selectIndex, id, update) {
 
     resolveCommand(modalCmd);
 }
+
+function overlayPanelItemListRenderer(items, selectedIndex) {
+    return {
+        overlayPanelItemListRenderer: {
+            items,
+            selectedIndex
+        }
+    }
+};
 
 function buttonItem(title, icon, commands) {
     const button = {
@@ -308,11 +312,36 @@ function SettingActionRenderer(title, itemId, serviceEndpoint, summary, thumbnai
     }
 }
 
+function scrollPaneRenderer(items) {
+    return {
+        scrollPaneRenderer: {
+            content: {
+                scrollPaneItemListRenderer: {
+                    items
+                }
+            }
+        }
+    }
+}
+
+function overlayMessageRenderer(simpleText) {
+    return {
+        overlayMessageRenderer: {
+            title: {
+                simpleText
+            }
+        }
+    }
+}
+
 export {
     showToast,
     showModal,
     buttonItem,
+    overlayPanelItemListRenderer,
+    overlayMessageRenderer,
     timelyAction,
+    scrollPaneRenderer,
     longPressData,
     SettingsCategory,
     SettingActionRenderer

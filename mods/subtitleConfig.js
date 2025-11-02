@@ -3,206 +3,60 @@
 
 import { configRead } from "./config.js";
 
-// Comprehensive language list for "Others" menu
-const COMPREHENSIVE_LANGUAGE_LIST = {
-    af: "Afrikaans",
-    sq: "Albanian",
-    am: "Amharic",
-    ar: "Arabic",
-    hy: "Armenian",
-    as: "Assamese",
-    az: "Azerbaijani",
-    eu: "Basque",
-    be: "Belarusian",
-    bn: "Bangla",
-    bs: "Bosnian",
-    bg: "Bulgarian",
-    my: "Burmese",
-    ca: "Catalan",
-    "zh-CN": "Chinese (Simplified)",
-    "zh-TW": "Chinese (Traditional)",
-    "zh-HK": "Chinese (Hong Kong)",
-    hr: "Croatian",
-    cs: "Czech",
-    da: "Danish",
-    nl: "Dutch",
-    en: "English",
-    et: "Estonian",
-    fil: "Filipino",
-    fi: "Finnish",
-    fr: "French",
-    gl: "Galician",
-    ka: "Georgian",
-    de: "German",
-    el: "Greek",
-    gu: "Gujarati",
-    he: "Hebrew",
-    hi: "Hindi",
-    hu: "Hungarian",
-    is: "Icelandic",
-    id: "Indonesian",
-    ga: "Irish",
-    it: "Italian",
-    ja: "Japanese",
-    kn: "Kannada",
-    kk: "Kazakh",
-    km: "Khmer",
-    ko: "Korean",
-    ky: "Kyrgyz",
-    lo: "Lao",
-    lv: "Latvian",
-    lt: "Lithuanian",
-    mk: "Macedonian",
-    ms: "Malay",
-    ml: "Malayalam",
-    mt: "Maltese",
-    mr: "Marathi",
-    mn: "Mongolian",
-    ne: "Nepali",
-    no: "Norwegian",
-    or: "Odia",
-    fa: "Persian",
-    pl: "Polish",
-    pt: "Portuguese",
-    pa: "Punjabi",
-    ro: "Romanian",
-    ru: "Russian",
-    sr: "Serbian",
-    si: "Sinhala",
-    sk: "Slovak",
-    sl: "Slovenian",
-    es: "Spanish",
-    sw: "Swahili",
-    sv: "Swedish",
-    ta: "Tamil",
-    te: "Telugu",
-    th: "Thai",
-    tr: "Turkish",
-    uk: "Ukrainian",
-    ur: "Urdu",
-    uz: "Uzbek",
-    vi: "Vietnamese",
-    cy: "Welsh",
-    yi: "Yiddish",
-    yo: "Yoruba",
-    zu: "Zulu",
-};
+const LANGUAGE_CODES = [
+    "af","sq","am","ar","hy","as","az","eu","be","bn","bs","bg",
+    "my","ca","zh-CN","zh-TW","zh-HK","hr","cs","da","nl","en","et",
+    "fil","fi","fr","gl","ka","de","el","gu","he","hi","hu","is",
+    "id","ga","it","ja","kn","kk","km","ko","ky","lo","lv","lt",
+    "mk","ms","ml","mt","mr","mn","ne","no","or","fa","pl","pt",
+    "pa","ro","ru","sr","si","sk","sl","es","sw","sv","ta","te",
+    "th","tr","uk","ur","uz","vi","cy","yi","yo","zu"
+];
 
-// Country code to language mapping based on most commonly spoken languages
-export const COUNTRY_TO_LANGUAGE = {
-    // Major languages from the provided data
-    US: { code: "en", name: "English" },
-    GB: { code: "en", name: "English" },
-    CA: { code: "en", name: "English" },
-    AU: { code: "en", name: "English" },
-    NZ: { code: "en", name: "English" },
-    IE: { code: "en", name: "English" },
-    ZA: { code: "en", name: "English" },
+// Return an object mapping language code -> localized language name.
+export function getComprehensiveLanguageList(locale = "en") {
+    try {
+        const displayNames = new Intl.DisplayNames([locale], { type: "language" });
+        const map = {};
+        LANGUAGE_CODES.forEach((code) => {
+            const name = displayNames.of(code) || code;
+            map[code] = name;
+        });
+        return map;
+    } catch (e) {
+        const fallback = {};
+        LANGUAGE_CODES.forEach((c) => (fallback[c] = c));
+        return fallback;
+    }
+}
 
-    ES: { code: "es", name: "Spanish" },
-    MX: { code: "es", name: "Spanish" },
-    AR: { code: "es", name: "Spanish" },
-    CO: { code: "es", name: "Spanish" },
-    CL: { code: "es", name: "Spanish" },
-    PE: { code: "es", name: "Spanish" },
-    VE: { code: "es", name: "Spanish" },
+// Infer the most likely language for a given ISO 3166-1 alpha-2 country code using Intl.Locale.
+// Returns { code, name } or null if unknown.
+export function getCountryLanguage(countryCode, locale = "en") {
+    if (!countryCode) return null;
+    try {
+        const region = String(countryCode).toUpperCase();
 
-    FR: { code: "fr", name: "French" },
-    BE: { code: "fr", name: "French" },
-    CH: { code: "fr", name: "French" },
-    LU: { code: "fr", name: "French" },
-    MC: { code: "fr", name: "French" },
+        const zhRegionMap = { CN: "zh-CN", TW: "zh-TW", HK: "zh-HK", SG: "zh-CN" };
+        if (zhRegionMap[region]) {
+            const code = zhRegionMap[region];
+            const name = new Intl.DisplayNames([locale], { type: "language" }).of(code) || code;
+            return { code, name };
+        }
 
-    DE: { code: "de", name: "German" },
-    AT: { code: "de", name: "German" },
+        const base = new Intl.Locale("und", { region });
+        const maximized = base.maximize ? base.maximize() : base;
+        const lang = maximized.language || "en";
 
-    IT: { code: "it", name: "Italian" },
-    SM: { code: "it", name: "Italian" },
-    VA: { code: "it", name: "Italian" },
+        const displayNames = new Intl.DisplayNames([locale], { type: "language" });
+        const name = displayNames.of(lang) || lang;
 
-    PT: { code: "pt", name: "Portuguese" },
-    BR: { code: "pt", name: "Portuguese" },
-
-    RU: { code: "ru", name: "Russian" },
-    BY: { code: "ru", name: "Russian" },
-    KZ: { code: "ru", name: "Russian" },
-
-    CN: { code: "zh-CN", name: "Chinese (Simplified)" },
-    TW: { code: "zh-TW", name: "Chinese (Traditional)" },
-    HK: { code: "zh-HK", name: "Chinese (Traditional)" },
-    SG: { code: "zh-CN", name: "Chinese (Simplified)" },
-
-    JP: { code: "ja", name: "Japanese" },
-    KR: { code: "ko", name: "Korean" },
-
-    IN: { code: "hi", name: "Hindi" },
-    PK: { code: "ur", name: "Urdu" },
-    BD: { code: "bn", name: "Bangla" },
-
-    IR: { code: "fa", name: "Persian" },
-    AF: { code: "fa", name: "Persian" },
-
-    SA: { code: "ar", name: "Arabic" },
-    EG: { code: "ar", name: "Arabic" },
-    AE: { code: "ar", name: "Arabic" },
-    QA: { code: "ar", name: "Arabic" },
-    KW: { code: "ar", name: "Arabic" },
-    BH: { code: "ar", name: "Arabic" },
-    OM: { code: "ar", name: "Arabic" },
-    JO: { code: "ar", name: "Arabic" },
-    LB: { code: "ar", name: "Arabic" },
-    SY: { code: "ar", name: "Arabic" },
-    IQ: { code: "ar", name: "Arabic" },
-    MA: { code: "ar", name: "Arabic" },
-    TN: { code: "ar", name: "Arabic" },
-    DZ: { code: "ar", name: "Arabic" },
-    LY: { code: "ar", name: "Arabic" },
-
-    TR: { code: "tr", name: "Turkish" },
-    TH: { code: "th", name: "Thai" },
-    VN: { code: "vi", name: "Vietnamese" },
-    ID: { code: "id", name: "Indonesian" },
-    MY: { code: "ms", name: "Malay" },
-    PH: { code: "fil", name: "Filipino" },
-
-    NL: { code: "nl", name: "Dutch" },
-    SE: { code: "sv", name: "Swedish" },
-    NO: { code: "no", name: "Norwegian" },
-    DK: { code: "da", name: "Danish" },
-    FI: { code: "fi", name: "Finnish" },
-    IS: { code: "is", name: "Icelandic" },
-
-    PL: { code: "pl", name: "Polish" },
-    CZ: { code: "cs", name: "Czech" },
-    SK: { code: "sk", name: "Slovak" },
-    HU: { code: "hu", name: "Hungarian" },
-    RO: { code: "ro", name: "Romanian" },
-    BG: { code: "bg", name: "Bulgarian" },
-    HR: { code: "hr", name: "Croatian" },
-    SI: { code: "sl", name: "Slovenian" },
-    RS: { code: "sr", name: "Serbian" },
-    BA: { code: "bs", name: "Bosnian" },
-    MK: { code: "mk", name: "Macedonian" },
-    AL: { code: "sq", name: "Albanian" },
-    GR: { code: "el", name: "Greek" },
-
-    UA: { code: "uk", name: "Ukrainian" },
-    LT: { code: "lt", name: "Lithuanian" },
-    LV: { code: "lv", name: "Latvian" },
-    EE: { code: "et", name: "Estonian" },
-
-    GE: { code: "ka", name: "Georgian" },
-    AM: { code: "hy", name: "Armenian" },
-    AZ: { code: "az", name: "Azerbaijani" },
-
-    IL: { code: "he", name: "Hebrew" },
-    ET: { code: "am", name: "Amharic" },
-    KE: { code: "sw", name: "Swahili" },
-    TZ: { code: "sw", name: "Swahili" },
-
-    NG: { code: "en", name: "English" }, // Nigeria uses English officially
-    GH: { code: "en", name: "English" }, // Ghana uses English officially
-};
+        return { code: lang, name };
+    } catch (e) {
+        console.warn("TizenTube Subtitle Localization: Could not infer language for country", countryCode, e);
+        return null;
+    }
+}
 
 let isPatched = false;
 
@@ -230,8 +84,8 @@ function getUserCountryCode() {
 // Function to get dynamic user language option name for settings UI
 export function getUserLanguageOptionName() {
     const userCountryCode = getUserCountryCode();
-    if (userCountryCode && COUNTRY_TO_LANGUAGE[userCountryCode]) {
-        const userLanguage = COUNTRY_TO_LANGUAGE[userCountryCode];
+    const userLanguage = getCountryLanguage(userCountryCode);
+    if (userLanguage) {
         return `Show ${userLanguage.name} Subtitle`;
     }
     return "Show Local Subtitle";
@@ -394,17 +248,12 @@ function patchSubtitleMenu() {
             // Add user's local language if enabled
             if (showUserLanguage) {
                 const userCountryCode = getUserCountryCode();
+                const userLanguage = getCountryLanguage(userCountryCode);
 
-                if (userCountryCode && COUNTRY_TO_LANGUAGE[userCountryCode]) {
-                    const userLanguage = COUNTRY_TO_LANGUAGE[userCountryCode];
-
+                if (userLanguage) {
                     // Check if the user's language already exists
                     if (
-                        !languageExistsInMenu(
-                            items,
-                            userLanguage.code,
-                            userLanguage.name
-                        )
+                        !languageExistsInMenu(items, userLanguage.code, userLanguage.name)
                     ) {
                         console.log(
                             `%c[TizenTube Subtitle Localization] Adding user's local language: ${userLanguage.name} (${userLanguage.code})`,
@@ -470,14 +319,8 @@ function patchSubtitleMenu() {
 
             // Create "Tizen Languages" section with all missing languages if enabled
             if (showOtherLanguages) {
-                const missingLanguages = Object.entries(
-                    COMPREHENSIVE_LANGUAGE_LIST
-                )
-                    .filter(
-                        ([code, name]) =>
-                            !existingLanguages.has(code) &&
-                            !existingLanguages.has(name)
-                    )
+                const missingLanguages = Object.entries(getComprehensiveLanguageList())
+                    .filter(([code, name]) => !existingLanguages.has(code) && !existingLanguages.has(name))
                     .sort(([, a], [, b]) => a.localeCompare(b));
 
                 if (missingLanguages.length > 0) {
@@ -487,7 +330,7 @@ function patchSubtitleMenu() {
                     );
 
                     // Add section title
-                    items.push(createSectionTitle("Tizen Languages"));
+                    items.push(createSectionTitle("Other Languages"));
 
                     // Add all missing languages
                     missingLanguages.forEach(([code, name]) => {

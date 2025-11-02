@@ -78,6 +78,11 @@
   width: 100% !important;
 }
 
+/* https://github.com/webosbrew/youtube-webos/commit/4fbe38a18df31ddd62b6cf15f141dd58e1d1a71d */
+.ytLrWatchDefault2025Shadow {
+  background-color: rgba(11, 11, 11, 0.5) !important;
+}
+
 /* Fixes shorts having a black background */
 
 .ytLrTileHeaderRendererShorts {

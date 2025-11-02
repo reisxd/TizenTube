@@ -1,6 +1,7 @@
 import { string } from 'rollup-plugin-string';
 import terser from '@rollup/plugin-terser';
 import getBabelOutputPlugin from '@rollup/plugin-babel';
+import { nodeResolve } from '@rollup/plugin-node-resolve';
 
 export default {
     input: "userScript.js",
@@ -21,5 +22,6 @@ export default {
                 }],
             ],
         }),
+        nodeResolve()
     ]
 };
