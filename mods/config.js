@@ -22,7 +22,9 @@ const defaultConfig = {
   enableLongPress: true,
   enableShorts: true,
   dontCheckUpdateUntil: 0,
-  enableWhoIsWatchingMenu: false
+  enableWhoIsWatchingMenu: false,
+  enableShowUserLanguage: true,
+  enableShowOtherLanguages: false
 };
 
 let localConfig;
@@ -36,12 +38,7 @@ try {
 
 export function configRead(key) {
   if (localConfig[key] === undefined) {
-    console.warn(
-      'Populating key',
-      key,
-      'with default value',
-      defaultConfig[key]
-    );
+    console.warn('Populating key', key, 'with default value', defaultConfig[key]);
     localConfig[key] = defaultConfig[key];
   }
 

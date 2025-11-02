@@ -1,5 +1,6 @@
 import { configRead } from '../config.js';
 import { showModal, buttonItem } from './ytUI.js';
+import { getUserLanguageOptionName } from '../subtitleConfig.js';
 
 export default function modernUI(update, parameters) {
     const settings = [
@@ -123,11 +124,26 @@ export default function modernUI(update, parameters) {
             value: 'enableShorts'
         },
         {
-            name: 'Who\'s Watching Menu',
+            name: "Who's Watching Menu",
             icon: 'ACCOUNT_CIRCLE',
             value: 'enableWhoIsWatchingMenu'
+        },
+        {
+            name: 'Subtitles',
+            icon: 'TRANSLATE',
+            value: null,
+            options: [
+                {
+                    name: getUserLanguageOptionName(),
+                    value: 'enableShowUserLanguage'
+                },
+                {
+                    name: 'Show Hidden Subtitles',
+                    value: 'enableShowOtherLanguages'
+                }
+            ]
         }
-    ]
+    ];
 
     const buttons = [];
 
@@ -137,80 +153,147 @@ export default function modernUI(update, parameters) {
         buttons.push(
             buttonItem(
                 { title: setting.name, subtitle: setting.subtitle },
-                { icon: setting.icon ? setting.icon : 'CHEVRON_DOWN', secondaryIcon: currentVal === null ? 'CHEVRON_RIGHT' : currentVal ? 'CHECK_BOX' : 'CHECK_BOX_OUTLINE_BLANK' },
-                currentVal !== null ? [
-                    {
-                        setClientSettingEndpoint: {
-                            settingDatas: [
-                                {
-                                    clientSettingEnum: {
-                                        item: setting.value
-                                    },
-                                    boolValue: !configRead(setting.value)
-                                }
-                            ]
-                        }
-                    },
-                    {
-                        customAction: {
-                            action: 'SETTINGS_UPDATE',
-                            parameters: [index]
-                        }
-                    }
-                ] : [
-                    {
-                        customAction: {
-                            action: 'OPTIONS_SHOW',
-                            parameters: {
-                                options: setting.options,
-                                selectedIndex: 0,
-                                update: false
-                            }
-                        }
-                    }
-                ]
+                {
+                    icon: setting.icon ? setting.icon : 'CHEVRON_DOWN',
+                    secondaryIcon:
+                        currentVal === null ? 'CHEVRON_RIGHT' : currentVal ? 'CHECK_BOX' : 'CHECK_BOX_OUTLINE_BLANK'
+                },
+                currentVal !== null
+                    ? [
+                          {
+                              setClientSettingEndpoint: {
+                                  settingDatas: [
+                                      {
+                                          clientSettingEnum: {
+                                              item: setting.value
+                                          },
+                                          boolValue: !configRead(setting.value)
+                                      }
+                                  ]
+                              }
+                          },
+                          {
+                              customAction: {
+                                  action: 'SETTINGS_UPDATE',
+                                  parameters: [index]
+                              }
+                          }
+                      ]
+                    : [
+                          {
+                              customAction: {
+                                  action: 'OPTIONS_SHOW',
+                                  parameters: {
+                                      options: setting.options,
+                                      selectedIndex: 0,
+                                      update: false
+                                  }
+                              }
+                          }
+                      ]
             )
         );
         index++;
     }
 
-    showModal({ title: 'TizenTube Settings', subtitle: 'Made by Reis Can (reisxd) with ❤️' }, buttons, parameters && parameters.length > 0 ? parameters[0] : 0, 'tt-settings', update);
+    showModal(
+        {
+            title: 'TizenTube Settings',
+            subtitle: 'Made by Reis Can (reisxd) with ❤️'
+        },
+        buttons,
+        parameters && parameters.length > 0 ? parameters[0] : 0,
+        'tt-settings',
+        update
+    );
 }
 
 export function optionShow(parameters, update) {
     const buttons = [];
-    const manualSkipValue = configRead('sponsorBlockManualSkips');
-    for (const option of parameters.options) {
-        buttons.push(
-            buttonItem(
-                { title: option.name },
-                { icon: option.icon ? option.icon : 'CHEVRON_DOWN', secondaryIcon: manualSkipValue.includes(option.value) ? 'CHECK_BOX' : 'CHECK_BOX_OUTLINE_BLANK' },
-                [
+
+    // Check if this is the legacy sponsorBlockManualSkips (array-based) or new boolean-based options
+    const isArrayBasedOptions = parameters.options.some(
+        option => option.value === 'sponsor' || option.value === 'intro'
+    );
+
+    if (isArrayBasedOptions) {
+        // Legacy handling for sponsorBlockManualSkips
+        const manualSkipValue = configRead('sponsorBlockManualSkips');
+        for (const option of parameters.options) {
+            buttons.push(
+                buttonItem(
+                    { title: option.name },
                     {
-                        setClientSettingEndpoint: {
-                            settingDatas: [
-                                {
-                                    clientSettingEnum: {
-                                        item: 'sponsorBlockManualSkips'
-                                    },
-                                    arrayValue: option.value
-                                }
-                            ]
-                        }
+                        icon: option.icon ? option.icon : 'CHEVRON_DOWN',
+                        secondaryIcon: manualSkipValue.includes(option.value) ? 'CHECK_BOX' : 'CHECK_BOX_OUTLINE_BLANK'
                     },
-                    {
-                        customAction: {
-                            action: 'OPTIONS_SHOW',
-                            parameters: {
-                                options: parameters.options,
-                                selectedIndex: parameters.options.indexOf(option),
-                                update: true
+                    [
+                        {
+                            setClientSettingEndpoint: {
+                                settingDatas: [
+                                    {
+                                        clientSettingEnum: {
+                                            item: 'sponsorBlockManualSkips'
+                                        },
+                                        arrayValue: option.value
+                                    }
+                                ]
+                            }
+                        },
+                        {
+                            customAction: {
+                                action: 'OPTIONS_SHOW',
+                                parameters: {
+                                    options: parameters.options,
+                                    selectedIndex: parameters.options.indexOf(option),
+                                    update: true
+                                }
                             }
                         }
-                    }
-                ]
-            )
-        );
+                    ]
+                )
+            );
+        }
+    } else {
+        // New handling for boolean-based options (like subtitle localization)
+        let index = 0;
+        for (const option of parameters.options) {
+            const currentVal = configRead(option.value);
+            buttons.push(
+                buttonItem(
+                    { title: option.name },
+                    {
+                        icon: option.icon ? option.icon : 'CHEVRON_DOWN',
+                        secondaryIcon: currentVal ? 'CHECK_BOX' : 'CHECK_BOX_OUTLINE_BLANK'
+                    },
+                    [
+                        {
+                            setClientSettingEndpoint: {
+                                settingDatas: [
+                                    {
+                                        clientSettingEnum: {
+                                            item: option.value
+                                        },
+                                        boolValue: !currentVal
+                                    }
+                                ]
+                            }
+                        },
+                        {
+                            customAction: {
+                                action: 'OPTIONS_SHOW',
+                                parameters: {
+                                    options: parameters.options,
+                                    selectedIndex: index,
+                                    update: true
+                                }
+                            }
+                        }
+                    ]
+                )
+            );
+            index++;
+        }
     }
 
     showModal('TizenTube Settings', buttons, parameters.selectedIndex, 'tt-settings-options', update);
