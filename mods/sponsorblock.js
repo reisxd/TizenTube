@@ -46,7 +46,7 @@ const barTypes = {
   }
 };
 
-const sponsorblockAPI = 'https://sponsorblock.inf.re/api';
+const sponsorblockAPI = 'https://sponsor.ajay.app/api';
 
 class SponsorBlockHandler {
   video = null;
