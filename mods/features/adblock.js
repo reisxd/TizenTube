@@ -1,8 +1,8 @@
-import { configRead } from './config.js';
-import Chapters from './ui/chapters.js';
-import resolveCommand from './resolveCommand.js';
-import { timelyAction, longPressData } from './ui/ytUI.js';
-import { PatchSettings } from './ui/customYTSettings.js';
+import { configRead } from '../config.js';
+import Chapters from '../ui/chapters.js';
+import resolveCommand from '../resolveCommand.js';
+import { timelyAction, longPressData } from '../ui/ytUI.js';
+import { PatchSettings } from '../ui/customYTSettings.js';
 
 /**
  * This is a minimal reimplementation of the following uBlock Origin rule:
@@ -40,6 +40,15 @@ JSON.parse = function () {
       r.contents.tvBrowseRenderer.content.tvSurfaceContentRenderer.content.sectionListRenderer.contents.filter(
         (elm) => !elm.adSlotRenderer
       );
+
+    for (const shelve of r.contents.tvBrowseRenderer.content.tvSurfaceContentRenderer.content.sectionListRenderer.contents) {
+      if (shelve.shelfRenderer) {
+        shelve.shelfRenderer.content.horizontalListRenderer.items =
+          shelve.shelfRenderer.content.horizontalListRenderer.items.filter(
+            (item) => !item.adSlotRenderer
+          );
+      }
+    }
   }
 
   // Remove shorts ads

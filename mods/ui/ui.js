@@ -6,6 +6,7 @@ import updateStyle from './theme.js';
 import { showToast } from './ytUI.js';
 import modernUI from './settings.js';
 import { patchResolveCommand } from '../resolveCommand.js';
+import { pipToFullscreen } from '../features/pictureInPicture.js';
 
 // It just works, okay?
 const interval = setInterval(() => {
@@ -150,6 +151,13 @@ function execute_once_dom_loaded() {
       if (evt.type === 'keydown') {
         modernUI();
       }
+    } else if (evt.keyCode == 39) {
+      // Right key, for PiP
+      if (evt.type === 'keydown') {
+        if (document.querySelector('.ytLrSearchTextBoxFocused') && window.isPipPlaying) {
+          pipToFullscreen();
+        }
+      }
     };
     return true;
   }
@@ -162,7 +170,7 @@ function execute_once_dom_loaded() {
   document.addEventListener('keyup', eventHandler, true);
 
   setTimeout(() => {
-    showToast('Welcome to TizenTube', 'Go to settings and scroll down to TizenTube category to open TizenTube Settings, open playback settings, click on Speed to open Video Speed Settings and press [RED] to open TizenTube Theme Settings.');
+    showToast('Welcome to TizenTube', 'Go to settings and click on TizenTube Settings for settings, press [RED] to open TizenTube Theme Settings.');
   }, 2000);
 
   // Fix UI issues, again. Love, Googol.

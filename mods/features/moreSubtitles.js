@@ -1,7 +1,7 @@
 // TizenTube Subtitle Localization Mod
 // Automatically adds user's local language to subtitle auto-translate menu if not present
 
-import { configRead } from "./config.js";
+import { configRead } from "../config.js";
 
 const LANGUAGE_CODES = [
     "af","sq","am","ar","hy","as","az","eu","be","bn","bs","bg",

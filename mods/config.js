@@ -16,7 +16,7 @@ const defaultConfig = {
   enableDeArrowThumbnails: false,
   focusContainerColor: '#0f0f0f',
   routeColor: '#0f0f0f',
-  enableFixedUI: true,
+  enableFixedUI: (window.h5vcc && window.h5vcc.tizentube) ? false : true,
   enableHqThumbnails: false,
   enableChapters: true,
   enableLongPress: true,

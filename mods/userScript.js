@@ -6,12 +6,13 @@ import '@formatjs/intl-displaynames/polyfill.iife'
 import '@formatjs/intl-displaynames/locale-data/en';
 
 import "./domrect-polyfill";
-import "./adblock.js";
-import "./sponsorblock.js";
+import "./features/adblock.js";
+import "./features/sponsorblock.js";
 import "./ui/ui.js";
 import "./ui/speedUI.js";
 import "./ui/theme.js";
 import "./ui/settings.js";
 import "./ui/disableWhosWatching.js";
-import "./subtitleConfig.js";
-import "./updater.js";
+import "./features/moreSubtitles.js";
+import "./features/updater.js";
+import "./features/pictureInPicture.js";

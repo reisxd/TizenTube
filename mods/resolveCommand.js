@@ -1,7 +1,8 @@
 import { configWrite, configRead } from './config.js';
+import { enablePip } from './features/pictureInPicture.js';
 import modernUI, { optionShow } from './ui/settings.js';
 import { speedSettings } from './ui/speedUI.js';
-import { showToast } from './ui/ytUI.js';
+import { showToast, buttonItem } from './ui/ytUI.js';
 
 export default function resolveCommand(cmd, _) {
     // resolveCommand function is pretty OP, it can do from opening modals, changing client settings and way more.
@@ -86,6 +87,22 @@ export function patchResolveCommand() {
                             };
                         }
                     }
+
+                    cmd.openPopupAction.popup.overlaySectionRenderer.overlay.overlayTwoPanelRenderer.actionPanel.overlayPanelRenderer.content.overlayPanelItemListRenderer.items.splice(2, 0,
+                        buttonItem(
+                            { title: 'Picture in Picture' },
+                            { icon: 'CLEAR_COOKIES' }, [
+                            {
+                                customAction: {
+                                    action: 'ENTER_PIP'
+                                }
+                            }
+                        ])
+                    );
+                } else if (cmd?.watchEndpoint?.videoId) {
+                    window.isPipPlaying = false;
+                    const ytlrPlayerContainer = document.querySelector('ytlr-player-container');
+                    ytlrPlayerContainer.style.removeProperty('z-index');
                 }
 
                 return ogResolve.call(this, cmd, _);
@@ -127,6 +144,9 @@ function customAction(action, parameters) {
         case 'SET_PLAYER_SPEED':
             const speed = Number(parameters);
             document.querySelector('video').playbackRate = speed;
+            break;
+        case 'ENTER_PIP':
+            enablePip();
             break;
     }
 }

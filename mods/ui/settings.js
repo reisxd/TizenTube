@@ -1,6 +1,6 @@
 import { configRead } from '../config.js';
 import { showModal, buttonItem, overlayPanelItemListRenderer, scrollPaneRenderer, overlayMessageRenderer } from './ytUI.js';
-import { getUserLanguageOptionName } from '../subtitleConfig.js';
+import { getUserLanguageOptionName } from '../features/moreSubtitles.js';
 
 export default function modernUI(update, parameters) {
     const settings = [

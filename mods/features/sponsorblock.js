@@ -1,6 +1,6 @@
-import sha256 from './tiny-sha256.js';
-import { configRead } from './config.js';
-import { showToast } from './ui/ytUI.js';
+import sha256 from '../tiny-sha256.js';
+import { configRead } from '../config.js';
+import { showToast } from '../ui/ytUI.js';
 
 // Copied from https://github.com/ajayyy/SponsorBlock/blob/da1a535de784540ee10166a75a3eb8537073838c/src/config.ts#L113-L134
 const barTypes = {
