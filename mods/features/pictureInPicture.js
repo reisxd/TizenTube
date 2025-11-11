@@ -30,7 +30,7 @@ if (document.readyState === 'complete') {
 
 function enablePip() {
     if (!PlayerService) return;
-
+    const timestamp = Math.floor(document.querySelector('video').currentTime);
     const videoElement = document.querySelector('video');
 
     const ytlrPlayer = document.querySelector('ytlr-player');
@@ -40,7 +40,6 @@ function enablePip() {
         mutations.forEach((mutation) => {
             if (mutation.attributeName === 'class') {
                 if (!ytlrPlayer.classList.contains('ytLrPlayerEnabled')) {
-
                     function setStyles() {
                         ytlrPlayerContainer.style.zIndex = '10';
                         ytlrPlayer.style.display = 'block';
@@ -50,10 +49,8 @@ function enablePip() {
                     setStyles();
                     setTimeout(setStyles, 500);
 
-
                     function onPipEnter() {
                         videoElement.style.removeProperty('inset');
-
                         const pipWidth = window.innerWidth / 3.5;
                         const pipHeight = window.innerHeight / 3.5;
                         videoElement.style.width = `${pipWidth}px`;
@@ -69,6 +66,7 @@ function enablePip() {
                     observer.disconnect();
 
                     setTimeout(() => {
+                        PlayerService.loadedPlaybackConfig.watchEndpoint.startTimeSeconds = timestamp;
                         PlayerService.loadVideo(PlayerService.loadedPlaybackConfig);
                     }, 1000);
                 }
