@@ -10,7 +10,7 @@ Looking for an app for Android TVs? Check out [TizenTube Cobalt](https://github.
 
 1. Install TizenBrew from [here](https://github.com/reisxd/TizenBrew) and follow the instructions.
 
-2. Add the NPM module `@foxreis/tizentube` to the module manager. You can access the module manager by pressing the [GREEN] button on the remote.
+2. TizenTube is installed to TizenBrew by default. It should be in the home screen. If not, add `@foxreis/tizentube` as a NPM module in TizenBrew module manager.
 
 # Features
 
