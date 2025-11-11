@@ -41,16 +41,10 @@ function enablePip() {
             if (mutation.attributeName === 'class') {
                 if (!ytlrPlayer.classList.contains('ytLrPlayerEnabled')) {
 
-                    function onLoadStart() {
-                        PlayerService.loadVideo(PlayerService.loadedPlaybackConfig);
-                        videoElement.removeEventListener('loadstart', onLoadStart);
-                    }
-                    videoElement.addEventListener('loadstart', onLoadStart);
-
                     function setStyles() {
                         ytlrPlayerContainer.style.zIndex = '10';
                         ytlrPlayer.style.display = 'block';
-                        ytlrPlayer.style.backgroundColor = 'rgb(0,0,0,0)';
+                        ytlrPlayer.style.backgroundColor = 'rgba(0,0,0,0)';
                     }
 
                     setStyles();
@@ -64,8 +58,8 @@ function enablePip() {
                         const pipHeight = window.innerHeight / 3.5;
                         videoElement.style.width = `${pipWidth}px`;
                         videoElement.style.height = `${pipHeight}px`;
-                        videoElement.style.bottom = '2em';
-                        videoElement.style.right = '2em';
+                        videoElement.style.top = '68vh';
+                        videoElement.style.left = '68vw';
 
                         window.isPipPlaying = true;
                         videoElement.removeEventListener('play', onPipEnter);
@@ -73,6 +67,10 @@ function enablePip() {
 
                     videoElement.addEventListener('play', onPipEnter);
                     observer.disconnect();
+
+                    setTimeout(() => {
+                        PlayerService.loadVideo(PlayerService.loadedPlaybackConfig);
+                    }, 1000);
                 }
             }
         });
@@ -90,6 +88,7 @@ function enablePip() {
 
 function pipToFullscreen() {
     const { clickTrackingParams, commandMetadata, watchEndpoint } = PlayerService.loadedPlaybackConfig;
+    watchEndpoint.startTimeSeconds = Math.floor(document.querySelector('video').currentTime);
     const command = {
         clickTrackingParams,
         commandMetadata,
