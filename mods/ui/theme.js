@@ -9,7 +9,8 @@ function updateStyle() {
         background-color: ${configRead('focusContainerColor')};
     }
 
-    #container {
+    #container,
+    .ytLrTvSecondaryNavRendererWithSideNav.ytLrTvSecondaryNavRendererWithSectionListNav .ytLrTvSecondaryNavRendererSideNav {
         background-color: ${configRead('routeColor')} !important;
     }
 `;
