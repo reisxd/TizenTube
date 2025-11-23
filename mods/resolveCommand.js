@@ -90,7 +90,7 @@ export function patchResolveCommand() {
 
                     cmd.openPopupAction.popup.overlaySectionRenderer.overlay.overlayTwoPanelRenderer.actionPanel.overlayPanelRenderer.content.overlayPanelItemListRenderer.items.splice(2, 0,
                         buttonItem(
-                            { title: 'Picture in Picture' },
+                            { title: 'Mini Player' },
                             { icon: 'CLEAR_COOKIES' }, [
                             {
                                 customAction: {

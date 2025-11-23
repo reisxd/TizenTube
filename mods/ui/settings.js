@@ -158,6 +158,15 @@ export default function modernUI(update, parameters) {
                     value: 'enableShowOtherLanguages'
                 }
             ]
+        },
+        {
+            name: 'Welcome Message',
+            value: 'showWelcomeToast',
+        },
+        {
+            name: 'Previous and Next Buttons',
+            icon: 'SKIP_NEXT',
+            value: 'enablePreviousNextButtons'
         }
     ];
 

@@ -167,35 +167,31 @@ class SponsorBlockHandler {
     const videoDuration = this.video.duration;
 
     this.segmentsoverlay = document.createElement('div');
-    this.segmentsoverlay.classList.add('ytLrProgressBarHost', 'ytLrProgressBarFocused', 'ytLrWatchDefaultProgressBar');
-    const sliderElement = document.createElement('div');
-    sliderElement.style.setProperty('background-color', 'rgb(0, 0, 0, 0)');
-    sliderElement.style.setProperty('bottom', 'auto', 'important');
-    sliderElement.style.setProperty('height', '0.25rem', 'important');
-    sliderElement.style.setProperty('overflow', 'hidden', 'important');
-    sliderElement.style.setProperty('position', 'absolute', 'important');
-    sliderElement.style.setProperty('top', '1.625rem', 'important');
-    sliderElement.style.setProperty('width', '100%', 'important');
-    this.segmentsoverlay.appendChild(sliderElement);
+
+    this.segmentsoverlay.classList.add('ytLrProgressBarSlider', 'ytLrProgressBarSliderRectangularProgressBar');
+    this.segmentsoverlay.style.setProperty('z-index', '10', 'important');
+    this.segmentsoverlay.style.setProperty('background-color', 'rgb(0, 0, 0, 0)', 'important');
+    this.segmentsoverlay.style.setProperty('width', '72rem', 'important');
+    this.segmentsoverlay.style.setProperty('left', '4rem', 'important');
     this.segments.forEach((segment) => {
       const [start, end] = segment.segment;
       const barType = barTypes[segment.category] || {
         color: 'blue',
         opacity: 0.7
       };
-      const transform = `translateX(${(start / videoDuration) * 100.0
-        }%) scaleX(${(end - start) / videoDuration})`;
+
+      const leftPercent = videoDuration ? (100.0 * start) / videoDuration : 0;
+      const widthPercent = videoDuration ? (100.0 * (end - start)) / videoDuration : 0;
+
       const elm = document.createElement('div');
-      elm.style.setProperty('background', barType.color, 'important');
+      elm.style.setProperty('background-color', barType.color, 'important');
       elm.style.setProperty('opacity', barType.opacity, 'important');
-      elm.style.setProperty('transform', transform, 'important');
-      elm.style.setProperty('height', '100%');
-      elm.style.setProperty('pointer-events', 'none');
-      elm.style.setProperty('position', 'absolute');
-      elm.style.setProperty('transform-origin', 'left');
-      elm.style.setProperty('width', '100%');
-      console.info('Generated element', elm, 'from', segment, transform);
-      sliderElement.appendChild(elm);
+      elm.style.setProperty('height', '100%', 'important');
+      elm.style.setProperty('width', `${widthPercent}%`, 'important');
+      elm.style.setProperty('left', `${leftPercent}%`, 'important');
+      elm.style.setProperty('position', 'absolute', 'important');
+      console.info('Generated element', elm, 'from', segment);
+      this.segmentsoverlay.appendChild(elm);
     });
 
     this.observer = new MutationObserver((mutations) => {
@@ -210,9 +206,9 @@ class SponsorBlockHandler {
         }
 
         if (document.querySelector('ytlr-progress-bar').getAttribute('hybridnavfocusable') === 'false') {
-          this.segmentsoverlay.classList.remove('ytLrProgressBarFocused');
+          this.segmentsoverlay.style.setProperty('display', 'none', 'important');
         } else {
-          this.segmentsoverlay.classList.add('ytLrProgressBarFocused');
+          this.segmentsoverlay.style.setProperty('display', 'block', 'important');
         }
       });
     });

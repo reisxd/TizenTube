@@ -24,7 +24,9 @@ const defaultConfig = {
   dontCheckUpdateUntil: 0,
   enableWhoIsWatchingMenu: false,
   enableShowUserLanguage: true,
-  enableShowOtherLanguages: false
+  enableShowOtherLanguages: false,
+  showWelcomeToast: true,
+  enablePreviousNextButtons: true
 };
 
 let localConfig;

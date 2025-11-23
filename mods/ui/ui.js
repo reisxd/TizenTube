@@ -102,25 +102,27 @@ function execute_once_dom_loaded() {
     true
   );
 
-  uiContainer.innerHTML = `
+  try {
+    uiContainer.innerHTML = `
 <h1>TizenTube Theme Configuration</h1>
 <label for="__barColor">Navigation Bar Color: <input type="text" id="__barColor"/></label>
 <label for="__routeColor">Main Content Color: <input type="text" id="__routeColor"/></label>
 <div><small>Sponsor segments skipping - https://sponsor.ajay.app</small></div>
 `;
-  document.querySelector('body').appendChild(uiContainer);
+    document.querySelector('body').appendChild(uiContainer);
 
-  uiContainer.querySelector('#__barColor').value = configRead('focusContainerColor');
-  uiContainer.querySelector('#__barColor').addEventListener('change', (evt) => {
-    configWrite('focusContainerColor', evt.target.value);
-    updateStyle();
-  });
+    uiContainer.querySelector('#__barColor').value = configRead('focusContainerColor');
+    uiContainer.querySelector('#__barColor').addEventListener('change', (evt) => {
+      configWrite('focusContainerColor', evt.target.value);
+      updateStyle();
+    });
 
-  uiContainer.querySelector('#__routeColor').value = configRead('routeColor');
-  uiContainer.querySelector('#__routeColor').addEventListener('change', (evt) => {
-    configWrite('routeColor', evt.target.value);
-    updateStyle();
-  });
+    uiContainer.querySelector('#__routeColor').value = configRead('routeColor');
+    uiContainer.querySelector('#__routeColor').addEventListener('change', (evt) => {
+      configWrite('routeColor', evt.target.value);
+      updateStyle();
+    });
+  } catch (e) { }
 
   var eventHandler = (evt) => {
     // We handle key events ourselves.
@@ -136,15 +138,17 @@ function execute_once_dom_loaded() {
       evt.preventDefault();
       evt.stopPropagation();
       if (evt.type === 'keydown') {
-        if (uiContainer.style.display === 'none') {
-          console.info('Showing and focusing!');
-          uiContainer.style.display = 'block';
-          uiContainer.focus();
-        } else {
-          console.info('Hiding!');
-          uiContainer.style.display = 'none';
-          uiContainer.blur();
-        }
+        try {
+          if (uiContainer.style.display === 'none') {
+            console.info('Showing and focusing!');
+            uiContainer.style.display = 'block';
+            uiContainer.focus();
+          } else {
+            console.info('Hiding!');
+            uiContainer.style.display = 'none';
+            uiContainer.blur();
+          }
+        } catch (e) { }
       }
       return false;
     } else if (evt.keyCode == 404) {
@@ -168,10 +172,11 @@ function execute_once_dom_loaded() {
   document.addEventListener('keydown', eventHandler, true);
   document.addEventListener('keypress', eventHandler, true);
   document.addEventListener('keyup', eventHandler, true);
-
-  setTimeout(() => {
-    showToast('Welcome to TizenTube', 'Go to settings and click on TizenTube Settings for settings, press [RED] to open TizenTube Theme Settings.');
-  }, 2000);
+  if (configRead('showWelcomeToast')) {
+    setTimeout(() => {
+      showToast('Welcome to TizenTube', 'Go to settings and click on TizenTube Settings for settings, press [RED] to open TizenTube Theme Settings.');
+    }, 2000);
+  }
 
   // Fix UI issues, again. Love, Googol.
 
