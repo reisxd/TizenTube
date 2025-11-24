@@ -98,7 +98,15 @@ class SponsorBlockHandler {
     this.manualSkippableCategories = configRead('sponsorBlockManualSkips');
     this.skippableCategories = this.getSkippableCategories();
 
-    this.scheduleSkipHandler = () => this.scheduleSkip();
+    this.scheduleSkipHandler = () => {
+      const slider = document.querySelector('div[idomkey="slider"]');
+      const sliderRect = slider.getBoundingClientRect();
+      const isOldUI = !document.querySelector('div[idomkey="Metadata-Section"]');
+      if (isOldUI) {
+        this.segmentsoverlay.style.setProperty('top', `${sliderRect.top}px`, 'important');
+      }
+      this.scheduleSkip();
+    }
     this.durationChangeHandler = () => this.buildOverlay();
 
     this.attachVideo();
@@ -165,14 +173,23 @@ class SponsorBlockHandler {
     }
 
     const videoDuration = this.video.duration;
+    const slider = document.querySelector('div[idomkey="slider"]');
 
     this.segmentsoverlay = document.createElement('div');
 
     this.segmentsoverlay.classList.add('ytLrProgressBarSlider', 'ytLrProgressBarSliderRectangularProgressBar');
     this.segmentsoverlay.style.setProperty('z-index', '10', 'important');
-    this.segmentsoverlay.style.setProperty('background-color', 'rgb(0, 0, 0, 0)', 'important');
+    this.segmentsoverlay.style.setProperty('background-color', 'rgba(0, 0, 0, 0)', 'important');
     this.segmentsoverlay.style.setProperty('width', '72rem', 'important');
     this.segmentsoverlay.style.setProperty('left', '4rem', 'important');
+    const sliderRect = slider.getBoundingClientRect();
+    if (!slider.classList.contains('ytLrProgressBarSlider')) {
+      slider.classList.forEach((name) => {
+        this.segmentsoverlay.classList.add(name);
+      });
+      this.segmentsoverlay.style.setProperty('height', `${sliderRect.height}px`, 'important');
+      this.segmentsoverlay.style.setProperty('bottom', `${sliderRect.bottom - sliderRect.top}px`, 'important');      
+    }
     this.segments.forEach((segment) => {
       const [start, end] = segment.segment;
       const barType = barTypes[segment.category] || {

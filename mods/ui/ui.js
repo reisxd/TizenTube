@@ -158,7 +158,9 @@ function execute_once_dom_loaded() {
     } else if (evt.keyCode == 39) {
       // Right key, for PiP
       if (evt.type === 'keydown') {
-        if (document.querySelector('.ytLrSearchTextBoxFocused') && window.isPipPlaying) {
+        if (document.querySelector('ytlr-search-text-box > .zylon-focus') && window.isPipPlaying) {
+          const ytlrPlayer = document.querySelector('ytlr-player');
+          ytlrPlayer.style.setProperty('background-color', 'rgb(0, 0, 0)');
           pipToFullscreen();
         }
       }

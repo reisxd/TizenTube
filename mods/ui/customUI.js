@@ -4,14 +4,17 @@ import { extractAssignedFunctions } from "../utils/ASTParser.js";
 import { configRead } from "../config.js";
 
 function applyPatches() {
+    if (!window._yttv) return setTimeout(applyPatches, 250);
+    if (!document.querySelector('video')) return setTimeout(applyPatches, 250);
     const methods = Object.keys(window._yttv).filter(key => {
         return typeof window._yttv[key] === 'function' && window._yttv[key].toString().includes('TRANSPORT_CONTROLS_BUTTON_TYPE_FEATURED_ACTION');
     });
 
     if (methods.length === 0) {
-        setTimeout(applyPatches, 1000);
+        setTimeout(applyPatches, 250);
         return;
     }
+
     const origMethod = window._yttv[methods[0]];
 
     function YtlrPlayerActionsContainer() {
@@ -122,9 +125,10 @@ function applyPatches() {
         return inst;
     }
 
-    YtlrPlayerActionsContainer.prototype = origMethod.prototype;
-    window._yttv[methods[0]] = YtlrPlayerActionsContainer;
-
+    if (configRead('enablePatchingVideoPlayer')) {
+        YtlrPlayerActionsContainer.prototype = origMethod.prototype;
+        window._yttv[methods[0]] = YtlrPlayerActionsContainer;
+    }
 }
 
 function ButtonRenderer(disabled, text, iconType, command) {

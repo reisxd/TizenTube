@@ -198,7 +198,7 @@ function patchSubtitleMenu() {
     if (isPatched) return;
 
     // Always patch if possible - settings will be checked dynamically
-
+    if (!window._yttv) return setTimeout(patchSubtitleMenu, 250);
     const yttvInstance = Object.values(window._yttv).find(
         (obj) =>
             obj &&

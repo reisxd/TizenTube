@@ -172,6 +172,7 @@ function deArrowify(items) {
       items.splice(index, 1);
       continue;
     }
+    if (!item.tileRenderer) continue;
     if (configRead('enableDeArrow')) {
       const videoID = item.tileRenderer.contentId;
       fetch(`https://sponsor.ajay.app/api/branding?videoID=${videoID}`).then(res => res.json()).then(data => {
@@ -192,7 +193,7 @@ function deArrowify(items) {
             ]
           }
         }
-      });
+      }).catch(() => {});
     }
   }
 }
@@ -200,6 +201,7 @@ function deArrowify(items) {
 
 function hqify(items) {
   for (const item of items) {
+    if (!item.tileRenderer) continue;
     if (item.tileRenderer.style !== 'TILE_STYLE_YTLR_DEFAULT') continue;
     if (configRead('enableHqThumbnails')) {
       const videoID = item.tileRenderer.contentId;
@@ -218,6 +220,7 @@ function hqify(items) {
 function addLongPress(items) {
   if (!configRead('enableLongPress')) return;
   for (const item of items) {
+    if (!item.tileRenderer) continue;
     if (item.tileRenderer.style !== 'TILE_STYLE_YTLR_DEFAULT') continue;
     if (item.tileRenderer.onLongPressCommand) continue;
     const subtitle = item.tileRenderer.metadata.tileMetadataRenderer.lines[0].lineRenderer.items[0].lineItemRenderer.text;

@@ -167,6 +167,11 @@ export default function modernUI(update, parameters) {
             name: 'Previous and Next Buttons',
             icon: 'SKIP_NEXT',
             value: 'enablePreviousNextButtons'
+        },
+        {
+            name: 'Patch Video Player',
+            icon: 'SETTINGS',
+            value: 'enablePatchingVideoPlayer'
         }
     ];
 
