@@ -6,6 +6,8 @@ Looking for an app for Android TVs? Check out [TizenTube Cobalt](https://github.
 
 [Discord Server Invite](https://discord.gg/m2P7v8Y2qR)
 
+[Telegram Channel](https://t.me/tizentubeofficial)
+
 # How to install
 
 1. Install TizenBrew from [here](https://github.com/reisxd/TizenBrew) and follow the instructions.
