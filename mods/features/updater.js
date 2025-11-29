@@ -71,8 +71,8 @@ if (window.h5vcc && window.h5vcc.tizentube) {
                                 ]
                             )
                         ]),
-                        0,
-                        'tt-update-modal'
+                        'tt-update-modal',
+                        false
                     )
                 } else {
                     console.info('You are using the latest version of TizenTube.');

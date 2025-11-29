@@ -96,29 +96,96 @@ function pipToFullscreen() {
     window.isPipPlaying = false;
 };
 
+const originalClasses = {
+    ytlrSearchVoice: {
+        length: 0,
+        classes: []
+    },
+    ytlrSearchVoiceMicButton: {
+        length: 0,
+        classes: []
+    }
+}
+
 const observerPipEnter = new MutationObserver(() => {
     if (!window.isPipPlaying) return;
     const searchBar = document.querySelector('ytlr-search-bar');
     if (searchBar) {
         const pipButtonExists = document.querySelector('#tt-pip-button');
         if (!pipButtonExists) {
-            const pipButton = document.createElement('ytlr-search-voice');
-            pipButton.style.left = '10.25em';
-            pipButton.id = 'tt-pip-button';
-            pipButton.setAttribute('idomkey', 'ytLrSearchBarSearchVoice');
-            pipButton.setAttribute('tabindex', '0');
-            pipButton.classList.add('ytLrSearchVoiceHost', 'ytLrSearchBarSearchVoice');
-            const pipButtonMicButton = document.createElement('ytlr-search-voice-mic-button');
-            pipButtonMicButton.setAttribute('hybridnavfocusable', 'true');
-            pipButtonMicButton.setAttribute('tabindex', '-1');
-            pipButtonMicButton.classList.add('ytLrSearchVoiceMicButtonHost', 'zylon-ve');
-            const pipIcon = document.createElement('yt-icon');
-            pipIcon.setAttribute('tabindex', '-1');
-            pipIcon.classList.add('ytContribIconTvArrowLeft', 'ytContribIconHost', 'ytLrSearchVoiceMicButtonIcon');
+            const voiceButton = searchBar.querySelector('ytlr-search-voice');
+            if (voiceButton) {
+                const iconClassNames = Object.values(_yttv).find(a => a instanceof Map && a.has("CLEAR_COOKIES"));
+                const iconClassToBeRemoved = iconClassNames.get('MICROPHONE_ON');
+                const iconClearCookiesClass = iconClassNames.get('CLEAR_COOKIES');
+                const pipButton = document.createElement('ytlr-search-voice');
+                for (let i = 0; i < voiceButton.classList.length; i++) {
+                    if (originalClasses.ytlrSearchVoice.length === 0) {
+                        originalClasses.ytlrSearchVoice.length = voiceButton.classList.length;
+                    }
 
-            pipButtonMicButton.appendChild(pipIcon);
-            pipButton.appendChild(pipButtonMicButton);
-            searchBar.appendChild(pipButton);
+                    if (originalClasses.ytlrSearchVoice.length !== voiceButton.classList.length) {
+                        for (const className of originalClasses.ytlrSearchVoice.classes) {
+                            pipButton.classList.add(className);
+                        }
+                        break;
+                    }
+
+                    if (!originalClasses.ytlrSearchVoice.classes.includes(voiceButton.classList[i]))
+                        originalClasses.ytlrSearchVoice.classes.push(voiceButton.classList[i]);
+
+                    pipButton.classList.add(voiceButton.classList[i]);
+
+                }
+                pipButton.style.left = '10.25em';
+                pipButton.id = 'tt-pip-button';
+                const pipButtonMicButton = document.createElement('ytlr-search-voice-mic-button');
+                for (let i = 0; i < voiceButton.children[0].classList.length; i++) {
+                    if (originalClasses.ytlrSearchVoiceMicButton.length === 0) {
+                        originalClasses.ytlrSearchVoiceMicButton.length = voiceButton.children[0].classList.length;
+                    }
+                    
+                    if (originalClasses.ytlrSearchVoiceMicButton.length !== voiceButton.children[0].classList.length) {
+                        for (const className of originalClasses.ytlrSearchVoiceMicButton.classes) {
+                            pipButtonMicButton.classList.add(className);
+                        }
+                        break;
+                    }
+
+                    if (!originalClasses.ytlrSearchVoiceMicButton.classes.includes(voiceButton.children[0].classList[i]))
+                        originalClasses.ytlrSearchVoiceMicButton.classes.push(voiceButton.children[0].classList[i]);
+
+                    pipButtonMicButton.classList.add(voiceButton.children[0].classList[i]);
+                }
+                const pipIcon = document.createElement('yt-icon');
+                for (let i = 0; i < voiceButton.children[0].children[0].classList.length; i++) {
+                    pipIcon.classList.add(voiceButton.children[0].children[0].classList[i]);
+                }
+                pipIcon.classList.remove(iconClassToBeRemoved);
+                pipIcon.classList.add(iconClearCookiesClass);
+
+                pipButtonMicButton.appendChild(pipIcon);
+                pipButton.appendChild(pipButtonMicButton);
+                searchBar.appendChild(pipButton);
+            } else {
+                const pipButton = document.createElement('ytlr-search-voice');
+                pipButton.style.left = '10.25em';
+                pipButton.id = 'tt-pip-button';
+                pipButton.setAttribute('idomkey', 'ytLrSearchBarSearchVoice');
+                pipButton.setAttribute('tabindex', '0');
+                pipButton.classList.add('ytLrSearchVoiceHost', 'ytLrSearchBarSearchVoice');
+                const pipButtonMicButton = document.createElement('ytlr-search-voice-mic-button');
+                pipButtonMicButton.setAttribute('hybridnavfocusable', 'true');
+                pipButtonMicButton.setAttribute('tabindex', '-1');
+                pipButtonMicButton.classList.add('ytLrSearchVoiceMicButtonHost', 'zylon-ve');
+                const pipIcon = document.createElement('yt-icon');
+                pipIcon.setAttribute('tabindex', '-1');
+                pipIcon.classList.add('ytContribIconTvArrowLeft', 'ytContribIconHost', 'ytLrSearchVoiceMicButtonIcon');
+
+                pipButtonMicButton.appendChild(pipIcon);
+                pipButton.appendChild(pipButtonMicButton);
+                searchBar.appendChild(pipButton);
+            }
         }
     }
 });

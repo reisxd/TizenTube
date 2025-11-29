@@ -184,9 +184,9 @@ class SponsorBlockHandler {
     this.segmentsoverlay.style.setProperty('left', '4rem', 'important');
     const sliderRect = slider.getBoundingClientRect();
     if (!slider.classList.contains('ytLrProgressBarSlider')) {
-      slider.classList.forEach((name) => {
-        this.segmentsoverlay.classList.add(name);
-      });
+      for (let i = 0; i < slider.classList.length; i++) {
+        this.segmentsoverlay.classList.add(slider.classList[i]);
+      }
       this.segmentsoverlay.style.setProperty('height', `${sliderRect.height}px`, 'important');
       this.segmentsoverlay.style.setProperty('bottom', `${sliderRect.bottom - sliderRect.top}px`, 'important');      
     }
