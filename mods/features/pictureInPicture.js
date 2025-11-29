@@ -115,7 +115,7 @@ const observerPipEnter = new MutationObserver(() => {
         if (!pipButtonExists) {
             const voiceButton = searchBar.querySelector('ytlr-search-voice');
             if (voiceButton) {
-                const iconClassNames = Object.values(_yttv).find(a => a instanceof Map && a.has("CLEAR_COOKIES"));
+                const iconClassNames = Object.values(window._yttv).find(a => a instanceof Map && a.has("CLEAR_COOKIES"));
                 const iconClassToBeRemoved = iconClassNames.get('MICROPHONE_ON');
                 const iconClearCookiesClass = iconClassNames.get('CLEAR_COOKIES');
                 const pipButton = document.createElement('ytlr-search-voice');

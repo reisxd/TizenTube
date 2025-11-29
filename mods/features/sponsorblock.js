@@ -62,6 +62,7 @@ class SponsorBlockHandler {
   segments = null;
   skippableCategories = [];
   manualSkippableCategories = [];
+  skippedCategories = new Map();
 
   constructor(videoID) {
     this.videoID = videoID;
@@ -301,6 +302,29 @@ class SponsorBlockHandler {
       const skipName = barTypes[segment.category]?.name || segment.category;
       console.info(this.videoID, 'Skipping', segment);
       if (!this.manualSkippableCategories.includes(segment.category)) {
+        const wasSkippedBefore = this.skippedCategories.get(segment.UUID)
+        if (wasSkippedBefore) {
+          wasSkippedBefore.count++;
+          wasSkippedBefore.lastSkipped = Date.now();
+          this.skippedCategories.set(segment.UUID, wasSkippedBefore);
+
+          if (wasSkippedBefore.lastSkipped - wasSkippedBefore.firstSkipped > 1000) {
+            if (!wasSkippedBefore.hasShownToast) {
+              showToast('SponsorBlock', `Not skipping ${skipName} (was skipped ${wasSkippedBefore.count} times)`);
+              wasSkippedBefore.hasShownToast = true;
+              this.skippedCategories.set(segment.UUID, wasSkippedBefore);
+            }
+            return;
+          }
+        } else {
+          this.skippedCategories.set(segment.UUID, {
+            count: 1,
+            firstSkipped: Date.now(),
+            lastSkipped: Date.now(),
+            hasShownToast: false
+          });
+        }
+
         showToast('SponsorBlock', `Skipping ${skipName}`);
         this.video.currentTime = end + 0.1;
         this.scheduleSkip();

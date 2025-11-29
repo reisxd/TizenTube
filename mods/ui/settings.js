@@ -28,82 +28,99 @@ export default function modernUI(update, parameters) {
         {
             name: 'SponsorBlock',
             icon: 'MONEY_HAND',
-            value: 'enableSponsorBlock'
-        },
-        {
-            name: 'Manual SponsorBlock Segment Skip',
-            icon: 'DOLLAR_SIGN',
             value: null,
+            menuId: 'tt-sponsorblock-settings',
             options: [
                 {
-                    name: 'Skip Sponsor Segments',
-                    icon: 'MONEY_HEART',
-                    value: 'sponsor'
+                    name: 'Enable SponsorBlock',
+                    icon: 'MONEY_HAND',
+                    value: 'enableSponsorBlock'
                 },
                 {
-                    name: 'Skip Intro Segments',
-                    icon: 'PLAY_CIRCLE',
-                    value: 'intro'
+                    name: 'Manual SponsorBlock Segment Skip',
+                    icon: 'DOLLAR_SIGN',
+                    value: null,
+                    menuId: 'tt-sponsorblock-manual-segment-skip',
+                    options: [
+                        {
+                            name: 'Skip Sponsor Segments',
+                            icon: 'MONEY_HEART',
+                            value: 'sponsor'
+                        },
+                        {
+                            name: 'Skip Intro Segments',
+                            icon: 'PLAY_CIRCLE',
+                            value: 'intro'
+                        },
+                        {
+                            name: 'Skip Outro Segments',
+                            value: 'outro'
+                        },
+                        {
+                            name: 'Skip Interaction Reminder Segments',
+                            value: 'interaction'
+                        },
+                        {
+                            name: 'Skip Self-Promotion Segments',
+                            value: 'selfpromo'
+                        },
+                        {
+                            name: 'Skip Preview/Recap Segments',
+                            value: 'preview'
+                        },
+                        {
+                            name: 'Skip Tangents/Jokes Segments',
+                            value: 'filler'
+                        },
+                        {
+                            name: 'Skip Off-Topic Music Segments',
+                            value: 'music_offtopic'
+                        }
+                    ]
                 },
                 {
-                    name: 'Skip Outro Segments',
-                    value: 'outro'
-                },
-                {
-                    name: 'Skip Interaction Reminder Segments',
-                    value: 'interaction'
-                },
-                {
-                    name: 'Skip Self-Promotion Segments',
-                    value: 'selfpromo'
-                },
-                {
-                    name: 'Skip Preview/Recap Segments',
-                    value: 'preview'
-                },
-                {
-                    name: 'Skip Tangents/Jokes Segments',
-                    value: 'filler'
-                },
-                {
-                    name: 'Skip Off-Topic Music Segments',
-                    value: 'music_offtopic'
+                    name: 'Segments',
+                    icon: 'SETTINGS',
+                    value: null,
+                    menuId: 'tt-sponsorblock-segments',
+                    options: [
+                        {
+                            name: 'Skip Sponsor Segments',
+                            icon: 'MONEY_HEART',
+                            value: 'enableSponsorBlockSponsor'
+                        },
+                        {
+                            name: 'Skip Intro Segments',
+                            icon: 'PLAY_CIRCLE',
+                            value: 'enableSponsorBlockIntro'
+                        },
+                        {
+                            name: 'Skip Outro Segments',
+                            value: 'enableSponsorBlockOutro'
+                        },
+                        {
+                            name: 'Skip Interaction Reminder Segments',
+                            value: 'enableSponsorBlockInteraction'
+                        },
+                        {
+                            name: 'Skip Self-Promotion Segments',
+                            value: 'enableSponsorBlockSelfPromo'
+                        },
+                        {
+                            name: 'Skip Preview/Recap Segments',
+                            value: 'enableSponsorBlockPreview'
+                        },
+                        {
+                            name: 'Skip Tangents/Jokes Segments',
+                            value: 'enableSponsorBlockFiller'
+                        },
+                        {
+                            name: 'Skip Off-Topic Music Segments',
+                            value: 'enableSponsorBlockMusicOfftopic'
+                        },
+                    ]
                 }
             ]
-        },
-        {
-            name: 'Skip Sponsor Segments',
-            icon: 'MONEY_HEART',
-            value: 'enableSponsorBlockSponsor'
-        },
-        {
-            name: 'Skip Intro Segments',
-            icon: 'PLAY_CIRCLE',
-            value: 'enableSponsorBlockIntro'
-        },
-        {
-            name: 'Skip Outro Segments',
-            value: 'enableSponsorBlockOutro'
-        },
-        {
-            name: 'Skip Interaction Reminder Segments',
-            value: 'enableSponsorBlockInteraction'
-        },
-        {
-            name: 'Skip Self-Promotion Segments',
-            value: 'enableSponsorBlockSelfPromo'
-        },
-        {
-            name: 'Skip Preview/Recap Segments',
-            value: 'enableSponsorBlockPreview'
-        },
-        {
-            name: 'Skip Tangents/Jokes Segments',
-            value: 'enableSponsorBlockFiller'
-        },
-        {
-            name: 'Skip Off-Topic Music Segments',
-            value: 'enableSponsorBlockMusicOfftopic'
         },
         {
             name: 'DeArrow',
@@ -172,6 +189,10 @@ export default function modernUI(update, parameters) {
             name: 'Patch Video Player',
             icon: 'SETTINGS',
             value: 'enablePatchingVideoPlayer'
+        },
+        {
+            name: 'Video Previews',
+            value: 'enablePreviews'
         }
     ];
 
@@ -251,92 +272,106 @@ export function optionShow(parameters, update) {
         );
         return;
     }
-        const buttons = [];
+    const buttons = [];
 
-        // Check if this is the legacy sponsorBlockManualSkips (array-based) or new boolean-based options
-        const isArrayBasedOptions = parameters.options.some(
-            option => option.value === 'sponsor' || option.value === 'intro'
-        );
+    // Check if this is the legacy sponsorBlockManualSkips (array-based) or new boolean-based options
+    const isArrayBasedOptions = parameters.options.some(
+        option => option.value === 'sponsor' || option.value === 'intro'
+    );
 
-        if (isArrayBasedOptions) {
-            // Legacy handling for sponsorBlockManualSkips
-            const manualSkipValue = configRead('sponsorBlockManualSkips');
-            for (const option of parameters.options) {
-                buttons.push(
-                    buttonItem(
-                        { title: option.name },
+    if (isArrayBasedOptions) {
+        // Legacy handling for sponsorBlockManualSkips
+        const manualSkipValue = configRead('sponsorBlockManualSkips');
+        for (const option of parameters.options) {
+            buttons.push(
+                buttonItem(
+                    { title: option.name },
+                    {
+                        icon: option.icon ? option.icon : 'CHEVRON_DOWN',
+                        secondaryIcon: manualSkipValue.includes(option.value) ? 'CHECK_BOX' : 'CHECK_BOX_OUTLINE_BLANK'
+                    },
+                    [
                         {
-                            icon: option.icon ? option.icon : 'CHEVRON_DOWN',
-                            secondaryIcon: manualSkipValue.includes(option.value) ? 'CHECK_BOX' : 'CHECK_BOX_OUTLINE_BLANK'
-                        },
-                        [
-                            {
-                                setClientSettingEndpoint: {
-                                    settingDatas: [
-                                        {
-                                            clientSettingEnum: {
-                                                item: 'sponsorBlockManualSkips'
-                                            },
-                                            arrayValue: option.value
-                                        }
-                                    ]
-                                }
-                            },
-                            {
-                                customAction: {
-                                    action: 'OPTIONS_SHOW',
-                                    parameters: {
-                                        options: parameters.options,
-                                        selectedIndex: parameters.options.indexOf(option),
-                                        update: true
+                            setClientSettingEndpoint: {
+                                settingDatas: [
+                                    {
+                                        clientSettingEnum: {
+                                            item: 'sponsorBlockManualSkips'
+                                        },
+                                        arrayValue: option.value
                                     }
+                                ]
+                            }
+                        },
+                        {
+                            customAction: {
+                                action: 'OPTIONS_SHOW',
+                                parameters: {
+                                    options: parameters.options,
+                                    selectedIndex: parameters.options.indexOf(option),
+                                    update: true,
+                                    menuId: parameters.menuId
                                 }
                             }
-                        ]
-                    )
-                );
-            }
-        } else {
-            // New handling for boolean-based options (like subtitle localization)
-            let index = 0;
-            for (const option of parameters.options) {
-                const currentVal = configRead(option.value);
-                buttons.push(
-                    buttonItem(
-                        { title: option.name },
-                        {
-                            icon: option.icon ? option.icon : 'CHEVRON_DOWN',
-                            secondaryIcon: currentVal ? 'CHECK_BOX' : 'CHECK_BOX_OUTLINE_BLANK'
-                        },
-                        [
-                            {
-                                setClientSettingEndpoint: {
-                                    settingDatas: [
-                                        {
-                                            clientSettingEnum: {
-                                                item: option.value
-                                            },
-                                            boolValue: !currentVal
-                                        }
-                                    ]
-                                }
-                            },
-                            {
-                                customAction: {
-                                    action: 'OPTIONS_SHOW',
-                                    parameters: {
-                                        options: parameters.options,
-                                        selectedIndex: index,
-                                        update: true
-                                    }
-                                }
-                            }
-                        ]
-                    )
-                );
-                index++;
-            }
+                        }
+                    ]
+                )
+            );
         }
-
-        showModal('TizenTube Settings', overlayPanelItemListRenderer(buttons, parameters.selectedIndex), 'tt-settings-options', update);
+    } else {
+        // New handling for boolean-based options (like subtitle localization)
+        let index = 0;
+        for (const option of parameters.options) {
+            const currentVal = configRead(option.value);
+            buttons.push(
+                buttonItem(
+                    { title: option.name },
+                    {
+                        icon: option.icon ? option.icon : 'CHEVRON_DOWN',
+                        secondaryIcon: option.value === null ? 'CHEVRON_RIGHT' : currentVal ? 'CHECK_BOX' : 'CHECK_BOX_OUTLINE_BLANK'
+                    },
+                    option.value === null ? [
+                        {
+                            customAction: {
+                                action: 'OPTIONS_SHOW',
+                                parameters: {
+                                    options: option.options,
+                                    selectedIndex: 0,
+                                    update: false,
+                                    menuId: option.menuId
+                                }
+                            }
+                        }
+                    ] : [
+                        {
+                            setClientSettingEndpoint: {
+                                settingDatas: [
+                                    {
+                                        clientSettingEnum: {
+                                            item: option.value
+                                        },
+                                        boolValue: !currentVal
+                                    }
+                                ]
+                            }
+                        },
+                        {
+                            customAction: {
+                                action: 'OPTIONS_SHOW',
+                                parameters: {
+                                    options: parameters.options,
+                                    selectedIndex: index,
+                                    update: true,
+                                    menuId: parameters.menuId
+                                }
+                            }
+                        }
+                    ]
+                )
+            );
+            index++;
+        }
     }
+
+    showModal('TizenTube Settings', overlayPanelItemListRenderer(buttons, parameters.selectedIndex), parameters.menuId || 'tt-settings-options', update);
+}

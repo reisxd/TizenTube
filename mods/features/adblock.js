@@ -51,6 +51,33 @@ JSON.parse = function () {
     }
   }
 
+  // Adding previews to videos
+  if (configRead('enablePreviews') && r?.contents?.tvBrowseRenderer?.content?.tvSurfaceContentRenderer?.content?.sectionListRenderer?.contents
+  ) {
+    for (const shelve of r.contents.tvBrowseRenderer.content.tvSurfaceContentRenderer.content.sectionListRenderer.contents) {
+      if (shelve.shelfRenderer) {
+        for (const item of shelve.shelfRenderer.content.horizontalListRenderer.items) {
+          if (item.tileRenderer) {
+            const watchEndpoint = item.tileRenderer.onSelectCommand;
+            if (item.tileRenderer?.onFocusCommand?.playbackEndpoint) continue;
+            item.tileRenderer.onFocusCommand = {
+              startInlinePlaybackCommand: {
+                blockAdoption: true,
+                caption: false,
+                delayMs: 3000,
+                durationMs: 40000,
+                muted: false,
+                restartPlaybackBeforeSeconds: 10,
+                resumeVideo: true,
+                playbackEndpoint: watchEndpoint
+              }
+            };
+          }
+        }
+      }
+    }
+  }
+
   // Remove shorts ads
   if (!Array.isArray(r) && r?.entries && configRead('enableAdBlock')) {
     r.entries = r.entries?.filter(
@@ -92,9 +119,9 @@ JSON.parse = function () {
   }
 
   /*
-
+ 
   Chapters are disabled due to the API removing description data which was used to generate chapters
-
+ 
   if (r?.contents?.singleColumnWatchNextResults?.results?.results?.contents && configRead('enableChapters')) {
     const chapterData = Chapters(r);
     r.frameworkUpdates.entityBatchUpdate.mutations.push(chapterData);
@@ -193,7 +220,7 @@ function deArrowify(items) {
             ]
           }
         }
-      }).catch(() => {});
+      }).catch(() => { });
     }
   }
 }

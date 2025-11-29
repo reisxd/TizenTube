@@ -16,4 +16,5 @@ import "./ui/disableWhosWatching.js";
 import "./features/moreSubtitles.js";
 import "./features/updater.js";
 import "./features/pictureInPicture.js";
+import "./features/enableFeatures.js";
 import "./ui/customUI.js";

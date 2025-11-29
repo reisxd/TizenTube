@@ -27,7 +27,8 @@ const defaultConfig = {
   enableShowOtherLanguages: false,
   showWelcomeToast: true,
   enablePreviousNextButtons: true,
-  enablePatchingVideoPlayer: true
+  enablePatchingVideoPlayer: true,
+  enablePreviews: true
 };
 
 let localConfig;
