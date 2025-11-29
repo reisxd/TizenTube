@@ -308,7 +308,7 @@ class SponsorBlockHandler {
           wasSkippedBefore.lastSkipped = Date.now();
           this.skippedCategories.set(segment.UUID, wasSkippedBefore);
 
-          if (wasSkippedBefore.lastSkipped - wasSkippedBefore.firstSkipped > 1000) {
+          if (wasSkippedBefore.lastSkipped - wasSkippedBefore.firstSkipped < 1000) {
             if (!wasSkippedBefore.hasShownToast) {
               showToast('SponsorBlock', `Not skipping ${skipName} (was skipped ${wasSkippedBefore.count} times)`);
               wasSkippedBefore.hasShownToast = true;

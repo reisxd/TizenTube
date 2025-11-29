@@ -6,7 +6,7 @@ import commonjs from '@rollup/plugin-commonjs';
 
 export default {
     input: "userScript.js",
-    output: { file: "../dist/userScript.js", format: "iife", sourcemap: 'inline' },
+    output: { file: "../dist/userScript.js", format: "iife" },
     plugins: [
         string({
             include: "**/*.css",
