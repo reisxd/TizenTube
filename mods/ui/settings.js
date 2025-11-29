@@ -40,6 +40,7 @@ export default function modernUI(update, parameters) {
                     name: 'Manual SponsorBlock Segment Skip',
                     icon: 'DOLLAR_SIGN',
                     value: null,
+                    arrayToEdit: 'sponsorBlockManualSkips',
                     menuId: 'tt-sponsorblock-manual-segment-skip',
                     options: [
                         {
@@ -193,6 +194,99 @@ export default function modernUI(update, parameters) {
         {
             name: 'Video Previews',
             value: 'enablePreviews'
+        },
+        {
+            name: 'Hide Watched Videos',
+            icon: 'VISIBILITY_OFF',
+            value: null,
+            options: [
+                {
+                    name: 'Enable Hide Watched Videos',
+                    icon: 'VISIBILITY_OFF',
+                    value: 'enableHideWatchedVideos'
+                },
+                {
+                    name: 'Watched Videos Threshold',
+                    icon: 'TIMELINE_PROGRESS',
+                    value: null,
+                    options: {
+                        title: 'Watched Videos Threshold',
+                        subtitle: 'Set the percentage threshold for hiding watched videos',
+                        content: overlayPanelItemListRenderer(
+                            [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100].map((percent) =>
+                                buttonItem(
+                                    { title: `${percent}%` },
+                                    {
+                                        icon: 'CHEVRON_DOWN'
+                                    },
+                                    [
+                                        {
+                                            setClientSettingEndpoint: {
+                                                settingDatas: [
+                                                    {
+                                                        clientSettingEnum: {
+                                                            item: 'hideWatchedVideosThreshold'
+                                                        },
+                                                        intValue: percent.toString()
+                                                    }
+                                                ]
+                                            }
+                                        },
+                                        {
+                                            customAction: {
+                                                action: 'SHOW_TOAST',
+                                                parameters: `Watched videos threshold set to ${percent}%`
+                                            }
+                                        }
+                                    ]
+                                )
+
+                            )
+                        )
+                    }
+                },
+                {
+                    name: 'Set Pages to Hide Watched Videos',
+                    value: null,
+                    arrayToEdit: 'hideWatchedVideosPages',
+                    menuId: 'tt-hide-watched-videos-pages',
+                    options: [
+                        {
+                            name: 'Search Results',
+                            value: 'search'
+                        },
+                        {
+                            name: 'Home',
+                            value: 'home'
+                        },
+                        {
+                            name: 'Music',
+                            value: 'music'
+                        },
+                        {
+                            name: 'Gaming',
+                            value: 'gaming'
+                        },
+                        {
+                            name: 'Subscriptions',
+                            value: 'subscriptions'
+                        },
+                        {
+                            name: 'Library',
+                            value: 'library'
+                        },
+                        {
+                            name: 'More',
+                            value: 'more'
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            name: 'Hide End Screen Cards',
+            icon: 'VISIBILITY_OFF',
+            value: 'enableHideEndScreenCards'
         }
     ];
 
@@ -275,20 +369,18 @@ export function optionShow(parameters, update) {
     const buttons = [];
 
     // Check if this is the legacy sponsorBlockManualSkips (array-based) or new boolean-based options
-    const isArrayBasedOptions = parameters.options.some(
-        option => option.value === 'sponsor' || option.value === 'intro'
-    );
+    const isArrayBasedOptions = parameters.arrayToEdit !== undefined;
 
     if (isArrayBasedOptions) {
         // Legacy handling for sponsorBlockManualSkips
-        const manualSkipValue = configRead('sponsorBlockManualSkips');
+        const value = configRead(parameters.arrayToEdit);
         for (const option of parameters.options) {
             buttons.push(
                 buttonItem(
                     { title: option.name },
                     {
                         icon: option.icon ? option.icon : 'CHEVRON_DOWN',
-                        secondaryIcon: manualSkipValue.includes(option.value) ? 'CHECK_BOX' : 'CHECK_BOX_OUTLINE_BLANK'
+                        secondaryIcon: value.includes(option.value) ? 'CHECK_BOX' : 'CHECK_BOX_OUTLINE_BLANK'
                     },
                     [
                         {
@@ -296,7 +388,7 @@ export function optionShow(parameters, update) {
                                 settingDatas: [
                                     {
                                         clientSettingEnum: {
-                                            item: 'sponsorBlockManualSkips'
+                                            item: parameters.arrayToEdit
                                         },
                                         arrayValue: option.value
                                     }
@@ -310,7 +402,8 @@ export function optionShow(parameters, update) {
                                     options: parameters.options,
                                     selectedIndex: parameters.options.indexOf(option),
                                     update: true,
-                                    menuId: parameters.menuId
+                                    menuId: parameters.menuId,
+                                    arrayToEdit: parameters.arrayToEdit
                                 }
                             }
                         }
@@ -337,8 +430,9 @@ export function optionShow(parameters, update) {
                                 parameters: {
                                     options: option.options,
                                     selectedIndex: 0,
-                                    update: false,
-                                    menuId: option.menuId
+                                    update: option.options?.title ? 'customUI' : false,
+                                    menuId: option.menuId,
+                                    arrayToEdit: option.arrayToEdit
                                 }
                             }
                         }
@@ -361,8 +455,9 @@ export function optionShow(parameters, update) {
                                 parameters: {
                                     options: parameters.options,
                                     selectedIndex: index,
-                                    update: true,
-                                    menuId: parameters.menuId
+                                    update: option.options?.title ? 'customUI' : true,
+                                    menuId: parameters.menuId,
+                                    arrayToEdit: option.arrayToEdit
                                 }
                             }
                         }

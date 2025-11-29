@@ -28,7 +28,11 @@ const defaultConfig = {
   showWelcomeToast: true,
   enablePreviousNextButtons: true,
   enablePatchingVideoPlayer: true,
-  enablePreviews: true
+  enablePreviews: true,
+  enableHideWatchedVideos: false,
+  hideWatchedVideosThreshold: 80,
+  hideWatchedVideosPages: [],
+  enableHideEndScreenCards: false
 };
 
 let localConfig;

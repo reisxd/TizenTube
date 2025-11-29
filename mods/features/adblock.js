@@ -78,11 +78,28 @@ JSON.parse = function () {
     }
   }
 
+  if (r.endscreen && configRead('enableHideEndScreenCards')) {
+    r.endscreen = null;
+  }
+
   // Remove shorts ads
   if (!Array.isArray(r) && r?.entries && configRead('enableAdBlock')) {
     r.entries = r.entries?.filter(
       (elm) => !elm?.command?.reelWatchEndpoint?.adClientParams?.isAd
     );
+  }
+
+  // Hide Watched Videos
+  if (r?.contents?.tvBrowseRenderer?.content?.tvSurfaceContentRenderer?.content?.sectionListRenderer?.contents && configRead('enableHideWatchedVideos')) {
+    for (const shelve of r.contents.tvBrowseRenderer.content.tvSurfaceContentRenderer.content.sectionListRenderer.contents) {
+      if (shelve.shelfRenderer && shelve.shelfRenderer.content.horizontalListRenderer) {
+        shelve.shelfRenderer.content.horizontalListRenderer.items = hideVideo(shelve.shelfRenderer.content.horizontalListRenderer.items);
+      }
+    }
+  }
+
+  if (r?.continuationContents?.horizontalListContinuation?.items) {
+    r.continuationContents.horizontalListContinuation.items = hideVideo(r.continuationContents.horizontalListContinuation.items);
   }
 
   // Patch settings
@@ -260,4 +277,21 @@ function addLongPress(items) {
     });
     item.tileRenderer.onLongPressCommand = data;
   }
+}
+
+function hideVideo(items) {
+  return items.filter(item => {
+    if (!item.tileRenderer) return true;
+    const progressBar = item.tileRenderer.header?.tileHeaderRenderer?.thumbnailOverlays?.find(overlay => overlay.thumbnailOverlayResumePlaybackRenderer)?.thumbnailOverlayResumePlaybackRenderer;
+    if (!progressBar) return true;
+    const pages = configRead('hideWatchedVideosPages');
+    const hash = location.hash.substring(1);
+    if (hash === '/' && !pages.includes('home')) return true;
+    if (hash.startsWith('/search') && !pages.includes('search')) return true;
+    const pageName = hash === '/' ? 'home' : hash.startsWith('search') ? 'search' : hash.split('?')[1].split('&')[0].split('=')[1].replace('FE', '').replace('topics_', '');
+    if (!pages.includes(pageName)) return true;
+
+    const percentWatched = (progressBar.percentDurationWatched || 0);
+    return percentWatched <= configRead('hideWatchedVideosThreshold');
+  });
 }

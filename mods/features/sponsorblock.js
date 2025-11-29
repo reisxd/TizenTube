@@ -371,6 +371,8 @@ class SponsorBlockHandler {
         this.durationChangeHandler
       );
     }
+
+    this.skippedCategories.clear();
   }
 }
 

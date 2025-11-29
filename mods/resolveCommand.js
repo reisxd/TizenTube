@@ -148,5 +148,8 @@ function customAction(action, parameters) {
         case 'ENTER_PIP':
             enablePip();
             break;
+        case 'SHOW_TOAST':
+            showToast('TizenTube', parameters);
+            break;
     }
 }
