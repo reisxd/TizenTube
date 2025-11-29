@@ -71,7 +71,6 @@ if (window.h5vcc && window.h5vcc.tizentube) {
                                 ]
                             )
                         ]),
-                        0,
                         'tt-update-modal'
                     )
                 } else {
