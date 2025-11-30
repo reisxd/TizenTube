@@ -199,9 +199,9 @@ export default function modernUI(update, parameters) {
                 title: 'Preferred Video Quality',
                 subtitle: 'Choose the preferred or next best video quality applied when playback starts',
                 content: overlayPanelItemListRenderer(
-                    [
+                    ['Auto', '2160p', '1440p', '1080p', '720p', '480p', '360p', '240p', '144p'].map((quality) =>
                         buttonItem(
-                            { title: 'Auto' },
+                            { title: quality },
                             { icon: '' },
                             [
                                 {
@@ -211,7 +211,7 @@ export default function modernUI(update, parameters) {
                                                 clientSettingEnum: {
                                                     item: 'preferredVideoQuality'
                                                 },
-                                                stringValue: 'auto'
+                                                stringValue: quality === 'Auto' ? 'auto' : quality
                                             }
                                         ]
                                     }
@@ -219,204 +219,12 @@ export default function modernUI(update, parameters) {
                                 {
                                     customAction: {
                                         action: 'SHOW_TOAST',
-                                        parameters: 'Preferred quality set to Auto'
-                                    }
-                                }
-                            ]
-                        ),
-                        buttonItem(
-                            { title: '2160p' },
-                            { icon: '' },
-                            [
-                                {
-                                    setClientSettingEndpoint: {
-                                        settingDatas: [
-                                            {
-                                                clientSettingEnum: {
-                                                    item: 'preferredVideoQuality'
-                                                },
-                                                stringValue: '2160p'
-                                            }
-                                        ]
-                                    }
-                                },
-                                {
-                                    customAction: {
-                                        action: 'SHOW_TOAST',
-                                        parameters: 'Preferred quality set to 2160p'
-                                    }
-                                }
-                            ]
-                        ),
-                        buttonItem(
-                            { title: '1440p' },
-                            { icon: '' },
-                            [
-                                {
-                                    setClientSettingEndpoint: {
-                                        settingDatas: [
-                                            {
-                                                clientSettingEnum: {
-                                                    item: 'preferredVideoQuality'
-                                                },
-                                                stringValue: '1440p'
-                                            }
-                                        ]
-                                    }
-                                },
-                                {
-                                    customAction: {
-                                        action: 'SHOW_TOAST',
-                                        parameters: 'Preferred quality set to 1440p'
-                                    }
-                                }
-                            ]
-                        ),
-                        buttonItem(
-                            { title: '1080p' },
-                            { icon: '' },
-                            [
-                                {
-                                    setClientSettingEndpoint: {
-                                        settingDatas: [
-                                            {
-                                                clientSettingEnum: {
-                                                    item: 'preferredVideoQuality'
-                                                },
-                                                stringValue: '1080p'
-                                            }
-                                        ]
-                                    }
-                                },
-                                {
-                                    customAction: {
-                                        action: 'SHOW_TOAST',
-                                        parameters: 'Preferred quality set to 1080p'
-                                    }
-                                }
-                            ]
-                        ),
-                        buttonItem(
-                            { title: '720p' },
-                            { icon: '' },
-                            [
-                                {
-                                    setClientSettingEndpoint: {
-                                        settingDatas: [
-                                            {
-                                                clientSettingEnum: {
-                                                    item: 'preferredVideoQuality'
-                                                },
-                                                stringValue: '720p'
-                                            }
-                                        ]
-                                    }
-                                },
-                                {
-                                    customAction: {
-                                        action: 'SHOW_TOAST',
-                                        parameters: 'Preferred quality set to 720p'
-                                    }
-                                }
-                            ]
-                        ),
-                        buttonItem(
-                            { title: '480p' },
-                            { icon: '' },
-                            [
-                                {
-                                    setClientSettingEndpoint: {
-                                        settingDatas: [
-                                            {
-                                                clientSettingEnum: {
-                                                    item: 'preferredVideoQuality'
-                                                },
-                                                stringValue: '480p'
-                                            }
-                                        ]
-                                    }
-                                },
-                                {
-                                    customAction: {
-                                        action: 'SHOW_TOAST',
-                                        parameters: 'Preferred quality set to 480p'
-                                    }
-                                }
-                            ]
-                        ),
-                        buttonItem(
-                            { title: '360p' },
-                            { icon: '' },
-                            [
-                                {
-                                    setClientSettingEndpoint: {
-                                        settingDatas: [
-                                            {
-                                                clientSettingEnum: {
-                                                    item: 'preferredVideoQuality'
-                                                },
-                                                stringValue: '360p'
-                                            }
-                                        ]
-                                    }
-                                },
-                                {
-                                    customAction: {
-                                        action: 'SHOW_TOAST',
-                                        parameters: 'Preferred quality set to 360p'
-                                    }
-                                }
-                            ]
-                        ),
-                        buttonItem(
-                            { title: '240p' },
-                            { icon: '' },
-                            [
-                                {
-                                    setClientSettingEndpoint: {
-                                        settingDatas: [
-                                            {
-                                                clientSettingEnum: {
-                                                    item: 'preferredVideoQuality'
-                                                },
-                                                stringValue: '240p'
-                                            }
-                                        ]
-                                    }
-                                },
-                                {
-                                    customAction: {
-                                        action: 'SHOW_TOAST',
-                                        parameters: 'Preferred quality set to 240p'
-                                    }
-                                }
-                            ]
-                        ),
-                        buttonItem(
-                            { title: '144p' },
-                            { icon: '' },
-                            [
-                                {
-                                    setClientSettingEndpoint: {
-                                        settingDatas: [
-                                            {
-                                                clientSettingEnum: {
-                                                    item: 'preferredVideoQuality'
-                                                },
-                                                stringValue: '144p'
-                                            }
-                                        ]
-                                    }
-                                },
-                                {
-                                    customAction: {
-                                        action: 'SHOW_TOAST',
-                                        parameters: 'Preferred quality set to 144p'
+                                        parameters: `Preferred quality set to ${quality}`
                                     }
                                 }
                             ]
                         )
-                    ]
+                    )
                 )
             }
         },
