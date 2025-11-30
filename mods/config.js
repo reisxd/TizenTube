@@ -12,6 +12,7 @@ const defaultConfig = {
   enableSponsorBlockMusicOfftopic: true,
   enableSponsorBlockFiller: false,
   videoSpeed: 1,
+  preferredVideoQuality: 'auto',
   enableDeArrow: true,
   enableDeArrowThumbnails: false,
   focusContainerColor: '#0f0f0f',

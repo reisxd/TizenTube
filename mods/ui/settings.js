@@ -192,6 +192,43 @@ export default function modernUI(update, parameters) {
             value: 'enablePatchingVideoPlayer'
         },
         {
+            name: 'Preferred Video Quality',
+            icon: 'VIDEO_QUALITY',
+            value: null,
+            options: {
+                title: 'Preferred Video Quality',
+                subtitle: 'Choose the preferred or next best video quality applied when playback starts',
+                content: overlayPanelItemListRenderer(
+                    ['Auto', '2160p', '1440p', '1080p', '720p', '480p', '360p', '240p', '144p'].map((quality) =>
+                        buttonItem(
+                            { title: quality },
+                            { icon: '' },
+                            [
+                                {
+                                    setClientSettingEndpoint: {
+                                        settingDatas: [
+                                            {
+                                                clientSettingEnum: {
+                                                    item: 'preferredVideoQuality'
+                                                },
+                                                stringValue: quality === 'Auto' ? 'auto' : quality
+                                            }
+                                        ]
+                                    }
+                                },
+                                {
+                                    customAction: {
+                                        action: 'SHOW_TOAST',
+                                        parameters: `Preferred quality set to ${quality}`
+                                    }
+                                }
+                            ]
+                        )
+                    )
+                )
+            }
+        },
+        {
             name: 'Video Previews',
             value: 'enablePreviews'
         },
