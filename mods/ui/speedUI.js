@@ -37,13 +37,14 @@ function execute_once_dom_loaded_speed() {
 function speedSettings() {
     const currentSpeed = configRead('videoSpeed');
     let selectedIndex = 0;
-    const maxSpeed = 4;
-    const increment = 0.25;
+    const maxSpeed = 5;
+    const increment = configRead('speedSettingsIncrement') || 0.25;
     const buttons = [];
     for (let speed = increment; speed <= maxSpeed; speed += increment) {
+        const fixedSpeed = Math.round(speed * 100) / 100;
         buttons.push(
             buttonItem(
-                { title: `${speed}x` },
+                { title: `${fixedSpeed}x` },
                 null,
                 [
                     {
@@ -58,7 +59,7 @@ function speedSettings() {
                                     clientSettingEnum: {
                                         item: 'videoSpeed'
                                     },
-                                    intValue: speed.toString()
+                                    intValue: fixedSpeed.toString()
                                 }
                             ]
                         }
@@ -66,13 +67,13 @@ function speedSettings() {
                     {
                         customAction: {
                             action: 'SET_PLAYER_SPEED',
-                            parameters: speed.toString()
+                            parameters: fixedSpeed.toString()
                         }
                     }
                 ]
             )
         );
-        if (currentSpeed === speed) {
+        if (currentSpeed === fixedSpeed) {
             selectedIndex = buttons.length - 1;
         }
     }

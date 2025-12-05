@@ -28,12 +28,21 @@ const defaultConfig = {
   enableShowOtherLanguages: false,
   showWelcomeToast: true,
   enablePreviousNextButtons: true,
+  enableSuperThanksButton: false,
   enablePatchingVideoPlayer: true,
   enablePreviews: true,
   enableHideWatchedVideos: false,
   hideWatchedVideosThreshold: 80,
   hideWatchedVideosPages: [],
-  enableHideEndScreenCards: false
+  enableHideEndScreenCards: false,
+  enableYouThereRenderer: false,
+  lastAnnouncementCheck: 0,
+  enableScreenDimming: true,
+  dimmingTimeout: 60,
+  dimmingOpacity: 0.5,
+  enablePaidPromotionOverlay: true,
+  speedSettingsIncrement: 0.25,
+  videoPreferredCodec: 'vp9'
 };
 
 let localConfig;

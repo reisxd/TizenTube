@@ -5,7 +5,7 @@ import { configRead, configWrite } from '../config.js';
 import updateStyle from './theme.js';
 import { showToast } from './ytUI.js';
 import modernUI from './settings.js';
-import { patchResolveCommand } from '../resolveCommand.js';
+import resolveCommand, { patchResolveCommand } from '../resolveCommand.js';
 import { pipToFullscreen } from '../features/pictureInPicture.js';
 
 // It just works, okay?
@@ -17,6 +17,8 @@ const interval = setInterval(() => {
     clearInterval(interval);
   }
 }, 250);
+
+let keyTimeout = null;
 
 function execute_once_dom_loaded() {
 
@@ -133,6 +135,18 @@ function execute_once_dom_loaded() {
       evt.keyCode,
       evt.defaultPrevented
     );
+    if (configRead('enableScreenDimming')) {
+      if (keyTimeout) {
+        clearTimeout(keyTimeout);
+      }
+      document.body.style.opacity = 1;
+      keyTimeout = setTimeout(() => {
+        const videoPlayer = document.querySelector('.html5-video-player');
+        const playerStateObject = videoPlayer.getPlayerStateObject();
+        if (playerStateObject.isPlaying) return;
+        document.body.style.opacity = (1 - configRead('dimmingOpacity'));
+      }, configRead('dimmingTimeout') * 1000);
+    }
     if (evt.keyCode == 403) {
       console.info('Taking over!');
       evt.preventDefault();
@@ -179,6 +193,12 @@ function execute_once_dom_loaded() {
       showToast('Welcome to TizenTube', 'Go to settings and click on TizenTube Settings for settings, press [RED] to open TizenTube Theme Settings.');
     }, 2000);
   }
+
+  resolveCommand({
+    signalAction: {
+      signal: 'SOFT_RELOAD_PAGE'
+    }
+  });
 
   // Fix UI issues, again. Love, Googol.
 

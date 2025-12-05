@@ -126,41 +126,74 @@ export default function modernUI(update, parameters) {
         {
             name: 'DeArrow',
             icon: 'VISIBILITY_OFF',
-            value: 'enableDeArrow'
+            value: null,
+            options: [
+                {
+                    name: 'Enable DeArrow',
+                    icon: 'VISIBILITY_OFF',
+                    value: 'enableDeArrow'
+                },
+                {
+                    name: 'DeArrow Thumbnails',
+                    icon: 'TV',
+                    value: 'enableDeArrowThumbnails'
+                }
+            ]
         },
         {
-            name: 'DeArrow Thumbnails',
-            icon: 'TV',
-            value: 'enableDeArrowThumbnails'
-        },
-        {
-            name: 'Fix UI',
-            icon: 'STAR',
-            value: 'enableFixedUI'
-        },
-        {
-            name: 'High Quality Thumbnails',
-            icon: 'VIDEO_QUALITY',
-            value: 'enableHqThumbnails'
-        },
-        /*{
-            name: 'Chapters',
-            icon: 'BOOKMARK_BORDER',
-            value: 'enableChapters'
-        },*/
-        {
-            name: 'Long Press',
-            value: 'enableLongPress'
-        },
-        {
-            name: 'Shorts',
-            icon: 'YOUTUBE_SHORTS_FILL_24',
-            value: 'enableShorts'
-        },
-        {
-            name: "Who's Watching Menu",
-            icon: 'ACCOUNT_CIRCLE',
-            value: 'enableWhoIsWatchingMenu'
+            name: 'Miscellaneous',
+            icon: 'SETTINGS',
+            value: null,
+            options: [
+                {
+                    name: 'Hide End Screen Cards',
+                    icon: 'VISIBILITY_OFF',
+                    value: 'enableHideEndScreenCards'
+                },
+                {
+                    name: 'You There Renderer',
+                    icon: 'HELP',
+                    value: 'enableYouThereRenderer'
+                },
+                {
+                    name: 'Paid Promotion Overlay',
+                    icon: 'MONEY_HAND',
+                    value: 'enablePaidPromotionOverlay'
+                },
+                {
+                    name: "Who's Watching Menu",
+                    icon: 'ACCOUNT_CIRCLE',
+                    value: 'enableWhoIsWatchingMenu'
+                },
+                {
+                    name: 'Fix UI',
+                    icon: 'STAR',
+                    value: 'enableFixedUI'
+                },
+                {
+                    name: 'High Quality Thumbnails',
+                    icon: 'VIDEO_QUALITY',
+                    value: 'enableHqThumbnails'
+                },
+                /*{
+                    name: 'Chapters',
+                    icon: 'BOOKMARK_BORDER',
+                    value: 'enableChapters'
+                },*/
+                {
+                    name: 'Long Press',
+                    value: 'enableLongPress'
+                },
+                {
+                    name: 'Shorts',
+                    icon: 'YOUTUBE_SHORTS_FILL_24',
+                    value: 'enableShorts'
+                },
+                {
+                    name: 'Video Previews',
+                    value: 'enablePreviews'
+                },
+            ]
         },
         {
             name: 'Subtitles',
@@ -182,14 +215,26 @@ export default function modernUI(update, parameters) {
             value: 'showWelcomeToast',
         },
         {
-            name: 'Previous and Next Buttons',
-            icon: 'SKIP_NEXT',
-            value: 'enablePreviousNextButtons'
-        },
-        {
             name: 'Patch Video Player',
             icon: 'SETTINGS',
-            value: 'enablePatchingVideoPlayer'
+            value: null,
+            options: [
+                {
+                    name: 'Enable Video Player Patching',
+                    icon: 'SETTINGS',
+                    value: 'enablePatchingVideoPlayer'
+                },
+                {
+                    name: 'Previous and Next Buttons',
+                    icon: 'SKIP_NEXT',
+                    value: 'enablePreviousNextButtons'
+                },
+                {
+                    name: 'Super Thanks Button',
+                    icon: 'SUPER_THANKS',
+                    value: 'enableSuperThanksButton'
+                }
+            ]
         },
         {
             name: 'Preferred Video Quality',
@@ -229,10 +274,6 @@ export default function modernUI(update, parameters) {
             }
         },
         {
-            name: 'Video Previews',
-            value: 'enablePreviews'
-        },
-        {
             name: 'Hide Watched Videos',
             icon: 'VISIBILITY_OFF',
             value: null,
@@ -244,7 +285,6 @@ export default function modernUI(update, parameters) {
                 },
                 {
                     name: 'Watched Videos Threshold',
-                    icon: 'TIMELINE_PROGRESS',
                     value: null,
                     options: {
                         title: 'Watched Videos Threshold',
@@ -321,9 +361,165 @@ export default function modernUI(update, parameters) {
             ]
         },
         {
-            name: 'Hide End Screen Cards',
-            icon: 'VISIBILITY_OFF',
-            value: 'enableHideEndScreenCards'
+            name: 'Screen Dimming',
+            icon: 'EYE_OFF',
+            value: null,
+            options: [
+                {
+                    name: 'Enable Screen Dimming',
+                    icon: 'EYE_OFF',
+                    value: 'enableScreenDimming'
+                },
+                {
+                    name: 'Dimming Timeout',
+                    icon: 'TIMER',
+                    value: null,
+                    options: {
+                        title: 'Dimming Timeout',
+                        subtitle: 'Set the inactivity timeout (in seconds) before the screen dims',
+                        content: overlayPanelItemListRenderer(
+                            [10, 20, 30, 60, 120, 180, 240, 300].map((seconds) => {
+                                const title = seconds >= 60 ? `${seconds / 60} minute${seconds / 60 > 1 ? 's' : ''}` : `${seconds} seconds`;
+                                return buttonItem(
+                                    { title: title },
+                                    { icon: 'CHEVRON_DOWN' },
+                                    [
+                                        {
+                                            setClientSettingEndpoint: {
+                                                settingDatas: [
+                                                    {
+                                                        clientSettingEnum: {
+                                                            item: 'dimmingTimeout'
+                                                        },
+                                                        intValue: seconds.toString()
+                                                    }
+                                                ]
+                                            }
+                                        },
+                                        {
+                                            customAction: {
+                                                action: 'SHOW_TOAST',
+                                                parameters: `Dimming timeout set to ${title}`
+                                            }
+                                        }
+                                    ]
+                                );
+                            })
+                        )
+                    }
+                },
+                {
+                    name: 'Dimming Opacity',
+                    icon: 'LENS_BLUE',
+                    value: null,
+                    options: {
+                        title: 'Dimming Opacity',
+                        subtitle: 'Set the opacity level for screen dimming',
+                        content: overlayPanelItemListRenderer(
+                            [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0].map((opacity) =>
+                                buttonItem(
+                                    { title: `${Math.round(opacity * 100)}%` },
+                                    { icon: 'CHEVRON_DOWN' },
+                                    [
+                                        {
+                                            setClientSettingEndpoint: {
+                                                settingDatas: [
+                                                    {
+                                                        clientSettingEnum: {
+                                                            item: 'dimmingOpacity'
+                                                        },
+                                                        intValue: opacity
+                                                    }
+                                                ]
+                                            }
+                                        },
+                                        {
+                                            customAction: {
+                                                action: 'SHOW_TOAST',
+                                                parameters: `Dimming opacity set to ${Math.round(opacity * 100)}%`
+                                            }
+                                        }
+                                    ]
+                                )
+                            )
+                        )
+                    }
+                }
+            ]
+        },
+        {
+            name: 'Speed Settings Increments',
+            icon: 'SLOW_MOTION_VIDEO',
+            value: null,
+            options: {
+                title: 'Speed Settings Increments',
+                subtitle: 'Set the speed increments for video playback speed adjustments',
+                content: overlayPanelItemListRenderer(
+                    [0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.45, 0.5].map((increment) =>
+                        buttonItem(
+                            { title: `${increment}x` },
+                            { icon: 'CHEVRON_DOWN' },
+                            [
+                                {
+                                    setClientSettingEndpoint: {
+                                        settingDatas: [
+                                            {
+                                                clientSettingEnum: {
+                                                    item: 'speedSettingsIncrement'
+                                                },
+                                                intValue: increment.toString()
+                                            }
+                                        ]
+                                    }
+                                },
+                                {
+                                    customAction: {
+                                        action: 'SHOW_TOAST',
+                                        parameters: `Speed settings increment set to ${increment}x`
+                                    }
+                                }
+                            ]
+                        )
+                    )
+                )
+            }
+        },
+        {
+            name: 'Preferred Video Codec',
+            icon: 'VIDEO_QUALITY',
+            value: null,
+            options: {
+                title: 'Preferred Video Codec',
+                subtitle: 'Choose the preferred video codec for playback',
+                content: overlayPanelItemListRenderer(
+                    ['any', 'vp9', 'av01', 'avc1'].map((codec) =>
+                        buttonItem(
+                            { title: codec.toUpperCase() },
+                            { icon: 'CHEVRON_DOWN' },
+                            [
+                                {
+                                    setClientSettingEndpoint: {
+                                        settingDatas: [
+                                            {
+                                                clientSettingEnum: {
+                                                    item: 'videoPreferredCodec'
+                                                },
+                                                stringValue: codec
+                                            }
+                                        ]
+                                    }
+                                },
+                                {
+                                    customAction: {
+                                        action: 'SHOW_TOAST',
+                                        parameters: `Preferred video codec set to ${codec.toUpperCase()}`
+                                    }
+                                }
+                            ]
+                        )
+                    )
+                )
+            }
         }
     ];
 

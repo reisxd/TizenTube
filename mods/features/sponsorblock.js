@@ -326,7 +326,9 @@ class SponsorBlockHandler {
         }
 
         showToast('SponsorBlock', `Skipping ${skipName}`);
-        this.video.currentTime = end + 0.1;
+        if (this.video.duration - end < 1) {
+          this.video.currentTime = end - 1;
+        } else this.video.currentTime = end;
         this.scheduleSkip();
       }
     }, (start - this.video.currentTime) * 1000);

@@ -92,6 +92,42 @@ function applyPatches() {
             }
         }).left.split('.')[1];
 
+        const engagementActionButton = functions.find(func => func.rhs.includes('props.data.engagementActions')).left.split('.')[1];
+
+        if (engagementActionButton) {
+            const origEngagementActionButton = inst[engagementActionButton];
+            inst[engagementActionButton] = function () {
+                const res = origEngagementActionButton.apply(this, arguments);
+                res.find(item => item.type === 'TRANSPORT_CONTROLS_BUTTON_TYPE_SPEED') || res.push({
+                    type: 'TRANSPORT_CONTROLS_BUTTON_TYPE_SPEED',
+                    button: {
+                        buttonRenderer: ButtonRenderer(
+                            false,
+                            "Speed Controls",
+                            'SLOW_MOTION_VIDEO',
+                            {
+                                customAction:
+                                {
+                                    action: 'TT_SPEED_SETTINGS_SHOW',
+                                }
+                            }
+                        )
+                    }
+                });
+                return res;
+            }
+        }
+
+        if (!configRead('enableSuperThanksButton')) {
+            const origEngagementActionButton = inst[engagementActionButton];
+            inst[engagementActionButton] = function () {
+                const res = origEngagementActionButton.apply(this, arguments);
+                const superThanksFiltered = res.filter(item => item.type !== 'TRANSPORT_CONTROLS_BUTTON_TYPE_SUPER_THANKS');
+                const shoppingFiltered = superThanksFiltered.filter(item => item.type !== 'TRANSPORT_CONTROLS_BUTTON_TYPE_SHOPPING');
+                return shoppingFiltered;
+            }
+        }
+
         if (configRead('enablePreviousNextButtons')) {
             if (!previousButtonName || !nextButtonName) return inst;
             inst[previousButtonName] = function () {

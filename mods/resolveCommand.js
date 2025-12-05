@@ -70,6 +70,9 @@ export function patchResolveCommand() {
                 } else if (cmd?.showEngagementPanelEndpoint?.customAction) {
                     customAction(cmd.showEngagementPanelEndpoint.customAction.action, cmd.showEngagementPanelEndpoint.customAction.parameters);
                     return true;
+                } else if (cmd?.playlistEditEndpoint?.customAction) {
+                    customAction(cmd.playlistEditEndpoint.customAction.action, cmd.playlistEditEndpoint.customAction.parameters);
+                    return true;
                 } else if (cmd?.openPopupAction?.uniqueId === 'playback-settings') {
                     // Patch the playback settings popup to use TizenTube speed settings
                     const items = cmd.openPopupAction.popup.overlaySectionRenderer.overlay.overlayTwoPanelRenderer.actionPanel.overlayPanelRenderer.content.overlayPanelItemListRenderer.items;
@@ -150,6 +153,14 @@ function customAction(action, parameters) {
             break;
         case 'SHOW_TOAST':
             showToast('TizenTube', parameters);
+            break;
+        case 'ADD_TO_QUEUE':
+            window.queuedVideos.videos.push(parameters);
+            showToast('TizenTube', 'Video added to queue.');
+            break;
+        case 'CLEAR_QUEUE':
+            window.queuedVideos.videos = [];
+            showToast('TizenTube', 'Video queue cleared.');
             break;
     }
 }

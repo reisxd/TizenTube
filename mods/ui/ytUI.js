@@ -23,8 +23,30 @@ function showToast(title, subtitle, thumbnails) {
     resolveCommand(toastCmd);
 }
 
-function showModal(titleAndSubtitle, content, id, update) {
-    const titleSubtitleObj = typeof titleAndSubtitle === 'string' ? { title: titleAndSubtitle, subtitle: '' } : titleAndSubtitle;
+function OverlayPanelHeaderRenderer(title, subtitle, thumbnails) {
+    return {
+        overlayPanelHeaderRenderer: {
+            title: {
+                simpleText: title
+            },
+            subtitle: {
+                simpleText: subtitle
+            },
+            image: {
+                thumbnails: thumbnails
+            },
+            style: "OVERLAY_PANEL_HEADER_STYLE_VIDEO_THUMBNAIL"
+        }
+    }
+}
+
+function Modal(header, content, id, update) {
+    const titleSubtitleObj = typeof header === 'string' ? { title: header, subtitle: '' } : header;
+    const overlayPanelHeaderRenderer = header.overlayPanelHeaderRenderer || {
+        title: {
+            simpleText: titleSubtitleObj.title
+        }
+    };
     const modalCmd = {
         openPopupAction: {
             popupType: 'MODAL',
@@ -35,11 +57,7 @@ function showModal(titleAndSubtitle, content, id, update) {
                             actionPanel: {
                                 overlayPanelRenderer: {
                                     header: {
-                                        overlayPanelHeaderRenderer: {
-                                            title: {
-                                                simpleText: titleSubtitleObj.title
-                                            }
-                                        }
+                                        overlayPanelHeaderRenderer
                                     },
                                     content
                                 }
@@ -81,6 +99,12 @@ function showModal(titleAndSubtitle, content, id, update) {
         modalCmd.openPopupAction.shouldMatchUniqueId = true;
         modalCmd.openPopupAction.updateAction = true;
     }
+
+    return modalCmd;
+}
+
+function showModal(header, content, id, update) {
+    const modalCmd = Modal(header, content, id, update);
 
     resolveCommand(modalCmd);
 }
@@ -180,64 +204,37 @@ function longPressData(data) {
             menu: {
                 menuRenderer: {
                     items: [
-                        {
-                            menuNavigationItemRenderer: {
-                                text: {
-                                    runs: [
-                                        {
-                                            text: 'Play'
-                                        }
-                                    ]
-                                },
-                                navigationEndpoint: {
-                                    clickTrackingParams: null,
-                                    watchEndpoint: data.watchEndpointData
-                                },
-                                trackingParams: null
-                            }
-                        },
-                        {
-                            menuServiceItemRenderer: {
-                                text: {
-                                    runs: [
-                                        {
-                                            text: 'Save to Watch Later'
-                                        }
-                                    ]
-                                },
-                                serviceEndpoint: {
-                                    clickTrackingParams: null,
-                                    playlistEditEndpoint: {
-                                        playlistId: 'WL',
-                                        actions: [
-                                            {
-                                                addedVideoId: data.videoId,
-                                                action: 'ACTION_ADD_VIDEO'
-                                            }
-                                        ]
+                        MenuNavigationItemRenderer('Play', {
+                            clickTrackingParams: null,
+                            watchEndpoint: data.watchEndpointData
+                        }),
+                        MenuServiceItemRenderer('Save to Watch Later', {
+                            clickTrackingParams: null,
+                            playlistEditEndpoint: {
+                                playlistId: 'WL',
+                                actions: [
+                                    {
+                                        addedVideoId: data.videoId,
+                                        action: 'ACTION_ADD_VIDEO'
                                     }
-                                },
-                                trackingParams: null
+                                ]
                             }
-                        },
-                        {
-                            menuNavigationItemRenderer: {
-                                text: {
-                                    runs: [
-                                        {
-                                            text: 'Save to playlist'
-                                        }
-                                    ]
-                                },
-                                navigationEndpoint: {
-                                    clickTrackingParams: null,
-                                    addToPlaylistEndpoint: {
-                                        videoId: data.videoId
-                                    }
-                                },
-                                trackingParams: null
+                        }),
+                        MenuNavigationItemRenderer('Save to Playlist', {
+                            clickTrackingParams: null,
+                            addToPlaylistEndpoint: {
+                                videoId: data.videoId
                             }
-                        }
+                        }),
+                        MenuServiceItemRenderer('Add to Queue', {
+                            clickTrackingParams: null,
+                            playlistEditEndpoint: {
+                                customAction: {
+                                    action: 'ADD_TO_QUEUE',
+                                    parameters: data.item
+                                }
+                            }
+                        }),
                     ],
                     trackingParams: null,
                     accessibility: {
@@ -247,6 +244,38 @@ function longPressData(data) {
                     }
                 }
             }
+        }
+    }
+}
+
+function MenuServiceItemRenderer(text, serviceEndpoint) {
+    return {
+        menuServiceItemRenderer: {
+            text: {
+                runs: [
+                    {
+                        text
+                    }
+                ]
+            },
+            serviceEndpoint,
+            trackingParams: null
+        }
+    };
+}
+
+function MenuNavigationItemRenderer(text, navigateEndpoint) {
+    return {
+        menuNavigationItemRenderer: {
+            text: {
+                runs: [
+                    {
+                        text
+                    }
+                ]
+            },
+            navigationEndpoint: navigateEndpoint,
+            trackingParams: null
         }
     }
 }
@@ -334,8 +363,47 @@ function overlayMessageRenderer(simpleText) {
     }
 }
 
+function ShelfRenderer(simpleText, items, selectedIndex = 0) {
+    return {
+        shelfRenderer: {
+            shelfHeaderRenderer: {
+                title: {
+                    simpleText
+                }
+            },
+            tvhtml5ShelfRendererType: "TVHTML5_SHELF_RENDERER_TYPE_GRID",
+            content: {
+                horizontalListRenderer: {
+                    items,
+                    selectedIndex,
+                    visibleItemCount: 3
+                }
+            }
+        }
+    }
+}
+
+function TileRenderer(simpleText, onSelectCommand) {
+    return {
+        tileRenderer: {
+            contentType: "TILE_CONTENT_TYPE_VIDEO",
+            metadata: {
+                tileMetadataRenderer: {
+                    title: {
+                        simpleText
+                    }
+                }
+            },
+            onSelectCommand,
+            style: "TILE_STYLE_YTLR_DEFAULT"
+        }
+    }
+}
+
 export {
     showToast,
+    Modal,
+    OverlayPanelHeaderRenderer,
     showModal,
     buttonItem,
     overlayPanelItemListRenderer,
@@ -343,6 +411,9 @@ export {
     timelyAction,
     scrollPaneRenderer,
     longPressData,
+    MenuServiceItemRenderer,
     SettingsCategory,
-    SettingActionRenderer
+    SettingActionRenderer,
+    ShelfRenderer,
+    TileRenderer
 }
