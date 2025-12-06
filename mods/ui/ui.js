@@ -139,12 +139,12 @@ function execute_once_dom_loaded() {
       if (keyTimeout) {
         clearTimeout(keyTimeout);
       }
-      document.body.style.opacity = 1;
+      document.getElementById('container').style.setProperty('opacity', '1', 'important');
       keyTimeout = setTimeout(() => {
         const videoPlayer = document.querySelector('.html5-video-player');
         const playerStateObject = videoPlayer.getPlayerStateObject();
         if (playerStateObject.isPlaying) return;
-        document.body.style.opacity = (1 - configRead('dimmingOpacity'));
+        document.getElementById('container').style.setProperty('opacity', (1 - configRead('dimmingOpacity')).toString(), 'important');
       }, configRead('dimmingTimeout') * 1000);
     }
     if (evt.keyCode == 403) {
