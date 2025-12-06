@@ -1,5 +1,4 @@
 import { configRead, configChangeEmitter } from "../config.js";
-import resolveCommand from "../resolveCommand.js";
 
 const SELECTORS = {
     PLAYER: '.html5-video-player',
@@ -17,6 +16,8 @@ const CONFIG_KEYS = {
 class PreferredQualityHandler {
     #player = null;
     #attachTimeout = null;
+    #lastVideoId = null;
+    #hasAppliedQuality = false;
 
     constructor() {
         this.init();
@@ -54,59 +55,45 @@ class PreferredQualityHandler {
 
     #handleStateChange = () => {
         const state = this.#player?.getPlayerStateObject?.();
+        const videoData = this.#player?.getVideoData?.();
+        const videoId = videoData?.video_id;
 
-        if (state?.isPlaying) {
+        if (videoId !== this.#lastVideoId) {
+            this.#lastVideoId = videoId;
+            this.#hasAppliedQuality = false;
+        }
+
+        if (state?.isPlaying && !this.#hasAppliedQuality) {
             this.#applyQuality();
+            this.#hasAppliedQuality = true;
         }
     };
 
     #applyQuality() {
         const preferredQuality = configRead(CONFIG_KEYS.QUALITY);
-        if (!preferredQuality || !this.#player) return;
+        if (!preferredQuality || preferredQuality === 'auto' || !this.#player) return;
 
         try {
-            const qualityData = this.#determineQualityData(preferredQuality);
+            const quality = this.#determineQuality(preferredQuality);
 
-            if (qualityData) {
-                this.#dispatchQualityCommand(qualityData);
+            if (quality) {
+              this.#player.setPlaybackQualityRange(quality, quality)
             }
         } catch (e) {
             console.warn('[PreferredQuality] Failed to apply quality:', e);
         }
     }
 
-    #determineQualityData(preference) {
-        if (preference === 'auto') {
-            return { quality: 'auto' };
-        }
-
+    #determineQuality(preference) {
         const availableQualities = this.#player.getAvailableQualityData();
-        if (!availableQualities?.length) return null;
+        if (!availableQualities?.length) return 'highres';
 
-        const getQualityValue = (label) => parseInt((label || '').toString().replace(/\D/g, ''), 10) || 0;
+        const getQualityValue = (label) => parseInt(label, 10) || 0;
         const targetValue = getQualityValue(preference);
 
-        const sorted = availableQualities
-            .map(q => ({ original: q, val: getQualityValue(q.qualityLabel) }))
-            .sort((a, b) => b.val - a.val);
+        const match = availableQualities.find(q => getQualityValue(q.qualityLabel) === targetValue);
 
-        const bestMatch = sorted.find(q => q.val <= targetValue) || sorted[sorted.length - 1];
-
-        return bestMatch ? {
-            quality: bestMatch.original.quality,
-            formatId: bestMatch.original.formatId
-        } : null;
-    }
-
-    #dispatchQualityCommand(qualityData) {
-        resolveCommand({
-            setClientSettingEndpoint: {
-                settingDatas: [{
-                    clientSettingEnum: { item: "PLAYBACK_QUALITY" },
-                    stringValue: JSON.stringify(qualityData)
-                }]
-            }
-        });
+        return match ? match.quality : 'highres';
     }
 }
 
