@@ -269,7 +269,12 @@ export default function modernUI(update, parameters) {
                                 }
                             ]
                         )
-                    )
+                    ),
+                    (() => {
+                        const savedVal = configRead('preferredVideoQuality');
+                        const idx = ['auto', '2160p', '1440p', '1080p', '720p', '480p', '360p', '240p', '144p'].indexOf(savedVal);
+                        return idx !== -1 ? idx : null;
+                    })()
                 )
             }
         },
@@ -318,7 +323,12 @@ export default function modernUI(update, parameters) {
                                     ]
                                 )
 
-                            )
+                            ),
+                            (() => {
+                                const savedVal = parseFloat(configRead('hideWatchedVideosThreshold'));
+                                const idx = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100].indexOf(savedVal);
+                                return idx !== -1 ? idx : null;
+                            })()
                         )
                     }
                 },
@@ -404,7 +414,12 @@ export default function modernUI(update, parameters) {
                                         }
                                     ]
                                 );
-                            })
+                            }),
+                            (() => {
+                                const savedVal = parseFloat(configRead('dimmingTimeout'));
+                                const idx = [10, 20, 30, 60, 120, 180, 240, 300].indexOf(savedVal);
+                                return idx !== -1 ? idx : null;
+                            })()
                         )
                     }
                 },
@@ -441,7 +456,12 @@ export default function modernUI(update, parameters) {
                                         }
                                     ]
                                 )
-                            )
+                            ),
+                            (() => {
+                                const savedVal = parseFloat(configRead('dimmingOpacity'));
+                                const idx = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0].indexOf(savedVal);
+                                return idx !== -1 ? idx : null;
+                            })()
                         )
                     }
                 }
@@ -480,7 +500,12 @@ export default function modernUI(update, parameters) {
                                 }
                             ]
                         )
-                    )
+                    ),
+                    (() => {
+                        const savedVal = parseFloat(configRead('speedSettingsIncrement'));
+                        const idx = [0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.45, 0.5].indexOf(savedVal);
+                        return idx !== -1 ? idx : null;
+                    })()
                 )
             }
         },
@@ -517,7 +542,12 @@ export default function modernUI(update, parameters) {
                                 }
                             ]
                         )
-                    )
+                    ),
+                    (() => {
+                        const savedVal = configRead('videoPreferredCodec');
+                        const idx = ['any', 'vp9', 'av01', 'avc1'].indexOf(savedVal);
+                        return idx !== -1 ? idx : null;
+                    })()
                 )
             }
         }
