@@ -12,6 +12,7 @@ function addListener() {
     videoPlayer.addEventListener('onStateChange', () => {
         const playerStateObject = videoPlayer.getPlayerStateObject();
         const videoData = videoPlayer.getVideoData();
+        if (window.queuedVideos.videos.length === 0) return;
         if (playerStateObject.isEnded) {
             const index = window.queuedVideos.videos.findIndex(v => v.tileRenderer.contentId === videoData.video_id);
             if (index !== -1) {

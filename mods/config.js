@@ -42,7 +42,7 @@ const defaultConfig = {
   dimmingOpacity: 0.5,
   enablePaidPromotionOverlay: true,
   speedSettingsIncrement: 0.25,
-  videoPreferredCodec: 'vp9'
+  videoPreferredCodec: 'any'
 };
 
 let localConfig;

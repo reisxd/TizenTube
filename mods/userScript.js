@@ -1,3 +1,4 @@
+import "./features/userAgentSpoofing.js";
 import "whatwg-fetch";
 import 'core-js/proposals/object-getownpropertydescriptors';
 import '@formatjs/intl-getcanonicallocales/polyfill.iife'
