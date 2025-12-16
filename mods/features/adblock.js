@@ -314,6 +314,10 @@ function addLongPress(items) {
     }
     if (!configRead('enableLongPress')) continue;
     const subtitle = item.tileRenderer.metadata.tileMetadataRenderer.lines[0].lineRenderer.items[0].lineItemRenderer.text;
+    let channelEndpoint = null;
+    if (item.tileRenderer.shortBylineText?.runs?.[0]?.navigationEndpoint) {
+      channelEndpoint = item.tileRenderer.shortBylineText.runs[0].navigationEndpoint;
+    }
     const data = longPressData({
       videoId: item.tileRenderer.contentId,
       thumbnails: item.tileRenderer.header.tileHeaderRenderer.thumbnail.thumbnails,
