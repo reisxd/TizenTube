@@ -184,68 +184,77 @@ function timelyAction(text, icon, command, triggerTimeMs, timeoutMs) {
             type: ''
         }
     }
-
 }
 
 function longPressData(data) {
-    return {
-        clickTrackingParams: null,
-        showMenuCommand: {
-            contentId: data.videoId,
-            thumbnail: {
-                thumbnails: data.thumbnails
+  const menuItems = [
+    MenuNavigationItemRenderer("Play", {
+      clickTrackingParams: null,
+      watchEndpoint: data.watchEndpointData,
+    }),
+    MenuServiceItemRenderer("Save to Watch Later", {
+      clickTrackingParams: null,
+      playlistEditEndpoint: {
+        playlistId: "WL",
+        actions: [
+          {
+            addedVideoId: data.videoId,
+            action: "ACTION_ADD_VIDEO",
+          },
+        ],
+      },
+    }),
+    MenuNavigationItemRenderer("Save to Playlist", {
+      clickTrackingParams: null,
+      addToPlaylistEndpoint: {
+        videoId: data.videoId,
+      },
+    }),
+    MenuServiceItemRenderer("Add to Queue", {
+      clickTrackingParams: null,
+      playlistEditEndpoint: {
+        customAction: {
+          action: "ADD_TO_QUEUE",
+          parameters: data.item,
+        },
+      },
+    }),
+  ];
+
+  if (data.channelEndpoint) {
+    menuItems.splice(
+      1,
+      0,
+      MenuNavigationItemRenderer("Go to Channel", data.channelEndpoint)
+    );
+  }
+
+  return {
+    clickTrackingParams: null,
+    showMenuCommand: {
+      contentId: data.videoId,
+      thumbnail: {
+        thumbnails: data.thumbnails,
+      },
+      title: {
+        simpleText: data.title,
+      },
+      subtitle: {
+        simpleText: data.subtitle,
+      },
+      menu: {
+        menuRenderer: {
+          items: menuItems,
+          trackingParams: null,
+          accessibility: {
+            accessibilityData: {
+              label: "Video options",
             },
-            title: {
-                simpleText: data.title
-            },
-            subtitle: {
-                simpleText: data.subtitle
-            },
-            menu: {
-                menuRenderer: {
-                    items: [
-                        MenuNavigationItemRenderer('Play', {
-                            clickTrackingParams: null,
-                            watchEndpoint: data.watchEndpointData
-                        }),
-                        MenuServiceItemRenderer('Save to Watch Later', {
-                            clickTrackingParams: null,
-                            playlistEditEndpoint: {
-                                playlistId: 'WL',
-                                actions: [
-                                    {
-                                        addedVideoId: data.videoId,
-                                        action: 'ACTION_ADD_VIDEO'
-                                    }
-                                ]
-                            }
-                        }),
-                        MenuNavigationItemRenderer('Save to Playlist', {
-                            clickTrackingParams: null,
-                            addToPlaylistEndpoint: {
-                                videoId: data.videoId
-                            }
-                        }),
-                        MenuServiceItemRenderer('Add to Queue', {
-                            clickTrackingParams: null,
-                            playlistEditEndpoint: {
-                                customAction: {
-                                    action: 'ADD_TO_QUEUE',
-                                    parameters: data.item
-                                }
-                            }
-                        }),
-                    ],
-                    trackingParams: null,
-                    accessibility: {
-                        accessibilityData: {
-                            label: 'Video options'
-                        }
-                    }
-                }
-            }
-        }
-    }
+          },
+        },
+      },
+    },
+  };
 }
 
 function MenuServiceItemRenderer(text, serviceEndpoint) {
