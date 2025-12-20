@@ -189,7 +189,7 @@ JSON.parse = function () {
       }
       r.playerOverlays.playerOverlayRenderer.timelyActionRenderers = timelyActions;
     }
-  } else if (r?.playerOverlays?.playerOverlayRenderer) {
+  } else if (r?.playerOverlays?.playerOverlayRenderers) {
     r.playerOverlays.playerOverlayRenderer.timelyActionRenderers = [];
   }
 
@@ -216,6 +216,10 @@ function processShelves(shelves, shouldAddPreviews = true) {
       }
       shelve.shelfRenderer.content.horizontalListRenderer.items = hideVideo(shelve.shelfRenderer.content.horizontalListRenderer.items);
       if (!configRead('enableShorts')) {
+        if (shelve.shelfRenderer.tvhtml5ShelfRendererType === 'TVHTML5_SHELF_RENDERER_TYPE_SHORTS') {
+          shelves.splice(shelves.indexOf(shelve), 1);
+          continue;
+        }
         shelve.shelfRenderer.content.horizontalListRenderer.items = shelve.shelfRenderer.content.horizontalListRenderer.items.filter(item => item.tileRenderer?.tvhtml5ShelfRendererType !== 'TVHTML5_TILE_RENDERER_TYPE_SHORTS');
       }
     }

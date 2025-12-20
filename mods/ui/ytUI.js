@@ -400,6 +400,22 @@ function TileRenderer(simpleText, onSelectCommand) {
     }
 }
 
+function QrCodeRenderer(url) {
+    return {
+        qrCodeRenderer: {
+            qrCodeImage: {
+                thumbnails: [
+                    {
+                        url
+                    }
+                ]
+            },
+            style: "QR_CODE_RENDERER_STYLE_ATA_SIDESHEET",
+            trackingParams: null
+        }
+    }
+}
+
 export {
     showToast,
     Modal,
@@ -415,5 +431,6 @@ export {
     SettingsCategory,
     SettingActionRenderer,
     ShelfRenderer,
-    TileRenderer
+    TileRenderer,
+    QrCodeRenderer
 }

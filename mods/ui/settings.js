@@ -1,6 +1,13 @@
 import { configRead } from '../config.js';
-import { showModal, buttonItem, overlayPanelItemListRenderer, scrollPaneRenderer, overlayMessageRenderer } from './ytUI.js';
+import { showModal, buttonItem, overlayPanelItemListRenderer, scrollPaneRenderer, overlayMessageRenderer, QrCodeRenderer } from './ytUI.js';
 import { getUserLanguageOptionName } from '../features/moreSubtitles.js';
+import qrcode from 'qrcode-npm';
+
+const donationQr = qrcode.qrcode(6, 'H');
+donationQr.addData('https://github.com/sponsors/reisxd');
+donationQr.make();
+const donationQrDataImgTag = donationQr.createImgTag(8, 8);
+const donationQrDataUrl = donationQrDataImgTag.match(/src="([^"]+)"/)[1];
 
 export default function modernUI(update, parameters) {
     const settings = [
@@ -19,6 +26,57 @@ export default function modernUI(update, parameters) {
                     overlayMessageRenderer('- GitHub Sponsors: https://github.com/sponsors/reisxd')
                 ])
             }
+        },
+        {
+            name: 'Social Media Links',
+            icon: 'PRIVACY_UNLISTED',
+            value: null,
+            options: [
+                {
+                    name: 'GitHub',
+                    link: 'https://github.com/reisxd/TizenTube',
+                },
+                {
+                    name: 'YouTube',
+                    link: 'https://www.youtube.com/@tizenbrew',
+                },
+                {
+                    name: 'Discord',
+                    link: 'https://discord.gg/m2P7v8Y2qR',
+                },
+                {
+                    name: 'Telegram (Announcements)',
+                    link: 'https://t.me/tizentubecobaltofficial',
+                },
+                {
+                    name: 'Telegram (Group)',
+                    link: 'https://t.me/tizentubeofficial',
+                },
+                {
+                    name: 'Website',
+                    link: 'https://tizentube.6513006.xyz',
+                }
+            ].map((option) => {
+                const qr = qrcode.qrcode(6, 'H');
+                qr.addData(option.link);
+                qr.make();
+                // '<img src="data:image/gif;base64,....." width="344" height="344"/>'
+                const qrDataImgTag = qr.createImgTag(8, 8);
+                const qrDataUrl = qrDataImgTag.match(/src="([^"]+)"/)[1];
+                return {
+                    name: option.name,
+                    icon: 'OPEN_IN_NEW',
+                    value: null,
+                    options: {
+                        title: option.name,
+                        subtitle: option.link,
+                        content: overlayPanelItemListRenderer([
+                            overlayMessageRenderer(`You can visit the ${option.name} page by scanning the QR code below.`),
+                            QrCodeRenderer(qrDataUrl)
+                        ])
+                    }
+                }
+            })
         },
         {
             name: 'Ad block',
@@ -193,6 +251,10 @@ export default function modernUI(update, parameters) {
                     name: 'Video Previews',
                     value: 'enablePreviews'
                 },
+                {
+                    name: 'Updater',
+                    value: 'enableUpdater'
+                }
             ]
         },
         {
@@ -550,6 +612,125 @@ export default function modernUI(update, parameters) {
                     })()
                 )
             }
+        },
+        {
+            name: 'Disable Sidebar Contents (Guide Actions)',
+            icon: 'MENU',
+            value: null,
+            arrayToEdit: 'disabledSidebarContents',
+            menuId: 'tt-sidebar-contents',
+            options: [
+                {
+                    name: 'Search',
+                    icon: 'SEARCH',
+                    value: 'SEARCH'
+                },
+                {
+                    name: 'Home',
+                    icon: 'WHAT_TO_WATCH',
+                    value: 'WHAT_TO_WATCH'
+                },
+                {
+                    name: 'Music',
+                    icon: 'YOUTUBE_MUSIC',
+                    value: 'YOUTUBE_MUSIC'
+                },
+                {
+                    name: 'Live',
+                    icon: 'LIVE',
+                    value: 'LIVE'
+                },
+                {
+                    name: 'Gaming',
+                    icon: 'GAMING',
+                    value: 'GAMING'
+                },
+                {
+                    name: 'Subscriptions',
+                    icon: 'SUBSCRIPTIONS',
+                    value: 'SUBSCRIPTIONS'
+                },
+                {
+                    name: 'Library',
+                    icon: 'TAB_LIBRARY',
+                    value: 'TAB_LIBRARY'
+                },
+                {
+                    name: 'More',
+                    icon: 'TAB_MORE',
+                    value: 'TAB_MORE'
+                }
+            ]
+        },
+        {
+            name: 'Launch to on startup',
+            icon: 'TV',
+            options: [
+                {
+                    name: 'Search',
+                    icon: 'SEARCH',
+                    key: 'launchToOnStartup',
+                    value: JSON.stringify({
+                        searchEndpoint: { query: '' }
+                    })
+                },
+                {
+                    name: 'Home',
+                    icon: 'WHAT_TO_WATCH',
+                    key: 'launchToOnStartup',
+                    value: JSON.stringify({
+                        browseEndpoint: { browseId: 'FEtopics' }
+                    })
+                },
+                {
+                    name: 'Music',
+                    icon: 'YOUTUBE_MUSIC',
+                    key: 'launchToOnStartup',
+                    value: JSON.stringify({
+                        browseEndpoint: { browseId: 'FEtopics_music' }
+                    })
+                },
+                {
+                    name: 'Gaming',
+                    icon: 'GAMING',
+                    key: 'launchToOnStartup',
+                    value: JSON.stringify({
+                        browseEndpoint: { browseId: 'FEtopics_gaming' }
+                    })
+                },
+                {
+                    name: 'Live',
+                    icon: 'LIVE',
+                    key: 'launchToOnStartup',
+                    value: JSON.stringify({
+                        browseEndpoint: { browseId: 'FEtopics_live' }
+                    })
+                },
+                {
+                    name: 'Subscriptions',
+                    icon: 'SUBSCRIPTIONS',
+                    key: 'launchToOnStartup',
+                    value: JSON.stringify({
+                        browseEndpoint: { browseId: 'FEsubscriptions' }
+                    })
+                },
+                {
+                    name: 'Library',
+                    icon: 'TAB_LIBRARY',
+                    key: 'launchToOnStartup',
+                    value: JSON.stringify({
+                        browseEndpoint: { browseId: 'FElibrary' }
+                    })
+                },
+                {
+                    name: 'More',
+                    icon: 'TAB_MORE',
+                    key: 'launchToOnStartup',
+                    value: JSON.stringify({
+                        browseEndpoint: { browseId: 'FEtopics_more' }
+                    })
+                }
+            ]
         }
     ];
 
@@ -594,7 +775,9 @@ export default function modernUI(update, parameters) {
                                 parameters: {
                                     options: setting.options,
                                     selectedIndex: 0,
-                                    update: setting.options?.title ? 'customUI' : false
+                                    update: setting.options?.title ? 'customUI' : false,
+                                    menuId: setting.menuId,
+                                    arrayToEdit: setting.arrayToEdit
                                 }
                             }
                         }
@@ -640,7 +823,7 @@ export function optionShow(parameters, update) {
         for (const option of parameters.options) {
             buttons.push(
                 buttonItem(
-                    { title: option.name },
+                    { title: option.name, subtitle: option.subtitle },
                     {
                         icon: option.icon ? option.icon : 'CHEVRON_DOWN',
                         secondaryIcon: value.includes(option.value) ? 'CHECK_BOX' : 'CHECK_BOX_OUTLINE_BLANK'
@@ -678,13 +861,14 @@ export function optionShow(parameters, update) {
         // New handling for boolean-based options (like subtitle localization)
         let index = 0;
         for (const option of parameters.options) {
-            const currentVal = configRead(option.value);
+            const isRadioChoice = option.key !== null && option.key !== undefined;
+            const currentVal = configRead(isRadioChoice ? option.key : option.value);
             buttons.push(
                 buttonItem(
-                    { title: option.name },
+                    { title: option.name, subtitle: option.subtitle },
                     {
                         icon: option.icon ? option.icon : 'CHEVRON_DOWN',
-                        secondaryIcon: option.value === null ? 'CHEVRON_RIGHT' : currentVal ? 'CHECK_BOX' : 'CHECK_BOX_OUTLINE_BLANK'
+                        secondaryIcon: isRadioChoice ? currentVal === option.value ? 'RADIO_BUTTON_CHECKED' : 'RADIO_BUTTON_UNCHECKED' : option.value === null ? 'CHEVRON_RIGHT' : currentVal ? 'CHECK_BOX' : 'CHECK_BOX_OUTLINE_BLANK'
                     },
                     option.value === null ? [
                         {
@@ -699,7 +883,32 @@ export function optionShow(parameters, update) {
                                 }
                             }
                         }
-                    ] : [
+                    ] : option.key !== null ? [
+                        {
+                            setClientSettingEndpoint: {
+                                settingDatas: [
+                                    {
+                                        clientSettingEnum: {
+                                            item: option.key
+                                        },
+                                        stringValue: option.value
+                                    }
+                                ]
+                            }
+                        },
+                        {
+                            customAction: {
+                                action: 'OPTIONS_SHOW',
+                                parameters: {
+                                    options: parameters.options,
+                                    selectedIndex: index,
+                                    update: option.options?.title ? 'customUI' : true,
+                                    menuId: parameters.menuId,
+                                    arrayToEdit: option.arrayToEdit
+                                }
+                            }
+                        }
+                    ]: [
                         {
                             setClientSettingEndpoint: {
                                 settingDatas: [

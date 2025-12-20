@@ -42,7 +42,10 @@ const defaultConfig = {
   dimmingOpacity: 0.5,
   enablePaidPromotionOverlay: true,
   speedSettingsIncrement: 0.25,
-  videoPreferredCodec: 'any'
+  videoPreferredCodec: 'any',
+  launchToOnStartup: null,
+  disabledSidebarContents: [],
+  enableUpdater: true
 };
 
 let localConfig;
@@ -83,6 +86,10 @@ export const configChangeEmitter = {
   dispatchEvent(event) {
     const type = event.type;
     if (!this.listeners[type]) return;
-    this.listeners[type].forEach(cb => cb.call(this, event));
+    this.listeners[type].forEach(cb => {
+      try {
+        cb.call(this, event)
+      } catch (_) {};
+    });
   }
 };

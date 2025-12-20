@@ -4,7 +4,7 @@ import { buttonItem, showModal, showToast, overlayPanelItemListRenderer } from '
 import { configRead } from '../config.js';
 
 // If TizenTube is not running on Cobalt, do nothing
-if (window.h5vcc && window.h5vcc.tizentube) {
+if (window.h5vcc && window.h5vcc.tizentube && configRead('enableUpdater')) {
     const currentAppVersion = window.h5vcc.tizentube.GetVersion();
 
     function getLatestRelease() {

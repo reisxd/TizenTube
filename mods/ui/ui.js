@@ -7,6 +7,7 @@ import { showToast } from './ytUI.js';
 import modernUI from './settings.js';
 import resolveCommand, { patchResolveCommand } from '../resolveCommand.js';
 import { pipToFullscreen } from '../features/pictureInPicture.js';
+import getCommandExecutor from './customCommandExecution.js';
 
 // It just works, okay?
 const interval = setInterval(() => {
@@ -199,6 +200,15 @@ function execute_once_dom_loaded() {
       signal: 'SOFT_RELOAD_PAGE'
     }
   });
+
+  if (configRead('launchToOnStartup')) {
+    resolveCommand(JSON.parse(configRead('launchToOnStartup')));
+  }
+
+  const commandExecutor = getCommandExecutor();
+  if (commandExecutor) {
+    commandExecutor.executeFunction(new commandExecutor.commandFunction('reloadGuideAction'));
+  }
 
   // Fix UI issues, again. Love, Googol.
 
