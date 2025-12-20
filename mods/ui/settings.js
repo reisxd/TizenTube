@@ -631,6 +631,11 @@ export default function modernUI(update, parameters) {
                     value: 'WHAT_TO_WATCH'
                 },
                 {
+                    name: 'Sports',
+                    icon: 'UNPLUGGED_SPORTS',
+                    value: 'UNPLUGGED_SPORTS'
+                },
+                {
                     name: 'Music',
                     icon: 'YOUTUBE_MUSIC',
                     value: 'YOUTUBE_MUSIC'
@@ -680,6 +685,14 @@ export default function modernUI(update, parameters) {
                     key: 'launchToOnStartup',
                     value: JSON.stringify({
                         browseEndpoint: { browseId: 'FEtopics' }
+                    })
+                },
+                {
+                    name: 'Sports',
+                    icon: 'UNPLUGGED_SPORTS',
+                    key: 'launchToOnStartup',
+                    value: JSON.stringify({
+                        browseEndpoint: { browseId: 'FEtopics_sports' }
                     })
                 },
                 {
@@ -883,7 +896,7 @@ export function optionShow(parameters, update) {
                                 }
                             }
                         }
-                    ] : option.key !== null ? [
+                    ] : option.key !== null && option.key !== undefined ? [
                         {
                             setClientSettingEndpoint: {
                                 settingDatas: [
