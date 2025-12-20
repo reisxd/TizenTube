@@ -94,7 +94,7 @@ function applyPatches() {
 
         const engagementActionButton = functions.find(func => func.rhs.includes('props.data.engagementActions')).left.split('.')[1];
 
-        if (engagementActionButton) {
+        if (engagementActionButton && configRead('enableSpeedControlsButton')) {
             const origEngagementActionButton = inst[engagementActionButton];
             inst[engagementActionButton] = function () {
                 const res = origEngagementActionButton.apply(this, arguments);

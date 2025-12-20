@@ -29,6 +29,7 @@ const defaultConfig = {
   showWelcomeToast: true,
   enablePreviousNextButtons: true,
   enableSuperThanksButton: false,
+  enableSpeedControlsButton: true,
   enablePatchingVideoPlayer: true,
   enablePreviews: true,
   enableHideWatchedVideos: false,

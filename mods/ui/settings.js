@@ -295,6 +295,11 @@ export default function modernUI(update, parameters) {
                     name: 'Super Thanks Button',
                     icon: 'SUPER_THANKS',
                     value: 'enableSuperThanksButton'
+                },
+                {
+                    name: 'Speed Controls Button',
+                    icon: 'SLOW_MOTION_VIDEO',
+                    value: 'enableSpeedControlsButton'
                 }
             ]
         },
@@ -641,6 +646,16 @@ export default function modernUI(update, parameters) {
                     value: 'YOUTUBE_MUSIC'
                 },
                 {
+                    name: 'Podcasts',
+                    icon: 'BROADCAST',
+                    value: 'BROADCAST'
+                },
+                {
+                    name: 'Movies & TV',
+                    icon: 'CLAPPERBOARD',
+                    value: 'CLAPPERBOARD'
+                },
+                {
                     name: 'Live',
                     icon: 'LIVE',
                     value: 'LIVE'
@@ -701,6 +716,22 @@ export default function modernUI(update, parameters) {
                     key: 'launchToOnStartup',
                     value: JSON.stringify({
                         browseEndpoint: { browseId: 'FEtopics_music' }
+                    })
+                },
+                {
+                    name: 'Podcasts',
+                    icon: 'BROADCAST',
+                    key: 'launchToOnStartup',
+                    value: JSON.stringify({
+                        browseEndpoint: { browseId: 'FEtopics_podcasts' }
+                    })
+                },
+                {
+                    name: 'Movies & TV',
+                    icon: 'CLAPPERBOARD',
+                    key: 'launchToOnStartup',
+                    value: JSON.stringify({
+                        browseEndpoint: { browseId: 'FEtopics_movies' }
                     })
                 },
                 {
@@ -921,7 +952,7 @@ export function optionShow(parameters, update) {
                                 }
                             }
                         }
-                    ]: [
+                    ] : [
                         {
                             setClientSettingEndpoint: {
                                 settingDatas: [
