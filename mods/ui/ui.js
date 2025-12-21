@@ -195,14 +195,14 @@ function execute_once_dom_loaded() {
     }, 2000);
   }
 
-  resolveCommand({
-    signalAction: {
-      signal: 'SOFT_RELOAD_PAGE'
-    }
-  });
-
   if (configRead('launchToOnStartup')) {
     resolveCommand(JSON.parse(configRead('launchToOnStartup')));
+  } else {
+    resolveCommand({
+      signalAction: {
+        signal: 'SOFT_RELOAD_PAGE'
+      }
+    });
   }
 
   const commandExecutor = getCommandExecutor();

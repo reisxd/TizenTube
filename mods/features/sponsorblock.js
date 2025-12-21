@@ -43,6 +43,11 @@ const barTypes = {
     color: '#ff9900',
     opacity: '0.7',
     name: 'non-music part'
+  },
+  poi_highlight: {
+    color: '#9b044c',
+    opacity: '0.7',
+    name: 'highlight'
   }
 };
 
@@ -78,7 +83,8 @@ class SponsorBlockHandler {
       'selfpromo',
       'preview',
       'filler',
-      'music_offtopic'
+      'music_offtopic',
+      'poi_highlight'
     ];
     const resp = await fetch(
       `${sponsorblockAPI}/skipSegments/${videoHash}?categories=${encodeURIComponent(
@@ -205,7 +211,7 @@ class SponsorBlockHandler {
       elm.style.setProperty('background-color', barType.color, 'important');
       elm.style.setProperty('opacity', barType.opacity, 'important');
       elm.style.setProperty('height', '100%', 'important');
-      elm.style.setProperty('width', `${widthPercent}%`, 'important');
+      elm.style.setProperty('width', `${segment.category === 'poi_highlight' ? 1 : widthPercent}%`, 'important');
       elm.style.setProperty('left', `${leftPercent}%`, 'important');
       elm.style.setProperty('position', 'absolute', 'important');
       console.info('Generated element', elm, 'from', segment);

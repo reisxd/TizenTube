@@ -3,12 +3,6 @@ import { showModal, buttonItem, overlayPanelItemListRenderer, scrollPaneRenderer
 import { getUserLanguageOptionName } from '../features/moreSubtitles.js';
 import qrcode from 'qrcode-npm';
 
-const donationQr = qrcode.qrcode(6, 'H');
-donationQr.addData('https://github.com/sponsors/reisxd');
-donationQr.make();
-const donationQrDataImgTag = donationQr.createImgTag(8, 8);
-const donationQrDataUrl = donationQrDataImgTag.match(/src="([^"]+)"/)[1];
-
 export default function modernUI(update, parameters) {
     const settings = [
         {
@@ -60,7 +54,7 @@ export default function modernUI(update, parameters) {
                 const qr = qrcode.qrcode(6, 'H');
                 qr.addData(option.link);
                 qr.make();
-                // '<img src="data:image/gif;base64,....." width="344" height="344"/>'
+
                 const qrDataImgTag = qr.createImgTag(8, 8);
                 const qrDataUrl = qrDataImgTag.match(/src="([^"]+)"/)[1];
                 return {
@@ -88,6 +82,10 @@ export default function modernUI(update, parameters) {
             icon: 'MONEY_HAND',
             value: null,
             menuId: 'tt-sponsorblock-settings',
+            menuHeader: {
+                title: 'SponsorBlock Settings',
+                subtitle: 'https://sponsor.ajay.app/'
+            },
             options: [
                 {
                     name: 'Enable SponsorBlock',
@@ -177,6 +175,11 @@ export default function modernUI(update, parameters) {
                             name: 'Skip Off-Topic Music Segments',
                             value: 'enableSponsorBlockMusicOfftopic'
                         },
+                        {
+                            name: 'Highlights',
+                            icon: 'LOCATION_POINT',
+                            value: 'enableSponsorBlockHighlight'
+                        }
                     ]
                 }
             ]
@@ -185,6 +188,10 @@ export default function modernUI(update, parameters) {
             name: 'DeArrow',
             icon: 'VISIBILITY_OFF',
             value: null,
+            menuHeader: {
+                title: 'DeArrow Settings',
+                subtitle: 'https://dearrow.ajay.app/'
+            },
             options: [
                 {
                     name: 'Enable DeArrow',
@@ -252,8 +259,8 @@ export default function modernUI(update, parameters) {
                     value: 'enablePreviews'
                 },
                 {
-                    name: 'Updater',
-                    value: 'enableUpdater'
+                    name: 'Welcome Message',
+                    value: 'showWelcomeToast',
                 }
             ]
         },
@@ -273,515 +280,438 @@ export default function modernUI(update, parameters) {
             ]
         },
         {
-            name: 'Welcome Message',
-            value: 'showWelcomeToast',
-        },
-        {
-            name: 'Patch Video Player',
-            icon: 'SETTINGS',
+            name: 'Video Player Settings',
+            icon: 'VIDEO_YOUTUBE',
             value: null,
+            menuHeader: {
+                title: 'Video Player Settings',
+                subtitle: 'Customize video player features'
+            },
             options: [
                 {
-                    name: 'Enable Video Player Patching',
+                    name: 'Patch Video Player UI',
                     icon: 'SETTINGS',
-                    value: 'enablePatchingVideoPlayer'
+                    value: null,
+                    menuId: 'tt-video-player-ui-patching',
+                    options: [
+                        {
+                            name: 'Enable Video Player UI Patching',
+                            icon: 'SETTINGS',
+                            value: 'enablePatchingVideoPlayer'
+                        },
+                        {
+                            name: 'Previous and Next Buttons',
+                            icon: 'SKIP_NEXT',
+                            value: 'enablePreviousNextButtons'
+                        },
+                        {
+                            name: 'Super Thanks Button',
+                            icon: 'MONEY_HEART',
+                            value: 'enableSuperThanksButton'
+                        },
+                        {
+                            name: 'Speed Controls Button',
+                            icon: 'SLOW_MOTION_VIDEO',
+                            value: 'enableSpeedControlsButton'
+                        }
+                    ]
                 },
                 {
-                    name: 'Previous and Next Buttons',
-                    icon: 'SKIP_NEXT',
-                    value: 'enablePreviousNextButtons'
+                    name: 'Preferred Video Quality',
+                    icon: 'VIDEO_QUALITY',
+                    value: null,
+                    menuId: 'tt-preferred-video-quality',
+                    menuHeader: {
+                        title: 'Preferred Video Quality',
+                        subtitle: 'Choose the preferred or next best video quality applied when playback starts'
+                    },
+                    options:
+                        ['Auto', '2160p', '1440p', '1080p', '720p', '480p', '360p', '240p', '144p'].map((quality) => {
+                            return {
+                                name: quality,
+                                key: 'preferredVideoQuality',
+                                value: quality.toLowerCase()
+                            }
+                        })
+
                 },
                 {
-                    name: 'Super Thanks Button',
-                    icon: 'SUPER_THANKS',
-                    value: 'enableSuperThanksButton'
-                },
-                {
-                    name: 'Speed Controls Button',
+                    name: 'Speed Settings Increments',
                     icon: 'SLOW_MOTION_VIDEO',
-                    value: 'enableSpeedControlsButton'
-                }
+                    value: null,
+                    menuId: 'tt-speed-settings-increments',
+                    menuHeader: {
+                        title: 'Speed Settings Increments',
+                        subtitle: 'Set the speed increments for video playback speed adjustments'
+                    },
+                    options: [0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.45, 0.5].map((increment) => {
+                        return {
+                            name: `${increment}x`,
+                            key: 'speedSettingsIncrement',
+                            value: increment
+                        }
+                    })
+                },
+                {
+                    name: 'Preferred Video Codec',
+                    icon: 'VIDEO_QUALITY',
+                    value: null,
+                    menuId: 'tt-preferred-video-codec',
+                    menuHeader: {
+                        title: 'Preferred Video Codec',
+                        subtitle: 'Choose the preferred video codec for playback',
+                    },
+                    options: ['any', 'vp9', 'av01', 'avc1'].map((codec) => {
+                        return {
+                            name: codec === 'any' ? 'Any' : codec.toUpperCase(),
+                            key: 'preferredVideoCodec',
+                            value: codec
+                        }
+                    })
+                },
             ]
         },
         {
-            name: 'Preferred Video Quality',
-            icon: 'VIDEO_QUALITY',
+            name: 'User Interface Settings',
+            icon: 'SETTINGS',
             value: null,
-            options: {
-                title: 'Preferred Video Quality',
-                subtitle: 'Choose the preferred or next best video quality applied when playback starts',
-                content: overlayPanelItemListRenderer(
-                    ['Auto', '2160p', '1440p', '1080p', '720p', '480p', '360p', '240p', '144p'].map((quality) =>
-                        buttonItem(
-                            { title: quality },
-                            { icon: '' },
-                            [
-                                {
-                                    setClientSettingEndpoint: {
-                                        settingDatas: [
-                                            {
-                                                clientSettingEnum: {
-                                                    item: 'preferredVideoQuality'
-                                                },
-                                                stringValue: quality === 'Auto' ? 'auto' : quality
-                                            }
-                                        ]
-                                    }
-                                },
-                                {
-                                    customAction: {
-                                        action: 'SHOW_TOAST',
-                                        parameters: `Preferred quality set to ${quality}`
-                                    }
-                                }
-                            ]
-                        )
-                    ),
-                    (() => {
-                        const savedVal = configRead('preferredVideoQuality');
-                        const idx = ['auto', '2160p', '1440p', '1080p', '720p', '480p', '360p', '240p', '144p'].indexOf(savedVal);
-                        return idx !== -1 ? idx : null;
-                    })()
-                )
-            }
-        },
-        {
-            name: 'Hide Watched Videos',
-            icon: 'VISIBILITY_OFF',
-            value: null,
+            menuHeader: {
+                title: 'User Interface Settings',
+                subtitle: 'Customize the UI to your liking'
+            },
             options: [
                 {
-                    name: 'Enable Hide Watched Videos',
+                    name: 'Hide Watched Videos',
                     icon: 'VISIBILITY_OFF',
-                    value: 'enableHideWatchedVideos'
-                },
-                {
-                    name: 'Watched Videos Threshold',
                     value: null,
-                    options: {
-                        title: 'Watched Videos Threshold',
-                        subtitle: 'Set the percentage threshold for hiding watched videos',
-                        content: overlayPanelItemListRenderer(
-                            [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100].map((percent) =>
-                                buttonItem(
-                                    { title: `${percent}%` },
-                                    {
-                                        icon: 'CHEVRON_DOWN'
-                                    },
-                                    [
-                                        {
-                                            setClientSettingEndpoint: {
-                                                settingDatas: [
-                                                    {
-                                                        clientSettingEnum: {
-                                                            item: 'hideWatchedVideosThreshold'
-                                                        },
-                                                        intValue: percent.toString()
-                                                    }
-                                                ]
-                                            }
-                                        },
-                                        {
-                                            customAction: {
-                                                action: 'SHOW_TOAST',
-                                                parameters: `Watched videos threshold set to ${percent}%`
-                                            }
-                                        }
-                                    ]
-                                )
-
-                            ),
-                            (() => {
-                                const savedVal = parseFloat(configRead('hideWatchedVideosThreshold'));
-                                const idx = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100].indexOf(savedVal);
-                                return idx !== -1 ? idx : null;
-                            })()
-                        )
-                    }
-                },
-                {
-                    name: 'Set Pages to Hide Watched Videos',
-                    value: null,
-                    arrayToEdit: 'hideWatchedVideosPages',
-                    menuId: 'tt-hide-watched-videos-pages',
+                    menuId: 'tt-hide-watched-videos-settings',
                     options: [
                         {
-                            name: 'Search Results',
-                            value: 'search'
+                            name: 'Enable Hide Watched Videos',
+                            icon: 'VISIBILITY_OFF',
+                            value: 'enableHideWatchedVideos'
+                        },
+                        {
+                            name: 'Watched Videos Threshold',
+                            value: null,
+                            menuId: 'tt-hide-watched-videos-threshold',
+                            menuHeader: {
+                                title: 'Watched Videos Threshold',
+                                subtitle: 'Set the percentage threshold for hiding watched videos'
+                            },
+                            options: [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100].map((percent) => {
+                                return {
+                                    name: `${percent}%`,
+                                    key: 'hideWatchedVideosThreshold',
+                                    value: percent
+                                }
+                            })
+                        },
+                        {
+                            name: 'Set Pages to Hide Watched Videos',
+                            value: null,
+                            arrayToEdit: 'hideWatchedVideosPages',
+                            menuId: 'tt-hide-watched-videos-pages',
+                            options: [
+                                {
+                                    name: 'Search Results',
+                                    value: 'search'
+                                },
+                                {
+                                    name: 'Home',
+                                    value: 'home'
+                                },
+                                {
+                                    name: 'Music',
+                                    value: 'music'
+                                },
+                                {
+                                    name: 'Gaming',
+                                    value: 'gaming'
+                                },
+                                {
+                                    name: 'Subscriptions',
+                                    value: 'subscriptions'
+                                },
+                                {
+                                    name: 'Library',
+                                    value: 'library'
+                                },
+                                {
+                                    name: 'More',
+                                    value: 'more'
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    name: 'Screen Dimming',
+                    icon: 'EYE_OFF',
+                    value: null,
+                    menuId: 'tt-screen-dimming-settings',
+                    options: [
+                        {
+                            name: 'Enable Screen Dimming',
+                            icon: 'EYE_OFF',
+                            value: 'enableScreenDimming'
+                        },
+                        {
+                            name: 'Dimming Timeout',
+                            icon: 'TIMER',
+                            value: null,
+                            menuId: 'tt-dimming-timeout',
+                            menuHeader: {
+                                title: 'Dimming Timeout',
+                                subtitle: 'Set the inactivity timeout (in seconds) before the screen dims'
+                            },
+                            options: [10, 20, 30, 60, 120, 180, 240, 300].map((seconds) => {
+                                const title = seconds >= 60 ? `${seconds / 60} minute${seconds / 60 > 1 ? 's' : ''}` : `${seconds} seconds`;
+                                return {
+                                    name: title,
+                                    key: 'dimmingTimeout',
+                                    value: seconds
+                                }
+                            })
+                        },
+                        {
+                            name: 'Dimming Opacity',
+                            icon: 'LENS_BLUE',
+                            value: null,
+                            menuId: 'tt-dimming-opacity',
+                            menuHeader: {
+                                title: 'Dimming Opacity',
+                                subtitle: 'Set the opacity level for screen dimming'
+                            },
+                            options: [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0].map((opacity) => {
+                                return {
+                                    name: `${Math.round(opacity * 100)}%`,
+                                    key: 'dimmingOpacity',
+                                    value: opacity
+                                }
+                            })
+                        }
+                    ]
+                },
+                {
+                    name: 'Disable Sidebar Contents (Guide Actions)',
+                    icon: 'MENU',
+                    value: null,
+                    arrayToEdit: 'disabledSidebarContents',
+                    menuId: 'tt-sidebar-contents',
+                    menuHeader: {
+                        title: 'Disable Sidebar Contents',
+                        subtitle: 'Select sidebar contents (guide actions) to disable'
+                    },
+                    options: [
+                        {
+                            name: 'Search',
+                            icon: 'SEARCH',
+                            value: 'SEARCH'
                         },
                         {
                             name: 'Home',
-                            value: 'home'
+                            icon: 'WHAT_TO_WATCH',
+                            value: 'WHAT_TO_WATCH'
+                        },
+                        {
+                            name: 'Sports',
+                            icon: 'TROPHY',
+                            value: 'TROPHY'
+                        },
+                        {
+                            name: 'News',
+                            icon: 'NEWS',
+                            value: 'NEWS'
                         },
                         {
                             name: 'Music',
-                            value: 'music'
+                            icon: 'YOUTUBE_MUSIC',
+                            value: 'YOUTUBE_MUSIC'
+                        },
+                        {
+                            name: 'Podcasts',
+                            icon: 'BROADCAST',
+                            value: 'BROADCAST'
+                        },
+                        {
+                            name: 'Movies & TV',
+                            icon: 'CLAPPERBOARD',
+                            value: 'CLAPPERBOARD'
+                        },
+                        {
+                            name: 'Live',
+                            icon: 'LIVE',
+                            value: 'LIVE'
                         },
                         {
                             name: 'Gaming',
-                            value: 'gaming'
+                            icon: 'GAMING',
+                            value: 'GAMING'
                         },
                         {
                             name: 'Subscriptions',
-                            value: 'subscriptions'
+                            icon: 'SUBSCRIPTIONS',
+                            value: 'SUBSCRIPTIONS'
                         },
                         {
                             name: 'Library',
-                            value: 'library'
+                            icon: 'TAB_LIBRARY',
+                            value: 'TAB_LIBRARY'
                         },
                         {
                             name: 'More',
-                            value: 'more'
+                            icon: 'TAB_MORE',
+                            value: 'TAB_MORE'
+                        }
+                    ]
+                },
+                {
+                    name: 'Launch to on startup',
+                    icon: 'TV',
+                    value: null,
+                    menuId: 'tt-launch-to-on-startup',
+                    menuHeader: {
+                        title: 'Launch to on startup',
+                        subtitle: 'Choose the default page TizenTube opens to on startup'
+                    },
+                    options: [
+                        {
+                            name: 'Search',
+                            icon: 'SEARCH',
+                            key: 'launchToOnStartup',
+                            value: JSON.stringify({
+                                searchEndpoint: { query: '' }
+                            })
+                        },
+                        {
+                            name: 'Home',
+                            icon: 'WHAT_TO_WATCH',
+                            key: 'launchToOnStartup',
+                            value: JSON.stringify({
+                                browseEndpoint: { browseId: 'FEtopics' }
+                            })
+                        },
+                        {
+                            name: 'Sports',
+                            icon: 'TROPHY',
+                            key: 'launchToOnStartup',
+                            value: JSON.stringify({
+                                browseEndpoint: { browseId: 'FEtopics_sports' }
+                            })
+                        },
+                        {
+                            name: 'News',
+                            icon: 'NEWS',
+                            key: 'launchToOnStartup',
+                            value: JSON.stringify({
+                                browseEndpoint: { browseId: 'FEtopics_news' }
+                            })
+                        },
+                        {
+                            name: 'Music',
+                            icon: 'YOUTUBE_MUSIC',
+                            key: 'launchToOnStartup',
+                            value: JSON.stringify({
+                                browseEndpoint: { browseId: 'FEtopics_music' }
+                            })
+                        },
+                        {
+                            name: 'Podcasts',
+                            icon: 'BROADCAST',
+                            key: 'launchToOnStartup',
+                            value: JSON.stringify({
+                                browseEndpoint: { browseId: 'FEtopics_podcasts' }
+                            })
+                        },
+                        {
+                            name: 'Movies & TV',
+                            icon: 'CLAPPERBOARD',
+                            key: 'launchToOnStartup',
+                            value: JSON.stringify({
+                                browseEndpoint: { browseId: 'FEtopics_movies' }
+                            })
+                        },
+                        {
+                            name: 'Gaming',
+                            icon: 'GAMING',
+                            key: 'launchToOnStartup',
+                            value: JSON.stringify({
+                                browseEndpoint: { browseId: 'FEtopics_gaming' }
+                            })
+                        },
+                        {
+                            name: 'Live',
+                            icon: 'LIVE',
+                            key: 'launchToOnStartup',
+                            value: JSON.stringify({
+                                browseEndpoint: { browseId: 'FEtopics_live' }
+                            })
+                        },
+                        {
+                            name: 'Subscriptions',
+                            icon: 'SUBSCRIPTIONS',
+                            key: 'launchToOnStartup',
+                            value: JSON.stringify({
+                                browseEndpoint: { browseId: 'FEsubscriptions' }
+                            })
+                        },
+                        {
+                            name: 'Library',
+                            icon: 'TAB_LIBRARY',
+                            key: 'launchToOnStartup',
+                            value: JSON.stringify({
+                                browseEndpoint: { browseId: 'FElibrary' }
+                            })
+                        },
+                        {
+                            name: 'More',
+                            icon: 'TAB_MORE',
+                            key: 'launchToOnStartup',
+                            value: JSON.stringify({
+                                browseEndpoint: { browseId: 'FEtopics_more' }
+                            })
                         }
                     ]
                 }
             ]
         },
-        {
-            name: 'Screen Dimming',
-            icon: 'EYE_OFF',
-            value: null,
-            options: [
-                {
-                    name: 'Enable Screen Dimming',
-                    icon: 'EYE_OFF',
-                    value: 'enableScreenDimming'
+        window.h5vcc && window.h5vcc.tizentube ?
+            {
+                name: 'TizenTube Cobalt Updater',
+                icon: 'SYSTEM_UPDATE',
+                value: null,
+                menuHeader: {
+                    title: 'TizenTube Cobalt Updater',
+                    subtitle: 'Manage TizenTube Cobalt updates'
                 },
-                {
-                    name: 'Dimming Timeout',
-                    icon: 'TIMER',
-                    value: null,
-                    options: {
-                        title: 'Dimming Timeout',
-                        subtitle: 'Set the inactivity timeout (in seconds) before the screen dims',
-                        content: overlayPanelItemListRenderer(
-                            [10, 20, 30, 60, 120, 180, 240, 300].map((seconds) => {
-                                const title = seconds >= 60 ? `${seconds / 60} minute${seconds / 60 > 1 ? 's' : ''}` : `${seconds} seconds`;
-                                return buttonItem(
-                                    { title: title },
-                                    { icon: 'CHEVRON_DOWN' },
-                                    [
-                                        {
-                                            setClientSettingEndpoint: {
-                                                settingDatas: [
-                                                    {
-                                                        clientSettingEnum: {
-                                                            item: 'dimmingTimeout'
-                                                        },
-                                                        intValue: seconds.toString()
-                                                    }
-                                                ]
-                                            }
-                                        },
-                                        {
-                                            customAction: {
-                                                action: 'SHOW_TOAST',
-                                                parameters: `Dimming timeout set to ${title}`
-                                            }
-                                        }
-                                    ]
-                                );
-                            }),
-                            (() => {
-                                const savedVal = parseFloat(configRead('dimmingTimeout'));
-                                const idx = [10, 20, 30, 60, 120, 180, 240, 300].indexOf(savedVal);
-                                return idx !== -1 ? idx : null;
-                            })()
-                        )
-                    }
-                },
-                {
-                    name: 'Dimming Opacity',
-                    icon: 'LENS_BLUE',
-                    value: null,
-                    options: {
-                        title: 'Dimming Opacity',
-                        subtitle: 'Set the opacity level for screen dimming',
-                        content: overlayPanelItemListRenderer(
-                            [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0].map((opacity) =>
-                                buttonItem(
-                                    { title: `${Math.round(opacity * 100)}%` },
-                                    { icon: 'CHEVRON_DOWN' },
-                                    [
-                                        {
-                                            setClientSettingEndpoint: {
-                                                settingDatas: [
-                                                    {
-                                                        clientSettingEnum: {
-                                                            item: 'dimmingOpacity'
-                                                        },
-                                                        intValue: opacity
-                                                    }
-                                                ]
-                                            }
-                                        },
-                                        {
-                                            customAction: {
-                                                action: 'SHOW_TOAST',
-                                                parameters: `Dimming opacity set to ${Math.round(opacity * 100)}%`
-                                            }
-                                        }
-                                    ]
-                                )
-                            ),
-                            (() => {
-                                const savedVal = parseFloat(configRead('dimmingOpacity'));
-                                const idx = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0].indexOf(savedVal);
-                                return idx !== -1 ? idx : null;
-                            })()
-                        )
-                    }
-                }
-            ]
-        },
-        {
-            name: 'Speed Settings Increments',
-            icon: 'SLOW_MOTION_VIDEO',
-            value: null,
-            options: {
-                title: 'Speed Settings Increments',
-                subtitle: 'Set the speed increments for video playback speed adjustments',
-                content: overlayPanelItemListRenderer(
-                    [0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.45, 0.5].map((increment) =>
-                        buttonItem(
-                            { title: `${increment}x` },
-                            { icon: 'CHEVRON_DOWN' },
-                            [
-                                {
-                                    setClientSettingEndpoint: {
-                                        settingDatas: [
-                                            {
-                                                clientSettingEnum: {
-                                                    item: 'speedSettingsIncrement'
-                                                },
-                                                intValue: increment.toString()
-                                            }
-                                        ]
-                                    }
-                                },
-                                {
-                                    customAction: {
-                                        action: 'SHOW_TOAST',
-                                        parameters: `Speed settings increment set to ${increment}x`
-                                    }
+                subtitle: `Current version: ${window.h5vcc.tizentube.GetVersion()}`,
+                options: [
+                    buttonItem(
+                        { title: 'Check for Updates' },
+                        { icon: 'SYSTEM_UPDATE' },
+                        [
+                            {
+                                customAction: {
+                                    action: 'CHECK_FOR_UPDATES',
                                 }
-                            ]
-                        )
+                            }
+                        ]
                     ),
-                    (() => {
-                        const savedVal = parseFloat(configRead('speedSettingsIncrement'));
-                        const idx = [0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.45, 0.5].indexOf(savedVal);
-                        return idx !== -1 ? idx : null;
-                    })()
-                )
-            }
-        },
-        {
-            name: 'Preferred Video Codec',
-            icon: 'VIDEO_QUALITY',
-            value: null,
-            options: {
-                title: 'Preferred Video Codec',
-                subtitle: 'Choose the preferred video codec for playback',
-                content: overlayPanelItemListRenderer(
-                    ['any', 'vp9', 'av01', 'avc1'].map((codec) =>
-                        buttonItem(
-                            { title: codec.toUpperCase() },
-                            { icon: 'CHEVRON_DOWN' },
-                            [
-                                {
-                                    setClientSettingEndpoint: {
-                                        settingDatas: [
-                                            {
-                                                clientSettingEnum: {
-                                                    item: 'videoPreferredCodec'
-                                                },
-                                                stringValue: codec
-                                            }
-                                        ]
-                                    }
-                                },
-                                {
-                                    customAction: {
-                                        action: 'SHOW_TOAST',
-                                        parameters: `Preferred video codec set to ${codec.toUpperCase()}`
-                                    }
-                                }
-                            ]
-                        )
-                    ),
-                    (() => {
-                        const savedVal = configRead('videoPreferredCodec');
-                        const idx = ['any', 'vp9', 'av01', 'avc1'].indexOf(savedVal);
-                        return idx !== -1 ? idx : null;
-                    })()
-                )
-            }
-        },
-        {
-            name: 'Disable Sidebar Contents (Guide Actions)',
-            icon: 'MENU',
-            value: null,
-            arrayToEdit: 'disabledSidebarContents',
-            menuId: 'tt-sidebar-contents',
-            options: [
-                {
-                    name: 'Search',
-                    icon: 'SEARCH',
-                    value: 'SEARCH'
-                },
-                {
-                    name: 'Home',
-                    icon: 'WHAT_TO_WATCH',
-                    value: 'WHAT_TO_WATCH'
-                },
-                {
-                    name: 'Sports',
-                    icon: 'UNPLUGGED_SPORTS',
-                    value: 'UNPLUGGED_SPORTS'
-                },
-                {
-                    name: 'Music',
-                    icon: 'YOUTUBE_MUSIC',
-                    value: 'YOUTUBE_MUSIC'
-                },
-                {
-                    name: 'Podcasts',
-                    icon: 'BROADCAST',
-                    value: 'BROADCAST'
-                },
-                {
-                    name: 'Movies & TV',
-                    icon: 'CLAPPERBOARD',
-                    value: 'CLAPPERBOARD'
-                },
-                {
-                    name: 'Live',
-                    icon: 'LIVE',
-                    value: 'LIVE'
-                },
-                {
-                    name: 'Gaming',
-                    icon: 'GAMING',
-                    value: 'GAMING'
-                },
-                {
-                    name: 'Subscriptions',
-                    icon: 'SUBSCRIPTIONS',
-                    value: 'SUBSCRIPTIONS'
-                },
-                {
-                    name: 'Library',
-                    icon: 'TAB_LIBRARY',
-                    value: 'TAB_LIBRARY'
-                },
-                {
-                    name: 'More',
-                    icon: 'TAB_MORE',
-                    value: 'TAB_MORE'
-                }
-            ]
-        },
-        {
-            name: 'Launch to on startup',
-            icon: 'TV',
-            options: [
-                {
-                    name: 'Search',
-                    icon: 'SEARCH',
-                    key: 'launchToOnStartup',
-                    value: JSON.stringify({
-                        searchEndpoint: { query: '' }
-                    })
-                },
-                {
-                    name: 'Home',
-                    icon: 'WHAT_TO_WATCH',
-                    key: 'launchToOnStartup',
-                    value: JSON.stringify({
-                        browseEndpoint: { browseId: 'FEtopics' }
-                    })
-                },
-                {
-                    name: 'Sports',
-                    icon: 'UNPLUGGED_SPORTS',
-                    key: 'launchToOnStartup',
-                    value: JSON.stringify({
-                        browseEndpoint: { browseId: 'FEtopics_sports' }
-                    })
-                },
-                {
-                    name: 'Music',
-                    icon: 'YOUTUBE_MUSIC',
-                    key: 'launchToOnStartup',
-                    value: JSON.stringify({
-                        browseEndpoint: { browseId: 'FEtopics_music' }
-                    })
-                },
-                {
-                    name: 'Podcasts',
-                    icon: 'BROADCAST',
-                    key: 'launchToOnStartup',
-                    value: JSON.stringify({
-                        browseEndpoint: { browseId: 'FEtopics_podcasts' }
-                    })
-                },
-                {
-                    name: 'Movies & TV',
-                    icon: 'CLAPPERBOARD',
-                    key: 'launchToOnStartup',
-                    value: JSON.stringify({
-                        browseEndpoint: { browseId: 'FEtopics_movies' }
-                    })
-                },
-                {
-                    name: 'Gaming',
-                    icon: 'GAMING',
-                    key: 'launchToOnStartup',
-                    value: JSON.stringify({
-                        browseEndpoint: { browseId: 'FEtopics_gaming' }
-                    })
-                },
-                {
-                    name: 'Live',
-                    icon: 'LIVE',
-                    key: 'launchToOnStartup',
-                    value: JSON.stringify({
-                        browseEndpoint: { browseId: 'FEtopics_live' }
-                    })
-                },
-                {
-                    name: 'Subscriptions',
-                    icon: 'SUBSCRIPTIONS',
-                    key: 'launchToOnStartup',
-                    value: JSON.stringify({
-                        browseEndpoint: { browseId: 'FEsubscriptions' }
-                    })
-                },
-                {
-                    name: 'Library',
-                    icon: 'TAB_LIBRARY',
-                    key: 'launchToOnStartup',
-                    value: JSON.stringify({
-                        browseEndpoint: { browseId: 'FElibrary' }
-                    })
-                },
-                {
-                    name: 'More',
-                    icon: 'TAB_MORE',
-                    key: 'launchToOnStartup',
-                    value: JSON.stringify({
-                        browseEndpoint: { browseId: 'FEtopics_more' }
-                    })
-                }
-            ]
-        }
+                    {
+                        name: 'Check for updates on startup',
+                        icon: 'SYSTEM_UPDATE',
+                        value: 'enableUpdater'
+                    }
+                ]
+            } : null
     ];
 
     const buttons = [];
 
     let index = 0;
     for (const setting of settings) {
+        if (!setting) continue;
         const currentVal = setting.value ? configRead(setting.value) : null;
         buttons.push(
             buttonItem(
@@ -821,7 +751,8 @@ export default function modernUI(update, parameters) {
                                     selectedIndex: 0,
                                     update: setting.options?.title ? 'customUI' : false,
                                     menuId: setting.menuId,
-                                    arrayToEdit: setting.arrayToEdit
+                                    arrayToEdit: setting.arrayToEdit,
+                                    menuHeader: setting.menuHeader
                                 }
                             }
                         }
@@ -893,7 +824,8 @@ export function optionShow(parameters, update) {
                                     selectedIndex: parameters.options.indexOf(option),
                                     update: true,
                                     menuId: parameters.menuId,
-                                    arrayToEdit: parameters.arrayToEdit
+                                    arrayToEdit: parameters.arrayToEdit,
+                                    menuHeader: parameters.menuHeader
                                 }
                             }
                         }
@@ -905,6 +837,11 @@ export function optionShow(parameters, update) {
         // New handling for boolean-based options (like subtitle localization)
         let index = 0;
         for (const option of parameters.options) {
+            if (option.compactLinkRenderer) {
+                buttons.push(option);
+                index++;
+                continue;
+            }
             const isRadioChoice = option.key !== null && option.key !== undefined;
             const currentVal = configRead(isRadioChoice ? option.key : option.value);
             buttons.push(
@@ -923,7 +860,8 @@ export function optionShow(parameters, update) {
                                     selectedIndex: 0,
                                     update: option.options?.title ? 'customUI' : false,
                                     menuId: option.menuId,
-                                    arrayToEdit: option.arrayToEdit
+                                    arrayToEdit: option.arrayToEdit,
+                                    menuHeader: option.menuHeader
                                 }
                             }
                         }
@@ -946,9 +884,10 @@ export function optionShow(parameters, update) {
                                 parameters: {
                                     options: parameters.options,
                                     selectedIndex: index,
-                                    update: option.options?.title ? 'customUI' : true,
+                                    update: parameters.options?.title ? 'customUI' : true,
                                     menuId: parameters.menuId,
-                                    arrayToEdit: option.arrayToEdit
+                                    arrayToEdit: parameters.arrayToEdit,
+                                    menuHeader: parameters.menuHeader
                                 }
                             }
                         }
@@ -971,9 +910,10 @@ export function optionShow(parameters, update) {
                                 parameters: {
                                     options: parameters.options,
                                     selectedIndex: index,
-                                    update: option.options?.title ? 'customUI' : true,
+                                    update: parameters.options?.title ? 'customUI' : true,
                                     menuId: parameters.menuId,
-                                    arrayToEdit: option.arrayToEdit
+                                    arrayToEdit: parameters.arrayToEdit,
+                                    menuHeader: parameters.menuHeader
                                 }
                             }
                         }
@@ -984,5 +924,5 @@ export function optionShow(parameters, update) {
         }
     }
 
-    showModal('TizenTube Settings', overlayPanelItemListRenderer(buttons, parameters.selectedIndex), parameters.menuId || 'tt-settings-options', update);
+    showModal(parameters.menuHeader ? parameters.menuHeader : 'TizenTube Settings', overlayPanelItemListRenderer(buttons, parameters.selectedIndex), parameters.menuId || 'tt-settings-options', update);
 }

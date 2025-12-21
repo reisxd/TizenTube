@@ -3,6 +3,7 @@ import { enablePip } from './features/pictureInPicture.js';
 import modernUI, { optionShow } from './ui/settings.js';
 import { speedSettings } from './ui/speedUI.js';
 import { showToast, buttonItem } from './ui/ytUI.js';
+import checkForUpdates from './features/updater.js';
 
 export default function resolveCommand(cmd, _) {
     // resolveCommand function is pretty OP, it can do from opening modals, changing client settings and way more.
@@ -161,6 +162,9 @@ function customAction(action, parameters) {
         case 'CLEAR_QUEUE':
             window.queuedVideos.videos = [];
             showToast('TizenTube', 'Video queue cleared.');
+            break;
+        case 'CHECK_FOR_UPDATES':
+            checkForUpdates(true);
             break;
     }
 }

@@ -11,6 +11,7 @@ const defaultConfig = {
   enableSponsorBlockPreview: true,
   enableSponsorBlockMusicOfftopic: true,
   enableSponsorBlockFiller: false,
+  enableSponsorBlockHighlight: true,
   videoSpeed: 1,
   preferredVideoQuality: 'auto',
   enableDeArrow: true,

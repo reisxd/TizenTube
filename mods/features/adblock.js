@@ -1,7 +1,7 @@
 import { configRead } from '../config.js';
 import Chapters from '../ui/chapters.js';
 import resolveCommand from '../resolveCommand.js';
-import { timelyAction, longPressData, MenuServiceItemRenderer, ShelfRenderer, TileRenderer } from '../ui/ytUI.js';
+import { timelyAction, longPressData, MenuServiceItemRenderer, ShelfRenderer, TileRenderer, ButtonRenderer } from '../ui/ytUI.js';
 import { PatchSettings } from '../ui/customYTSettings.js';
 
 /**
@@ -189,8 +189,34 @@ JSON.parse = function () {
       }
       r.playerOverlays.playerOverlayRenderer.timelyActionRenderers = timelyActions;
     }
-  } else if (r?.playerOverlays?.playerOverlayRenderers) {
+  } else if (r?.playerOverlays?.playerOverlayRenderer) {
     r.playerOverlays.playerOverlayRenderer.timelyActionRenderers = [];
+  }
+
+  if (r?.transportControls?.transportControlsRenderer?.promotedActions && configRead('enableSponsorBlockHighlight')) {
+    if (window?.sponsorblock?.segments) {
+      const category = window.sponsorblock.segments.find(seg => seg.category === 'poi_highlight');
+      if (category) {
+        r.transportControls.transportControlsRenderer.promotedActions.push({
+          type: 'TRANSPORT_CONTROLS_BUTTON_TYPE_SPONSORBLOCK_HIGHLIGHT',
+          button: {
+            buttonRenderer: ButtonRenderer(
+              false,
+              'Skip to highlight',
+              'SKIP_NEXT',
+              {
+                clickTrackingParams: null,
+                customAction: {
+                  action: 'SKIP',
+                  parameters: {
+                    time: category.segment[0]
+                  }
+                }
+              })
+          }
+        });
+      }
+    }
   }
 
   return r;

@@ -416,6 +416,24 @@ function QrCodeRenderer(url) {
     }
 }
 
+function ButtonRenderer(disabled, text, iconType, command) {
+    return {
+        isDisabled: disabled,
+        text: {
+            runs: [
+                {
+                    text: text
+                }
+            ]
+        },
+        icon: {
+            iconType
+        },
+        command: command,
+        trackingParams: null
+    };
+}
+
 export {
     showToast,
     Modal,
@@ -432,5 +450,6 @@ export {
     SettingActionRenderer,
     ShelfRenderer,
     TileRenderer,
-    QrCodeRenderer
+    QrCodeRenderer,
+    ButtonRenderer
 }
