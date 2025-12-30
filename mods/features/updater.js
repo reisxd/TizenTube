@@ -23,6 +23,7 @@ function getLatestRelease() {
 
 function checkForUpdates(showNoUpdateToast) {
     const currentAppVersion = window.h5vcc.tizentube.GetVersion();
+    const currentEpoch = Math.floor(Date.now() / 1000);
 
     getLatestRelease()
         .then(release => {
@@ -84,7 +85,7 @@ function checkForUpdates(showNoUpdateToast) {
         })
         .catch(error => {
             console.error('Error fetching the latest release:', error);
-            showToast('TizenTube Update Check Failed', 'Could not check for updates.', null);
+            showToast('TizenTube update check failed', 'Could not check for updates.', null);
         });
 }
 
