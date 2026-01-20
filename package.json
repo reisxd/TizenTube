@@ -1,12 +1,12 @@
 {
-  "name": "@jensorx/tizentube",
-  "appName": "TizenTubeJX",
-  "version": "1.0.1",
+  "name": "@foxreis/tizentube",
+  "appName": "TizenTube",
+  "version": "1.12.4",
   "description": "TizenTube is an ad-free and sponsor-free solution for your favourite streaming website on your Tizen (Samsung) TVs.",
   "packageType": "mods",
   "websiteURL": "https://youtube.com/tv?additionalDataUrl=http%3A%2F%2Flocalhost%3A8085%2Fdial%2Fapps%2FYouTube",
   "main": "dist/userScript.js",
-  "author": "JensorX",
+  "author": "Reis Can",
   "serviceFile": "dist/service.js",
   "keys": [
     "MediaPlayPause",
@@ -19,19 +19,7 @@
     "MediaTrackPrevious"
   ],
   "repository": {
-    "type": "git",
-    "url": "git+https://github.com/JensorX/TizenTube.git"
+    "url": "https://github.com/reisxd/TizenTube"
   },
-  "license": "GPL-3.0-only",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "keywords": [],
-  "bugs": {
-    "url": "https://github.com/JensorX/TizenTube/issues"
-  },
-  "homepage": "https://github.com/JensorX/TizenTube#readme",
-  "dependencies": {
-    "ncc": "^0.3.6"
-  }
+  "license": "GPL-3.0-only"
 }
