@@ -91,11 +91,15 @@ function execute_once_dom_loaded_speed() {
 			this.lastRate = 1;
 			this.lastDroppedFrames = null;
 			this.lastAdjustmentWall = 0;
-			this.threshold = 0.15; // seconds
-			this.margin = 0.05; // seconds to avoid overshoot
-			this.intervalMs = 250;
+			this.threshold = 0.08; // seconds - more aggressive
+			this.margin = 0.02; // seconds to avoid overshoot - smaller margin
+			this.intervalMs = 150; // faster checks
 			this._tickCount = 0;
-			this._qualitySampleModulo = 4; // sample droppedFrames every N ticks
+			this._qualitySampleModulo = 3; // sample droppedFrames every N ticks
+			this.maxAdjustmentPerTick = 0.5; // max seconds to jump forward per correction
+			this.criticalDriftThreshold = 0.2; // seconds - trigger micro pause/resume
+			this.lastMicroPauseWall = 0;
+			this.microPauseCooldown = 2; // seconds between micro pauses
 		}
 
 		attach(videoEl) {
@@ -107,7 +111,10 @@ function execute_once_dom_loaded_speed() {
 				this.resetBaseline();
 				this.start();
 			};
-			const onPause = () => this.stop();
+			const onPause = () => {
+				this.forceSync(); // Immediate sync on pause to fix runaway video
+				this.stop();
+			};
 			const onRateChange = () => this.resetBaseline();
 			const onSeeked = () => this.resetBaseline();
 			const onCanPlay = () => this.resetBaseline();
@@ -156,6 +163,52 @@ function execute_once_dom_loaded_speed() {
 			this.lastDroppedFrames = quality?.droppedFrames ?? null;
 		}
 
+		forceSync() {
+			// Force immediate sync check and correction on pause/seek events
+			if (!this.videoEl) return;
+			const now = performance.now();
+			const wallDelta = (now - this.lastBaselineWall) / 1000;
+			const expected = this.lastBaselineMedia + wallDelta * this.lastRate;
+			const diff = expected - this.videoEl.currentTime;
+
+			// More aggressive immediate correction
+			if (Math.abs(diff) > 0.05) {
+				this.videoEl.currentTime = expected;
+				this.resetBaseline();
+			}
+		}
+
+		performMicroPauseResume(driftAmount) {
+			if (!this.videoEl || this.videoEl.paused) return;
+
+			console.info(`TizenTube Sync: Critical drift ${driftAmount.toFixed(3)}s detected, performing micro pause/resume`);
+			this.lastMicroPauseWall = performance.now();
+
+			// Store current state
+			const wasPlaying = !this.videoEl.paused;
+			const targetTime = this.videoEl.currentTime + driftAmount * 0.9; // Jump forward by 90% of drift
+
+			if (wasPlaying) {
+				// Micro pause
+				this.videoEl.pause();
+
+				// Set corrected time and resume after brief delay
+				setTimeout(() => {
+					if (this.videoEl) {
+						this.videoEl.currentTime = targetTime;
+						this.resetBaseline();
+
+						// Resume playback
+						setTimeout(() => {
+							if (this.videoEl && wasPlaying) {
+								this.videoEl.play().catch(() => {});
+							}
+						}, 50);
+					}
+				}, 100);
+			}
+		}
+
 		start() {
 			if (this._running) return;
 			this._running = true;
@@ -173,7 +226,8 @@ function execute_once_dom_loaded_speed() {
 			if (!this._running) return;
 			const v = this.videoEl;
 			const rate = v ? (v.playbackRate || this.lastRate || 1) : 1;
-			const delay = rate >= 1.5 ? 250 : 500; // slower cadence for lower rates
+			// Faster checks for high speeds and 60fps content
+			const delay = rate >= 1.5 ? this.intervalMs : Math.min(this.intervalMs * 2, 400);
 			this.timerId = setTimeout(() => {
 				this._tick();
 				this._schedule();
@@ -199,20 +253,32 @@ function execute_once_dom_loaded_speed() {
 			}
 
 			const rate = v.playbackRate || this.lastRate;
-			const shouldConsider = rate >= 1.5 || droppedDelta > 0;
+			const shouldConsider = rate >= 1.25 || droppedDelta > 0; // Lower threshold for activation
 
-			// Limit adjustments frequency
+			// More frequent adjustments for persistent drift
 			const sinceAdjust = (now - this.lastAdjustmentWall) / 1000;
+			const adjustmentCooldown = rate >= 1.5 ? 0.25 : 0.4; // Shorter cooldown for high speeds
 
-			if (shouldConsider && diff > this.threshold && sinceAdjust > 0.5) {
-				// Nudge video forward towards expected time with a small margin
-				const target = expected - this.margin;
-				// Avoid going backwards
-				if (target > v.currentTime) {
+			if (shouldConsider && diff > this.threshold && sinceAdjust > adjustmentCooldown) {
+				// Calculate target with adaptive correction
+				const correctionAmount = Math.min(diff * 0.8, this.maxAdjustmentPerTick); // 80% of drift, capped
+				const target = v.currentTime + correctionAmount;
+
+				if (target > v.currentTime && correctionAmount > 0.01) {
 					v.currentTime = target;
 					this.lastAdjustmentWall = now;
-					// After a jump, rebuild baseline to avoid over-correction
-					this.resetBaseline();
+					// Reset baseline after significant corrections
+					if (correctionAmount > 0.1) {
+						this.resetBaseline();
+					}
+				}
+			}
+
+			// Check for critical drift that requires micro pause/resume
+			if (diff > this.criticalDriftThreshold) {
+				const sinceMicroPause = (now - this.lastMicroPauseWall) / 1000;
+				if (sinceMicroPause > this.microPauseCooldown) {
+					this.performMicroPauseResume(diff);
 				}
 			}
 		}
