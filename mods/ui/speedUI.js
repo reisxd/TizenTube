@@ -100,6 +100,10 @@ function execute_once_dom_loaded_speed() {
 			this.criticalDriftThreshold = 0.2; // seconds - trigger micro pause/resume
 			this.lastMicroPauseWall = 0;
 			this.microPauseCooldown = 2; // seconds between micro pauses
+			this.cpuStressThreshold = 5; // dropped frames per check to consider CPU stress
+			this.smoothCorrectionQueue = [];
+			this.lastFrameDropCount = 0;
+			this.cpuStressNotified = false;
 		}
 
 		attach(videoEl) {
@@ -181,34 +185,33 @@ function execute_once_dom_loaded_speed() {
 		performMicroPauseResume(driftAmount) {
 			if (!this.videoEl || this.videoEl.paused) return;
 
-			console.info(`TizenTube Sync: Critical drift ${driftAmount.toFixed(3)}s detected, performing micro pause/resume`);
+			// Ultra-short, visually imperceptible correction
 			this.lastMicroPauseWall = performance.now();
 
 			// Store current state
 			const wasPlaying = !this.videoEl.paused;
-			const targetTime = this.videoEl.currentTime + driftAmount * 0.9; // Jump forward by 90% of drift
+			const targetTime = this.videoEl.currentTime + driftAmount * 0.7; // Jump forward by 70% of drift
 
 			if (wasPlaying) {
-				// Micro pause
+				// Ultra-micro pause - almost imperceptible
 				this.videoEl.pause();
 
-				// Set corrected time and resume after brief delay
+				// Set corrected time and resume after minimal delay
 				setTimeout(() => {
 					if (this.videoEl) {
 						this.videoEl.currentTime = targetTime;
 						this.resetBaseline();
 
-						// Resume playback
+						// Resume playback immediately
 						setTimeout(() => {
 							if (this.videoEl && wasPlaying) {
 								this.videoEl.play().catch(() => {});
 							}
-						}, 50);
+						}, 15); // Ultra-short 15ms resume delay
 					}
-				}, 100);
+				}, 20); // Ultra-short 20ms pause duration
 			}
 		}
-
 		start() {
 			if (this._running) return;
 			this._running = true;
@@ -244,12 +247,19 @@ function execute_once_dom_loaded_speed() {
 			const diff = expected - v.currentTime; // positive if video is lagging behind expected timeline
 			// Sample dropped frames less frequently to reduce overhead
 			let droppedDelta = 0;
+			let cpuStressDetected = false;
 			this._tickCount = (this._tickCount + 1) % 1024;
 			if (this._tickCount % this._qualitySampleModulo === 0) {
 				const quality = v.getVideoPlaybackQuality?.();
 				const droppedFrames = quality?.droppedFrames ?? null;
 				droppedDelta = (droppedFrames != null && this.lastDroppedFrames != null) ? (droppedFrames - this.lastDroppedFrames) : 0;
 				this.lastDroppedFrames = droppedFrames;
+
+				// CPU stress detection
+				cpuStressDetected = droppedDelta >= this.cpuStressThreshold;
+				if (cpuStressDetected && rate >= 1.25 && !this.cpuStressNotified) {
+					this.handleCpuStress(rate);
+				}
 			}
 
 			const rate = v.playbackRate || this.lastRate;
@@ -260,26 +270,84 @@ function execute_once_dom_loaded_speed() {
 			const adjustmentCooldown = rate >= 1.5 ? 0.25 : 0.4; // Shorter cooldown for high speeds
 
 			if (shouldConsider && diff > this.threshold && sinceAdjust > adjustmentCooldown) {
-				// Calculate target with adaptive correction
-				const correctionAmount = Math.min(diff * 0.8, this.maxAdjustmentPerTick); // 80% of drift, capped
-				const target = v.currentTime + correctionAmount;
+				// Use smooth corrections instead of hard jumps for better UX
+				const correctionAmount = Math.min(diff * 0.6, this.maxAdjustmentPerTick); // 60% of drift, more conservative
 
-				if (target > v.currentTime && correctionAmount > 0.01) {
-					v.currentTime = target;
+				if (correctionAmount > 0.01) {
+					// Queue smooth correction instead of immediate jump
+					this.queueSmoothCorrection(correctionAmount);
 					this.lastAdjustmentWall = now;
-					// Reset baseline after significant corrections
-					if (correctionAmount > 0.1) {
-						this.resetBaseline();
-					}
 				}
 			}
 
+			// Process smooth correction queue
+			this.processSmoothCorrections();
 			// Check for critical drift that requires micro pause/resume
 			if (diff > this.criticalDriftThreshold) {
 				const sinceMicroPause = (now - this.lastMicroPauseWall) / 1000;
 				if (sinceMicroPause > this.microPauseCooldown) {
 					this.performMicroPauseResume(diff);
 				}
+			}
+		}
+
+		handleCpuStress(currentRate) {
+			// CPU stress handling
+			this.cpuStressNotified = true;
+			console.warn(`TizenTube Sync: CPU stress detected at ${currentRate}x speed (${this.lastDroppedFrames || 'N/A'} dropped frames)`);
+
+			try {
+				// More aggressive sync corrections during CPU stress - no quality reduction
+				this.threshold = 0.05; // Even more aggressive sync threshold
+				this.intervalMs = 100; // Faster monitoring during stress
+				this.microPauseCooldown = 1.5; // Shorter cooldown for micro-pauses
+				this.criticalDriftThreshold = 0.15; // Lower threshold for critical drift
+
+				console.info('TizenTube Sync: Activated aggressive sync mode due to CPU stress');
+
+				// Reset parameters after some time
+				setTimeout(() => {
+					this.cpuStressNotified = false;
+					this.threshold = 0.08; // Reset to normal
+					this.intervalMs = 150; // Reset to normal
+					this.microPauseCooldown = 2; // Reset to normal
+					this.criticalDriftThreshold = 0.2; // Reset to normal
+					console.info('TizenTube Sync: Returned to normal sync mode');
+				}, 15000); // 15 seconds
+
+			} catch (e) {
+				console.warn('TizenTube Sync: Could not adjust sync parameters during CPU stress:', e);
+			}
+		}
+
+		queueSmoothCorrection(amount) {
+			// Split correction into smaller chunks for smoother experience
+			const chunkSize = 0.03; // 30ms chunks
+			const chunks = Math.ceil(amount / chunkSize);
+
+			for (let i = 0; i < chunks; i++) {
+				const chunkAmount = Math.min(chunkSize, amount - (i * chunkSize));
+				this.smoothCorrectionQueue.push({
+					amount: chunkAmount,
+					scheduledTime: performance.now() + (i * 100) // 100ms between chunks
+				});
+			}
+		}
+
+		processSmoothCorrections() {
+			if (!this.videoEl || !this.smoothCorrectionQueue.length) return;
+
+			const now = performance.now();
+			const ready = this.smoothCorrectionQueue.filter(c => c.scheduledTime <= now);
+
+			for (const correction of ready) {
+				this.videoEl.currentTime += correction.amount;
+				const index = this.smoothCorrectionQueue.indexOf(correction);
+				this.smoothCorrectionQueue.splice(index, 1);
+			}
+
+			if (ready.length > 0) {
+				this.resetBaseline();
 			}
 		}
 	}

@@ -1,7 +1,7 @@
 {
   "name": "@JensorX/tizentube",
   "appName": "TizenTubeJX",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "TizenTube is an ad-free and sponsor-free solution for your favourite streaming website on your Tizen (Samsung) TVs.",
   "packageType": "mods",
   "websiteURL": "https://youtube.com/tv?additionalDataUrl=http%3A%2F%2Flocalhost%3A8085%2Fdial%2Fapps%2FYouTube",
