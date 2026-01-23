@@ -188,7 +188,7 @@ function execute_once_dom_loaded() {
 	document.addEventListener('keydown', eventHandler, true);
 	if (configRead('showWelcomeToast')) {
 		setTimeout(() => {
-			showToast('Welcome to TizenTubeJX', 'Go to settings and click on TizenTube Settings for settings, press [RED] to open TizenTube Theme Settings.');
+			showToast('Welcome to TizenTubeJX 1.0.5', 'Go to settings and click on TizenTube Settings for settings, press [RED] to open TizenTube Theme Settings.');
 		}, 2000);
 	}
 
