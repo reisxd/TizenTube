@@ -4,19 +4,21 @@ import { showToast } from '../ui/ytUI.js';
 /**
  * PlaybackSync: Subtile Audio-Video-Synchronisierung für Tizen TVs
  * 
- * Problem: Bei hoher Playback-Speed (1.5x+) auf 50/60fps YouTube-Videos werden Frames gedroppt
- * → Audio und Video laufen asynchron, besonders bei höheren Resolutionen.
+ * Problem: Bei hoher Playback-Speed (1.5x+) auf 50/60fps YouTube-Videos werden viele Frames gedroppt
+ * → Audio und Video laufen asynchron, Drift kann sehr schnell >5s werden
  * 
- * Lösung: Subtile, unmerkliche Anpassungen der Video-Position:
- * - Monitort Drift zwischen Audio und Video (wird über currentTime erkannt)
- * - Nur bei kritischem Drift (>200ms) kleine Sprünge (~20-50ms)
- * - Extrem seltene Anpassungen (mindestens 5-10 Sekunden zwischen Korrektionen)
- * - User merkt nichts davon - es sieht aus wie normales Abspielen
+ * Lösung: Aktive, frame-drop-aware Synchronisierung:
+ * - Monitort DROPPED FRAMES direkt aus getVideoStats() (primär)
+ * - Monitort auch Drift zwischen Audio/Video (fallback)
+ * - Bei hohem Frame-Drop sofort aggressiv synchen (keine 3s Wartezeit)
+ * - Bei niedrigem Frame-Drop subtil und selten synchen
+ * - User merkt nichts - sieht nur flüssiges Playback
  */
 
 class SubtlePlaybackSync {
   constructor() {
     this.videoEl = null;
+    this.player = null;
     this._running = false;
     this.timerId = null;
 
@@ -30,16 +32,30 @@ class SubtlePlaybackSync {
     this.lastAdjustmentAmount = 0;
     this.consecutiveHighDrifts = 0;
 
+    // Frame-Drop Tracking (primär für Erkennung)
+    this.lastDroppedFrameCount = 0;
+    this.lastTotalFrameCount = 0;
+    this.droppedFrameRate = 0;
+
     // Video-Tracking für Toast
     this.currentVideoId = null;
     this.hasShownToastForVideo = false;
 
-    // Thresholds - Balance zwischen schneller Korrektur und merkbaren Sprüngen
-    this.criticalDriftThreshold = 0.18; // 180ms - erst dann anpassen (reduziert von 200ms)
-    this.warningDriftThreshold = 0.15; // 150ms - vorher warnen
-    this.maxAdjustmentPerTick = 0.04; // Max 40ms Anpassung pro Mal (erhöht von 30ms)
-    this.minAdjustmentInterval = 3000; // Mindestens 3 Sekunden zwischen Anpassungen (reduziert von 7s)
-    this.intervalMs = 1000; // Check alle 1 Sekunde (statt 2s für frühere Erkennung)
+    // Thresholds
+    this.criticalDriftThreshold = 0.18; // 180ms - klassische Drift-Schwelle
+    this.warningDriftThreshold = 0.15; // 150ms
+    this.droppedFrameRateWarning = 0.15; // 15% dropped frames = reagiere
+    this.droppedFrameRateCritical = 0.25; // 25% dropped frames = aggressiv
+    
+    // Anpassungsparameter
+    this.maxAdjustmentPerTick = 0.04; // Max 40ms normal
+    this.maxAdjustmentPerTickAggressive = 0.08; // Max 80ms bei hohem Frame-Drop
+    
+    // Interval-Parameter
+    this.minAdjustmentInterval = 3000; // Normal: 3s minimum zwischen Anpassungen
+    this.minAdjustmentIntervalAggressive = 1000; // Aggressive: 1s wenn Frames fallen
+    
+    this.intervalMs = 500; // Check alle 500ms (schneller für Frame-Drop Erkennung)
     this.enabled = true;
   }
 
@@ -48,15 +64,26 @@ class SubtlePlaybackSync {
 
     this.videoEl = videoEl;
 
+    // Find player element for stats
+    try {
+      this.player = document.querySelector('.html5-video-player');
+    } catch (e) {
+      console.warn('[SubtlePlaybackSync] Could not find player element');
+    }
+
     // Listener für Speed-Änderungen
     this._onRateChange = () => {
       this.resetBaseline();
       this.consecutiveHighDrifts = 0;
+      this.lastDroppedFrameCount = 0;
+      this.lastTotalFrameCount = 0;
     };
 
     this._onSeeked = () => {
       this.resetBaseline();
       this.consecutiveHighDrifts = 0;
+      this.lastDroppedFrameCount = 0;
+      this.lastTotalFrameCount = 0;
     };
 
     this._onConfigChange = (ev) => {
@@ -83,6 +110,7 @@ class SubtlePlaybackSync {
     }
     this.stop();
     this.videoEl = null;
+    this.player = null;
   }
 
   resetBaseline() {
@@ -129,6 +157,52 @@ class SubtlePlaybackSync {
     }
   }
 
+  _getVideoStats() {
+    try {
+      return this.player?.getVideoStats?.();
+    } catch (e) {
+      return null;
+    }
+  }
+
+  _updateDroppedFrameRate() {
+    const stats = this._getVideoStats();
+    if (!stats) return 0;
+
+    // Versuche dropped frames zu extrahieren
+    const droppedFrames = this._getStatValue(stats, [
+      'droppedVideoFrames',
+      'dropped_video_frames',
+      'droppedFrames'
+    ]);
+
+    const totalFrames = this._getStatValue(stats, [
+      'totalVideoFrames',
+      'total_video_frames',
+      'totalFrames'
+    ]);
+
+    if (totalFrames > 0) {
+      this.droppedFrameRate = droppedFrames / totalFrames;
+      return this.droppedFrameRate;
+    }
+
+    return 0;
+  }
+
+  _getStatValue(stats, keys) {
+    if (!stats || typeof stats !== 'object') return 0;
+
+    for (const key of keys) {
+      const val = stats[key];
+      if (val !== undefined && val !== null) {
+        const num = parseInt(val, 10);
+        if (!isNaN(num)) return num;
+      }
+    }
+    return 0;
+  }
+
   _tick() {
     if (!this.videoEl || this.videoEl.paused || this.videoEl.ended) return;
 
@@ -136,52 +210,73 @@ class SubtlePlaybackSync {
     const elapsedSeconds = (now - this.lastBaselineTime) / 1000;
     const rate = this.videoEl.playbackRate || 1;
 
-    // Erwartete Zeit basierend auf Playback-Rate
-    const expectedCurrentTime = this.lastBaselineCurrentTime + elapsedSeconds * rate;
-    const actualCurrentTime = this.videoEl.currentTime;
-    
-    // Drift: wie weit Audio/Video auseinander sind
-    const drift = Math.abs(expectedCurrentTime - actualCurrentTime);
-
-    // Debug logging (optional)
-    // console.log(`[SubtleSync] Drift: ${drift.toFixed(3)}s at ${rate}x speed`);
-
-    // Nur bei hohen Speeds und 50/60fps monitoren
+    // Nur bei hohen Speeds monitoren
     if (rate < 1.25) {
       this.consecutiveHighDrifts = 0;
+      this.droppedFrameRate = 0;
       return;
     }
 
-    // Zähle konsekutive High-Drift-Events
+    // 1. PRIMÄR: Prüfe Dropped Frames (zuverlässiger als currentTime bei Frame-Drop)
+    const droppedFrameRate = this._updateDroppedFrameRate();
+    const hasHighFrameDrop = droppedFrameRate > this.droppedFrameRateWarning;
+    const hasCriticalFrameDrop = droppedFrameRate > this.droppedFrameRateCritical;
+
+    // 2. SEKUNDÄR: Klassische Drift-Erkennung
+    const expectedCurrentTime = this.lastBaselineCurrentTime + elapsedSeconds * rate;
+    const actualCurrentTime = this.videoEl.currentTime;
+    const drift = Math.abs(expectedCurrentTime - actualCurrentTime);
+
     if (drift > this.warningDriftThreshold) {
       this.consecutiveHighDrifts++;
     } else {
       this.consecutiveHighDrifts = 0;
     }
 
-    // Nur wenn kritischer Drift UND genug Zeit seit letzter Anpassung vergangen
-    if (drift > this.criticalDriftThreshold) {
-      const timeSinceLastAdjustment = now - this.lastAdjustmentTime;
-      
+    // 3. ENTSCHEIDUNG: Wann synchronisieren?
+    const timeSinceLastAdjustment = now - this.lastAdjustmentTime;
+
+    // Aggressive Sync bei kritischem Frame-Drop
+    if (hasCriticalFrameDrop && timeSinceLastAdjustment > this.minAdjustmentIntervalAggressive) {
+      console.warn(
+        `[SubtleSync] HIGH FRAME DROP RATE: ${(droppedFrameRate * 100).toFixed(1)}% at ${rate}x - aggressive sync`
+      );
+      this.performSubtleCorrection(expectedCurrentTime, actualCurrentTime, drift, true);
+      return;
+    }
+
+    // Moderate Sync bei erhöhtem Frame-Drop
+    if (hasHighFrameDrop && timeSinceLastAdjustment > this.minAdjustmentIntervalAggressive * 2) {
+      console.warn(
+        `[SubtleSync] Moderate frame drop: ${(droppedFrameRate * 100).toFixed(1)}% at ${rate}x - moderate sync`
+      );
+      this.performSubtleCorrection(expectedCurrentTime, actualCurrentTime, drift, false);
+      return;
+    }
+
+    // Subtile Sync nur bei klassischem Drift (wenn keine Frame-Drops)
+    if (!hasHighFrameDrop && drift > this.criticalDriftThreshold) {
       if (timeSinceLastAdjustment > this.minAdjustmentInterval) {
-        this.performSubtleCorrection(expectedCurrentTime, actualCurrentTime, drift);
+        this.performSubtleCorrection(expectedCurrentTime, actualCurrentTime, drift, false);
       }
     }
   }
 
-  performSubtleCorrection(expectedTime, actualTime, drift) {
+  performSubtleCorrection(expectedTime, actualTime, drift, isAggressive) {
     const now = performance.now();
     const timeDiff = expectedTime - actualTime;
 
-    // Berechne Korrekturgröße: kleiner, je kleiner der Drift
-    // Bei 200ms Drift: ~30ms Anpassung
-    // Bei 250ms Drift: ~30ms Anpassung
+    // Adaptive Korrekturgröße basierend auf Mode
+    const maxAdjustment = isAggressive 
+      ? this.maxAdjustmentPerTickAggressive 
+      : this.maxAdjustmentPerTick;
+
     const correctionAmount = Math.min(
-      Math.abs(timeDiff) * 0.15, // 15% des Drifts
-      this.maxAdjustmentPerTick
+      Math.abs(timeDiff) * (isAggressive ? 0.25 : 0.15), // Aggressiver oder subtil
+      maxAdjustment
     );
 
-    const direction = timeDiff > 0 ? 1 : -1; // Forward oder backward
+    const direction = timeDiff > 0 ? 1 : -1;
     const newTime = actualTime + (correctionAmount * direction);
 
     try {
@@ -202,7 +297,8 @@ class SubtlePlaybackSync {
       }
 
       console.info(
-        `[SubtleSync] Subtle correction applied: drift=${drift.toFixed(3)}s, ` +
+        `[SubtleSync] ${isAggressive ? 'AGGRESSIVE' : 'Subtle'} correction: ` +
+        `drift=${drift.toFixed(3)}s, dropped=${(this.droppedFrameRate * 100).toFixed(1)}%, ` +
         `adjustment=${(correctionAmount * direction).toFixed(3)}s at ${this.videoEl.playbackRate}x speed`
       );
 
