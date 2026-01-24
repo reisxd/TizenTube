@@ -34,12 +34,12 @@ class SubtlePlaybackSync {
     this.currentVideoId = null;
     this.hasShownToastForVideo = false;
 
-    // Thresholds - extrem konservativ, damit User nichts merkt
-    this.criticalDriftThreshold = 0.2; // 200ms - erst dann anpassen
+    // Thresholds - Balance zwischen schneller Korrektur und merkbaren Sprüngen
+    this.criticalDriftThreshold = 0.18; // 180ms - erst dann anpassen (reduziert von 200ms)
     this.warningDriftThreshold = 0.15; // 150ms - vorher warnen
-    this.maxAdjustmentPerTick = 0.03; // Max 30ms Anpassung pro Mal
-    this.minAdjustmentInterval = 7000; // Mindestens 7 Sekunden zwischen Anpassungen
-    this.intervalMs = 2000; // Check alle 2 Sekunden
+    this.maxAdjustmentPerTick = 0.04; // Max 40ms Anpassung pro Mal (erhöht von 30ms)
+    this.minAdjustmentInterval = 3000; // Mindestens 3 Sekunden zwischen Anpassungen (reduziert von 7s)
+    this.intervalMs = 1000; // Check alle 1 Sekunde (statt 2s für frühere Erkennung)
     this.enabled = true;
   }
 
