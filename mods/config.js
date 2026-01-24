@@ -47,7 +47,8 @@ const defaultConfig = {
   videoPreferredCodec: 'any',
   launchToOnStartup: null,
   disabledSidebarContents: [],
-  enableUpdater: true
+  enableUpdater: true,
+  enableCpuStressOptimization: true
 };
 
 let localConfig;
