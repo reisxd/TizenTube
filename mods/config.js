@@ -48,7 +48,8 @@ const defaultConfig = {
   launchToOnStartup: null,
   disabledSidebarContents: [],
   enableUpdater: true,
-  enableCpuStressOptimization: true
+  enableCpuStressOptimization: true,
+  enableDecoderMonitor: true
 };
 
 let localConfig;

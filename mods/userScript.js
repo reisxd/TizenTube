@@ -8,6 +8,7 @@ import '@formatjs/intl-displaynames/locale-data/en';
 
 import "./domrect-polyfill";
 import "./features/playbackSync.js";
+import "./features/decoderHealthMonitor.js";
 import "./features/adblock.js";
 import "./features/sponsorblock.js";
 import "./ui/ui.js";
