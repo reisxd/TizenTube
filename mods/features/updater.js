@@ -23,6 +23,21 @@ function getLatestRelease() {
 
 function checkForUpdates(showNoUpdateToast) {
     const currentAppVersion = window.h5vcc.tizentube.GetVersion();
+    let architecture;
+    let downloadUrl;
+
+    if (window.h5vcc.tizentube.GetArchitecture) {
+        architecture = window.h5vcc.tizentube.GetArchitecture();
+    }
+
+    if (architecture) {
+        if (architecture === 'arm64-v8a') {
+            downloadUrl = release.assets.find(asset => asset.name.includes('arm64.apk')).browser_download_url;
+        } else {
+            downloadUrl = release.assets.find(asset => asset.name.includes('arm.apk')).browser_download_url;
+        }
+    } else downloadUrl = release.assets[0].browser_download_url;
+
     const currentEpoch = Math.floor(Date.now() / 1000);
 
     getLatestRelease()
@@ -45,7 +60,7 @@ function checkForUpdates(showNoUpdateToast) {
                                 {
                                     customAction: {
                                         action: 'UPDATE_DOWNLOAD',
-                                        parameters: release.assets[0].browser_download_url
+                                        parameters: downloadUrl
                                     }
                                 },
                                 {

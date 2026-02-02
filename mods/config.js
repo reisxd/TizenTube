@@ -47,7 +47,8 @@ const defaultConfig = {
   videoPreferredCodec: 'any',
   launchToOnStartup: null,
   disabledSidebarContents: [],
-  enableUpdater: true
+  enableUpdater: true,
+  autoFrameRate: false
 };
 
 let localConfig;
