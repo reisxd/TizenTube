@@ -1,28 +1,42 @@
 import { configRead } from "../config.js";
 
 function attachToVideoPlayer() {
-    const video = document.querySelector('.html5-video-player');
-    if (!video) return setTimeout(attachToVideoPlayer, 500);
+    const player = document.querySelector('.html5-video-player');
+    const video = document.querySelector('video');
+    if (!player) return setTimeout(attachToVideoPlayer, 500);
 
-    video.addEventListener('onStateChange', state => {
+    player.addEventListener('onStateChange', state => {
         try {
             if (state === 1) {
-                const statsForNerds = video.getStatsForNerds();
+                if (window.location.href.indexOf('watch') === -1) return;
+                const statsForNerds = player.getStatsForNerds();
 
                 const resolutionMatch = statsForNerds.resolution.match(/(\d+)x(\d+)@([\d.]+)/);
+                const pauseFor = configRead('autoFrameRatePauseVideoFor');
+
                 if (resolutionMatch) {
                     const fps = resolutionMatch[3];
                     if (configRead('autoFrameRate') && window.h5vcc && window.h5vcc.tizentube && window.h5vcc.tizentube.SetFrameRate) {
+                        if (pauseFor > 0) {
+                            video.pause();
+                            setTimeout(() => {
+                                video.play();
+                            }, pauseFor);
+                        }
                         window.h5vcc.tizentube.SetFrameRate(parseFloat(fps));
                     }
-                }
-            } else {
-                if (configRead('autoFrameRate') && window.h5vcc && window.h5vcc.tizentube && window.h5vcc.tizentube.SetFrameRate) {
-                    window.h5vcc.tizentube.SetFrameRate(60);
                 }
             }
         } catch (e) {
             console.error('Error in auto frame rate handling:', e);
+        }
+    });
+
+    window.addEventListener('hashchange', () => {
+        if (window.location.href.indexOf('watch') > 0) {
+            if (configRead('autoFrameRate') && window.h5vcc && window.h5vcc.tizentube && window.h5vcc.tizentube.SetFrameRate) {
+                window.h5vcc.tizentube.SetFrameRate(0);
+            }
         }
     });
 }

@@ -378,6 +378,23 @@ export default function modernUI(update, parameters) {
                     name: 'Auto Frame Rate',
                     icon: 'SLOW_MOTION_VIDEO',
                     value: 'autoFrameRate'
+                } : null,
+                window.h5vcc && window.h5vcc.tizentube && window.h5vcc.tizentube.SetFrameRate ? {
+                    name: 'Auto Frame Rate Pause Duration',
+                    icon: 'TIMER',
+                    value: null,
+                    menuId: 'tt-auto-frame-rate-pause-duration',
+                    menuHeader: {
+                        title: 'Auto Frame Rate Pause Duration',
+                        subtitle: 'Set the duration (in seconds) to pause video playback when adjusting frame rate'
+                    },
+                    options: [0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5].map((seconds) => {
+                        return {
+                            name: `${seconds} seconds`,
+                            key: 'autoFrameRatePauseVideoFor',
+                            value: seconds * 1000
+                        }
+                    })
                 } : null
             ]
         },
@@ -847,6 +864,7 @@ export function optionShow(parameters, update) {
         // New handling for boolean-based options (like subtitle localization)
         let index = 0;
         for (const option of parameters.options) {
+            if (!option) continue;
             if (option.compactLinkRenderer) {
                 buttons.push(option);
                 index++;

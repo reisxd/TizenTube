@@ -48,7 +48,8 @@ const defaultConfig = {
   launchToOnStartup: null,
   disabledSidebarContents: [],
   enableUpdater: true,
-  autoFrameRate: false
+  autoFrameRate: false,
+  autoFrameRatePauseVideoFor: 0
 };
 
 let localConfig;
