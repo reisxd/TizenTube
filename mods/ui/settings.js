@@ -318,6 +318,12 @@ export default function modernUI(update, parameters) {
                             name: 'Speed Controls Button',
                             icon: 'SLOW_MOTION_VIDEO',
                             value: 'enableSpeedControlsButton'
+                        },
+                        {
+                            name: 'Default Speed for Music Videos',
+                            icon: 'MUSIC_NOTE',
+                            value: 'force1xForMusic',
+                            subtitle: 'Force 1x speed for music videos'
                         }
                     ]
                 },
