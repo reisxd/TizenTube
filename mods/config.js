@@ -99,7 +99,7 @@ export const configChangeEmitter = {
     this.listeners[type].forEach(cb => {
       try {
         cb.call(this, event)
-      } catch (_) { };
+      } catch (_) {};
     });
   }
 };

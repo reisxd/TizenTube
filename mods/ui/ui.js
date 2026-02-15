@@ -10,7 +10,6 @@ import { pipToFullscreen } from '../features/pictureInPicture.js';
 import getCommandExecutor from './customCommandExecution.js';
 
 // It just works, okay?
-
 const interval = setInterval(() => {
   const videoElement = document.querySelector('video');
   if (videoElement) {
