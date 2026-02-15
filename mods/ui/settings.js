@@ -374,6 +374,42 @@ export default function modernUI(update, parameters) {
                         }
                     })
                 },
+                {
+                    name: 'Advanced Codec Settings',
+                    icon: 'SETTINGS',
+                    value: null,
+                    menuId: 'tt-advanced-codec-settings',
+                    menuHeader: {
+                        title: 'Advanced Codec Settings',
+                        subtitle: 'Individually deactivate specific codecs and high frame rates',
+                    },
+                    options: [
+                        {
+                            name: 'Disable 60fps (High Frame Rate)',
+                            value: 'disable60fps'
+                        },
+                        {
+                            name: 'Disable AV1',
+                            value: 'disableAV1'
+                        },
+                        {
+                            name: 'Disable VP9',
+                            value: 'disableVP9'
+                        },
+                        {
+                            name: 'Disable AVC (H.264)',
+                            value: 'disableAVC'
+                        },
+                        {
+                            name: 'Disable VP8',
+                            value: 'disableVP8'
+                        },
+                        {
+                            name: 'Disable HEVC',
+                            value: 'disableHEVC'
+                        }
+                    ]
+                },
                 window.h5vcc && window.h5vcc.tizentube && window.h5vcc.tizentube.SetFrameRate ? {
                     name: 'Auto Frame Rate',
                     icon: 'SLOW_MOTION_VIDEO',

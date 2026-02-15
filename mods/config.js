@@ -47,6 +47,12 @@ const defaultConfig = {
   videoPreferredCodec: 'any',
   launchToOnStartup: null,
   disabledSidebarContents: [],
+  disable60fps: false,
+  disableAV1: false,
+  disableVP9: false,
+  disableAVC: false,
+  disableVP8: false,
+  disableHEVC: false,
   enableUpdater: true,
   autoFrameRate: false,
   autoFrameRatePauseVideoFor: 0
@@ -93,7 +99,7 @@ export const configChangeEmitter = {
     this.listeners[type].forEach(cb => {
       try {
         cb.call(this, event)
-      } catch (_) {};
+      } catch (_) { };
     });
   }
 };
