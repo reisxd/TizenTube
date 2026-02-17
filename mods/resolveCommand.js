@@ -1,9 +1,9 @@
 import { configWrite, configRead } from './config.js';
-import { enablePip } from './features/pictureInPicture.js';
+import { enablePip } from './main/features/pictureInPicture.js';
 import modernUI, { optionShow } from './ui/settings.js';
 import { speedSettings } from './ui/speedUI.js';
 import { showToast, buttonItem } from './ui/ytUI.js';
-import checkForUpdates from './features/updater.js';
+import checkForUpdates from './main/updater.js';
 
 export default function resolveCommand(cmd, _) {
     // resolveCommand function is pretty OP, it can do from opening modals, changing client settings and way more.

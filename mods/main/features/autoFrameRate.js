@@ -1,4 +1,4 @@
-import { configRead } from "../config.js";
+import { configRead } from "../../config.js";
 
 function attachToVideoPlayer() {
     const player = document.querySelector('.html5-video-player');
