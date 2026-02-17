@@ -1,4 +1,4 @@
-import { configRead, configChangeEmitter } from "../config.js";
+import { configRead, configChangeEmitter } from "../../config.js";
 
 const SELECTORS = {
     PLAYER: '.html5-video-player',

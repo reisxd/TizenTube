@@ -1,5 +1,5 @@
 // Enable features that aren't enabled by default due to YT seeing the TV as a low-end device
-import { configRead, configChangeEmitter } from '../config.js';
+import { configRead, configChangeEmitter } from '../../config.js';
 
 configChangeEmitter.addEventListener('configChange', (event) => {
     enableFeatures();

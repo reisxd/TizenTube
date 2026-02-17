@@ -1,6 +1,6 @@
 import { configRead } from '../config.js';
 import { showModal, buttonItem, overlayPanelItemListRenderer, scrollPaneRenderer, overlayMessageRenderer, QrCodeRenderer } from './ytUI.js';
-import { getUserLanguageOptionName } from '../features/moreSubtitles.js';
+import { getUserLanguageOptionName } from '../main/features/moreSubtitles.js';
 import qrcode from 'qrcode-npm';
 
 const qrcodes = {};

@@ -1,4 +1,4 @@
-import "./features/userAgentSpoofing.js";
+import "./main/userAgentSpoofing.js";
 import "whatwg-fetch";
 import 'core-js/proposals/object-getownpropertydescriptors';
 import '@formatjs/intl-getcanonicallocales/polyfill.iife'
@@ -7,19 +7,19 @@ import '@formatjs/intl-displaynames/polyfill.iife'
 import '@formatjs/intl-displaynames/locale-data/en';
 
 import "./domrect-polyfill";
-import "./features/adblock.js";
-import "./features/sponsorblock.js";
+import "./main/features/responsePatches.js";
+import "./main/features/sponsorblock.js";
 import "./ui/ui.js";
 import "./ui/speedUI.js";
 import "./ui/theme.js";
 import "./ui/settings.js";
 import "./ui/disableWhosWatching.js";
-import "./features/moreSubtitles.js";
-import "./features/updater.js";
-import "./features/pictureInPicture.js";
-import "./features/preferredVideoQuality.js";
-import "./features/videoQueuing.js";
-import "./features/enableFeatures.js";
+import "./main/features/moreSubtitles.js";
+import "./main/updater.js";
+import "./main/features/pictureInPicture.js";
+import "./main/features/preferredVideoQuality.js";
+import "./main/features/videoQueuing.js";
+import "./main/features/enableFeatures.js";
 import "./ui/customUI.js";
 import "./ui/customGuideAction.js";
-import "./features/autoFrameRate.js";
+import "./main/features/autoFrameRate.js";

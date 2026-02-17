@@ -1,6 +1,6 @@
 // Picture in Picture Mode for TizenTube
 
-import resolveCommand from "../resolveCommand.js";
+import resolveCommand from "../../resolveCommand.js";
 
 window.isPipPlaying = false;
 let PlayerService = null;

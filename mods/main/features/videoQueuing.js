@@ -3,7 +3,7 @@ window.queuedVideos = {
     lastVideoId: null
 };
 
-import resolveCommand from '../resolveCommand.js';
+import resolveCommand from '../../resolveCommand.js';
 
 function addListener() {
     const videoPlayer = document.querySelector('.html5-video-player');
