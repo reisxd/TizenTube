@@ -1,3 +1,6 @@
+.github/*
+!.github/FUNDING.yml
+
 node_modules
 mods
 service
