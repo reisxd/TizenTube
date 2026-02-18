@@ -11,7 +11,12 @@ const interval = setInterval(() => {
 
 function execute_once_dom_loaded_speed() {
     document.querySelector('video').addEventListener('canplay', () => {
-        document.getElementsByTagName('video')[0].playbackRate = configRead('videoSpeed');;
+        const video = document.getElementsByTagName('video')[0];
+        if (configRead('force1xForMusic') && window.isMusicVideo) {
+            video.playbackRate = 1;
+        } else {
+            video.playbackRate = configRead('videoSpeed');
+        }
     });
 
     const eventHandler = (evt) => {

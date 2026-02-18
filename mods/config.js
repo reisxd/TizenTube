@@ -49,7 +49,8 @@ const defaultConfig = {
   disabledSidebarContents: [],
   enableUpdater: true,
   autoFrameRate: false,
-  autoFrameRatePauseVideoFor: 0
+  autoFrameRatePauseVideoFor: 0,
+  force1xForMusic: false
 };
 
 let localConfig;
@@ -93,7 +94,7 @@ export const configChangeEmitter = {
     this.listeners[type].forEach(cb => {
       try {
         cb.call(this, event)
-      } catch (_) {};
+      } catch (_) { };
     });
   }
 };
