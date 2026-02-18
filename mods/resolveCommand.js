@@ -115,20 +115,17 @@ export function patchResolveCommand() {
                     for (const command of cmd.commandExecutorCommand.commands) {
                         if (command.customAction) {
                             customAction(command.customAction.action, command.customAction.parameters);
-                            return true;
                         } else if (command.signalAction?.customAction) {
                             customAction(command.signalAction.customAction.action, command.signalAction.customAction.parameters);
-                            return true;
                         } else if (command.showEngagementPanelEndpoint?.customAction) {
                             customAction(command.showEngagementPanelEndpoint.customAction.action, command.showEngagementPanelEndpoint.customAction.parameters);
-                            return true;
                         } else if (command.playlistEditEndpoint?.customAction) {
                             customAction(command.playlistEditEndpoint.customAction.action, command.playlistEditEndpoint.customAction.parameters);
-                            return true;
                         } else {
-                            return window._yttv[key].instance.resolveCommand(cmd, _);
+                            window._yttv[key].instance.resolveCommand(command, _);
                         }
                     }
+                    return true;
                 }
 
                 return ogResolve.call(this, cmd, _);
