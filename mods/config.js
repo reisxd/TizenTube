@@ -2,6 +2,7 @@ const CONFIG_KEY = 'ytaf-configuration';
 const defaultConfig = {
   enableAdBlock: true,
   enableSponsorBlock: true,
+  enableSponsorBlockToasts: true,
   sponsorBlockManualSkips: ['intro', 'outro', 'filler'],
   enableSponsorBlockSponsor: true,
   enableSponsorBlockIntro: true,
@@ -49,7 +50,8 @@ const defaultConfig = {
   disabledSidebarContents: [],
   enableUpdater: true,
   autoFrameRate: false,
-  autoFrameRatePauseVideoFor: 0
+  autoFrameRatePauseVideoFor: 0,
+  enableSigninReminder: false
 };
 
 let localConfig;
