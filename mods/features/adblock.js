@@ -37,14 +37,39 @@ JSON.parse = function () {
     r.paidContentOverlay = null;
   }
 
-  if (r?.streamingData?.adaptiveFormats && configRead('videoPreferredCodec') !== 'any') {
+  if (r?.streamingData?.adaptiveFormats) {
+    const disableAV1 = configRead('disableAV1');
+    const disableVP9 = configRead('disableVP9');
+    const disableAVC = configRead('disableAVC');
+    const disableVP8 = configRead('disableVP8');
+    const disableHEVC = configRead('disableHEVC');
+    const disable60fps = configRead('disable60fps');
     const preferredCodec = configRead('videoPreferredCodec');
-    const hasPreferredCodec = r.streamingData.adaptiveFormats.find(format => format.mimeType.includes(preferredCodec));
-    if (hasPreferredCodec) {
-      r.streamingData.adaptiveFormats = r.streamingData.adaptiveFormats.filter(format => {
-        if (format.mimeType.startsWith('audio/')) return true;
-        return format.mimeType.includes(preferredCodec);
-      });
+
+    r.streamingData.adaptiveFormats = r.streamingData.adaptiveFormats.filter(format => {
+      if (format.mimeType.startsWith('audio/')) return true;
+
+      const lowerMime = format.mimeType.toLowerCase();
+      if (disableAV1 && (lowerMime.includes('av1') || lowerMime.includes('av01'))) return false;
+      if (disableVP9 && (lowerMime.includes('vp9') || lowerMime.includes('vp09'))) return false;
+      if (disableAVC && (lowerMime.includes('avc') || lowerMime.includes('avc1'))) return false;
+      if (disableVP8 && (lowerMime.includes('vp8') || lowerMime.includes('vp08'))) return false;
+      if (disableHEVC && (lowerMime.includes('hev') || lowerMime.includes('hvc'))) return false;
+
+      if (disable60fps && format.fps > 30) return false;
+
+      return true;
+    });
+
+    // Preferred codec logic (if set and available)
+    if (preferredCodec !== 'any') {
+      const hasPreferredCodec = r.streamingData.adaptiveFormats.some(format => format.mimeType.includes(preferredCodec));
+      if (hasPreferredCodec) {
+        r.streamingData.adaptiveFormats = r.streamingData.adaptiveFormats.filter(format => {
+          if (format.mimeType.startsWith('audio/')) return true;
+          return format.mimeType.includes(preferredCodec);
+        });
+      }
     }
   }
 
