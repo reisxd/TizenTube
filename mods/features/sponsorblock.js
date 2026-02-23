@@ -316,7 +316,9 @@ class SponsorBlockHandler {
 
           if (wasSkippedBefore.lastSkipped - wasSkippedBefore.firstSkipped < 1000) {
             if (!wasSkippedBefore.hasShownToast) {
-              showToast('SponsorBlock', `Not skipping ${skipName} (was skipped ${wasSkippedBefore.count} times)`);
+              if (configRead('enableSponsorBlockToasts')) {
+                showToast('SponsorBlock', `Not skipping ${skipName} (was skipped ${wasSkippedBefore.count} times)`);
+              }
               wasSkippedBefore.hasShownToast = true;
               this.skippedCategories.set(segment.UUID, wasSkippedBefore);
             }
@@ -330,8 +332,9 @@ class SponsorBlockHandler {
             hasShownToast: false
           });
         }
-
-        showToast('SponsorBlock', `Skipping ${skipName}`);
+        if (configRead('enableSponsorBlockToasts')) {
+          showToast('SponsorBlock', `Skipping ${skipName}`);
+        }
         if (this.video.duration - end < 1) {
           this.video.currentTime = end - 1;
         } else this.video.currentTime = end;

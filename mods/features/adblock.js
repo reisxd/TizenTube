@@ -17,6 +17,7 @@ const origParse = JSON.parse;
 JSON.parse = function () {
   const r = origParse.apply(this, arguments);
   const adBlockEnabled = configRead('enableAdBlock');
+  const signinReminderEnabled = configRead('enableSigninReminder');
 
   // Music Video Detection
   if (r.videoDetails) {
@@ -64,6 +65,13 @@ JSON.parse = function () {
     r?.contents?.tvBrowseRenderer?.content?.tvSurfaceContentRenderer?.content
       ?.sectionListRenderer?.contents
   ) {
+    if (!signinReminderEnabled) {
+      r.contents.tvBrowseRenderer.content.tvSurfaceContentRenderer.content.sectionListRenderer.contents =
+        r.contents.tvBrowseRenderer.content.tvSurfaceContentRenderer.content.sectionListRenderer.contents.filter(
+          (elm) => !elm.feedNudgeRenderer
+        );
+    }
+
     if (adBlockEnabled) {
       r.contents.tvBrowseRenderer.content.tvSurfaceContentRenderer.content.sectionListRenderer.contents =
         r.contents.tvBrowseRenderer.content.tvSurfaceContentRenderer.content.sectionListRenderer.contents.filter(
@@ -132,6 +140,12 @@ JSON.parse = function () {
   }
 
   if (r?.contents?.singleColumnWatchNextResults?.pivot?.sectionListRenderer) {
+    if (!signinReminderEnabled) {
+      r.contents.singleColumnWatchNextResults.pivot.sectionListRenderer.contents =
+        r.contents.singleColumnWatchNextResults.pivot.sectionListRenderer.contents.filter(
+          (elm) => !elm.alertWithActionsRenderer
+        );
+    }
     processShelves(r.contents.singleColumnWatchNextResults.pivot.sectionListRenderer.contents, false);
     if (window.queuedVideos.videos.length > 0) {
       const queuedVideosClone = window.queuedVideos.videos.slice();

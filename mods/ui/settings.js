@@ -186,6 +186,10 @@ export default function modernUI(update, parameters) {
                             value: 'enableSponsorBlockHighlight'
                         }
                     ]
+                },
+                {
+                    name: 'Show SponsorBlock Toasts',
+                    value: 'enableSponsorBlockToasts'
                 }
             ]
         },
@@ -266,6 +270,10 @@ export default function modernUI(update, parameters) {
                 {
                     name: 'Welcome Message',
                     value: 'showWelcomeToast',
+                },
+                {
+                    name: 'Show Sign In Reminder',
+                    value: 'enableSigninReminder'
                 }
             ]
         },
