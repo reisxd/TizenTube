@@ -26,6 +26,8 @@ const defaultConfig = {
   enableShorts: true,
   dontCheckUpdateUntil: 0,
   enableWhoIsWatchingMenu: false,
+  permanentlyEnableWhoIsWatchingMenu: false,
+  enableWhosWatchingMenuOnAppExit: false,
   enableShowUserLanguage: true,
   enableShowOtherLanguages: false,
   showWelcomeToast: true,

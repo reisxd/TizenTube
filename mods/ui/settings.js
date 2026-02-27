@@ -19,6 +19,7 @@ export default function modernUI(update, parameters) {
                     overlayMessageRenderer('1. Star the GitHub repository to help increase its visibility.'),
                     overlayMessageRenderer('2. Share TizenTube with others.'),
                     overlayMessageRenderer('If you would like to contribute financially, consider donating:'),
+                    overlayMessageRenderer('- Buy Me A Coffee: https://www.buymeacoffee.com/reisxd (preferably)'),
                     overlayMessageRenderer('- GitHub Sponsors: https://github.com/sponsors/reisxd')
                 ])
             }
@@ -51,6 +52,14 @@ export default function modernUI(update, parameters) {
                 {
                     name: 'Website',
                     link: 'https://tizentube.6513006.xyz',
+                },
+                {
+                    name: 'Buy Me A Coffee',
+                    link: 'https://www.buymeacoffee.com/reisxd',
+                },
+                {
+                    name: 'GitHub Sponsors',
+                    link: 'https:///github.com/sponsors/reisxd',
                 }
             ].map((option) => {
                 if (!qrcodes[option.name]) {
@@ -237,7 +246,22 @@ export default function modernUI(update, parameters) {
                 {
                     name: "Who's Watching Menu",
                     icon: 'ACCOUNT_CIRCLE',
-                    value: 'enableWhoIsWatchingMenu'
+                    menuId: 'tt-whos-watching-menu-settings',
+                    value: null,
+                    options: [
+                        {
+                            name: "Enable Who's Watching Menu",
+                            value: 'enableWhoIsWatchingMenu'
+                        },
+                        {
+                            name: "Permanently Enable Who's Watching Menu",
+                            value: 'permanentlyEnableWhoIsWatchingMenu'
+                        },
+                        {
+                            name: "Enable Who's Watching Menu on App Exit",
+                            value: 'enableWhosWatchingMenuOnAppExit'
+                        }
+                    ]
                 },
                 {
                     name: 'Fix UI',
