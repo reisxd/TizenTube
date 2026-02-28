@@ -3,6 +3,7 @@ import terser from '@rollup/plugin-terser';
 import getBabelOutputPlugin from '@rollup/plugin-babel';
 import { nodeResolve } from '@rollup/plugin-node-resolve';
 import commonjs from '@rollup/plugin-commonjs';
+import json from '@rollup/plugin-json';
 
 export default {
     input: "userScript.js",
@@ -15,6 +16,7 @@ export default {
             browser: true,
             preferBuiltins: false,
         }),
+        json(),
         commonjs({
             include: [/node_modules/, /mods/],
             transformMixedEsModules: true,
