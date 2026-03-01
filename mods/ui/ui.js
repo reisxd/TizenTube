@@ -181,7 +181,7 @@ function execute_once_dom_loaded() {
         const isSearchFocused = document.querySelector('ytlr-search-text-box > .zylon-focus');
         const voiceButton = document.querySelector('#tt-voice-search-button');
         if (isSearchFocused && voiceButton) {
-          showToast('Voice Search', 'Press [OK] to activate voice search');
+          //     showToast('Voice Search', 'Press [OK] to activate voice search');
           voiceButton.focus();
           evt.preventDefault();
           evt.stopPropagation();
@@ -203,7 +203,7 @@ function execute_once_dom_loaded() {
   document.addEventListener('keyup', eventHandler, true);
   if (configRead('showWelcomeToast')) {
     setTimeout(() => {
-      showToast('Welcome to TizenTubeAV 2.1.47', 'Go to settings and click on TizenTube Settings for settings, press [RED] to open TizenTube Theme Settings.');
+      //showToast('Welcome to TizenTubeJX', 'Go to settings and click on TizenTube Settings for settings, press [RED] to open TizenTube Theme Settings.');
     }, 2000);
   }
 
@@ -211,8 +211,8 @@ function execute_once_dom_loaded() {
   setTimeout(() => {
     const apiKeys = window.webapis ? Object.keys(window.webapis).slice(0, 10).join(", ") : "none";
     const tizenKeys = window.tizen ? Object.keys(window.tizen).slice(0, 5).join(", ") : "none";
-    showToast("Debug API", "Webapis: " + !!window.webapis + " | Tizen: " + !!window.tizen + " | Voice: " + (window.webapis ? !!window.webapis.voiceinteraction : "N/A"));
-    showToast("API Keys", "WebAPI: " + apiKeys + " | Tizen: " + tizenKeys);
+    //  showToast("Debug API", "Webapis: " + !!window.webapis + " | Tizen: " + !!window.tizen + " | Voice: " + (window.webapis ? !!window.webapis.voiceinteraction : "N/A"));
+    //  showToast("API Keys", "WebAPI: " + apiKeys + " | Tizen: " + tizenKeys);
     console.log("Webapis:", !!window.webapis, "Tizen:", !!window.tizen);
   }, 5000);
 

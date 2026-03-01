@@ -20,21 +20,21 @@ function initVoiceInteraction() {
         try {
             window.webapis.voiceinteraction.setCallback({
                 onupdatestate: function () {
-                    showToast("VoiceSearch", "[VoiceSearch] VIF requesting app state");
+                    //showToast("VoiceSearch", "[VoiceSearch] VIF requesting app state");
                     return "List";
                 },
                 onsearch: function (vt) {
-                    showToast("VoiceSearch", "[VoiceSearch] VIF onsearch triggered:", vt);
+                    // showToast("VoiceSearch", "[VoiceSearch] VIF onsearch triggered:", vt);
                     const utterance = window.webapis.voiceinteraction.getDataFromSearchTerm(vt, "SEARCH_TERM_UTTERANCE");
                     if (utterance) {
-                        showToast("VoiceSearch", "[VoiceSearch] Recognized utterance:", utterance);
+                        // showToast("VoiceSearch", "[VoiceSearch] Recognized utterance:", utterance);
                         performSearch(utterance);
                     }
                     return true;
                 }
             });
             window.webapis.voiceinteraction.listen();
-            showToast("VoiceSearch", "[VoiceSearch] VIF listen() called");
+            //  showToast("VoiceSearch", "[VoiceSearch] VIF listen() called");
         } catch (e) {
             console.error("[VoiceSearch] VIF initialization failed:", e);
         }
