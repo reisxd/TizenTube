@@ -321,10 +321,59 @@ function normalizeHorizontalListRenderer(horizontalListRenderer, context = '') {
   const after = {
     visibleItemCount: horizontalListRenderer.visibleItemCount,
     collapsedItemCount: horizontalListRenderer.collapsedItemCount,
-    totalItemCount: horizontalListRenderer.totalItemCount
+    totalItemCount: horizontalListRenderer.totalItemCount,
+    selectedIndex: horizontalListRenderer.selectedIndex,
+    focusIndex: horizontalListRenderer.focusIndex,
+    currentIndex: horizontalListRenderer.currentIndex
   };
 
+  const clamp = (value) => {
+    if (typeof value !== 'number') return value;
+    if (count <= 0) return 0;
+    return Math.max(0, Math.min(count - 1, value));
+  };
+
+  if (typeof horizontalListRenderer.selectedIndex === 'number') {
+    horizontalListRenderer.selectedIndex = clamp(horizontalListRenderer.selectedIndex);
+  }
+  if (typeof horizontalListRenderer.focusIndex === 'number') {
+    horizontalListRenderer.focusIndex = clamp(horizontalListRenderer.focusIndex);
+  }
+  if (typeof horizontalListRenderer.currentIndex === 'number') {
+    horizontalListRenderer.currentIndex = clamp(horizontalListRenderer.currentIndex);
+  }
+
   appendFileOnlyLogOnce(`list.normalize.${context}`.substring(0, 48), {
+    context,
+    count,
+    before,
+    after
+  });
+}
+
+function normalizeGridRenderer(gridRenderer, context = '') {
+  if (!gridRenderer || !Array.isArray(gridRenderer.items)) return;
+  const count = gridRenderer.items.length;
+
+  const before = {
+    visibleItemCount: gridRenderer.visibleItemCount,
+    totalItemCount: gridRenderer.totalItemCount,
+    currentIndex: gridRenderer.currentIndex
+  };
+
+  if (typeof gridRenderer.visibleItemCount === 'number') gridRenderer.visibleItemCount = count;
+  if (typeof gridRenderer.totalItemCount === 'number') gridRenderer.totalItemCount = count;
+  if (typeof gridRenderer.currentIndex === 'number') {
+    gridRenderer.currentIndex = count <= 0 ? 0 : Math.max(0, Math.min(count - 1, gridRenderer.currentIndex));
+  }
+
+  const after = {
+    visibleItemCount: gridRenderer.visibleItemCount,
+    totalItemCount: gridRenderer.totalItemCount,
+    currentIndex: gridRenderer.currentIndex
+  };
+
+  appendFileOnlyLogOnce(`grid.normalize.${context}`.substring(0, 48), {
     context,
     count,
     before,
@@ -544,6 +593,7 @@ JSON.parse = function () {
   if (r?.contents?.tvBrowseRenderer?.content?.tvSurfaceContentRenderer?.content?.gridRenderer?.items) {
     const gridItems = r.contents.tvBrowseRenderer.content.tvSurfaceContentRenderer.content.gridRenderer.items;
     r.contents.tvBrowseRenderer.content.tvSurfaceContentRenderer.content.gridRenderer.items = hideVideo(gridItems, detectedPage);
+    normalizeGridRenderer(r.contents.tvBrowseRenderer.content.tvSurfaceContentRenderer.content.gridRenderer, 'contents.tvBrowseRenderer.grid');
   }
 
   if (r?.continuationContents?.sectionListContinuation?.contents) {
@@ -576,6 +626,7 @@ JSON.parse = function () {
       !!r?.continuationContents?.gridContinuation?.continuations,
       'gridContinuation'
     );
+    normalizeGridRenderer(r.continuationContents.gridContinuation, 'continuation.grid');
   }
 
   // FIX (Bug 2): Handle playlist scroll-down continuations.
@@ -631,6 +682,7 @@ JSON.parse = function () {
         const gridItems = tab?.tabRenderer?.content?.tvSurfaceContentRenderer?.content?.gridRenderer?.items;
         if (Array.isArray(gridItems)) {
           tab.tabRenderer.content.tvSurfaceContentRenderer.content.gridRenderer.items = hideVideo(gridItems, detectedPage);
+          normalizeGridRenderer(tab.tabRenderer.content.tvSurfaceContentRenderer.content.gridRenderer, 'tab.grid');
         }
 
         const playlistItems = tab?.tabRenderer?.content?.tvSurfaceContentRenderer?.content?.playlistVideoListRenderer?.contents;
