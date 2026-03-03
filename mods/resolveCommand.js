@@ -128,6 +128,18 @@ export function patchResolveCommand() {
                     return true;
                 }
 
+                if (cmd?.requestAccountSelectorCommand 
+                    && cmd.requestAccountSelectorCommand?.identityActionContext?.eventTrigger === 'ACCOUNT_EVENT_TRIGGER_ON_EXIT') {
+                    if (!configRead('enableWhosWatchingMenuOnAppExit')) {
+                        ogResolve.call(this, {
+                            signalAction: {
+                                signal: 'EXIT_APP'
+                            }
+                        });
+                        return false;
+                    }
+                }
+
                 return ogResolve.call(this, cmd, _);
             }
         }

@@ -26,6 +26,8 @@ const defaultConfig = {
   enableShorts: true,
   dontCheckUpdateUntil: 0,
   enableWhoIsWatchingMenu: false,
+  permanentlyEnableWhoIsWatchingMenu: false,
+  enableWhosWatchingMenuOnAppExit: false,
   enableShowUserLanguage: true,
   enableShowOtherLanguages: false,
   showWelcomeToast: true,
@@ -53,7 +55,8 @@ const defaultConfig = {
   autoFrameRatePauseVideoFor: 0,
   enableSigninReminder: false,
   enableDebugConsole: false,
-  debugConsolePosition: 'bottom-right',
+  enableDebugLogging: false,
+  debugConsolePosition: 'top-left',
   debugConsoleHeight: 1054
 };
 
