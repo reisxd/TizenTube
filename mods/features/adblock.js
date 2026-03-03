@@ -258,6 +258,12 @@ function filterLibraryNavTabs(sections, detectedPage) {
     if (tabs.length !== before)
       appendFileOnlyLog('library.navtabs.result', { before, after: tabs.length });
   }
+
+  const allText = collectAllText(tile);
+  const durationCandidate = allText.map(parseDurationToSeconds).find((v) => Number.isFinite(v));
+  if (Number.isFinite(durationCandidate) && durationCandidate > 0 && durationCandidate <= 180) return true;
+
+  return false;
 }
 
 function isLikelyShortItem(item) {
