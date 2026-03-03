@@ -185,9 +185,18 @@ function pruneLibraryTabsInResponse(node, path = 'root') {
   }
 }
 
-// NEW: filter the tabs[] array inside tvSecondaryNavSectionRenderer by browseId.
-// The old pruneLibraryTabsInResponse only walked horizontalListRenderer.items (shelf rows),
-// so the nav tab bar entries were never touched.
+// FIX (Bug 4): Broaden browseId extraction to cover all known TV nav tab endpoint paths,
+// including navigationEndpoint which YouTube TV uses most commonly.
+function extractNavTabBrowseId(tab) {
+  return (
+    tab?.tabRenderer?.navigationEndpoint?.browseEndpoint?.browseId ||
+    tab?.tabRenderer?.endpoint?.browseEndpoint?.browseId ||
+    tab?.tabRenderer?.content?.tvSurfaceContentRenderer?.browseEndpoint?.browseId ||
+    tab?.tabRenderer?.content?.tvSurfaceContentRenderer?.content?.browseEndpoint?.browseId ||
+    ''
+  );
+}
+
 function filterLibraryNavTabs(sections, detectedPage) {
   if (detectedPage !== 'library') return;
   if (!Array.isArray(sections)) return;
@@ -196,10 +205,8 @@ function filterLibraryNavTabs(sections, detectedPage) {
     if (!Array.isArray(tabs)) continue;
     const before = tabs.length;
     for (let i = tabs.length - 1; i >= 0; i--) {
-      const browseId = String(
-        tabs[i]?.tabRenderer?.endpoint?.browseEndpoint?.browseId ||
-        tabs[i]?.tabRenderer?.content?.tvSurfaceContentRenderer?.browseEndpoint?.browseId || ''
-      ).toLowerCase();
+      const browseId = String(extractNavTabBrowseId(tabs[i])).toLowerCase();
+      appendFileOnlyLog('library.navtab.check', { browseId, index: i });
       if (HIDDEN_LIBRARY_TAB_IDS.has(browseId)) {
         appendFileOnlyLog('library.navtab.removed', { browseId, index: i });
         tabs.splice(i, 1);
@@ -401,12 +408,25 @@ JSON.parse = function () {
     }
   }
 
+  // FIX (Bug 2): Handle playlist scroll-down continuations.
+  // These use TILE_STYLE_YTLR_VERTICAL_LIST tiles and come through a different continuation key.
+  if (r?.continuationContents?.playlistVideoListContinuation?.contents) {
+    const playlistItems = r.continuationContents.playlistVideoListContinuation.contents;
+    deArrowify(playlistItems);
+    addLongPress(playlistItems);
+    r.continuationContents.playlistVideoListContinuation.contents = hideVideo(playlistItems, detectedPage);
+  }
+
   if (r?.contents?.tvBrowseRenderer?.content?.tvSecondaryNavRenderer?.sections) {
     filterLibraryNavTabs(r.contents.tvBrowseRenderer.content.tvSecondaryNavRenderer.sections, detectedPage);
 
     for (const section of r.contents.tvBrowseRenderer.content.tvSecondaryNavRenderer.sections) {
+      if (!Array.isArray(section?.tvSecondaryNavSectionRenderer?.tabs)) continue;
       for (const tab of section.tvSecondaryNavSectionRenderer.tabs) {
-        processShelves(tab.tabRenderer.content.tvSurfaceContentRenderer.content.sectionListRenderer.contents, true, detectedPage);
+        const contents = tab?.tabRenderer?.content?.tvSurfaceContentRenderer?.content?.sectionListRenderer?.contents;
+        if (Array.isArray(contents)) {
+          processShelves(contents, true, detectedPage);
+        }
       }
     }
   }
@@ -529,54 +549,65 @@ for (const key in window._yttv) {
 }
 
 
+// FIX (Bug 1): Replaced for...of + splice with a reverse for-loop.
+// The old for...of loop mutated the array while iterating — when an item was spliced out at
+// index i, the item that was at i+1 shifted to i, but the iterator advanced to i+1, silently
+// skipping it. This caused the Shorts shelf (and any shelf immediately after a removed one)
+// to be missed. Iterating in reverse avoids all index-shift problems.
 function processShelves(shelves, shouldAddPreviews = true, pageHint = null) {
+  if (!Array.isArray(shelves)) return;
   const activePage = pageHint || getActivePage();
   appendFileOnlyLog('processShelves.start', {
     page: activePage,
-    shelfCount: Array.isArray(shelves) ? shelves.length : 0,
+    shelfCount: shelves.length,
     shouldAddPreviews
   });
 
-  for (const shelve of shelves) {
-    if (shelve.shelfRenderer) {
-      deArrowify(shelve.shelfRenderer.content.horizontalListRenderer.items);
-      hqify(shelve.shelfRenderer.content.horizontalListRenderer.items);
-      addLongPress(shelve.shelfRenderer.content.horizontalListRenderer.items);
-      if (shouldAddPreviews) {
-        addPreviews(shelve.shelfRenderer.content.horizontalListRenderer.items);
-      }
-      shelve.shelfRenderer.content.horizontalListRenderer.items = hideVideo(shelve.shelfRenderer.content.horizontalListRenderer.items, activePage);
-      if (activePage === 'library') {
-        shelve.shelfRenderer.content.horizontalListRenderer.items = filterHiddenLibraryTabs(shelve.shelfRenderer.content.horizontalListRenderer.items, 'processShelves.shelfRenderer.horizontalListRenderer.items');
-      }
-      if (!configRead('enableShorts')) {
-        const shelfTitleDirect = String(shelve?.shelfRenderer?.title?.simpleText || '').toLowerCase();
-        const shelfTitleFromHeader = collectAllText(shelve?.shelfRenderer?.header).join(' ').toLowerCase();
-        const shelfTitle = shelfTitleDirect || shelfTitleFromHeader;
-        appendFileOnlyLogOnce('shelf.title.' + shelfTitle.substring(0, 24), {
-          page: activePage,
-          rendererType: shelve?.shelfRenderer?.tvhtml5ShelfRendererType || '',
-          direct: shelfTitleDirect, fromHeader: shelfTitleFromHeader.substring(0, 60)
-        });
-        if (shelve.shelfRenderer.tvhtml5ShelfRendererType === 'TVHTML5_SHELF_RENDERER_TYPE_SHORTS' || shelfTitle.includes('short')) {
-          appendFileOnlyLog('shorts.shelf.remove', {
-            page: activePage,
-            reason: 'TVHTML5_SHELF_RENDERER_TYPE_SHORTS',
-            shelfTitle: shelve?.shelfRenderer?.title || ''
-          });
-          shelves.splice(shelves.indexOf(shelve), 1);
-          continue;
-        }
+  for (let i = shelves.length - 1; i >= 0; i--) {
+    const shelve = shelves[i];
+    if (!shelve.shelfRenderer) continue;
 
-        const beforeShortsFilter = shelve.shelfRenderer.content.horizontalListRenderer.items.length;
-        shelve.shelfRenderer.content.horizontalListRenderer.items = shelve.shelfRenderer.content.horizontalListRenderer.items.filter(item => !isLikelyShortItem(item));
-        appendFileOnlyLog('shorts.tiles.filter', {
+    deArrowify(shelve.shelfRenderer.content.horizontalListRenderer.items);
+    hqify(shelve.shelfRenderer.content.horizontalListRenderer.items);
+    addLongPress(shelve.shelfRenderer.content.horizontalListRenderer.items);
+    if (shouldAddPreviews) {
+      addPreviews(shelve.shelfRenderer.content.horizontalListRenderer.items);
+    }
+    shelve.shelfRenderer.content.horizontalListRenderer.items = hideVideo(shelve.shelfRenderer.content.horizontalListRenderer.items, activePage);
+    if (activePage === 'library') {
+      shelve.shelfRenderer.content.horizontalListRenderer.items = filterHiddenLibraryTabs(shelve.shelfRenderer.content.horizontalListRenderer.items, 'processShelves.shelfRenderer.horizontalListRenderer.items');
+    }
+    if (!configRead('enableShorts')) {
+      const shelfTitleDirect = String(shelve?.shelfRenderer?.title?.simpleText || '').toLowerCase();
+      const shelfTitleFromHeader = collectAllText(shelve?.shelfRenderer?.header).join(' ').toLowerCase();
+      const shelfTitle = shelfTitleDirect || shelfTitleFromHeader;
+      appendFileOnlyLogOnce('shelf.title.' + shelfTitle.substring(0, 24), {
+        page: activePage,
+        rendererType: shelve?.shelfRenderer?.tvhtml5ShelfRendererType || '',
+        direct: shelfTitleDirect, fromHeader: shelfTitleFromHeader.substring(0, 60)
+      });
+      if (
+        shelve.shelfRenderer.tvhtml5ShelfRendererType === 'TVHTML5_SHELF_RENDERER_TYPE_SHORTS' ||
+        shelfTitle.includes('short')
+      ) {
+        appendFileOnlyLog('shorts.shelf.remove', {
           page: activePage,
-          before: beforeShortsFilter,
-          after: shelve.shelfRenderer.content.horizontalListRenderer.items.length,
-          removed: beforeShortsFilter - shelve.shelfRenderer.content.horizontalListRenderer.items.length
+          reason: 'TVHTML5_SHELF_RENDERER_TYPE_SHORTS',
+          shelfTitle: shelve?.shelfRenderer?.title || ''
         });
+        // Safe to splice because we are iterating in reverse
+        shelves.splice(i, 1);
+        continue;
       }
+
+      const beforeShortsFilter = shelve.shelfRenderer.content.horizontalListRenderer.items.length;
+      shelve.shelfRenderer.content.horizontalListRenderer.items = shelve.shelfRenderer.content.horizontalListRenderer.items.filter(item => !isLikelyShortItem(item));
+      appendFileOnlyLog('shorts.tiles.filter', {
+        page: activePage,
+        before: beforeShortsFilter,
+        after: shelve.shelfRenderer.content.horizontalListRenderer.items.length,
+        removed: beforeShortsFilter - shelve.shelfRenderer.content.horizontalListRenderer.items.length
+      });
     }
   }
 }
@@ -641,10 +672,15 @@ function deArrowify(items) {
 function hqify(items) {
   for (const item of items) {
     if (!item.tileRenderer) continue;
-    if (item.tileRenderer.style !== 'TILE_STYLE_YTLR_DEFAULT') continue;
+    // FIX (Bug 3): Also handle vertical-list tiles used in playlists.
+    if (
+      item.tileRenderer.style !== 'TILE_STYLE_YTLR_DEFAULT' &&
+      item.tileRenderer.style !== 'TILE_STYLE_YTLR_VERTICAL_LIST'
+    ) continue;
     if (configRead('enableHqThumbnails')) {
-      const videoID = item.tileRenderer.onSelectCommand.watchEndpoint.videoId;
-      const queryArgs = item.tileRenderer.header.tileHeaderRenderer.thumbnail.thumbnails[0].url.split('?')[1];
+      const videoID = item.tileRenderer.onSelectCommand?.watchEndpoint?.videoId;
+      if (!videoID) continue;
+      const queryArgs = item.tileRenderer.header?.tileHeaderRenderer?.thumbnail?.thumbnails?.[0]?.url?.split('?')[1];
       item.tileRenderer.header.tileHeaderRenderer.thumbnail.thumbnails = [
         {
           url: `https://i.ytimg.com/vi/${videoID}/sddefault.jpg${queryArgs ? `?${queryArgs}` : ''}`,
@@ -659,7 +695,11 @@ function hqify(items) {
 function addLongPress(items) {
   for (const item of items) {
     if (!item.tileRenderer) continue;
-    if (item.tileRenderer.style !== 'TILE_STYLE_YTLR_DEFAULT') continue;
+    // FIX (Bug 3): Also handle vertical-list tiles used in playlists.
+    if (
+      item.tileRenderer.style !== 'TILE_STYLE_YTLR_DEFAULT' &&
+      item.tileRenderer.style !== 'TILE_STYLE_YTLR_VERTICAL_LIST'
+    ) continue;
     if (item.tileRenderer.onLongPressCommand) {
       item.tileRenderer.onLongPressCommand.showMenuCommand.menu.menuRenderer.items.push(MenuServiceItemRenderer('Add to Queue', {
         clickTrackingParams: null,
