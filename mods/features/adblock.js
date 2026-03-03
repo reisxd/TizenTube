@@ -106,6 +106,8 @@ function getItemTitle(item) {
     || 'unknown';
 }
 
+const HIDDEN_LIBRARY_TAB_IDS = new Set(['femusic_last_played', 'festorefront', 'fecollection_podcasts', 'femy_videos']);
+
 function isLikelyShortItem(item) {
   const tile = item?.tileRenderer;
   if (!tile) return false;
@@ -135,10 +137,12 @@ JSON.parse = function () {
   const r = origParse.apply(this, arguments);
   const adBlockEnabled = configRead('enableAdBlock');
 
+  const detectedPage = detectCurrentPage();
   appendFileOnlyLog('json.parse.meta', {
     hash: location.hash || '',
     path: location.pathname || '',
     search: location.search || '',
+    detectedPage,
     rootType: Array.isArray(r) ? 'array' : typeof r,
     rootKeys: r && typeof r === 'object' ? Object.keys(r).slice(0, 40) : []
   });
@@ -541,6 +545,12 @@ function hideVideo(items) {
 
     const progressBar = item.tileRenderer.header?.tileHeaderRenderer?.thumbnailOverlays?.find(overlay => overlay.thumbnailOverlayResumePlaybackRenderer)?.thumbnailOverlayResumePlaybackRenderer;
     const title = item?.tileRenderer?.metadata?.tileMetadataRenderer?.title?.simpleText || item?.tileRenderer?.contentId || 'unknown';
+    const contentId = String(item?.tileRenderer?.contentId || '').toLowerCase();
+
+    if (pageName === 'library' && HIDDEN_LIBRARY_TAB_IDS.has(contentId)) {
+      appendFileOnlyLog('hideVideo.item', { pageName, title, contentId, hasProgress: !!progressBar, remove: true, reason: 'library_tab_hidden' });
+      return false;
+    }
 
     const shortLike = isLikelyShortItem(item);
     if (!shortsEnabled && shortLike) {
