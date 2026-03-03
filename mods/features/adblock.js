@@ -65,6 +65,42 @@ function detectCurrentPage() {
   return pageName;
 }
 
+function normalizeBrowseIdToPage(rawBrowseId = '') {
+  const browseId = String(rawBrowseId || '').toLowerCase();
+  if (!browseId) return null;
+  if (browseId.includes('fesubscription')) return 'subscriptions';
+  if (browseId.startsWith('uc')) return 'channel';
+  if (browseId === 'fehistory') return 'history';
+  if (browseId === 'felibrary') return 'library';
+  if (browseId === 'feplaylist_aggregation') return 'playlists';
+  if (browseId === 'femy_youtube' || browseId === 'vlwl' || browseId === 'vlll' || browseId.startsWith('vlpl')) return 'playlist';
+  return null;
+}
+
+function detectPageFromResponse(response) {
+  const serviceParams = response?.responseContext?.serviceTrackingParams || [];
+  for (const entry of serviceParams) {
+    for (const param of (entry?.params || [])) {
+      if (param?.key === 'browse_id') {
+        const detected = normalizeBrowseIdToPage(param?.value);
+        if (detected) return detected;
+      }
+    }
+  }
+
+  const targetId = String(response?.contents?.tvBrowseRenderer?.targetId || '');
+  if (targetId.startsWith('browse-feed')) {
+    const detected = normalizeBrowseIdToPage(targetId.replace('browse-feed', ''));
+    if (detected) return detected;
+  }
+
+  return null;
+}
+
+function getActivePage() {
+  return window.__ttLastDetectedPage || detectCurrentPage();
+}
+
 function collectAllText(node, out = []) {
   if (!node) return out;
   if (typeof node === 'string') {
@@ -108,6 +144,46 @@ function getItemTitle(item) {
 
 const HIDDEN_LIBRARY_TAB_IDS = new Set(['femusic_last_played', 'festorefront', 'fecollection_podcasts', 'femy_videos']);
 
+function filterHiddenLibraryTabs(items, context = '') {
+  if (!Array.isArray(items)) return items;
+  const before = items.length;
+  const filtered = items.filter((item) => {
+    const contentId = String(item?.tileRenderer?.contentId || '').toLowerCase();
+    return !HIDDEN_LIBRARY_TAB_IDS.has(contentId);
+  });
+
+  if (before !== filtered.length) {
+    appendFileOnlyLog('library.tabs.filter', {
+      context,
+      before,
+      after: filtered.length,
+      removed: before - filtered.length
+    });
+  }
+
+  return filtered;
+}
+
+
+
+function pruneLibraryTabsInResponse(node, path = 'root') {
+  if (!node || typeof node !== 'object') return;
+
+  if (Array.isArray(node)) {
+    for (let i = 0; i < node.length; i++) {
+      pruneLibraryTabsInResponse(node[i], `${path}[${i}]`);
+    }
+    return;
+  }
+
+  if (Array.isArray(node?.horizontalListRenderer?.items)) {
+    node.horizontalListRenderer.items = filterHiddenLibraryTabs(node.horizontalListRenderer.items, `${path}.horizontalListRenderer.items`);
+  }
+
+  for (const key of Object.keys(node)) {
+    pruneLibraryTabsInResponse(node[key], `${path}.${key}`);
+  }
+}
 function isLikelyShortItem(item) {
   const tile = item?.tileRenderer;
   if (!tile) return false;
@@ -137,7 +213,8 @@ JSON.parse = function () {
   const r = origParse.apply(this, arguments);
   const adBlockEnabled = configRead('enableAdBlock');
 
-  const detectedPage = detectCurrentPage();
+  const detectedPage = detectPageFromResponse(r) || detectCurrentPage();
+  window.__ttLastDetectedPage = detectedPage;
   appendFileOnlyLog('json.parse.meta', {
     hash: location.hash || '',
     path: location.pathname || '',
@@ -206,7 +283,11 @@ JSON.parse = function () {
       }
     }
 
-    processShelves(r.contents.tvBrowseRenderer.content.tvSurfaceContentRenderer.content.sectionListRenderer.contents);
+    processShelves(r.contents.tvBrowseRenderer.content.tvSurfaceContentRenderer.content.sectionListRenderer.contents, true, detectedPage);
+
+    if (detectedPage === 'library') {
+      pruneLibraryTabsInResponse(r, 'response');
+    }
   }
 
   if (r.endscreen && configRead('enableHideEndScreenCards')) {
@@ -235,24 +316,28 @@ JSON.parse = function () {
   // DeArrow Implementation. I think this is the best way to do it. (DOM manipulation would be a pain)
 
   if (r?.contents?.sectionListRenderer?.contents) {
-    processShelves(r.contents.sectionListRenderer.contents);
+    processShelves(r.contents.sectionListRenderer.contents, true, detectedPage);
   }
 
   if (r?.continuationContents?.sectionListContinuation?.contents) {
-    processShelves(r.continuationContents.sectionListContinuation.contents);
+    processShelves(r.continuationContents.sectionListContinuation.contents, true, detectedPage);
   }
 
   if (r?.continuationContents?.horizontalListContinuation?.items) {
     deArrowify(r.continuationContents.horizontalListContinuation.items);
     hqify(r.continuationContents.horizontalListContinuation.items);
     addLongPress(r.continuationContents.horizontalListContinuation.items);
-    r.continuationContents.horizontalListContinuation.items = hideVideo(r.continuationContents.horizontalListContinuation.items);
+    r.continuationContents.horizontalListContinuation.items = hideVideo(r.continuationContents.horizontalListContinuation.items, detectedPage);
+    if (detectedPage === 'library') {
+      r.continuationContents.horizontalListContinuation.items = filterHiddenLibraryTabs(r.continuationContents.horizontalListContinuation.items, 'continuation.horizontalListContinuation.items');
+      pruneLibraryTabsInResponse(r.continuationContents, 'response.continuationContents');
+    }
   }
 
   if (r?.contents?.tvBrowseRenderer?.content?.tvSecondaryNavRenderer?.sections) {
     for (const section of r.contents.tvBrowseRenderer.content.tvSecondaryNavRenderer.sections) {
       for (const tab of section.tvSecondaryNavSectionRenderer.tabs) {
-        processShelves(tab.tabRenderer.content.tvSurfaceContentRenderer.content.sectionListRenderer.contents);
+        processShelves(tab.tabRenderer.content.tvSurfaceContentRenderer.content.sectionListRenderer.contents, true, detectedPage);
       }
     }
   }
@@ -264,7 +349,7 @@ JSON.parse = function () {
           (elm) => !elm.alertWithActionsRenderer
         );
     }
-    processShelves(r.contents.singleColumnWatchNextResults.pivot.sectionListRenderer.contents, false);
+    processShelves(r.contents.singleColumnWatchNextResults.pivot.sectionListRenderer.contents, false, detectedPage);
     if (window.queuedVideos.videos.length > 0) {
       const queuedVideosClone = window.queuedVideos.videos.slice();
       queuedVideosClone.unshift(TileRenderer(
@@ -375,9 +460,10 @@ for (const key in window._yttv) {
 }
 
 
-function processShelves(shelves, shouldAddPreviews = true) {
+function processShelves(shelves, shouldAddPreviews = true, pageHint = null) {
+  const activePage = pageHint || getActivePage();
   appendFileOnlyLog('processShelves.start', {
-    page: detectCurrentPage(),
+    page: activePage,
     shelfCount: Array.isArray(shelves) ? shelves.length : 0,
     shouldAddPreviews
   });
@@ -390,12 +476,15 @@ function processShelves(shelves, shouldAddPreviews = true) {
       if (shouldAddPreviews) {
         addPreviews(shelve.shelfRenderer.content.horizontalListRenderer.items);
       }
-      shelve.shelfRenderer.content.horizontalListRenderer.items = hideVideo(shelve.shelfRenderer.content.horizontalListRenderer.items);
+      shelve.shelfRenderer.content.horizontalListRenderer.items = hideVideo(shelve.shelfRenderer.content.horizontalListRenderer.items, activePage);
+      if (activePage === 'library') {
+        shelve.shelfRenderer.content.horizontalListRenderer.items = filterHiddenLibraryTabs(shelve.shelfRenderer.content.horizontalListRenderer.items, 'processShelves.shelfRenderer.horizontalListRenderer.items');
+      }
       if (!configRead('enableShorts')) {
         const shelfTitle = String(shelve?.shelfRenderer?.title?.simpleText || '').toLowerCase();
         if (shelve.shelfRenderer.tvhtml5ShelfRendererType === 'TVHTML5_SHELF_RENDERER_TYPE_SHORTS' || shelfTitle.includes('short')) {
           appendFileOnlyLog('shorts.shelf.remove', {
-            page: detectCurrentPage(),
+            page: activePage,
             reason: 'TVHTML5_SHELF_RENDERER_TYPE_SHORTS',
             shelfTitle: shelve?.shelfRenderer?.title || ''
           });
@@ -406,7 +495,7 @@ function processShelves(shelves, shouldAddPreviews = true) {
         const beforeShortsFilter = shelve.shelfRenderer.content.horizontalListRenderer.items.length;
         shelve.shelfRenderer.content.horizontalListRenderer.items = shelve.shelfRenderer.content.horizontalListRenderer.items.filter(item => !isLikelyShortItem(item));
         appendFileOnlyLog('shorts.tiles.filter', {
-          page: detectCurrentPage(),
+          page: activePage,
           before: beforeShortsFilter,
           after: shelve.shelfRenderer.content.horizontalListRenderer.items.length,
           removed: beforeShortsFilter - shelve.shelfRenderer.content.horizontalListRenderer.items.length
@@ -521,9 +610,9 @@ function addLongPress(items) {
   }
 }
 
-function hideVideo(items) {
+function hideVideo(items, pageHint = null) {
   const pages = configRead('hideWatchedVideosPages') || [];
-  const pageName = detectCurrentPage();
+  const pageName = pageHint || getActivePage();
   const threshold = Number(configRead('hideWatchedVideosThreshold') || 0);
 
   const hideWatchedEnabled = !!configRead('enableHideWatchedVideos');
@@ -541,7 +630,14 @@ function hideVideo(items) {
   let removedWatched = 0;
   let removedShorts = 0;
   const result = items.filter(item => {
-    if (!item.tileRenderer) return true;
+    if (!item.tileRenderer) {
+      appendFileOnlyLog('hideVideo.item.skip', {
+        pageName,
+        rendererKeys: item && typeof item === 'object' ? Object.keys(item).slice(0, 5) : typeof item,
+        reason: 'no_tile_renderer'
+      });
+      return true;
+    }
 
     const progressBar = item.tileRenderer.header?.tileHeaderRenderer?.thumbnailOverlays?.find(overlay => overlay.thumbnailOverlayResumePlaybackRenderer)?.thumbnailOverlayResumePlaybackRenderer;
     const title = item?.tileRenderer?.metadata?.tileMetadataRenderer?.title?.simpleText || item?.tileRenderer?.contentId || 'unknown';
