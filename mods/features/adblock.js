@@ -79,6 +79,10 @@ function normalizeBrowseIdToPage(rawBrowseId = '') {
 }
 
 function detectPageFromResponse(response) {
+  if (response?.contents?.singleColumnWatchNextResults || response?.playerOverlays || response?.videoDetails) {
+    return 'watch';
+  }
+
   const serviceParams = response?.responseContext?.serviceTrackingParams || [];
   for (const entry of serviceParams) {
     for (const param of (entry?.params || [])) {
@@ -268,12 +272,42 @@ function filterLibraryNavTabs(sections, detectedPage) {
     if (tabs.length !== before)
       appendFileOnlyLog('library.navtabs.result', { before, after: tabs.length });
   }
+}
 
-  const allText = collectAllText(tile);
-  const durationCandidate = allText.map(parseDurationToSeconds).find((v) => Number.isFinite(v));
-  if (Number.isFinite(durationCandidate) && durationCandidate > 0 && durationCandidate <= 180) return true;
+function isShortsShelf(shelve) {
+  const shelfRenderer = shelve?.shelfRenderer;
+  if (!shelfRenderer) return !!shelve?.reelShelfRenderer;
 
-  return false;
+  const titleText = [
+    String(shelfRenderer?.title?.simpleText || ''),
+    collectAllText(shelfRenderer?.header).join(' ')
+  ].join(' ').toLowerCase();
+
+  const browseIds = Array.from(extractBrowseIdsDeep(shelfRenderer)).map((id) => String(id).toLowerCase());
+  const hasShortsBrowseId = browseIds.some((id) => id.includes('short') || id.includes('reel'));
+
+  return (
+    shelfRenderer.tvhtml5ShelfRendererType === 'TVHTML5_SHELF_RENDERER_TYPE_SHORTS' ||
+    titleText.includes('short') ||
+    titleText.includes('kurz') ||
+    hasShortsBrowseId
+  );
+}
+
+function getShelfItems(shelve) {
+  return shelve?.shelfRenderer?.content?.horizontalListRenderer?.items || null;
+}
+
+function filterContinuationItems(items, pageName, hasContinuation = false, label = 'continuation') {
+  const filteredItems = hideVideo(items, pageName);
+  if (hasContinuation && filteredItems.length === 0 && Array.isArray(items) && items.length > 0) {
+    appendFileOnlyLog(`${label}.keep-one`, {
+      pageName,
+      originalCount: items.length
+    });
+    return [items[0]];
+  }
+  return filteredItems;
 }
 
 function isLikelyShortItem(item) {
@@ -482,10 +516,16 @@ JSON.parse = function () {
   }
 
   if (r?.continuationContents?.horizontalListContinuation?.items) {
+    const continuation = r.continuationContents.horizontalListContinuation;
     deArrowify(r.continuationContents.horizontalListContinuation.items);
     hqify(r.continuationContents.horizontalListContinuation.items);
     addLongPress(r.continuationContents.horizontalListContinuation.items);
-    r.continuationContents.horizontalListContinuation.items = hideVideo(r.continuationContents.horizontalListContinuation.items, detectedPage);
+    r.continuationContents.horizontalListContinuation.items = filterContinuationItems(
+      r.continuationContents.horizontalListContinuation.items,
+      detectedPage,
+      !!continuation?.continuations,
+      'horizontalListContinuation'
+    );
     if (detectedPage === 'library') {
       r.continuationContents.horizontalListContinuation.items = filterHiddenLibraryTabs(r.continuationContents.horizontalListContinuation.items, 'continuation.horizontalListContinuation.items');
       pruneLibraryTabsInResponse(r.continuationContents, 'response.continuationContents');
@@ -494,7 +534,12 @@ JSON.parse = function () {
 
   if (r?.continuationContents?.gridContinuation?.items) {
     const gridItems = r.continuationContents.gridContinuation.items;
-    r.continuationContents.gridContinuation.items = hideVideo(gridItems, detectedPage);
+    r.continuationContents.gridContinuation.items = filterContinuationItems(
+      gridItems,
+      detectedPage,
+      !!r?.continuationContents?.gridContinuation?.continuations,
+      'gridContinuation'
+    );
   }
 
   // FIX (Bug 2): Handle playlist scroll-down continuations.
@@ -507,18 +552,12 @@ JSON.parse = function () {
       itemCount: Array.isArray(playlistItems) ? playlistItems.length : 0,
       hasContinuation
     });
-    const filteredPlaylistItems = hideVideo(playlistItems, detectedPage);
-    // Avoid continuation stalls when a whole batch (often 15 items) is filtered out.
-    // Keeping one item preserves list growth behavior on some YouTube TV playlist feeds.
-    if (hasContinuation && filteredPlaylistItems.length === 0 && Array.isArray(playlistItems) && playlistItems.length > 0) {
-      appendFileOnlyLog('playlist.continuation.keep-one', {
-        detectedPage,
-        originalCount: playlistItems.length
-      });
-      r.continuationContents.playlistVideoListContinuation.contents = [playlistItems[0]];
-    } else {
-      r.continuationContents.playlistVideoListContinuation.contents = filteredPlaylistItems;
-    }
+    r.continuationContents.playlistVideoListContinuation.contents = filterContinuationItems(
+      playlistItems,
+      detectedPage,
+      hasContinuation,
+      'playlist.continuation'
+    );
   }
 
   if (r?.contents?.tvBrowseRenderer?.content?.tvSecondaryNavRenderer?.sections) {
@@ -704,10 +743,10 @@ function processShelves(shelves, shouldAddPreviews = true, pageHint = null) {
   for (let i = shelves.length - 1; i >= 0; i--) {
     const shelve = shelves[i];
 
-    if (!configRead('enableShorts') && shelve?.reelShelfRenderer) {
+    if (!configRead('enableShorts') && isShortsShelf(shelve)) {
       appendFileOnlyLog('shorts.reelShelf.remove', {
         page: activePage,
-        reason: 'reelShelfRenderer'
+        reason: 'is_shorts_shelf'
       });
       shelves.splice(i, 1);
       continue;
@@ -715,13 +754,16 @@ function processShelves(shelves, shouldAddPreviews = true, pageHint = null) {
 
     if (!shelve.shelfRenderer) continue;
 
-    deArrowify(shelve.shelfRenderer.content.horizontalListRenderer.items);
-    hqify(shelve.shelfRenderer.content.horizontalListRenderer.items);
-    addLongPress(shelve.shelfRenderer.content.horizontalListRenderer.items);
+    const shelfItems = getShelfItems(shelve);
+    if (!Array.isArray(shelfItems)) continue;
+
+    deArrowify(shelfItems);
+    hqify(shelfItems);
+    addLongPress(shelfItems);
     if (shouldAddPreviews) {
-      addPreviews(shelve.shelfRenderer.content.horizontalListRenderer.items);
+      addPreviews(shelfItems);
     }
-    shelve.shelfRenderer.content.horizontalListRenderer.items = hideVideo(shelve.shelfRenderer.content.horizontalListRenderer.items, activePage);
+    shelve.shelfRenderer.content.horizontalListRenderer.items = hideVideo(shelfItems, activePage);
     if (activePage === 'library') {
       shelve.shelfRenderer.content.horizontalListRenderer.items = filterHiddenLibraryTabs(shelve.shelfRenderer.content.horizontalListRenderer.items, 'processShelves.shelfRenderer.horizontalListRenderer.items');
     }
@@ -734,13 +776,10 @@ function processShelves(shelves, shouldAddPreviews = true, pageHint = null) {
         rendererType: shelve?.shelfRenderer?.tvhtml5ShelfRendererType || '',
         direct: shelfTitleDirect, fromHeader: shelfTitleFromHeader.substring(0, 60)
       });
-      if (
-        shelve.shelfRenderer.tvhtml5ShelfRendererType === 'TVHTML5_SHELF_RENDERER_TYPE_SHORTS' ||
-        shelfTitle.includes('short')
-      ) {
+      if (isShortsShelf(shelve)) {
         appendFileOnlyLog('shorts.shelf.remove', {
           page: activePage,
-          reason: 'TVHTML5_SHELF_RENDERER_TYPE_SHORTS',
+          reason: 'is_shorts_shelf',
           shelfTitle: shelve?.shelfRenderer?.title || ''
         });
         // Safe to splice because we are iterating in reverse
