@@ -384,11 +384,21 @@ function normalizeGridRenderer(gridRenderer, context = '') {
 function filterContinuationItems(items, pageName, hasContinuation = false, label = 'continuation') {
   const filteredItems = hideVideo(items, pageName);
   if (hasContinuation && filteredItems.length === 0 && Array.isArray(items) && items.length > 0) {
+    const fallbackItem =
+      items.find((item) => item?.tileRenderer?.header?.tileHeaderRenderer?.thumbnail?.thumbnails?.length) ||
+      items.find((item) => item?.tileRenderer) ||
+      items[0];
+
+    const fallbackType = fallbackItem && typeof fallbackItem === 'object'
+      ? Object.keys(fallbackItem).slice(0, 4)
+      : typeof fallbackItem;
+
     appendFileOnlyLog(`${label}.keep-one`, {
       pageName,
-      originalCount: items.length
+      originalCount: items.length,
+      fallbackType
     });
-    return [items[0]];
+    return [fallbackItem];
   }
   return filteredItems;
 }
@@ -1067,6 +1077,14 @@ function isWatchedByTextSignals(item) {
   );
 }
 
+function isLikelyPlaceholderItem(item) {
+  if (!item || typeof item !== 'object') return false;
+  if (item.continuationItemRenderer || item.adSlotRenderer) return true;
+
+  const keys = Object.keys(item);
+  return keys.some((key) => /placeholder|skeleton/i.test(key));
+}
+
 function processTileArraysDeep(node, pageHint = null, path = 'root', depth = 0) {
   if (!node || depth > 10) return;
   const pageName = pageHint || getActivePage();
@@ -1139,6 +1157,14 @@ function hideVideo(items, pageHint = null) {
   const result = items.filter(item => {
     try {
     if (!item?.tileRenderer) {
+      if (isLikelyPlaceholderItem(item)) {
+        appendFileOnlyLog('hideVideo.item.skip', {
+          pageName,
+          rendererKeys: item && typeof item === 'object' ? Object.keys(item).slice(0, 5) : typeof item,
+          reason: 'placeholder_removed'
+        });
+        return false;
+      }
       appendFileOnlyLog('hideVideo.item.skip', {
         pageName,
         rendererKeys: item && typeof item === 'object' ? Object.keys(item).slice(0, 5) : typeof item,
