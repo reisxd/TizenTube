@@ -248,10 +248,10 @@ function filterLibraryNavTabs(sections, detectedPage) {
     if (!Array.isArray(tabs)) continue;
     const before = tabs.length;
     for (let i = tabs.length - 1; i >= 0; i--) {
-      const browseIds = String(extractNavTabBrowseId(tabs[i])).toLowerCase().split(',').filter(Boolean);
-      appendFileOnlyLog('library.navtab.check', { browseIds, index: i });
-      if (browseIds.some((id) => HIDDEN_LIBRARY_TAB_IDS.has(id))) {
-        appendFileOnlyLog('library.navtab.removed', { browseIds, index: i });
+      const browseId = String(extractNavTabBrowseId(tabs[i])).toLowerCase();
+      appendFileOnlyLog('library.navtab.check', { browseId, index: i });
+      if (HIDDEN_LIBRARY_TAB_IDS.has(browseId)) {
+        appendFileOnlyLog('library.navtab.removed', { browseId, index: i });
         tabs.splice(i, 1);
       }
     }
@@ -457,12 +457,8 @@ JSON.parse = function () {
   }
 
   if (r?.contents?.tvBrowseRenderer?.content?.tvSurfaceContentRenderer?.content?.gridRenderer?.items) {
-    r.contents.tvBrowseRenderer.content.tvSurfaceContentRenderer.content.gridRenderer.items =
-      processGridRendererItems(
-        r.contents.tvBrowseRenderer.content.tvSurfaceContentRenderer.content.gridRenderer.items,
-        detectedPage,
-        'contents.tvBrowseRenderer.content.tvSurfaceContentRenderer.content.gridRenderer.items'
-      );
+    const gridItems = r.contents.tvBrowseRenderer.content.tvSurfaceContentRenderer.content.gridRenderer.items;
+    r.contents.tvBrowseRenderer.content.tvSurfaceContentRenderer.content.gridRenderer.items = hideVideo(gridItems, detectedPage);
   }
 
   if (r?.continuationContents?.sectionListContinuation?.contents) {
@@ -481,11 +477,8 @@ JSON.parse = function () {
   }
 
   if (r?.continuationContents?.gridContinuation?.items) {
-    r.continuationContents.gridContinuation.items = processGridRendererItems(
-      r.continuationContents.gridContinuation.items,
-      detectedPage,
-      'continuationContents.gridContinuation.items'
-    );
+    const gridItems = r.continuationContents.gridContinuation.items;
+    r.continuationContents.gridContinuation.items = hideVideo(gridItems, detectedPage);
   }
 
   // FIX (Bug 2): Handle playlist scroll-down continuations.
@@ -497,7 +490,7 @@ JSON.parse = function () {
       itemCount: Array.isArray(playlistItems) ? playlistItems.length : 0,
       hasContinuation: !!r?.continuationContents?.playlistVideoListContinuation?.continuations
     });
-    // Keep continuation payload minimally touched to avoid breaking infinite scroll behavior.
+    // Keep continuation payload minimally touched to avoid breaking continuation loading.
     r.continuationContents.playlistVideoListContinuation.contents = hideVideo(playlistItems, detectedPage);
   }
 
@@ -532,9 +525,22 @@ JSON.parse = function () {
         if (Array.isArray(contents)) {
           processShelves(contents, true, detectedPage);
         }
+
+        const gridItems = tab?.tabRenderer?.content?.tvSurfaceContentRenderer?.content?.gridRenderer?.items;
+        if (Array.isArray(gridItems)) {
+          tab.tabRenderer.content.tvSurfaceContentRenderer.content.gridRenderer.items = hideVideo(gridItems, detectedPage);
+        }
+
+        const playlistItems = tab?.tabRenderer?.content?.tvSurfaceContentRenderer?.content?.playlistVideoListRenderer?.contents;
+        if (Array.isArray(playlistItems)) {
+          tab.tabRenderer.content.tvSurfaceContentRenderer.content.playlistVideoListRenderer.contents = hideVideo(playlistItems, detectedPage);
+        }
       }
     }
   }
+
+  // Last-pass safety net for unknown/new TV response shapes that still carry tileRenderer arrays.
+  processTileArraysDeep(r, detectedPage, 'response');
 
   if (r?.contents?.singleColumnWatchNextResults?.pivot?.sectionListRenderer) {
     if (!signinReminderEnabled) {
@@ -727,22 +733,6 @@ function processShelves(shelves, shouldAddPreviews = true, pageHint = null) {
   }
 }
 
-function processGridRendererItems(items, pageHint = null, context = '') {
-  if (!Array.isArray(items)) return items;
-  const pageName = pageHint || getActivePage();
-  appendFileOnlyLog('grid.process.start', { pageName, context, inputCount: items.length });
-
-  const filtered = hideVideo(items, pageName);
-  if (!configRead('enableShorts')) {
-    const before = filtered.length;
-    const afterList = filtered.filter(item => !isLikelyShortItem(item));
-    appendFileOnlyLog('grid.process.shorts', { pageName, context, before, after: afterList.length, removed: before - afterList.length });
-    return afterList;
-  }
-
-  return filtered;
-}
-
 
 function addPreviews(items) {
   if (!configRead('enablePreviews')) return;
@@ -881,15 +871,63 @@ function getTileWatchProgress(item) {
 }
 
 function isWatchedByTextSignals(item) {
-  const words = collectAllText(item?.tileRenderer || item).join(' ').toLowerCase();
-  if (!words) return false;
-
+  const text = collectAllText(item?.tileRenderer || item).join(' ').toLowerCase();
+  if (!text) return false;
   return (
-    words.includes('watched') ||
-    words.includes('already watched') ||
-    words.includes('gesehen') ||
-    words.includes('bereits angesehen')
+    text.includes('watched') ||
+    text.includes('already watched') ||
+    text.includes('gesehen') ||
+    text.includes('bereits angesehen')
   );
+}
+
+function processTileArraysDeep(node, pageHint = null, path = 'root', depth = 0) {
+  if (!node || depth > 10) return;
+  const pageName = pageHint || getActivePage();
+
+  if (Array.isArray(node)) {
+    if (node.some((item) => item?.tileRenderer)) {
+      const before = node.length;
+      let filtered = hideVideo(node, pageName);
+      if (!configRead('enableShorts')) {
+        const beforeShorts = filtered.length;
+        filtered = filtered.filter(item => !isLikelyShortItem(item));
+        if (beforeShorts !== filtered.length) {
+          appendFileOnlyLog('deep.tiles.shorts', {
+            pageName,
+            path,
+            before: beforeShorts,
+            after: filtered.length,
+            removed: beforeShorts - filtered.length
+          });
+        }
+      }
+      if (pageName === 'library') {
+        filtered = filterHiddenLibraryTabs(filtered, `deep:${path}`);
+      }
+      if (before !== filtered.length) {
+        appendFileOnlyLog('deep.tiles.filtered', {
+          pageName,
+          path,
+          before,
+          after: filtered.length,
+          removed: before - filtered.length
+        });
+      }
+      node.splice(0, node.length, ...filtered);
+      return;
+    }
+
+    for (let i = 0; i < node.length; i++) {
+      processTileArraysDeep(node[i], pageName, `${path}[${i}]`, depth + 1);
+    }
+    return;
+  }
+
+  if (typeof node !== 'object') return;
+  for (const key of Object.keys(node)) {
+    processTileArraysDeep(node[key], pageName, `${path}.${key}`, depth + 1);
+  }
 }
 
 function hideVideo(items, pageHint = null) {
