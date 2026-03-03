@@ -184,6 +184,32 @@ function pruneLibraryTabsInResponse(node, path = 'root') {
     pruneLibraryTabsInResponse(node[key], `${path}.${key}`);
   }
 }
+
+// NEW: filter the tabs[] array inside tvSecondaryNavSectionRenderer by browseId.
+// The old pruneLibraryTabsInResponse only walked horizontalListRenderer.items (shelf rows),
+// so the nav tab bar entries were never touched.
+function filterLibraryNavTabs(sections, detectedPage) {
+  if (detectedPage !== 'library') return;
+  if (!Array.isArray(sections)) return;
+  for (const section of sections) {
+    const tabs = section?.tvSecondaryNavSectionRenderer?.tabs;
+    if (!Array.isArray(tabs)) continue;
+    const before = tabs.length;
+    for (let i = tabs.length - 1; i >= 0; i--) {
+      const browseId = String(
+        tabs[i]?.tabRenderer?.endpoint?.browseEndpoint?.browseId ||
+        tabs[i]?.tabRenderer?.content?.tvSurfaceContentRenderer?.browseEndpoint?.browseId || ''
+      ).toLowerCase();
+      if (HIDDEN_LIBRARY_TAB_IDS.has(browseId)) {
+        appendFileOnlyLog('library.navtab.removed', { browseId, index: i });
+        tabs.splice(i, 1);
+      }
+    }
+    if (tabs.length !== before)
+      appendFileOnlyLog('library.navtabs.result', { before, after: tabs.length });
+  }
+}
+
 function isLikelyShortItem(item) {
   const tile = item?.tileRenderer;
   if (!tile) return false;
@@ -191,6 +217,13 @@ function isLikelyShortItem(item) {
 
   const title = String(getItemTitle(item) || '').toLowerCase();
   if (title.includes('#shorts')) return true;
+  
+  // Videos with 2+ hashtags are almost always repurposed Shorts
+  const hashtagMatches = title.match(/#[a-z0-9_]+/gi);
+  if (hashtagMatches && hashtagMatches.length >= 2) {
+    appendFileOnlyLog('shorts.hashtag.detected', { title, count: hashtagMatches.length });
+    return true;
+  }
 
   const allText = collectAllText(tile);
   const durationCandidate = allText.map(parseDurationToSeconds).find((v) => Number.isFinite(v));
@@ -238,6 +271,40 @@ JSON.parse = function () {
   // Also set adSlots to an empty array, emptying only the adPlacements won't work.
   if (r.adSlots && adBlockEnabled) {
     r.adSlots = [];
+  }
+
+  // NEW: build watch-progress cache from entity mutations.
+  // Subscription/channel tiles don't have progress overlays in the tile JSON.
+  // YouTube sends progress separately via frameworkUpdates.entityBatchUpdate.mutations.
+  if (r?.frameworkUpdates?.entityBatchUpdate?.mutations) {
+    if (!window._ttVideoProgressCache) window._ttVideoProgressCache = {};
+    let hits = 0;
+    for (const mutation of r.frameworkUpdates.entityBatchUpdate.mutations) {
+      const key = String(mutation?.entityKey || '');
+      const payload = mutation?.payload || {};
+      appendFileOnlyLogOnce('mutation.shape.' + key.substring(0, 20), {
+        entityKey: key, type: mutation?.type,
+        payloadKeys: Object.keys(payload).slice(0, 10),
+        firstSubKeys: (() => { const v = payload[Object.keys(payload)[0]]; return v && typeof v === 'object' ? Object.keys(v).slice(0, 10) : []; })()
+      });
+      const pct =
+        payload?.videoAttributionModel?.watchProgressPercentage ??
+        payload?.videoData?.watchProgressPercentage ??
+        payload?.macroMarkersListEntity?.watchProgressPercentage ??
+        payload?.videoAnnotationsEntity?.watchProgressPercentage ?? null;
+      if (pct !== null) {
+        const videoId = key.includes('|') ? key.split('|')[0] : key;
+        window._ttVideoProgressCache[videoId] = { percentDurationWatched: Number(pct), source: 'entityMutation' };
+        hits++;
+      }
+      const explicitId = payload?.videoAttributionModel?.externalVideoId ||
+        payload?.videoData?.videoId || payload?.videoAnnotationsEntity?.externalVideoId || null;
+      if (explicitId && pct !== null) {
+        window._ttVideoProgressCache[String(explicitId)] = { percentDurationWatched: Number(pct), source: 'entityMutationExplicit' };
+        hits++;
+      }
+    }
+    appendFileOnlyLog('mutation.cache.result', { count: r.frameworkUpdates.entityBatchUpdate.mutations.length, hits, total: Object.keys(window._ttVideoProgressCache).length });
   }
 
   if (r.paidContentOverlay && !configRead('enablePaidPromotionOverlay')) {
@@ -335,6 +402,8 @@ JSON.parse = function () {
   }
 
   if (r?.contents?.tvBrowseRenderer?.content?.tvSecondaryNavRenderer?.sections) {
+    filterLibraryNavTabs(r.contents.tvBrowseRenderer.content.tvSecondaryNavRenderer.sections, detectedPage);
+
     for (const section of r.contents.tvBrowseRenderer.content.tvSecondaryNavRenderer.sections) {
       for (const tab of section.tvSecondaryNavSectionRenderer.tabs) {
         processShelves(tab.tabRenderer.content.tvSurfaceContentRenderer.content.sectionListRenderer.contents, true, detectedPage);
@@ -481,7 +550,14 @@ function processShelves(shelves, shouldAddPreviews = true, pageHint = null) {
         shelve.shelfRenderer.content.horizontalListRenderer.items = filterHiddenLibraryTabs(shelve.shelfRenderer.content.horizontalListRenderer.items, 'processShelves.shelfRenderer.horizontalListRenderer.items');
       }
       if (!configRead('enableShorts')) {
-        const shelfTitle = String(shelve?.shelfRenderer?.title?.simpleText || '').toLowerCase();
+        const shelfTitleDirect = String(shelve?.shelfRenderer?.title?.simpleText || '').toLowerCase();
+        const shelfTitleFromHeader = collectAllText(shelve?.shelfRenderer?.header).join(' ').toLowerCase();
+        const shelfTitle = shelfTitleDirect || shelfTitleFromHeader;
+        appendFileOnlyLogOnce('shelf.title.' + shelfTitle.substring(0, 24), {
+          page: activePage,
+          rendererType: shelve?.shelfRenderer?.tvhtml5ShelfRendererType || '',
+          direct: shelfTitleDirect, fromHeader: shelfTitleFromHeader.substring(0, 60)
+        });
         if (shelve.shelfRenderer.tvhtml5ShelfRendererType === 'TVHTML5_SHELF_RENDERER_TYPE_SHORTS' || shelfTitle.includes('short')) {
           appendFileOnlyLog('shorts.shelf.remove', {
             page: activePage,
@@ -639,9 +715,14 @@ function hideVideo(items, pageHint = null) {
       return true;
     }
 
-    const progressBar = item.tileRenderer.header?.tileHeaderRenderer?.thumbnailOverlays?.find(overlay => overlay.thumbnailOverlayResumePlaybackRenderer)?.thumbnailOverlayResumePlaybackRenderer;
-    const title = item?.tileRenderer?.metadata?.tileMetadataRenderer?.title?.simpleText || item?.tileRenderer?.contentId || 'unknown';
-    const contentId = String(item?.tileRenderer?.contentId || '').toLowerCase();
+    const tileProgressBar = item.tileRenderer.header?.tileHeaderRenderer?.thumbnailOverlays
+      ?.find(o => o.thumbnailOverlayResumePlaybackRenderer)?.thumbnailOverlayResumePlaybackRenderer;
+    const videoId = String(item?.tileRenderer?.contentId || '');
+    const title = item?.tileRenderer?.metadata?.tileMetadataRenderer?.title?.simpleText || videoId || 'unknown';
+    const contentId = videoId.toLowerCase();
+    const cachedProgress = window._ttVideoProgressCache?.[videoId] ?? null;
+    const progressBar = tileProgressBar ?? cachedProgress;
+    const progressSource = tileProgressBar ? 'tile_overlay' : cachedProgress ? 'entity_cache' : 'none';
 
     if (pageName === 'library' && HIDDEN_LIBRARY_TAB_IDS.has(contentId)) {
       appendFileOnlyLog('hideVideo.item', { pageName, title, contentId, hasProgress: !!progressBar, remove: true, reason: 'library_tab_hidden' });
@@ -656,7 +737,7 @@ function hideVideo(items, pageHint = null) {
     }
 
     if (!progressBar) {
-      appendFileOnlyLog('hideVideo.item', { pageName, title, hasProgress: false, remove: false, reason: 'no_progress' });
+      appendFileOnlyLog('hideVideo.item', { pageName, title, videoId, hasProgress: false, progressSource, remove: false, reason: 'no_progress' });
       return true;
     }
 
