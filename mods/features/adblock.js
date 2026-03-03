@@ -106,13 +106,15 @@ function getActivePage() {
   return window.__ttLastDetectedPage || detectCurrentPage();
 }
 
-function collectWatchProgressEntries(node, out = [], depth = 0) {
+function collectWatchProgressEntries(node, out = [], depth = 0, seen = new WeakSet()) {
   if (!node || depth > 10) return out;
   if (Array.isArray(node)) {
-    for (const child of node) collectWatchProgressEntries(child, out, depth + 1);
+    for (const child of node) collectWatchProgressEntries(child, out, depth + 1, seen);
     return out;
   }
   if (typeof node !== 'object') return out;
+  if (seen.has(node)) return out;
+  seen.add(node);
 
   const id = node.videoId || node.externalVideoId || node.contentId || null;
   const pctRaw = node.watchProgressPercentage ?? node.percentDurationWatched ?? node.watchedPercent ?? null;
@@ -122,29 +124,32 @@ function collectWatchProgressEntries(node, out = [], depth = 0) {
   }
 
   for (const key of Object.keys(node)) {
-    collectWatchProgressEntries(node[key], out, depth + 1);
+    collectWatchProgressEntries(node[key], out, depth + 1, seen);
   }
   return out;
 }
 
-function collectAllText(node, out = []) {
+function collectAllText(node, out = [], seen = new WeakSet(), depth = 0) {
+  if (depth > 12) return out;
   if (!node) return out;
   if (typeof node === 'string') {
     out.push(node);
     return out;
   }
   if (Array.isArray(node)) {
-    for (const child of node) collectAllText(child, out);
+    for (const child of node) collectAllText(child, out, seen, depth + 1);
     return out;
   }
   if (typeof node === 'object') {
+    if (seen.has(node)) return out;
+    seen.add(node);
     if (typeof node.simpleText === 'string') out.push(node.simpleText);
     if (Array.isArray(node.runs)) {
       for (const run of node.runs) if (typeof run?.text === 'string') out.push(run.text);
     }
     for (const key of Object.keys(node)) {
       if (key === 'runs' || key === 'simpleText') continue;
-      collectAllText(node[key], out);
+      collectAllText(node[key], out, seen, depth + 1);
     }
   }
   return out;
