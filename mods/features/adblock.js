@@ -258,6 +258,12 @@ function filterLibraryNavTabs(sections, detectedPage) {
     if (tabs.length !== before)
       appendFileOnlyLog('library.navtabs.result', { before, after: tabs.length });
   }
+
+  const allText = collectAllText(tile);
+  const durationCandidate = allText.map(parseDurationToSeconds).find((v) => Number.isFinite(v));
+  if (Number.isFinite(durationCandidate) && durationCandidate > 0 && durationCandidate <= 180) return true;
+
+  return false;
 }
 
 function isLikelyShortItem(item) {
@@ -456,6 +462,11 @@ JSON.parse = function () {
     processShelves(r.contents.sectionListRenderer.contents, true, detectedPage);
   }
 
+  if (r?.contents?.tvBrowseRenderer?.content?.tvSurfaceContentRenderer?.content?.gridRenderer?.items) {
+    const gridItems = r.contents.tvBrowseRenderer.content.tvSurfaceContentRenderer.content.gridRenderer.items;
+    r.contents.tvBrowseRenderer.content.tvSurfaceContentRenderer.content.gridRenderer.items = hideVideo(gridItems, detectedPage);
+  }
+
   if (r?.continuationContents?.sectionListContinuation?.contents) {
     processShelves(r.continuationContents.sectionListContinuation.contents, true, detectedPage);
   }
@@ -471,6 +482,11 @@ JSON.parse = function () {
     }
   }
 
+  if (r?.continuationContents?.gridContinuation?.items) {
+    const gridItems = r.continuationContents.gridContinuation.items;
+    r.continuationContents.gridContinuation.items = hideVideo(gridItems, detectedPage);
+  }
+
   // FIX (Bug 2): Handle playlist scroll-down continuations.
   // These use TILE_STYLE_YTLR_VERTICAL_LIST tiles and come through a different continuation key.
   if (r?.continuationContents?.playlistVideoListContinuation?.contents) {
@@ -480,9 +496,7 @@ JSON.parse = function () {
       itemCount: Array.isArray(playlistItems) ? playlistItems.length : 0,
       hasContinuation: !!r?.continuationContents?.playlistVideoListContinuation?.continuations
     });
-    deArrowify(playlistItems);
-    hqify(playlistItems);
-    addLongPress(playlistItems);
+    // Keep continuation payload minimally touched to avoid breaking continuation loading.
     r.continuationContents.playlistVideoListContinuation.contents = hideVideo(playlistItems, detectedPage);
   }
 
@@ -517,9 +531,22 @@ JSON.parse = function () {
         if (Array.isArray(contents)) {
           processShelves(contents, true, detectedPage);
         }
+
+        const gridItems = tab?.tabRenderer?.content?.tvSurfaceContentRenderer?.content?.gridRenderer?.items;
+        if (Array.isArray(gridItems)) {
+          tab.tabRenderer.content.tvSurfaceContentRenderer.content.gridRenderer.items = hideVideo(gridItems, detectedPage);
+        }
+
+        const playlistItems = tab?.tabRenderer?.content?.tvSurfaceContentRenderer?.content?.playlistVideoListRenderer?.contents;
+        if (Array.isArray(playlistItems)) {
+          tab.tabRenderer.content.tvSurfaceContentRenderer.content.playlistVideoListRenderer.contents = hideVideo(playlistItems, detectedPage);
+        }
       }
     }
   }
+
+  // Last-pass safety net for unknown/new TV response shapes that still carry tileRenderer arrays.
+  processTileArraysDeep(r, detectedPage, 'response');
 
   if (r?.contents?.singleColumnWatchNextResults?.pivot?.sectionListRenderer) {
     if (!signinReminderEnabled) {
@@ -849,6 +876,66 @@ function getTileWatchProgress(item) {
   return null;
 }
 
+function isWatchedByTextSignals(item) {
+  const text = collectAllText(item?.tileRenderer || item).join(' ').toLowerCase();
+  if (!text) return false;
+  return (
+    text.includes('watched') ||
+    text.includes('already watched') ||
+    text.includes('gesehen') ||
+    text.includes('bereits angesehen')
+  );
+}
+
+function processTileArraysDeep(node, pageHint = null, path = 'root', depth = 0) {
+  if (!node || depth > 10) return;
+  const pageName = pageHint || getActivePage();
+
+  if (Array.isArray(node)) {
+    if (node.some((item) => item?.tileRenderer)) {
+      const before = node.length;
+      let filtered = hideVideo(node, pageName);
+      if (!configRead('enableShorts')) {
+        const beforeShorts = filtered.length;
+        filtered = filtered.filter(item => !isLikelyShortItem(item));
+        if (beforeShorts !== filtered.length) {
+          appendFileOnlyLog('deep.tiles.shorts', {
+            pageName,
+            path,
+            before: beforeShorts,
+            after: filtered.length,
+            removed: beforeShorts - filtered.length
+          });
+        }
+      }
+      if (pageName === 'library') {
+        filtered = filterHiddenLibraryTabs(filtered, `deep:${path}`);
+      }
+      if (before !== filtered.length) {
+        appendFileOnlyLog('deep.tiles.filtered', {
+          pageName,
+          path,
+          before,
+          after: filtered.length,
+          removed: before - filtered.length
+        });
+      }
+      node.splice(0, node.length, ...filtered);
+      return;
+    }
+
+    for (let i = 0; i < node.length; i++) {
+      processTileArraysDeep(node[i], pageName, `${path}[${i}]`, depth + 1);
+    }
+    return;
+  }
+
+  if (typeof node !== 'object') return;
+  for (const key of Object.keys(node)) {
+    processTileArraysDeep(node[key], pageName, `${path}.${key}`, depth + 1);
+  }
+}
+
 function hideVideo(items, pageHint = null) {
   const pages = configRead('hideWatchedVideosPages') || [];
   const pageName = pageHint || getActivePage();
@@ -883,7 +970,8 @@ function hideVideo(items, pageHint = null) {
     const title = item?.tileRenderer?.metadata?.tileMetadataRenderer?.title?.simpleText || videoId || 'unknown';
     const contentId = videoId.toLowerCase();
     const cachedProgress = window._ttVideoProgressCache?.[videoId] ?? null;
-    const progressBar = tileProgressBar ?? cachedProgress;
+    const textWatched = isWatchedByTextSignals(item);
+    const progressBar = tileProgressBar ?? cachedProgress ?? (textWatched ? { percentDurationWatched: 100 } : null);
     const progressSource = tileProgressBar?.source || (cachedProgress ? 'entity_cache' : 'none');
 
     if (pageName === 'library' && HIDDEN_LIBRARY_TAB_IDS.has(contentId)) {
@@ -899,7 +987,7 @@ function hideVideo(items, pageHint = null) {
     }
 
     if (!progressBar) {
-      appendFileOnlyLog('hideVideo.item', { pageName, title, videoId, hasProgress: false, progressSource, remove: false, reason: 'no_progress' });
+      appendFileOnlyLog('hideVideo.item', { pageName, title, videoId, hasProgress: false, progressSource, textWatched, remove: false, reason: 'no_progress' });
       return true;
     }
 
