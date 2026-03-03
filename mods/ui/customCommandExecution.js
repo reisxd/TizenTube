@@ -43,7 +43,7 @@ function getCommandExecutor() {
     return {
         executeFunction: executeFunction.bind(instance),
         commandFunction
-    }
+    };
 }
 
 export default getCommandExecutor;

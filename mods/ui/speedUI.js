@@ -30,8 +30,6 @@ function execute_once_dom_loaded_speed() {
     // 403, 404, 405, 406
     // ---, 172, 170, 191
     document.addEventListener('keydown', eventHandler, true);
-    document.addEventListener('keypress', eventHandler, true);
-    document.addEventListener('keyup', eventHandler, true);
 }
 
 function speedSettings() {

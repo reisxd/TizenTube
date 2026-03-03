@@ -298,6 +298,48 @@ export default function modernUI(update, parameters) {
                 {
                     name: 'Show Sign In Reminder',
                     value: 'enableSigninReminder'
+                },
+                {
+                    name: 'Debug Console',
+                    icon: 'BUG_REPORT',
+                    value: null,
+                    menuId: 'tt-debug-console-settings',
+                    options: [
+                        {
+                            name: 'Enable Debug Console',
+                            icon: 'BUG_REPORT',
+                            value: 'enableDebugConsole'
+                        },
+                        {
+                            name: 'Enable Background Debug Logging',
+                            icon: 'ARTICLE',
+                            value: 'enableDebugLogging'
+                        },
+                        {
+                            name: 'Console Position',
+                            value: null,
+                            menuId: 'tt-debug-console-position',
+                            options: [
+                                { name: 'Top Left', key: 'debugConsolePosition', value: 'top-left' },
+                                { name: 'Top Right', key: 'debugConsolePosition', value: 'top-right' },
+                                { name: 'Bottom Left', key: 'debugConsolePosition', value: 'bottom-left' },
+                                { name: 'Bottom Right', key: 'debugConsolePosition', value: 'bottom-right' },
+                                { name: 'Center', key: 'debugConsolePosition', value: 'center' }
+                            ]
+                        },
+                        {
+                            name: 'Console Height',
+                            value: null,
+                            menuId: 'tt-debug-console-height',
+                            options: [300, 400, 500, 600, 700, 800, 1054].map((height) => {
+                                return {
+                                    name: `${height}px`,
+                                    key: 'debugConsoleHeight',
+                                    value: height
+                                }
+                            })
+                        }
+                    ]
                 }
             ]
         },
@@ -458,7 +500,7 @@ export default function modernUI(update, parameters) {
                                 title: 'Watched Videos Threshold',
                                 subtitle: 'Set the percentage threshold for hiding watched videos'
                             },
-                            options: [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100].map((percent) => {
+                            options: [0, 5, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100].map((percent) => {
                                 return {
                                     name: `${percent}%`,
                                     key: 'hideWatchedVideosThreshold',
@@ -493,12 +535,35 @@ export default function modernUI(update, parameters) {
                                     value: 'subscriptions'
                                 },
                                 {
+                                    name: 'Channel Pages',
+                                    value: 'channel'
+                                },
+                                {
                                     name: 'Library',
                                     value: 'library'
                                 },
                                 {
+                                    name: 'Library → Playlists Overview',
+                                    icon: 'PLAYLIST_PLAY',
+                                    value: 'playlists'
+                                },
+                                {
+                                    name: 'Library → Individual Playlists (WL, LL, etc)',
+                                    icon: 'PLAYLIST_PLAY',
+                                    value: 'playlist'
+                                },
+                                {
+                                    name: 'Library → History',
+                                    icon: 'HISTORY',
+                                    value: 'history'
+                                },
+                                {
                                     name: 'More',
                                     value: 'more'
+                                },
+                                {
+                                    name: 'Watch',
+                                    value: 'watch'
                                 }
                             ]
                         }

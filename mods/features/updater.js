@@ -90,7 +90,7 @@ function checkForUpdates(showNoUpdateToast) {
                     ]),
                     'tt-update-modal',
                     false
-                )
+                );
             } else {
                 console.info('You are using the latest version of TizenTube.');
                 if (showNoUpdateToast) {

@@ -47,7 +47,7 @@ const deviceProfiles = [
         brand: 'Amazon',
         model: 'AFTMM'
     }
-]
+];
 
 const cobaltVersion = '25.lts.30.1034958-gold';
 const v8Version = 'v8/8.8.278.17-jit';

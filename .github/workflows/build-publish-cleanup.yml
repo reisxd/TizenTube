@@ -1,0 +1,602 @@
+# -----------------------------------------------------------------------------
+# Build, publish, and cleanup TizenTube on npm
+#
+# WHAT THIS WORKFLOW DOES
+# -----------------------
+# - Runs on every push to the `main` branch (build + verification + version bump)
+# - Runs on push to main and manual dispatch (build + npm publish + cleanup)
+# - Builds:
+#     - dist/userScript.js  (browser userscript, bundled & minified)
+#     - dist/service.js     (DIAL service, bundled with Rollup)
+# - Publishes the package to https://www.npmjs.com on release only
+# - Automatically removes old versions from npm (within 72-hour window)
+# - Deprecates older versions (beyond 72-hour window) if any remain
+# - Purges jsDelivr CDN cache after publishing
+#
+# WHEN IT RUNS
+# ------------
+# push to main:
+#   - Bumps version in root package.json (+10 patch, rollover to minor)
+#   - Builds the project (dist files contain the NEW version)
+#   - Commits updated package.json + dist outputs back to repo
+#   - Does NOT publish to npm
+#
+# push/workflow_dispatch:
+#   - Builds the project
+#   - Publishes to npm
+#   - Removes old versions (≤72 hours old, keeps current version only)
+#   - Deprecates very old versions (>72 hours, if unpublish fails)
+#   - Purges jsDelivr cache
+#
+# AUTOMATIC VERSION CLEANUP
+# -------------------------
+# After publishing a new version, this workflow automatically:
+# - Identifies all versions except the newly published one
+# - Unpublishes versions that are ≤72 hours old (npm policy allows this)
+# - Deprecates versions >72 hours old (unpublish no longer allowed)
+# - Result: Only the latest version remains active on npm
+#
+# Note: npm allows unpublishing versions within ~72 hours of publication.
+# After that window, versions can only be deprecated, not removed.
+#
+# VERSION BUMP RULE (push to main only)
+# -------------------------------------
+# - Increments patch by +10:
+#     1.17.680 -> 1.17.690 -> ... -> 1.17.990
+# - When patch would hit 1000:
+#     1.17.990 -> 1.18.0
+#
+# LOOP PREVENTION
+# --------------
+# - Bot commits include "[skip ci]"
+# - Job is skipped when:
+#   - actor is github-actions[bot], OR
+#   - commit message contains "[skip ci]"
+#
+# PREREQUISITES (REQUIRED)
+# -----------------------
+# 1) Create an npm account:
+#    https://www.npmjs.com/signup
+#
+# 2) Create an npm access token:
+#    - npm → Profile → Access Tokens
+#    - Click "Generate New Token"
+#    - Token name: anything you want
+#    - CHECK: "Bypass two-factor authentication (2FA)"
+#    - Packages and scopes:
+#        - Permissions: Read and Write
+#        - Scope: All packages
+#    - Expiration date: e.g. 90 days
+#    - Click "Generate token" and COPY it
+#
+# 3) Add the token to GitHub Secrets:
+#    - GitHub repository → Settings
+#    - Security → Secrets and variables → Actions
+#    - Repository secrets → New repository secret
+#        Name:   NPM_TOKEN
+#        Secret: <paste npm token here>
+#
+# PACKAGE REQUIREMENTS
+# --------------------
+# - package.json must contain a unique name, e.g.:
+#     "@krx3d/tizentube"
+# - The version MUST be increased before each release
+#   (npm will reject duplicate versions)
+#
+# HOW TO PUBLISH A NEW VERSION
+# ----------------------------
+# 1) Push to main (workflow auto-bumps version and rebuilds dist)
+# 2) Create a GitHub Release
+# 3) When the release is published:
+#      → GitHub Actions builds
+#      → npm publish runs automatically
+#      → Old versions are automatically removed
+#      → jsDelivr cache is purged
+#
+# CONFIGURATION
+# -------------
+# - PACKAGE_NAME: Set to your npm package name (e.g., '@krx3d/tizentube')
+# - NODE_VERSION: Node.js version to use (default: '20')
+# - UNPUBLISH_WINDOW_HOURS: How long versions can be unpublished (default: '72')
+#
+# -----------------------------------------------------------------------------
+
+name: Build, publish and cleanup old npm versions
+
+on:
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - '.github/**'
+      - '.gitattributes'
+      - '.gitignore'
+      - '.npmignore'
+      - 'LICENSE'
+      - 'README.md'
+      - 'package.json'
+      - 'dist/**'
+  workflow_dispatch:
+
+# Allow this workflow to push back changes to the repo
+permissions:
+  contents: write
+
+env:
+  PACKAGE_NAME: '@krx3d/tizentube2'
+  PACKAGE_NAME_GH: 'KrX3D/TizenTube'
+  NODE_VERSION: '20'
+  UNPUBLISH_WINDOW_HOURS: '72'
+
+jobs:
+  build-publish-clean:
+    runs-on: ubuntu-latest
+
+    # Prevent loop on bot commits and on our own "[skip ci]" commits
+    if: >
+      github.event_name != 'pull_request' &&
+      (github.event_name != 'push' ||
+      (github.actor != 'github-actions[bot]' && !contains(github.event.head_commit.message, '[skip ci]')))
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          # ensure the checkout action leaves credentials so we can push
+          persist-credentials: true
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      # ----------------------------
+      # Version bump (push to main only) - MUST happen BEFORE building dist
+      # ----------------------------
+      - name: Bump root package.json version (+10 patch, rollover -> minor)
+        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+        run: |
+          set -euo pipefail
+          node - <<'NODE'
+          const fs = require('fs');
+          const path = 'package.json';
+          const pkg = JSON.parse(fs.readFileSync(path, 'utf8'));
+
+          const ver = pkg.version || '0.0.0';
+          const m = ver.match(/^(\d+)\.(\d+)\.(\d+)$/);
+          if (!m) throw new Error(`Invalid version in package.json: ${ver}`);
+
+          let major = parseInt(m[1], 10);
+          let minor = parseInt(m[2], 10);
+          let patch = parseInt(m[3], 10);
+
+          patch += 10;
+          if (patch >= 1000) {
+            minor += 1;
+            patch = 0;
+          }
+
+          const newVer = `${major}.${minor}.${patch}`;
+          pkg.version = newVer;
+
+          fs.writeFileSync(path, JSON.stringify(pkg, null, 2) + '\n', 'utf8');
+          console.log(`Bumped version: ${ver} -> ${newVer}`);
+          NODE
+
+      - name: Show current version (old -> new)
+        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+        run: |
+          set -euo pipefail
+
+          OLD_VER="$(git show HEAD^:package.json 2>/dev/null | node -e "let s='';process.stdin.on('data',d=>s+=d);process.stdin.on('end',()=>{try{console.log(JSON.parse(s).version||'');}catch{console.log('');}})")"
+          NEW_VER="$(node -p "require('./package.json').version")"
+
+          if [ -z "${OLD_VER:-}" ]; then
+            echo "Version: (unknown) -> ${NEW_VER}"
+          else
+            echo "Version: ${OLD_VER} -> ${NEW_VER}"
+          fi
+
+      # ----------------------------
+      # Build mods (userScript.js)
+      # ----------------------------
+      - name: Clean dist
+        run: |
+          set -euo pipefail
+          rm -rf dist
+          mkdir -p dist
+
+      - name: Install mods dependencies
+        run: |
+          set -euo pipefail
+          cd mods
+          npm ci
+
+      - name: Update Browserslist DB (mods)
+        run: |
+          set -euo pipefail
+          cd mods
+          npx update-browserslist-db@latest
+
+      - name: Build mods (rollup)
+        run: |
+          set -euo pipefail
+          cd mods
+          npm install
+          npx rollup -c
+
+      # ----------------------------
+      # Build service (service.js)
+      # ----------------------------
+      - name: Install service dependencies
+        run: |
+          set -euo pipefail
+          cd service
+          npm ci
+
+      - name: Build service (rollup)
+        run: |
+          set -euo pipefail
+          cd service
+          npm install
+          npx rollup -c
+
+      # ----------------------------
+      # Verify output
+      # ----------------------------
+      - name: Verify dist output
+        run: |
+          set -euo pipefail
+          echo "Listing dist/ (should contain built outputs):"
+          ls -lah dist || true
+          test -f dist/userScript.js
+          test -f dist/service.js
+
+      # ----------------------------
+      # Commit version bump + built JS to repo (push to main only)
+      # NOTE: dist is often gitignored, so we force-add the built files.
+      # ----------------------------
+      - name: Commit version bump + built files in dist/ (if changed)
+        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+        run: |
+          set -euo pipefail
+          echo "Committing version bump + built files (if any changes)..."
+
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+          # stage what you actually want to commit
+          git add package.json
+
+          # stage dist files (use -f because dist/ is in .gitignore)
+          git add -f dist/userScript.js dist/service.js
+
+          if git diff --cached --quiet; then
+            echo "No changes to commit."
+            exit 0
+          fi
+
+          NEWVER=$(node -p "require('./package.json').version")
+          git commit -m "chore: bump version to ${NEWVER} + rebuild dist [skip ci]"
+
+          # IMPORTANT: ensure clean tree before rebase/pull
+          # (drops any lockfile drift etc. that you didn't commit)
+          git reset --hard HEAD
+          git clean -fd
+
+          git fetch origin main
+          #git pull --rebase origin main
+          git rebase origin/main
+          # git reset --hard
+
+          echo "Pushing changes back to main..."
+          git push origin HEAD:main
+
+
+      # --------------------
+      # NPM AUTH
+      # --------------------
+      - name: Configure npm auth
+        if: success()
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          set -euo pipefail
+          if [ -z "${NPM_TOKEN:-}" ]; then
+            echo "::error::NPM_TOKEN secret is not set"
+            exit 1
+          fi
+          printf "//registry.npmjs.org/:_authToken=%s\n" "$NPM_TOKEN" > ~/.npmrc
+          printf "always-auth=true\n" >> ~/.npmrc
+          npm whoami
+          echo "✓ npm auth OK"
+
+      # --------------------
+      # PUBLISH
+      # --------------------
+      - name: Publish package to npm
+        if: success()
+        id: publish_npm
+        run: |
+          set -euo pipefail
+          echo "Publishing package..."
+          npm publish --access public
+
+      - name: Wait for npm propagation (after publish)
+        if: steps.publish_npm.outcome == 'success'
+        run: |
+          echo "Waiting for npm propagation..."
+          sleep 10
+
+      # --------------------
+      # FETCH VERSIONS
+      # --------------------
+      - name: Gather versions and publish times
+        if: steps.publish_npm.outcome == 'success'
+        env:
+          PKG: ${{ env.PACKAGE_NAME }}
+        run: |
+          set -euo pipefail
+          echo "Fetching versions & times for ${PKG} ..."
+          npm view "${PKG}" versions --json > /tmp/versions.json
+          npm view "${PKG}" time --json > /tmp/time.json
+
+          CUR_VER=$(node -e "console.log(require('./package.json').version)")
+          echo "Current repo version: $CUR_VER"
+          echo "$CUR_VER" > /tmp/current_version.txt
+
+      # --------------------
+      # DECIDE WHAT TO REMOVE
+      # --------------------
+      - name: Decide versions to unpublish / deprecate
+        if: steps.publish_npm.outcome == 'success'
+        env:
+          UNPUBLISH_WINDOW_HOURS: ${{ env.UNPUBLISH_WINDOW_HOURS }}
+        run: |
+          set -euo pipefail
+          node -e '
+          const fs = require("fs");
+          const versions = JSON.parse(fs.readFileSync("/tmp/versions.json","utf8")||"[]");
+          const times = JSON.parse(fs.readFileSync("/tmp/time.json","utf8")||"{}");
+          const current = fs.readFileSync("/tmp/current_version.txt","utf8").trim();
+
+          const windowHours = Number(process.env.UNPUBLISH_WINDOW_HOURS || 72);
+          const now = Date.now();
+
+          const toUnpublish = [];
+          const toDeprecate = [];
+
+          for (const v of versions) {
+            if (v === current) continue;
+            const t = times[v] ? new Date(times[v]) : null;
+            if (!t) { toDeprecate.push(v); continue; }
+            const ageHours = (now - t.getTime()) / 36e5;
+            if (ageHours <= windowHours) toUnpublish.push(v);
+            else toDeprecate.push(v);
+          }
+
+          fs.writeFileSync("/tmp/to_unpublish.txt", toUnpublish.length ? toUnpublish.join("\n") + "\n" : "");
+          fs.writeFileSync("/tmp/to_deprecate.txt", toDeprecate.length ? toDeprecate.join("\n") + "\n" : "");
+          console.log("To unpublish (<= " + windowHours + "h):", toUnpublish);
+          console.log("To deprecate (> " + windowHours + "h + unknown):", toDeprecate);
+          '
+
+          echo ""
+          echo "=== Unpublish candidates ==="
+          if [ -s /tmp/to_unpublish.txt ]; then cat /tmp/to_unpublish.txt; else echo "(none)"; fi
+
+          echo ""
+          echo "=== Deprecate candidates ==="
+          if [ -s /tmp/to_deprecate.txt ]; then cat /tmp/to_deprecate.txt; else echo "(none)"; fi
+
+      # --------------------
+      # UNPUBLISH
+      # --------------------
+      - name: Unpublish old versions (verified) and fallback to deprecate
+        if: steps.publish_npm.outcome == 'success'
+        env:
+          PKG: ${{ env.PACKAGE_NAME }}
+        run: |
+          set -euo pipefail
+
+          verify_gone(){
+            ver="$1"
+            tries=8
+            i=1
+            while [ $i -le $tries ]; do
+              echo "verify_gone: attempt $i for ${PKG}@${ver}"
+              if npm view "${PKG}@${ver}" --json > /tmp/view_${ver}.json 2>&1; then
+                echo "npm view still shows ${PKG}@${ver}"
+                i=$((i+1))
+                sleep 3
+                continue
+              else
+                echo "npm view does NOT show ${PKG}@${ver} (gone)"
+                return 0
+              fi
+            done
+            return 1
+          }
+
+          if [ ! -s /tmp/to_unpublish.txt ]; then
+            echo "No versions to unpublish."
+          else
+            while IFS= read -r ver; do
+              ver="$(echo "$ver" | tr -d '\r' | xargs)"
+              [ -z "$ver" ] && continue
+
+              echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+              echo "Attempting unpublish: ${PKG}@${ver}"
+              echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+
+              if npm unpublish "${PKG}@${ver}" 2>&1 | tee /tmp/npm_unpublish_${ver}.log; then
+                echo "npm unpublish command returned success for ${PKG}@${ver}"
+                if verify_gone "$ver"; then
+                  echo "Verified ${PKG}@${ver} removed."
+                else
+                  echo "::warning::Still visible after unpublish attempts -> deprecate fallback"
+                  npm deprecate "${PKG}@${ver}" "Deprecated — please upgrade to a newer release." 2>&1 | tee /tmp/npm_deprecate_${ver}.log || echo "::warning::deprecate failed for ${ver}"
+                fi
+              else
+                echo "::warning::npm unpublish failed or returned non-zero for ${PKG}@${ver}"
+                echo "Attempting to deprecate as fallback..."
+                npm deprecate "${PKG}@${ver}" "Deprecated — please upgrade to a newer release." 2>&1 | tee /tmp/npm_deprecate_${ver}.log || echo "::warning::deprecate failed for ${ver}"
+              fi
+
+            done < /tmp/to_unpublish.txt
+          fi
+
+      # --------------------
+      # DEPRECATE older (>72h)
+      # --------------------
+      - name: Deprecate older versions
+        if: steps.publish_npm.outcome == 'success'
+        env:
+          PKG: ${{ env.PACKAGE_NAME }}
+        run: |
+          set -euo pipefail
+          if [ ! -s /tmp/to_deprecate.txt ]; then
+            echo "No versions to deprecate."
+            exit 0
+          fi
+
+          while IFS= read -r ver; do
+            ver="$(echo "$ver" | tr -d '\r' | xargs)"
+            [ -z "$ver" ] && continue
+            echo "Deprecating ${PKG}@${ver}..."
+            npm deprecate "${PKG}@${ver}" "Deprecated — please upgrade to a newer release." 2>&1 | tee /tmp/npm_deprecate_${ver}.log || echo "::warning::Deprecate failed for ${PKG}@${ver}"
+          done < /tmp/to_deprecate.txt
+
+      # --------------------
+      # Final wait + verify final state
+      # --------------------
+      - name: Wait before final verify
+        if: steps.publish_npm.outcome == 'success'
+        run: |
+          echo "Short wait to let registry propagate final state..."
+          sleep 8
+
+      - name: Verify final state
+        if: steps.publish_npm.outcome == 'success'
+        env:
+          PKG: ${{ env.PACKAGE_NAME }}
+        run: |
+          set -euo pipefail
+          echo "Final versions on npm:"
+          npm view "${PKG}" versions --json
+          echo ""
+          echo "Latest version:"
+          npm view "${PKG}" version
+
+      # --------------------
+      # Purge jsDelivr cache
+      # --------------------
+      - name: Generate jsDelivr URLs to purge
+        if: steps.publish_npm.outcome == 'success'
+        id: cdn_urls
+        run: |
+          set -euo pipefail
+
+          NPM_BASE="https://cdn.jsdelivr.net/npm/${PACKAGE_NAME}"
+          GH_BASE="https://cdn.jsdelivr.net/gh/${PACKAGE_NAME_GH}"
+
+          # Create array of URLs (npm + GitHub)
+          declare -a URLS=(
+            # npm package URLs
+            "${NPM_BASE}@latest"
+            "${NPM_BASE}@latest/package.json"
+            "${NPM_BASE}@latest/dist/userScript.js"
+            "${NPM_BASE}@latest/dist/service.js"
+            "${NPM_BASE}@*/package.json"
+            "${NPM_BASE}@*/dist/userScript.js"
+            "${NPM_BASE}@*/dist/service.js"
+            "${NPM_BASE}/package.json"
+            "${NPM_BASE}/dist/userScript.js"
+            "${NPM_BASE}/dist/service.js"
+            "${NPM_BASE}@*"
+            
+            # GitHub repo URLs - main branch
+            "${GH_BASE}@main"
+            "${GH_BASE}@main/package.json"
+            "${GH_BASE}@main/dist/userScript.js"
+            "${GH_BASE}@main/dist/service.js"
+            
+            # GitHub repo URLs - master branch (if you use it)
+            "${GH_BASE}@master"
+            "${GH_BASE}@master/package.json"
+            "${GH_BASE}@master/dist/userScript.js"
+            "${GH_BASE}@master/dist/service.js"
+            
+            # GitHub repo URLs - without branch
+            "${GH_BASE}/package.json"
+            "${GH_BASE}/dist/userScript.js"
+            "${GH_BASE}/dist/service.js"
+            
+            # Purge all GitHub branches/tags
+            "${GH_BASE}@*"
+          )
+
+          # Join with commas
+          URL_STRING=$(IFS=,; echo "${URLS[*]}")
+          
+          echo "urls=${URL_STRING}" >> $GITHUB_OUTPUT
+          echo "Generated CDN URLs:"
+          printf '%s\n' "${URLS[@]}"
+
+      - name: Purge jsDelivr cache
+        if: steps.publish_npm.outcome == 'success'
+        uses: egad13/purge-jsdelivr-cache@v1
+        with:
+          url: ${{ steps.cdn_urls.outputs.urls }}
+          attempts: 3
+
+      - name: Purge individual URLs (fallback if batch fails)
+        if: steps.publish_npm.outcome == 'success' && failure()
+        continue-on-error: true
+        run: |
+          set +e
+          
+          NPM_BASE="https://cdn.jsdelivr.net/npm/${PACKAGE_NAME}"
+          GH_BASE="https://cdn.jsdelivr.net/gh/${PACKAGE_NAME_GH}"
+          
+          declare -a URLS=(
+            "${NPM_BASE}@latest"
+            "${NPM_BASE}@latest/package.json"
+            "${NPM_BASE}@latest/dist/userScript.js"
+            "${NPM_BASE}@latest/dist/service.js"
+            "${NPM_BASE}@*/package.json"
+            "${NPM_BASE}@*/dist/userScript.js"
+            "${NPM_BASE}@*/dist/service.js"
+            "${NPM_BASE}/package.json"
+            "${NPM_BASE}/dist/userScript.js"
+            "${NPM_BASE}/dist/service.js"
+            "${NPM_BASE}@*"
+            "${GH_BASE}@main"
+            "${GH_BASE}@main/package.json"
+            "${GH_BASE}@main/dist/userScript.js"
+            "${GH_BASE}@main/dist/service.js"
+            "${GH_BASE}@master"
+            "${GH_BASE}@master/package.json"
+            "${GH_BASE}@master/dist/userScript.js"
+            "${GH_BASE}@master/dist/service.js"
+            "${GH_BASE}/package.json"
+            "${GH_BASE}/dist/userScript.js"
+            "${GH_BASE}/dist/service.js"
+            "${GH_BASE}@*"
+          )
+          
+          echo "Attempting individual URL purges..."
+          for url in "${URLS[@]}"; do
+            echo "Purging: $url"
+            curl -X POST "https://purge.jsdelivr.net/" \
+              -H "cache-control: no-cache" \
+              -d "path[]=$url" || echo "Failed to purge $url (continuing...)"
+            sleep 2
+          done
+          
+          echo "Individual purge attempts complete"
+
+      - name: Cache purge complete
+        if: steps.publish_npm.outcome == 'success'
+        run: echo "✅ jsDelivr cache purge complete (npm + GitHub)"
