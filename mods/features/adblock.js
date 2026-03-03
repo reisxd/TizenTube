@@ -280,7 +280,8 @@ function isShortsShelf(shelve) {
 
   const titleText = [
     String(shelfRenderer?.title?.simpleText || ''),
-    collectAllText(shelfRenderer?.header).join(' ')
+    collectAllText(shelfRenderer?.header).join(' '),
+    collectAllText(shelfRenderer?.headerRenderer).join(' ')
   ].join(' ').toLowerCase();
 
   const browseIds = Array.from(extractBrowseIdsDeep(shelfRenderer)).map((id) => String(id).toLowerCase());
@@ -925,6 +926,13 @@ function getItemVideoId(item) {
   );
 }
 
+function getGenericNodeProgress(item) {
+  const entries = collectWatchProgressEntries(item);
+  if (!entries.length) return null;
+  const best = entries.reduce((max, entry) => Number(entry.percent) > Number(max.percent) ? entry : max, entries[0]);
+  return { percentDurationWatched: Number(best.percent || 0), source: best.source || 'deep_scan' };
+}
+
 
 function addPreviews(items) {
   if (!configRead('enablePreviews')) return;
@@ -1156,7 +1164,8 @@ function hideVideo(items, pageHint = null) {
   let removedShorts = 0;
   const result = items.filter(item => {
     try {
-    if (!item?.tileRenderer) {
+    const hasTileRenderer = !!item?.tileRenderer;
+    if (!hasTileRenderer) {
       if (isLikelyPlaceholderItem(item)) {
         appendFileOnlyLog('hideVideo.item.skip', {
           pageName,
@@ -1165,6 +1174,31 @@ function hideVideo(items, pageHint = null) {
         });
         return false;
       }
+      const genericTitle = collectAllText(item).join(' ').trim().substring(0, 120) || 'unknown';
+      const genericProgress = getGenericNodeProgress(item) || (isWatchedByTextSignals(item) ? { percentDurationWatched: 100, source: 'text_signal' } : null);
+      const genericShortLike = !shortsEnabled && /\bshorts?\b/i.test(genericTitle);
+
+      if (genericShortLike) {
+        removedShorts++;
+        appendFileOnlyLog('hideVideo.item.generic', { pageName, title: genericTitle, remove: true, reason: 'generic_short_detected' });
+        return false;
+      }
+
+      if (genericProgress && hideWatchedEnabled && pages.includes(pageName)) {
+        const percentWatched = Number(genericProgress.percentDurationWatched || 0);
+        const remove = percentWatched > threshold;
+        if (remove) removedWatched++;
+        appendFileOnlyLog('hideVideo.item.generic', {
+          pageName,
+          title: genericTitle,
+          percentWatched,
+          threshold,
+          remove,
+          source: genericProgress.source || 'generic'
+        });
+        return !remove;
+      }
+
       appendFileOnlyLog('hideVideo.item.skip', {
         pageName,
         rendererKeys: item && typeof item === 'object' ? Object.keys(item).slice(0, 5) : typeof item,
