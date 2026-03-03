@@ -37,7 +37,8 @@ function detectCurrentPage() {
   const cParam = (hash.match(/[?&]c=([^&]+)/i)?.[1] || '').toLowerCase();
   let pageName = 'home';
 
-  if (cParam.includes('fesubscription')) pageName = 'subscriptions';
+  if (hash.startsWith('/watch')) pageName = 'watch';
+  else if (cParam.includes('fesubscription')) pageName = 'subscriptions';
   else if (cParam === 'fehistory') pageName = 'history';
   else if (cParam === 'felibrary') pageName = 'library';
   else if (cParam === 'feplaylist_aggregation') pageName = 'playlists';
@@ -165,12 +166,21 @@ function getItemTitle(item) {
 
 const HIDDEN_LIBRARY_TAB_IDS = new Set(['femusic_last_played', 'festorefront', 'fecollection_podcasts', 'femy_videos']);
 
+function isHiddenLibraryBrowseId(value) {
+  const id = String(value || '').toLowerCase();
+  if (!id) return false;
+  for (const hiddenId of HIDDEN_LIBRARY_TAB_IDS) {
+    if (id === hiddenId || id.includes(hiddenId)) return true;
+  }
+  return false;
+}
+
 function filterHiddenLibraryTabs(items, context = '') {
   if (!Array.isArray(items)) return items;
   const before = items.length;
   const filtered = items.filter((item) => {
     const contentId = String(item?.tileRenderer?.contentId || '').toLowerCase();
-    return !HIDDEN_LIBRARY_TAB_IDS.has(contentId);
+    return !isHiddenLibraryBrowseId(contentId);
   });
 
   if (before !== filtered.length) {
@@ -194,7 +204,7 @@ function pruneLibraryTabsInResponse(node, path = 'root') {
     const before = node.length;
     for (let i = node.length - 1; i >= 0; i--) {
       const browseIds = Array.from(extractBrowseIdsDeep(node[i])).map((v) => String(v).toLowerCase());
-      if (browseIds.some((id) => HIDDEN_LIBRARY_TAB_IDS.has(id))) {
+      if (browseIds.some((id) => isHiddenLibraryBrowseId(id))) {
         appendFileOnlyLog('library.array.pruned', { path, index: i, browseIds });
         node.splice(i, 1);
       }
@@ -248,10 +258,10 @@ function filterLibraryNavTabs(sections, detectedPage) {
     if (!Array.isArray(tabs)) continue;
     const before = tabs.length;
     for (let i = tabs.length - 1; i >= 0; i--) {
-      const browseId = String(extractNavTabBrowseId(tabs[i])).toLowerCase();
-      appendFileOnlyLog('library.navtab.check', { browseId, index: i });
-      if (HIDDEN_LIBRARY_TAB_IDS.has(browseId)) {
-        appendFileOnlyLog('library.navtab.removed', { browseId, index: i });
+      const browseIds = Array.from(extractBrowseIdsDeep(tabs[i])).map((id) => String(id).toLowerCase());
+      appendFileOnlyLog('library.navtab.check', { browseIds, index: i });
+      if (browseIds.some((id) => isHiddenLibraryBrowseId(id))) {
+        appendFileOnlyLog('library.navtab.removed', { browseIds, index: i });
         tabs.splice(i, 1);
       }
     }
@@ -491,13 +501,24 @@ JSON.parse = function () {
   // These use TILE_STYLE_YTLR_VERTICAL_LIST tiles and come through a different continuation key.
   if (r?.continuationContents?.playlistVideoListContinuation?.contents) {
     const playlistItems = r.continuationContents.playlistVideoListContinuation.contents;
+    const hasContinuation = !!r?.continuationContents?.playlistVideoListContinuation?.continuations;
     appendFileOnlyLog('playlist.continuation.detected', {
       detectedPage,
       itemCount: Array.isArray(playlistItems) ? playlistItems.length : 0,
-      hasContinuation: !!r?.continuationContents?.playlistVideoListContinuation?.continuations
+      hasContinuation
     });
-    // Keep continuation payload minimally touched to avoid breaking continuation loading.
-    r.continuationContents.playlistVideoListContinuation.contents = hideVideo(playlistItems, detectedPage);
+    const filteredPlaylistItems = hideVideo(playlistItems, detectedPage);
+    // Avoid continuation stalls when a whole batch (often 15 items) is filtered out.
+    // Keeping one item preserves list growth behavior on some YouTube TV playlist feeds.
+    if (hasContinuation && filteredPlaylistItems.length === 0 && Array.isArray(playlistItems) && playlistItems.length > 0) {
+      appendFileOnlyLog('playlist.continuation.keep-one', {
+        detectedPage,
+        originalCount: playlistItems.length
+      });
+      r.continuationContents.playlistVideoListContinuation.contents = [playlistItems[0]];
+    } else {
+      r.continuationContents.playlistVideoListContinuation.contents = filteredPlaylistItems;
+    }
   }
 
   if (r?.contents?.tvBrowseRenderer?.content?.tvSecondaryNavRenderer?.sections) {
@@ -736,7 +757,25 @@ function processShelves(shelves, shouldAddPreviews = true, pageHint = null) {
         removed: beforeShortsFilter - shelve.shelfRenderer.content.horizontalListRenderer.items.length
       });
     }
+
+    if (shelve.shelfRenderer.content.horizontalListRenderer.items.length === 0) {
+      appendFileOnlyLog('shelf.empty.remove', {
+        page: activePage,
+        shelfTitle: shelve?.shelfRenderer?.title?.simpleText || collectAllText(shelve?.shelfRenderer?.header).join(' ').substring(0, 80)
+      });
+      shelves.splice(i, 1);
+    }
   }
+}
+
+function getItemVideoId(item) {
+  return String(
+    item?.tileRenderer?.contentId ||
+    item?.tileRenderer?.onSelectCommand?.watchEndpoint?.videoId ||
+    item?.tileRenderer?.onSelectCommand?.watchEndpoint?.playlistId ||
+    item?.tileRenderer?.onSelectCommand?.reelWatchEndpoint?.videoId ||
+    ''
+  );
 }
 
 
@@ -966,7 +1005,7 @@ function hideVideo(items, pageHint = null) {
     }
 
     const tileProgressBar = getTileWatchProgress(item);
-    const videoId = String(item?.tileRenderer?.contentId || '');
+    const videoId = getItemVideoId(item);
     const title = item?.tileRenderer?.metadata?.tileMetadataRenderer?.title?.simpleText || videoId || 'unknown';
     const contentId = videoId.toLowerCase();
     const cachedProgress = window._ttVideoProgressCache?.[videoId] ?? null;
@@ -974,7 +1013,7 @@ function hideVideo(items, pageHint = null) {
     const progressBar = tileProgressBar ?? cachedProgress ?? (textWatched ? { percentDurationWatched: 100 } : null);
     const progressSource = tileProgressBar?.source || (cachedProgress ? 'entity_cache' : 'none');
 
-    if (pageName === 'library' && HIDDEN_LIBRARY_TAB_IDS.has(contentId)) {
+    if (pageName === 'library' && isHiddenLibraryBrowseId(contentId)) {
       appendFileOnlyLog('hideVideo.item', { pageName, title, contentId, hasProgress: !!progressBar, remove: true, reason: 'library_tab_hidden' });
       return false;
     }
