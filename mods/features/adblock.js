@@ -298,6 +298,40 @@ function getShelfItems(shelve) {
   return shelve?.shelfRenderer?.content?.horizontalListRenderer?.items || null;
 }
 
+function normalizeHorizontalListRenderer(horizontalListRenderer, context = '') {
+  if (!horizontalListRenderer || !Array.isArray(horizontalListRenderer.items)) return;
+  const count = horizontalListRenderer.items.length;
+
+  const before = {
+    visibleItemCount: horizontalListRenderer.visibleItemCount,
+    collapsedItemCount: horizontalListRenderer.collapsedItemCount,
+    totalItemCount: horizontalListRenderer.totalItemCount
+  };
+
+  if (typeof horizontalListRenderer.visibleItemCount === 'number') {
+    horizontalListRenderer.visibleItemCount = count;
+  }
+  if (typeof horizontalListRenderer.collapsedItemCount === 'number') {
+    horizontalListRenderer.collapsedItemCount = count;
+  }
+  if (typeof horizontalListRenderer.totalItemCount === 'number') {
+    horizontalListRenderer.totalItemCount = count;
+  }
+
+  const after = {
+    visibleItemCount: horizontalListRenderer.visibleItemCount,
+    collapsedItemCount: horizontalListRenderer.collapsedItemCount,
+    totalItemCount: horizontalListRenderer.totalItemCount
+  };
+
+  appendFileOnlyLogOnce(`list.normalize.${context}`.substring(0, 48), {
+    context,
+    count,
+    before,
+    after
+  });
+}
+
 function filterContinuationItems(items, pageName, hasContinuation = false, label = 'continuation') {
   const filteredItems = hideVideo(items, pageName);
   if (hasContinuation && filteredItems.length === 0 && Array.isArray(items) && items.length > 0) {
@@ -527,6 +561,7 @@ JSON.parse = function () {
       !!continuation?.continuations,
       'horizontalListContinuation'
     );
+    normalizeHorizontalListRenderer(r.continuationContents.horizontalListContinuation, 'continuation.horizontal');
     if (detectedPage === 'library') {
       r.continuationContents.horizontalListContinuation.items = filterHiddenLibraryTabs(r.continuationContents.horizontalListContinuation.items, 'continuation.horizontalListContinuation.items');
       pruneLibraryTabsInResponse(r.continuationContents, 'response.continuationContents');
@@ -772,8 +807,10 @@ function processShelves(shelves, shouldAddPreviews = true, pageHint = null) {
       addPreviews(shelfItems);
     }
     shelve.shelfRenderer.content.horizontalListRenderer.items = hideVideo(shelfItems, activePage);
+    normalizeHorizontalListRenderer(shelve.shelfRenderer.content.horizontalListRenderer, `shelf:${activePage}:${i}`);
     if (activePage === 'library') {
       shelve.shelfRenderer.content.horizontalListRenderer.items = filterHiddenLibraryTabs(shelve.shelfRenderer.content.horizontalListRenderer.items, 'processShelves.shelfRenderer.horizontalListRenderer.items');
+      normalizeHorizontalListRenderer(shelve.shelfRenderer.content.horizontalListRenderer, `shelf:${activePage}:${i}:library`);
     }
     if (!configRead('enableShorts')) {
       const shelfTitleDirect = String(shelve?.shelfRenderer?.title?.simpleText || '').toLowerCase();
@@ -797,6 +834,7 @@ function processShelves(shelves, shouldAddPreviews = true, pageHint = null) {
 
       const beforeShortsFilter = shelve.shelfRenderer.content.horizontalListRenderer.items.length;
       shelve.shelfRenderer.content.horizontalListRenderer.items = shelve.shelfRenderer.content.horizontalListRenderer.items.filter(item => !isLikelyShortItem(item));
+      normalizeHorizontalListRenderer(shelve.shelfRenderer.content.horizontalListRenderer, `shelf:${activePage}:${i}:shorts`);
       appendFileOnlyLog('shorts.tiles.filter', {
         page: activePage,
         before: beforeShortsFilter,
