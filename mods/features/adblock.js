@@ -34,25 +34,91 @@ function appendFileOnlyLogOnce(key, payload) {
 
 function detectCurrentPage() {
   const hash = location.hash ? location.hash.substring(1) : '';
+  const cParam = (hash.match(/[?&]c=([^&]+)/i)?.[1] || '').toLowerCase();
   let pageName = 'home';
-  try {
-    pageName = hash === '/'
-      ? 'home'
-      : hash.startsWith('/search')
-        ? 'search'
-        : (hash.split('?')[1]?.split('&')[0]?.split('=')[1] || 'home').replace('FE', '').replace('topics_', '');
-  } catch (_) {
-    pageName = 'home';
+
+  if (cParam.includes('fesubscription')) pageName = 'subscriptions';
+  else if (cParam === 'fehistory') pageName = 'history';
+  else if (cParam === 'felibrary') pageName = 'library';
+  else if (cParam === 'feplaylist_aggregation') pageName = 'playlists';
+  else if (cParam === 'femy_youtube' || cParam === 'vlwl' || cParam === 'vlll' || cParam.startsWith('vlpl')) pageName = 'playlist';
+  else {
+    try {
+      pageName = hash === '/'
+        ? 'home'
+        : hash.startsWith('/search')
+          ? 'search'
+          : (hash.split('?')[1]?.split('&')[0]?.split('=')[1] || 'home').replace('FE', '').replace('topics_', '');
+    } catch (_) {
+      pageName = 'home';
+    }
   }
 
   appendFileOnlyLogOnce(`page-detect:${pageName}`, {
     hash,
+    cParam,
     pathname: location.pathname || '',
     search: location.search || '',
     pageName
   });
 
   return pageName;
+}
+
+function collectAllText(node, out = []) {
+  if (!node) return out;
+  if (typeof node === 'string') {
+    out.push(node);
+    return out;
+  }
+  if (Array.isArray(node)) {
+    for (const child of node) collectAllText(child, out);
+    return out;
+  }
+  if (typeof node === 'object') {
+    if (typeof node.simpleText === 'string') out.push(node.simpleText);
+    if (Array.isArray(node.runs)) {
+      for (const run of node.runs) if (typeof run?.text === 'string') out.push(run.text);
+    }
+    for (const key of Object.keys(node)) {
+      if (key === 'runs' || key === 'simpleText') continue;
+      collectAllText(node[key], out);
+    }
+  }
+  return out;
+}
+
+function parseDurationToSeconds(text) {
+  if (!text) return null;
+  const m = String(text).match(/\b(\d{1,2}:\d{2}(?::\d{2})?)\b/);
+  if (!m) return null;
+  const parts = m[1].split(':').map(Number);
+  if (parts.some(Number.isNaN)) return null;
+  if (parts.length === 2) return parts[0] * 60 + parts[1];
+  if (parts.length === 3) return parts[0] * 3600 + parts[1] * 60 + parts[2];
+  return null;
+}
+
+
+function getItemTitle(item) {
+  return item?.tileRenderer?.metadata?.tileMetadataRenderer?.title?.simpleText
+    || item?.tileRenderer?.contentId
+    || 'unknown';
+}
+
+function isLikelyShortItem(item) {
+  const tile = item?.tileRenderer;
+  if (!tile) return false;
+  if (tile?.tvhtml5ShelfRendererType === 'TVHTML5_TILE_RENDERER_TYPE_SHORTS') return true;
+
+  const title = String(getItemTitle(item) || '').toLowerCase();
+  if (title.includes('#shorts')) return true;
+
+  const allText = collectAllText(tile);
+  const durationCandidate = allText.map(parseDurationToSeconds).find((v) => Number.isFinite(v));
+  if (Number.isFinite(durationCandidate) && durationCandidate > 0 && durationCandidate <= 180) return true;
+
+  return false;
 }
 
 /**
@@ -322,7 +388,8 @@ function processShelves(shelves, shouldAddPreviews = true) {
       }
       shelve.shelfRenderer.content.horizontalListRenderer.items = hideVideo(shelve.shelfRenderer.content.horizontalListRenderer.items);
       if (!configRead('enableShorts')) {
-        if (shelve.shelfRenderer.tvhtml5ShelfRendererType === 'TVHTML5_SHELF_RENDERER_TYPE_SHORTS') {
+        const shelfTitle = String(shelve?.shelfRenderer?.title?.simpleText || '').toLowerCase();
+        if (shelve.shelfRenderer.tvhtml5ShelfRendererType === 'TVHTML5_SHELF_RENDERER_TYPE_SHORTS' || shelfTitle.includes('short')) {
           appendFileOnlyLog('shorts.shelf.remove', {
             page: detectCurrentPage(),
             reason: 'TVHTML5_SHELF_RENDERER_TYPE_SHORTS',
@@ -333,7 +400,7 @@ function processShelves(shelves, shouldAddPreviews = true) {
         }
 
         const beforeShortsFilter = shelve.shelfRenderer.content.horizontalListRenderer.items.length;
-        shelve.shelfRenderer.content.horizontalListRenderer.items = shelve.shelfRenderer.content.horizontalListRenderer.items.filter(item => item.tileRenderer?.tvhtml5ShelfRendererType !== 'TVHTML5_TILE_RENDERER_TYPE_SHORTS');
+        shelve.shelfRenderer.content.horizontalListRenderer.items = shelve.shelfRenderer.content.horizontalListRenderer.items.filter(item => !isLikelyShortItem(item));
         appendFileOnlyLog('shorts.tiles.filter', {
           page: detectCurrentPage(),
           before: beforeShortsFilter,
@@ -455,28 +522,40 @@ function hideVideo(items) {
   const pageName = detectCurrentPage();
   const threshold = Number(configRead('hideWatchedVideosThreshold') || 0);
 
+  const hideWatchedEnabled = !!configRead('enableHideWatchedVideos');
+  const shortsEnabled = !!configRead('enableShorts');
+
   appendFileOnlyLog('hideVideo.start', {
     pageName,
     threshold,
     configuredPages: pages,
     inputCount: Array.isArray(items) ? items.length : 0,
-    enableHideWatchedVideos: !!configRead('enableHideWatchedVideos')
+    enableHideWatchedVideos: hideWatchedEnabled,
+    enableShorts: shortsEnabled
   });
 
   let removedWatched = 0;
+  let removedShorts = 0;
   const result = items.filter(item => {
     if (!item.tileRenderer) return true;
 
     const progressBar = item.tileRenderer.header?.tileHeaderRenderer?.thumbnailOverlays?.find(overlay => overlay.thumbnailOverlayResumePlaybackRenderer)?.thumbnailOverlayResumePlaybackRenderer;
     const title = item?.tileRenderer?.metadata?.tileMetadataRenderer?.title?.simpleText || item?.tileRenderer?.contentId || 'unknown';
 
+    const shortLike = isLikelyShortItem(item);
+    if (!shortsEnabled && shortLike) {
+      removedShorts++;
+      appendFileOnlyLog('hideVideo.item', { pageName, title, hasProgress: !!progressBar, remove: true, reason: 'short_detected' });
+      return false;
+    }
+
     if (!progressBar) {
       appendFileOnlyLog('hideVideo.item', { pageName, title, hasProgress: false, remove: false, reason: 'no_progress' });
       return true;
     }
 
-    if (!pages.includes(pageName)) {
-      appendFileOnlyLog('hideVideo.item', { pageName, title, hasProgress: true, percentWatched: Number(progressBar.percentDurationWatched || 0), remove: false, reason: 'page_not_enabled' });
+    if (!hideWatchedEnabled || !pages.includes(pageName)) {
+      appendFileOnlyLog('hideVideo.item', { pageName, title, hasProgress: true, percentWatched: Number(progressBar.percentDurationWatched || 0), remove: false, reason: hideWatchedEnabled ? 'page_not_enabled' : 'watched_feature_disabled' });
       return true;
     }
 
@@ -501,7 +580,8 @@ function hideVideo(items) {
     pageName,
     input: Array.isArray(items) ? items.length : 0,
     output: result.length,
-    removedWatched
+    removedWatched,
+    removedShorts
   });
 
   return result;
