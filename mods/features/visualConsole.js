@@ -56,6 +56,7 @@ function initVisualConsole() {
   document.addEventListener('DOMContentLoaded', mount);
 
   let logs = [];
+  if (!Array.isArray(window.__ttFileOnlyLogs)) window.__ttFileOnlyLogs = [];
   const original = {
     log: console.log,
     info: console.info,
@@ -81,7 +82,7 @@ function initVisualConsole() {
   };
 
   const addLog = (type, args) => {
-    if (!configRead('enableDebugConsole')) return;
+    if (!configRead('enableDebugConsole') && !configRead('enableDebugLogging')) return;
     const color = type === 'error' ? '#f55' : type === 'warn' ? '#ff0' : '#0f0';
     const msg = args.map((a) => {
       if (typeof a === 'string') return a;
@@ -101,6 +102,27 @@ function initVisualConsole() {
   console.error = (...args) => { original.error.apply(console, args); addLog('error', args); };
   console.debug = (...args) => { original.debug.apply(console, args); addLog('debug', args); };
 
+  const downloadLogs = () => {
+    try {
+      const plainTextLogs = logs
+        .map((entry) => entry.replace(/<div[^>]*>/g, '').replace(/<\/div>/g, ''))
+        .join('\n');
+      const fileOnlyLogs = Array.isArray(window.__ttFileOnlyLogs) ? window.__ttFileOnlyLogs.join('\n') : '';
+      const combinedLogs = `${plainTextLogs}\n\n===== FILE-ONLY DEBUG LOGS =====\n${fileOnlyLogs}`;
+      const blob = new Blob([combinedLogs], { type: 'text/plain;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `tizentube-logs-${Date.now()}.txt`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch (err) {
+      original.error('Failed to download logs', err);
+    }
+  };
+
+  window.downloadTizenTubeLogs = downloadLogs;
+
   window.toggleDebugConsole = function () {
     configWrite('enableDebugConsole', !configRead('enableDebugConsole'));
     syncVisible();
@@ -110,8 +132,10 @@ function initVisualConsole() {
   syncVisible();
 
   console.log('[Console] ========================================');
-  console.log(`[Console] Visual Console ${APP_VERSION_LABEL} v${APP_VERSION}`);
   console.log('[Console] Use TizenTube settings to configure position/height');
+  console.log(`[Console] Visual Console ${APP_VERSION_LABEL} v${APP_VERSION}`);
+  console.log(`[Console] User-Agent: ${navigator.userAgent}`);
+  console.log('[Console] User-Agent (raw):', navigator.userAgent);
   console.log('[Console] ========================================');
 
   const versionToastCmd = {
