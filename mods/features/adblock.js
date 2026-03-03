@@ -4,6 +4,57 @@ import resolveCommand from '../resolveCommand.js';
 import { timelyAction, longPressData, MenuServiceItemRenderer, ShelfRenderer, TileRenderer, ButtonRenderer } from '../ui/ytUI.js';
 import { PatchSettings } from '../ui/customYTSettings.js';
 
+
+function appendFileOnlyLog(label, payload) {
+  if (!configRead('enableDebugLogging')) return;
+  if (!Array.isArray(window.__ttFileOnlyLogs)) window.__ttFileOnlyLogs = [];
+
+  const stamp = new Date().toISOString();
+  let message = '';
+  if (typeof payload === 'string') message = payload;
+  else {
+    try { message = JSON.stringify(payload); } catch (_) { message = String(payload); }
+  }
+
+  window.__ttFileOnlyLogs.push(`[${stamp}] [TT_ADBLOCK_FILE] ${label} ${message}`);
+  if (window.__ttFileOnlyLogs.length > 5000) window.__ttFileOnlyLogs.shift();
+}
+
+function appendFileOnlyLogOnce(key, payload) {
+  if (!configRead('enableDebugLogging')) return;
+  if (!window._ttFileDebugOnce) window._ttFileDebugOnce = new Map();
+
+  let serialized = '';
+  try { serialized = JSON.stringify(payload); } catch (_) { serialized = String(payload); }
+
+  if (window._ttFileDebugOnce.get(key) === serialized) return;
+  window._ttFileDebugOnce.set(key, serialized);
+  appendFileOnlyLog(key, serialized);
+}
+
+function detectCurrentPage() {
+  const hash = location.hash ? location.hash.substring(1) : '';
+  let pageName = 'home';
+  try {
+    pageName = hash === '/'
+      ? 'home'
+      : hash.startsWith('/search')
+        ? 'search'
+        : (hash.split('?')[1]?.split('&')[0]?.split('=')[1] || 'home').replace('FE', '').replace('topics_', '');
+  } catch (_) {
+    pageName = 'home';
+  }
+
+  appendFileOnlyLogOnce(`page-detect:${pageName}`, {
+    hash,
+    pathname: location.pathname || '',
+    search: location.search || '',
+    pageName
+  });
+
+  return pageName;
+}
+
 /**
  * This is a minimal reimplementation of the following uBlock Origin rule:
  * https://github.com/uBlockOrigin/uAssets/blob/3497eebd440f4871830b9b45af0afc406c6eb593/filters/filters.txt#L116
@@ -17,6 +68,15 @@ const origParse = JSON.parse;
 JSON.parse = function () {
   const r = origParse.apply(this, arguments);
   const adBlockEnabled = configRead('enableAdBlock');
+
+  appendFileOnlyLog('json.parse.meta', {
+    hash: location.hash || '',
+    path: location.pathname || '',
+    search: location.search || '',
+    rootType: Array.isArray(r) ? 'array' : typeof r,
+    rootKeys: r && typeof r === 'object' ? Object.keys(r).slice(0, 40) : []
+  });
+  appendFileOnlyLog('json.parse.full', r);
   const signinReminderEnabled = configRead('enableSigninReminder');
 
   if (r.adPlacements && adBlockEnabled) {
@@ -246,6 +306,12 @@ for (const key in window._yttv) {
 
 
 function processShelves(shelves, shouldAddPreviews = true) {
+  appendFileOnlyLog('processShelves.start', {
+    page: detectCurrentPage(),
+    shelfCount: Array.isArray(shelves) ? shelves.length : 0,
+    shouldAddPreviews
+  });
+
   for (const shelve of shelves) {
     if (shelve.shelfRenderer) {
       deArrowify(shelve.shelfRenderer.content.horizontalListRenderer.items);
@@ -257,14 +323,28 @@ function processShelves(shelves, shouldAddPreviews = true) {
       shelve.shelfRenderer.content.horizontalListRenderer.items = hideVideo(shelve.shelfRenderer.content.horizontalListRenderer.items);
       if (!configRead('enableShorts')) {
         if (shelve.shelfRenderer.tvhtml5ShelfRendererType === 'TVHTML5_SHELF_RENDERER_TYPE_SHORTS') {
+          appendFileOnlyLog('shorts.shelf.remove', {
+            page: detectCurrentPage(),
+            reason: 'TVHTML5_SHELF_RENDERER_TYPE_SHORTS',
+            shelfTitle: shelve?.shelfRenderer?.title || ''
+          });
           shelves.splice(shelves.indexOf(shelve), 1);
           continue;
         }
+
+        const beforeShortsFilter = shelve.shelfRenderer.content.horizontalListRenderer.items.length;
         shelve.shelfRenderer.content.horizontalListRenderer.items = shelve.shelfRenderer.content.horizontalListRenderer.items.filter(item => item.tileRenderer?.tvhtml5ShelfRendererType !== 'TVHTML5_TILE_RENDERER_TYPE_SHORTS');
+        appendFileOnlyLog('shorts.tiles.filter', {
+          page: detectCurrentPage(),
+          before: beforeShortsFilter,
+          after: shelve.shelfRenderer.content.horizontalListRenderer.items.length,
+          removed: beforeShortsFilter - shelve.shelfRenderer.content.horizontalListRenderer.items.length
+        });
       }
     }
   }
 }
+
 
 function addPreviews(items) {
   if (!configRead('enablePreviews')) return;
@@ -371,16 +451,58 @@ function addLongPress(items) {
 }
 
 function hideVideo(items) {
-  return items.filter(item => {
-    if (!item.tileRenderer) return true;
-    const progressBar = item.tileRenderer.header?.tileHeaderRenderer?.thumbnailOverlays?.find(overlay => overlay.thumbnailOverlayResumePlaybackRenderer)?.thumbnailOverlayResumePlaybackRenderer;
-    if (!progressBar) return true;
-    const pages = configRead('hideWatchedVideosPages');
-    const hash = location.hash.substring(1);
-    const pageName = hash === '/' ? 'home' : hash.startsWith('/search') ? 'search' : hash.split('?')[1].split('&')[0].split('=')[1].replace('FE', '').replace('topics_', '');
-    if (!pages.includes(pageName)) return true;
+  const pages = configRead('hideWatchedVideosPages') || [];
+  const pageName = detectCurrentPage();
+  const threshold = Number(configRead('hideWatchedVideosThreshold') || 0);
 
-    const percentWatched = (progressBar.percentDurationWatched || 0);
-    return percentWatched <= configRead('hideWatchedVideosThreshold');
+  appendFileOnlyLog('hideVideo.start', {
+    pageName,
+    threshold,
+    configuredPages: pages,
+    inputCount: Array.isArray(items) ? items.length : 0,
+    enableHideWatchedVideos: !!configRead('enableHideWatchedVideos')
   });
+
+  let removedWatched = 0;
+  const result = items.filter(item => {
+    if (!item.tileRenderer) return true;
+
+    const progressBar = item.tileRenderer.header?.tileHeaderRenderer?.thumbnailOverlays?.find(overlay => overlay.thumbnailOverlayResumePlaybackRenderer)?.thumbnailOverlayResumePlaybackRenderer;
+    const title = item?.tileRenderer?.metadata?.tileMetadataRenderer?.title?.simpleText || item?.tileRenderer?.contentId || 'unknown';
+
+    if (!progressBar) {
+      appendFileOnlyLog('hideVideo.item', { pageName, title, hasProgress: false, remove: false, reason: 'no_progress' });
+      return true;
+    }
+
+    if (!pages.includes(pageName)) {
+      appendFileOnlyLog('hideVideo.item', { pageName, title, hasProgress: true, percentWatched: Number(progressBar.percentDurationWatched || 0), remove: false, reason: 'page_not_enabled' });
+      return true;
+    }
+
+    const percentWatched = Number(progressBar.percentDurationWatched || 0);
+    const remove = percentWatched > threshold;
+    if (remove) removedWatched++;
+
+    appendFileOnlyLog('hideVideo.item', {
+      pageName,
+      title,
+      hasProgress: true,
+      percentWatched,
+      threshold,
+      remove,
+      reason: remove ? 'remove' : 'below_threshold'
+    });
+
+    return !remove;
+  });
+
+  appendFileOnlyLog('hideVideo.done', {
+    pageName,
+    input: Array.isArray(items) ? items.length : 0,
+    output: result.length,
+    removedWatched
+  });
+
+  return result;
 }

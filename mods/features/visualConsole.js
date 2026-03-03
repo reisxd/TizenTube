@@ -56,6 +56,7 @@ function initVisualConsole() {
   document.addEventListener('DOMContentLoaded', mount);
 
   let logs = [];
+  if (!Array.isArray(window.__ttFileOnlyLogs)) window.__ttFileOnlyLogs = [];
   const original = {
     log: console.log,
     info: console.info,
@@ -106,7 +107,9 @@ function initVisualConsole() {
       const plainTextLogs = logs
         .map((entry) => entry.replace(/<div[^>]*>/g, '').replace(/<\/div>/g, ''))
         .join('\n');
-      const blob = new Blob([plainTextLogs], { type: 'text/plain;charset=utf-8' });
+      const fileOnlyLogs = Array.isArray(window.__ttFileOnlyLogs) ? window.__ttFileOnlyLogs.join('\n') : '';
+      const combinedLogs = `${plainTextLogs}\n\n===== FILE-ONLY DEBUG LOGS =====\n${fileOnlyLogs}`;
+      const blob = new Blob([combinedLogs], { type: 'text/plain;charset=utf-8' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
