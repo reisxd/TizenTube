@@ -222,6 +222,9 @@ function isLikelyShortItem(item) {
   if (!tile) return false;
   if (tile?.tvhtml5ShelfRendererType === 'TVHTML5_TILE_RENDERER_TYPE_SHORTS') return true;
 
+  // Shorts tiles use reelWatchEndpoint instead of watchEndpoint — this is the most reliable signal.
+  if (tile?.onSelectCommand?.reelWatchEndpoint) return true;
+
   const title = String(getItemTitle(item) || '').toLowerCase();
   if (title.includes('#shorts')) return true;
   
@@ -358,10 +361,13 @@ JSON.parse = function () {
     }
 
     processShelves(r.contents.tvBrowseRenderer.content.tvSurfaceContentRenderer.content.sectionListRenderer.contents, true, detectedPage);
+  }
 
-    if (detectedPage === 'library') {
-      pruneLibraryTabsInResponse(r, 'response');
-    }
+  // Library tab pruning: must run unconditionally whenever we're on the library page,
+  // because the library page sends its nav tabs via tvSecondaryNavRenderer (not tvSurfaceContentRenderer),
+  // so gating this inside the tvSurfaceContentRenderer block meant it never fired on library.
+  if (detectedPage === 'library') {
+    pruneLibraryTabsInResponse(r, 'response');
   }
 
   if (r.endscreen && configRead('enableHideEndScreenCards')) {
@@ -422,6 +428,27 @@ JSON.parse = function () {
 
     for (const section of r.contents.tvBrowseRenderer.content.tvSecondaryNavRenderer.sections) {
       if (!Array.isArray(section?.tvSecondaryNavSectionRenderer?.tabs)) continue;
+
+      // Remove the "Shorts" tab from the channel nav bar when shorts are disabled.
+      // Previously only the tab's content was filtered; the tab button itself stayed visible.
+      if (!configRead('enableShorts')) {
+        const tabs = section.tvSecondaryNavSectionRenderer.tabs;
+        for (let i = tabs.length - 1; i >= 0; i--) {
+          const tab = tabs[i];
+          const tabTitle = String(
+            tab?.tabRenderer?.title?.simpleText ||
+            collectAllText(tab?.tabRenderer?.title).join(' ')
+          ).toLowerCase();
+          // Also catch via the endpoint browseId (Shorts tabs often point to a shorts browseId)
+          const tabBrowseId = String(extractNavTabBrowseId(tab)).toLowerCase();
+          if (tabTitle.includes('short') || tabBrowseId.includes('short')) {
+            appendFileOnlyLog('shorts.navtab.removed', { tabTitle, tabBrowseId, index: i });
+            tabs.splice(i, 1);
+            continue;
+          }
+        }
+      }
+
       for (const tab of section.tvSecondaryNavSectionRenderer.tabs) {
         const contents = tab?.tabRenderer?.content?.tvSurfaceContentRenderer?.content?.sectionListRenderer?.contents;
         if (Array.isArray(contents)) {
@@ -636,25 +663,28 @@ function addPreviews(items) {
 }
 
 function deArrowify(items) {
-  for (const item of items) {
+  // Iterate in reverse so splicing an adSlotRenderer doesn't shift indices of unvisited items.
+  for (let i = items.length - 1; i >= 0; i--) {
+    const item = items[i];
     if (item.adSlotRenderer) {
-      const index = items.indexOf(item);
-      items.splice(index, 1);
+      items.splice(i, 1);
       continue;
     }
     if (!item.tileRenderer) continue;
     if (configRead('enableDeArrow')) {
-      const videoID = item.tileRenderer.contentId;
+      // Capture item reference so the async callback isn't affected by loop variable changes.
+      const capturedItem = item;
+      const videoID = capturedItem.tileRenderer.contentId;
       fetch(`https://sponsor.ajay.app/api/branding?videoID=${videoID}`).then(res => res.json()).then(data => {
         if (data.titles.length > 0) {
           const mostVoted = data.titles.reduce((max, title) => max.votes > title.votes ? max : title);
-          item.tileRenderer.metadata.tileMetadataRenderer.title.simpleText = mostVoted.title;
+          capturedItem.tileRenderer.metadata.tileMetadataRenderer.title.simpleText = mostVoted.title;
         }
 
         if (data.thumbnails.length > 0 && configRead('enableDeArrowThumbnails')) {
           const mostVotedThumbnail = data.thumbnails.reduce((max, thumbnail) => max.votes > thumbnail.votes ? max : thumbnail);
           if (mostVotedThumbnail.timestamp) {
-            item.tileRenderer.header.tileHeaderRenderer.thumbnail.thumbnails = [
+            capturedItem.tileRenderer.header.tileHeaderRenderer.thumbnail.thumbnails = [
               {
                 url: `https://dearrow-thumb.ajay.app/api/v1/getThumbnail?videoID=${videoID}&time=${mostVotedThumbnail.timestamp}`,
                 width: 1280,
