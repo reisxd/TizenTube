@@ -848,11 +848,32 @@ function processShelves(shelves, shouldAddPreviews = true, pageHint = null) {
 
   for (let i = shelves.length - 1; i >= 0; i--) {
     const shelve = shelves[i];
+    const shelfAllText = collectAllText(shelve).join(' ').toLowerCase();
+    appendFileOnlyLog('processShelves.item', {
+      page: activePage,
+      index: i,
+      keys: shelve && typeof shelve === 'object' ? Object.keys(shelve).slice(0, 8) : typeof shelve,
+      hasShelfRenderer: !!shelve?.shelfRenderer,
+      hasReelShelfRenderer: !!shelve?.reelShelfRenderer,
+      textPreview: shelfAllText.substring(0, 80)
+    });
 
     if (!configRead('enableShorts') && isShortsShelf(shelve)) {
       appendFileOnlyLog('shorts.reelShelf.remove', {
         page: activePage,
         reason: 'is_shorts_shelf'
+      });
+      shelves.splice(i, 1);
+      continue;
+    }
+
+    // Some channel surfaces include "Shorts" shelf-like rows under non-shelf renderers.
+    if (!configRead('enableShorts') && !shelve?.shelfRenderer && /\bshorts?\b/i.test(shelfAllText)) {
+      appendFileOnlyLog('shorts.genericShelf.remove', {
+        page: activePage,
+        index: i,
+        keys: shelve && typeof shelve === 'object' ? Object.keys(shelve).slice(0, 8) : typeof shelve,
+        textPreview: shelfAllText.substring(0, 120)
       });
       shelves.splice(i, 1);
       continue;
@@ -998,6 +1019,7 @@ function deArrowify(items) {
 function hqify(items) {
   if (!Array.isArray(items)) return;
   for (const item of items) {
+    try {
     if (!item?.tileRenderer) continue;
     // FIX (Bug 3): Also handle vertical-list tiles used in playlists.
     if (
@@ -1016,12 +1038,20 @@ function hqify(items) {
         }
       ];
     }
+    } catch (error) {
+      appendFileOnlyLog('hqify.item.error', {
+        message: error?.message || String(error),
+        stack: String(error?.stack || '').substring(0, 400),
+        keys: item && typeof item === 'object' ? Object.keys(item).slice(0, 8) : typeof item
+      });
+    }
   }
 }
 
 function addLongPress(items) {
   if (!Array.isArray(items)) return;
   for (const item of items) {
+    try {
     if (!item?.tileRenderer) continue;
     // FIX (Bug 3): Also handle vertical-list tiles used in playlists.
     if (
@@ -1051,6 +1081,13 @@ function addLongPress(items) {
       item
     });
     item.tileRenderer.onLongPressCommand = data;
+    } catch (error) {
+      appendFileOnlyLog('addLongPress.item.error', {
+        message: error?.message || String(error),
+        stack: String(error?.stack || '').substring(0, 400),
+        keys: item && typeof item === 'object' ? Object.keys(item).slice(0, 8) : typeof item
+      });
+    }
   }
 }
 
