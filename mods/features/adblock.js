@@ -347,6 +347,7 @@ function isLikelyShortItem(item) {
 const origParse = JSON.parse;
 JSON.parse = function () {
   const r = origParse.apply(this, arguments);
+  try {
   const adBlockEnabled = configRead('enableAdBlock');
 
   const detectedPage = detectPageFromResponse(r) || detectCurrentPage();
@@ -715,6 +716,13 @@ JSON.parse = function () {
   }
 
   return r;
+  } catch (error) {
+    appendFileOnlyLog('json.parse.error', {
+      message: error?.message || String(error),
+      stack: String(error?.stack || '').substring(0, 600)
+    });
+    return r;
+  }
 };
 
 // Patch JSON.parse to use the custom one
@@ -841,14 +849,16 @@ function addPreviews(items) {
 }
 
 function deArrowify(items) {
+  if (!Array.isArray(items)) return;
   // Iterate in reverse so splicing an adSlotRenderer doesn't shift indices of unvisited items.
   for (let i = items.length - 1; i >= 0; i--) {
     const item = items[i];
+    if (!item || typeof item !== 'object') continue;
     if (item.adSlotRenderer) {
       items.splice(i, 1);
       continue;
     }
-    if (!item.tileRenderer) continue;
+    if (!item?.tileRenderer) continue;
     if (configRead('enableDeArrow')) {
       // Capture item reference so the async callback isn't affected by loop variable changes.
       const capturedItem = item;
@@ -878,8 +888,9 @@ function deArrowify(items) {
 
 
 function hqify(items) {
+  if (!Array.isArray(items)) return;
   for (const item of items) {
-    if (!item.tileRenderer) continue;
+    if (!item?.tileRenderer) continue;
     // FIX (Bug 3): Also handle vertical-list tiles used in playlists.
     if (
       item.tileRenderer.style !== 'TILE_STYLE_YTLR_DEFAULT' &&
@@ -901,8 +912,9 @@ function hqify(items) {
 }
 
 function addLongPress(items) {
+  if (!Array.isArray(items)) return;
   for (const item of items) {
-    if (!item.tileRenderer) continue;
+    if (!item?.tileRenderer) continue;
     // FIX (Bug 3): Also handle vertical-list tiles used in playlists.
     if (
       item.tileRenderer.style !== 'TILE_STYLE_YTLR_DEFAULT' &&
@@ -1015,6 +1027,7 @@ function processTileArraysDeep(node, pageHint = null, path = 'root', depth = 0) 
 }
 
 function hideVideo(items, pageHint = null) {
+  if (!Array.isArray(items)) return [];
   const pages = configRead('hideWatchedVideosPages') || [];
   const pageName = pageHint || getActivePage();
   const threshold = Number(configRead('hideWatchedVideosThreshold') || 0);
@@ -1034,7 +1047,8 @@ function hideVideo(items, pageHint = null) {
   let removedWatched = 0;
   let removedShorts = 0;
   const result = items.filter(item => {
-    if (!item.tileRenderer) {
+    try {
+    if (!item?.tileRenderer) {
       appendFileOnlyLog('hideVideo.item.skip', {
         pageName,
         rendererKeys: item && typeof item === 'object' ? Object.keys(item).slice(0, 5) : typeof item,
@@ -1089,6 +1103,15 @@ function hideVideo(items, pageHint = null) {
     });
 
     return !remove;
+    } catch (error) {
+      appendFileOnlyLog('hideVideo.item.error', {
+        pageName,
+        message: error?.message || String(error),
+        stack: String(error?.stack || '').substring(0, 500),
+        itemKeys: item && typeof item === 'object' ? Object.keys(item).slice(0, 10) : typeof item
+      });
+      return true;
+    }
   });
 
   appendFileOnlyLog('hideVideo.done', {
