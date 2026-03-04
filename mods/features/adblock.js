@@ -432,7 +432,7 @@ function attemptPlaylistAutoLoad(reason = 'playlist.auto_load', attempt = 0) {
 function schedulePlaylistAutoLoad(reason = 'playlist.auto_load') {
   if (getActivePage() !== 'playlist') return;
   const reasonText = String(reason || '');
-  const allowAutoLoad = reasonText.includes('keep-one');
+  const allowAutoLoad = reasonText.includes('keep-one') || reasonText.includes('empty_batch');
   if (!allowAutoLoad) {
     appendFileOnlyLog('playlist.auto_load.skipped', { reason, skip: 'reason_not_whitelisted', page: getActivePage() });
     return;
@@ -944,6 +944,11 @@ function filterContinuationItems(items, pageName, hasContinuation = false, label
 
   if (pageName === 'playlist' && !hasContinuation && filteredItems.length === 0) {
     showPlaylistAllHiddenNotice(`${label}.no_continuation_all_hidden`);
+  }
+
+  if (pageName === 'playlist' && hasContinuation && filteredItems.length === 0) {
+    appendFileOnlyLog(`${label}.empty_batch.autoload`, { pageName, originalCount: Array.isArray(items) ? items.length : 0 });
+    schedulePlaylistAutoLoad(`${label}.empty_batch`);
   }
 
   if (hasContinuation && filteredItems.length === 0 && pageName !== 'playlist') {
