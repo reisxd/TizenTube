@@ -510,7 +510,9 @@ function retirePlaylistHelperVideoId(videoId, label = 'playlist.helper') {
 
 function getPlaylistTileNodes() {
   if (typeof document === 'undefined' || !document?.querySelectorAll) return [];
-  return Array.from(document.querySelectorAll('ytlr-tile-renderer, ytlr-grid-tile, ytlr-rich-item-renderer'));
+  const listRoot = document.querySelector('ytlr-playlist-video-list-renderer');
+  if (!listRoot) return [];
+  return Array.from(listRoot.querySelectorAll('ytlr-tile-renderer, ytlr-grid-tile, ytlr-rich-item-renderer'));
 }
 
 function parseTranslateYRem(transformValue, fallbackRem = 0) {
@@ -532,10 +534,16 @@ function softHidePlaylistHelperRow(rowNode, tileNode) {
   if (!rowNode) return false;
   try {
     rowNode.classList?.add('tt-helper-soft-hidden');
+    rowNode.classList?.remove('lxpVI', 'zylon-focus');
     rowNode.style.visibility = 'hidden';
     rowNode.style.pointerEvents = 'none';
     rowNode.setAttribute('aria-hidden', 'true');
-    if (tileNode) tileNode.style.display = 'none';
+    rowNode.setAttribute('tabindex', '-1');
+    if (tileNode) {
+      tileNode.classList?.remove('zylon-focus');
+      tileNode.style.display = 'none';
+      tileNode.setAttribute('tabindex', '-1');
+    }
     return true;
   } catch (_) {
     return false;
@@ -570,9 +578,13 @@ function compactPlaylistVirtualRows(reason = 'playlist.row_compact') {
     for (const row of rowNodes) {
       const hasTile = !!row.querySelector('ytlr-tile-renderer, ytlr-grid-tile, ytlr-rich-item-renderer');
       const classText = String(row.className || '');
+      const softHidden = classText.includes('tt-helper-soft-hidden');
       const focused = classText.includes('lxpVI') || classText.includes('zylon-focus') || !!row.querySelector('.zylon-focus');
-      const isPlaceholder = !hasTile || classText.includes('fitbrf') || classText.includes('B3hoEd') || classText.includes('tt-helper-soft-hidden');
+      const isPlaceholder = !hasTile || classText.includes('fitbrf') || classText.includes('B3hoEd') || softHidden;
       if (isPlaceholder && !focused) {
+        row.remove();
+        removedPlaceholders++;
+      } else if (softHidden) {
         row.remove();
         removedPlaceholders++;
       }
@@ -731,6 +743,8 @@ function cleanupPlaylistHelpersFromDom(helperIds, reason = 'playlist.helper.clea
     );
   };
 
+  const playlistRoot = document.querySelector('ytlr-playlist-video-list-renderer') || document;
+
   for (const rawId of helperIds) {
     const id = String(rawId || '').trim();
     if (!id) continue;
@@ -739,15 +753,13 @@ function cleanupPlaylistHelpersFromDom(helperIds, reason = 'playlist.helper.clea
       `[data-video-id="${id}"]`,
       `[video-id="${id}"]`,
       `[data-content-id="${id}"]`,
-      `[content-id="${id}"]`,
-      `a[href*="v=${id}"]`,
-      `a[href*="/watch?v=${id}"]`
+      `[content-id="${id}"]`
     ];
 
     for (const selector of selectors) {
       let nodes = [];
       try {
-        nodes = Array.from(document.querySelectorAll(selector));
+        nodes = Array.from(playlistRoot.querySelectorAll(selector));
       } catch (_) {
         nodes = [];
       }
