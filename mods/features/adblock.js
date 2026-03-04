@@ -178,6 +178,14 @@ const HIDDEN_LIBRARY_TAB_IDS = new Set(['femusic_last_played', 'festorefront', '
 function isHiddenLibraryBrowseId(value) {
   const id = String(value || '').toLowerCase();
   if (!id) return false;
+
+  if (configRead('hideAllLibraryTabs')) {
+    if (id.startsWith('fe') || id.startsWith('femusic_') || id.startsWith('femy_') || id.startsWith('fecollection_')) {
+      // Keep core navigation entries when "all" is enabled to avoid breaking library navigation itself.
+      return !(id === 'fehistory' || id === 'feplaylist_aggregation' || id === 'femy_youtube');
+    }
+  }
+
   for (const hiddenId of HIDDEN_LIBRARY_TAB_IDS) {
     if (id === hiddenId || id.includes(hiddenId)) return true;
   }
@@ -1149,7 +1157,7 @@ function processTileArraysDeep(node, pageHint = null, path = 'root', depth = 0) 
       let filtered = hideVideo(node, pageName);
       if (!configRead('enableShorts')) {
         const beforeShorts = filtered.length;
-        filtered = filtered.filter(item => !isLikelyShortItem(item));
+        filtered = filtered.filter(item => item?.__ttKeepOneForContinuation || !isLikelyShortItem(item));
         if (beforeShorts !== filtered.length) {
           appendFileOnlyLog('deep.tiles.shorts', {
             pageName,

@@ -6,28 +6,38 @@ const APP_VERSION_LABEL = 'TizenTube';
 const APP_VERSION = rootPkg.version;
 
 function detectTvModel() {
+  let modelName = null;
+  let modelCode = null;
+
   try {
     const h5vccModel = window?.h5vcc?.system?.getDeviceInfo?.()?.modelName;
-    if (h5vccModel) return String(h5vccModel);
+    if (h5vccModel) modelName = String(h5vccModel);
   } catch (_) { }
 
   try {
     const webapisModel = window?.webapis?.productinfo?.getModel?.();
-    if (webapisModel) return String(webapisModel);
+    if (webapisModel) modelName = String(webapisModel);
   } catch (_) { }
 
   try {
     const webapisRealModel = window?.webapis?.productinfo?.getRealModel?.();
-    if (webapisRealModel) return String(webapisRealModel);
+    if (webapisRealModel) modelName = String(webapisRealModel);
+  } catch (_) { }
+
+  try {
+    const maybeCode = window?.webapis?.productinfo?.getModelCode?.();
+    if (maybeCode) modelCode = String(maybeCode);
   } catch (_) { }
 
   try {
     const ua = String(navigator.userAgent || '');
     const match = ua.match(/\(([^)]*?TV[^)]*?)\)/i);
-    if (match?.[1]) return match[1];
+    if (!modelName && match?.[1]) modelName = match[1];
   } catch (_) { }
 
-  return 'unknown';
+  if (!modelName && !modelCode) return 'unknown';
+  if (modelName && modelCode) return `${modelName} (${modelCode})`;
+  return modelName || modelCode;
 }
 
 function initVisualConsole() {
