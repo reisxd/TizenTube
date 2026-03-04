@@ -426,6 +426,23 @@ function attemptPlaylistAutoLoad(reason = 'playlist.auto_load', attempt = 0) {
     // ignore scroll failures
   }
 
+  if (String(reason || '').includes('empty_batch')) {
+    const vlist = document.querySelector('ytlr-playlist-video-list-renderer yt-virtual-list, yt-virtual-list.rN5BTd');
+    try {
+      if (vlist && typeof vlist.scrollBy === 'function') {
+        vlist.scrollBy({ top: 1400, left: 0, behavior: 'auto' });
+      }
+    } catch (_) {
+      // ignore
+    }
+    try {
+      document.dispatchEvent(new KeyboardEvent('keydown', { key: 'PageDown', code: 'PageDown', bubbles: true }));
+      document.dispatchEvent(new KeyboardEvent('keyup', { key: 'PageDown', code: 'PageDown', bubbles: true }));
+    } catch (_) {
+      // ignore
+    }
+  }
+
   appendFileOnlyLog('playlist.auto_load.trigger', { reason, attempt, page: getActivePage() });
 }
 
@@ -439,6 +456,16 @@ function schedulePlaylistAutoLoad(reason = 'playlist.auto_load') {
   }
 
   const now = Date.now();
+  if (reasonText.includes('empty_batch')) {
+    window.__ttEmptyBatchAutoLoadCount = Number(window.__ttEmptyBatchAutoLoadCount || 0) + 1;
+    if (window.__ttEmptyBatchAutoLoadCount > 6) {
+      appendFileOnlyLog('playlist.auto_load.skipped', { reason, skip: 'empty_batch_limit', count: window.__ttEmptyBatchAutoLoadCount, page: getActivePage() });
+      return;
+    }
+  } else {
+    window.__ttEmptyBatchAutoLoadCount = 0;
+  }
+
   const cooldownUntil = Number(window.__ttPlaylistAutoLoadCooldownUntil || 0);
   if (now < cooldownUntil) {
     appendFileOnlyLog('playlist.auto_load.skipped', { reason, waitMs: cooldownUntil - now, page: getActivePage() });
