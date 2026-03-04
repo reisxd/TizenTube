@@ -404,6 +404,10 @@ function filterContinuationItems(items, pageName, hasContinuation = false, label
       originalCount: items.length,
       fallbackType
     });
+    if (fallbackItem && typeof fallbackItem === 'object') {
+      fallbackItem.__ttKeepOneForContinuation = true;
+      fallbackItem.__ttKeepOneForContinuationLabel = label;
+    }
     return [fallbackItem];
   }
   return filteredItems;
@@ -1257,6 +1261,16 @@ function hideVideo(items, pageHint = null) {
     const textWatched = isWatchedByTextSignals(item);
     const progressBar = tileProgressBar ?? cachedProgress ?? (textWatched ? { percentDurationWatched: 100 } : null);
     const progressSource = tileProgressBar?.source || (cachedProgress ? 'entity_cache' : 'none');
+
+    if (item?.__ttKeepOneForContinuation) {
+      appendFileOnlyLog('hideVideo.item.keep_one', {
+        pageName,
+        title,
+        videoId,
+        keepOneLabel: item?.__ttKeepOneForContinuationLabel || 'unknown'
+      });
+      return true;
+    }
 
     if (pageName === 'library' && isHiddenLibraryBrowseId(contentId)) {
       appendFileOnlyLog('hideVideo.item', { pageName, title, contentId, hasProgress: !!progressBar, remove: true, reason: 'library_tab_hidden' });
