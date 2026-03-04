@@ -530,23 +530,16 @@ function parseTranslateYRem(transformValue, fallbackRem = 0) {
   return fallbackRem;
 }
 
-function softHidePlaylistHelperRow(rowNode, tileNode) {
-  if (!rowNode) return false;
-  try {
-    rowNode.classList?.add('tt-helper-soft-hidden');
-    rowNode.classList?.remove('lxpVI', 'zylon-focus');
-    rowNode.style.visibility = 'hidden';
-    rowNode.style.pointerEvents = 'none';
-    rowNode.setAttribute('aria-hidden', 'true');
-    rowNode.setAttribute('tabindex', '-1');
-    if (tileNode) {
-      tileNode.classList?.remove('zylon-focus');
-      tileNode.style.display = 'none';
-      tileNode.setAttribute('tabindex', '-1');
-    }
-    return true;
-  } catch (_) {
-    return false;
+function restoreSoftHiddenPlaylistRow(rowNode, tileNode) {
+  if (!rowNode) return;
+  rowNode.classList?.remove('tt-helper-soft-hidden');
+  rowNode.style.removeProperty('visibility');
+  rowNode.style.removeProperty('pointer-events');
+  if (rowNode.getAttribute('aria-hidden') === 'true') rowNode.removeAttribute('aria-hidden');
+  if (rowNode.getAttribute('tabindex') === '-1') rowNode.removeAttribute('tabindex');
+  if (tileNode) {
+    tileNode.style.removeProperty('display');
+    if (tileNode.getAttribute('tabindex') === '-1') tileNode.removeAttribute('tabindex');
   }
 }
 
@@ -576,12 +569,18 @@ function compactPlaylistVirtualRows(reason = 'playlist.row_compact') {
       const hasButtonRow = !!row.querySelector('ytlr-button-renderer, ytlr-button');
       const classText = String(row.className || '');
       const softHidden = classText.includes('tt-helper-soft-hidden');
+      const tileNode = row.querySelector('ytlr-tile-renderer, ytlr-grid-tile, ytlr-rich-item-renderer');
       const rowHtml = String(row.innerHTML || '').trim();
       const noRenderableContent = !hasTile && !hasButtonRow && !rowHtml;
       const isHardHiddenShell = row.getAttribute('aria-hidden') === 'true' && String(row.style?.visibility || '').toLowerCase() === 'hidden';
+      if (softHidden) restoreSoftHiddenPlaylistRow(row, tileNode);
       if (noRenderableContent || isHardHiddenShell) {
-        row.remove();
-        removedHiddenShells++;
+        if (Math.abs(rootOffset) <= 0.1) {
+          row.remove();
+          removedHiddenShells++;
+        } else {
+          skippedScrolledRoots++;
+        }
         continue;
       }
 
@@ -600,9 +599,7 @@ function compactPlaylistVirtualRows(reason = 'playlist.row_compact') {
       }
     }
 
-    if (Math.abs(rootOffset) > 0.1) {
-      skippedScrolledRoots++;
-    }
+      if (Math.abs(rootOffset) > 0.1) skippedScrolledRoots++;
   }
 
   appendFileOnlyLog('playlist.row_compact', { reason, rows, removedPlaceholders, removedHiddenShells, adjusted: 0, skippedScrolledRoots, mode: 'remove_empty_rows_top_only' });
@@ -633,8 +630,7 @@ function removeRetiredHelpersFromTiles(reason = 'playlist.helper.tile_scan') {
         const rowClass = String(rowNode?.className || '');
         const focused = rowClass.includes('lxpVI') || rowClass.includes('zylon-focus') || tile.classList?.contains('zylon-focus');
         if (focused) {
-          if (softHidePlaylistHelperRow(rowNode, tile)) softHidden++;
-          else skippedUnsafe++;
+          skippedUnsafe++;
           break;
         }
         if (!removedTiles.has(tile)) {
@@ -793,8 +789,7 @@ function cleanupPlaylistHelpersFromDom(helperIds, reason = 'playlist.helper.clea
         const rowClass = String(rowNode?.className || '');
         const focused = rowClass.includes('lxpVI') || rowClass.includes('zylon-focus') || safeNode.classList?.contains('zylon-focus');
         if (focused) {
-          if (softHidePlaylistHelperRow(rowNode, safeNode)) softHidden++;
-          else skippedUnsafe++;
+          skippedUnsafe++;
           continue;
         }
         if (removedNodes.has(safeNode)) continue;
