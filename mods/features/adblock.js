@@ -396,7 +396,8 @@ function normalizeGridRenderer(gridRenderer, context = '') {
 
 function filterContinuationItems(items, pageName, hasContinuation = false, label = 'continuation') {
   const filteredItems = hideVideo(items, pageName);
-  if (hasContinuation && filteredItems.length === 0 && Array.isArray(items) && items.length > 0) {
+  const allowKeepOneFallback = hasContinuation && pageName === 'playlist';
+  if (allowKeepOneFallback && filteredItems.length === 0 && Array.isArray(items) && items.length > 0) {
     const fallbackItem =
       items.find((item) => item?.tileRenderer?.header?.tileHeaderRenderer?.thumbnail?.thumbnails?.length) ||
       items.find((item) => item?.tileRenderer) ||
@@ -417,6 +418,11 @@ function filterContinuationItems(items, pageName, hasContinuation = false, label
     }
     return [fallbackItem];
   }
+
+  if (hasContinuation && filteredItems.length === 0 && pageName !== 'playlist') {
+    appendFileOnlyLog(`${label}.no_keep_one`, { pageName, reason: 'disabled_for_page' });
+  }
+
   return filteredItems;
 }
 
@@ -776,20 +782,22 @@ JSON.parse = function () {
       }
 
       for (const tab of section.tvSecondaryNavSectionRenderer.tabs) {
+        const tabBrowseId = String(extractNavTabBrowseId(tab)).toLowerCase();
+        const tabPage = normalizeBrowseIdToPage(tabBrowseId) || detectedPage;
         const contents = tab?.tabRenderer?.content?.tvSurfaceContentRenderer?.content?.sectionListRenderer?.contents;
         if (Array.isArray(contents)) {
-          processShelves(contents, true, detectedPage);
+          processShelves(contents, true, tabPage);
         }
 
         const gridItems = tab?.tabRenderer?.content?.tvSurfaceContentRenderer?.content?.gridRenderer?.items;
         if (Array.isArray(gridItems)) {
-          tab.tabRenderer.content.tvSurfaceContentRenderer.content.gridRenderer.items = hideVideo(gridItems, detectedPage);
+          tab.tabRenderer.content.tvSurfaceContentRenderer.content.gridRenderer.items = hideVideo(gridItems, tabPage);
           normalizeGridRenderer(tab.tabRenderer.content.tvSurfaceContentRenderer.content.gridRenderer, 'tab.grid');
         }
 
         const playlistItems = tab?.tabRenderer?.content?.tvSurfaceContentRenderer?.content?.playlistVideoListRenderer?.contents;
         if (Array.isArray(playlistItems)) {
-          tab.tabRenderer.content.tvSurfaceContentRenderer.content.playlistVideoListRenderer.contents = hideVideo(playlistItems, detectedPage);
+          tab.tabRenderer.content.tvSurfaceContentRenderer.content.playlistVideoListRenderer.contents = hideVideo(playlistItems, tabPage);
         }
       }
     }
