@@ -400,12 +400,29 @@ function getPlaylistHelperVideoIdSet() {
   return window.__ttPlaylistHelperVideoIds;
 }
 
-function cleanupPlaylistHelpersFromDom(helperIds, reason = 'playlist.helper.cleanup') {
-  if (!Array.isArray(helperIds) || helperIds.length === 0) return;
-  if (typeof document === 'undefined' || !document?.querySelectorAll) return;
+function cleanupPlaylistHelpersFromDom(helperIds, reason = 'playlist.helper.cleanup', attempt = 0) {
+  if (!Array.isArray(helperIds) || helperIds.length === 0) return { matched: 0, removed: 0 };
+  if (typeof document === 'undefined' || !document?.querySelectorAll) return { matched: 0, removed: 0 };
 
+  const seenContainers = new Set();
   let matched = 0;
   let removed = 0;
+
+  const tryRemoveNode = (node) => {
+    const container = node?.closest?.('ytlr-tile-renderer, ytlr-grid-tile, ytlr-rich-item-renderer, [role="listitem"], [idomkey]') || node;
+    if (!container || container === document.body || container === document.documentElement) return;
+    if (seenContainers.has(container)) return;
+    seenContainers.add(container);
+    if (container?.remove) {
+      try {
+        container.remove();
+        removed++;
+      } catch (_) {
+        // ignore DOM remove failures
+      }
+    }
+  };
+
   for (const rawId of helperIds) {
     const id = String(rawId || '').trim();
     if (!id) continue;
@@ -414,7 +431,9 @@ function cleanupPlaylistHelpersFromDom(helperIds, reason = 'playlist.helper.clea
       `a[href*="${id}"]`,
       `[href*="${id}"]`,
       `[data-video-id="${id}"]`,
-      `[video-id="${id}"]`
+      `[video-id="${id}"]`,
+      `[data-content-id="${id}"]`,
+      `[content-id="${id}"]`
     ];
 
     for (const selector of selectors) {
@@ -426,28 +445,39 @@ function cleanupPlaylistHelpersFromDom(helperIds, reason = 'playlist.helper.clea
       }
       if (!nodes.length) continue;
       matched += nodes.length;
+      for (const node of nodes) tryRemoveNode(node);
+    }
 
-      for (const node of nodes) {
-        const container = node.closest?.('ytlr-tile-renderer, ytlr-grid-tile, ytlr-rich-item-renderer, [role="listitem"], [idomkey]') || node;
-        if (!container || container === document.body || container === document.documentElement) continue;
-        if (container?.remove) {
-          try {
-            container.remove();
-            removed++;
-          } catch (_) {
-            // ignore DOM remove failures; logging below captures matched/removed counts
-          }
-        }
+    // Fallback: brute-force scan likely tile containers for embedded id references.
+    const containers = Array.from(document.querySelectorAll('ytlr-tile-renderer, ytlr-grid-tile, ytlr-rich-item-renderer, [role="listitem"], [idomkey]'));
+    let fallbackMatches = 0;
+    for (const container of containers) {
+      const haystack = `${container?.getAttribute?.('idomkey') || ''} ${container?.getAttribute?.('href') || ''} ${container?.getAttribute?.('data-video-id') || ''} ${container?.getAttribute?.('video-id') || ''} ${container?.outerHTML || ''}`;
+      if (haystack.includes(id)) {
+        fallbackMatches++;
+        tryRemoveNode(container);
       }
     }
+    matched += fallbackMatches;
   }
 
   appendFileOnlyLog('playlist.helper.dom.cleanup', {
     reason,
     helperIds,
+    attempt,
     matched,
     removed,
     page: getActivePage()
+  });
+
+  return { matched, removed };
+}
+
+function schedulePlaylistHelperDomCleanup(helperIds, reason = 'playlist.helper.cleanup') {
+  if (!Array.isArray(helperIds) || helperIds.length === 0) return;
+  const delays = [0, 200, 800, 2000];
+  delays.forEach((delay, index) => {
+    setTimeout(() => cleanupPlaylistHelpersFromDom(helperIds, reason, index), delay);
   });
 }
 
@@ -457,7 +487,7 @@ function registerPlaylistHelperVideoId(videoId, label = 'playlist.helper') {
   const set = getPlaylistHelperVideoIdSet();
   const staleIds = Array.from(set).filter((knownId) => knownId !== id);
   if (staleIds.length > 0) {
-    cleanupPlaylistHelpersFromDom(staleIds, `${label}.register.stale`);
+    schedulePlaylistHelperDomCleanup(staleIds, `${label}.register.stale`);
     for (const staleId of staleIds) unregisterPlaylistHelperVideoId(staleId, `${label}.register.stale`);
   }
   set.add(id);
@@ -478,7 +508,7 @@ function clearPlaylistHelperVideoIdSet(label = 'playlist.helper') {
   const helperIds = Array.from(set);
   const cleared = helperIds.length;
   if (cleared > 0) {
-    cleanupPlaylistHelpersFromDom(helperIds, `${label}.registry.cleared`);
+    schedulePlaylistHelperDomCleanup(helperIds, `${label}.registry.cleared`);
     set.clear();
     appendFileOnlyLog(`${label}.registry.cleared`, { cleared, helperIds });
   }
