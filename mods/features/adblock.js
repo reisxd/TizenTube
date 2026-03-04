@@ -400,10 +400,66 @@ function getPlaylistHelperVideoIdSet() {
   return window.__ttPlaylistHelperVideoIds;
 }
 
+function cleanupPlaylistHelpersFromDom(helperIds, reason = 'playlist.helper.cleanup') {
+  if (!Array.isArray(helperIds) || helperIds.length === 0) return;
+  if (typeof document === 'undefined' || !document?.querySelectorAll) return;
+
+  let matched = 0;
+  let removed = 0;
+  for (const rawId of helperIds) {
+    const id = String(rawId || '').trim();
+    if (!id) continue;
+
+    const selectors = [
+      `a[href*="${id}"]`,
+      `[href*="${id}"]`,
+      `[data-video-id="${id}"]`,
+      `[video-id="${id}"]`
+    ];
+
+    for (const selector of selectors) {
+      let nodes = [];
+      try {
+        nodes = Array.from(document.querySelectorAll(selector));
+      } catch (_) {
+        nodes = [];
+      }
+      if (!nodes.length) continue;
+      matched += nodes.length;
+
+      for (const node of nodes) {
+        const container = node.closest?.('ytlr-tile-renderer, ytlr-grid-tile, ytlr-rich-item-renderer, [role="listitem"], [idomkey]') || node;
+        if (!container || container === document.body || container === document.documentElement) continue;
+        if (container?.remove) {
+          try {
+            container.remove();
+            removed++;
+          } catch (_) {
+            // ignore DOM remove failures; logging below captures matched/removed counts
+          }
+        }
+      }
+    }
+  }
+
+  appendFileOnlyLog('playlist.helper.dom.cleanup', {
+    reason,
+    helperIds,
+    matched,
+    removed,
+    page: getActivePage()
+  });
+}
+
 function registerPlaylistHelperVideoId(videoId, label = 'playlist.helper') {
   const id = String(videoId || '').trim();
   if (!id) return;
   const set = getPlaylistHelperVideoIdSet();
+  const staleIds = Array.from(set).filter((knownId) => knownId !== id);
+  if (staleIds.length > 0) {
+    cleanupPlaylistHelpersFromDom(staleIds, `${label}.register.stale`);
+    for (const staleId of staleIds) unregisterPlaylistHelperVideoId(staleId, `${label}.register.stale`);
+  }
   set.add(id);
   appendFileOnlyLog(`${label}.register`, { videoId: id, total: set.size });
 }
@@ -419,10 +475,12 @@ function unregisterPlaylistHelperVideoId(videoId, label = 'playlist.helper') {
 
 function clearPlaylistHelperVideoIdSet(label = 'playlist.helper') {
   const set = getPlaylistHelperVideoIdSet();
-  const cleared = set.size;
+  const helperIds = Array.from(set);
+  const cleared = helperIds.length;
   if (cleared > 0) {
+    cleanupPlaylistHelpersFromDom(helperIds, `${label}.registry.cleared`);
     set.clear();
-    appendFileOnlyLog(`${label}.registry.cleared`, { cleared });
+    appendFileOnlyLog(`${label}.registry.cleared`, { cleared, helperIds });
   }
 }
 
