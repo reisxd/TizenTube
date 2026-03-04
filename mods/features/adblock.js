@@ -522,63 +522,89 @@ function parseTranslateYRem(transformValue, fallbackRem = null) {
   return value;
 }
 
+function getPlaylistVirtualRowSpacingRem(positions = [], fallbackRem = 8.25) {
+  if (!positions.length) return fallbackRem;
+  const sorted = [...positions].filter((v) => Number.isFinite(v)).sort((a, b) => a - b);
+  if (sorted.length < 2) return fallbackRem;
+
+  const diffs = [];
+  for (let i = 1; i < sorted.length; i++) {
+    const diff = sorted[i] - sorted[i - 1];
+    if (diff > 0.25) diffs.push(diff);
+  }
+  if (!diffs.length) return fallbackRem;
+
+  diffs.sort((a, b) => a - b);
+  const median = diffs[Math.floor(diffs.length / 2)];
+  return Number.isFinite(median) ? median : fallbackRem;
+}
+
+function isPlaylistDetailView() {
+  if (typeof location === 'undefined') return false;
+  const hash = String(location.hash || '').toLowerCase();
+  if (hash.includes('c=feplaylist_aggregation')) return false;
+  return detectCurrentPage() === 'playlist';
+}
+
 function compactPlaylistVirtualRows(reason = 'playlist.row_compact') {
   if (typeof document === 'undefined') return { rows: 0, removedPlaceholders: 0, adjusted: 0 };
-  if (detectCurrentPage() !== 'playlist') return { rows: 0, removedPlaceholders: 0, adjusted: 0 };
+  if (!isPlaylistDetailView()) return { rows: 0, removedPlaceholders: 0, adjusted: 0 };
 
   const listRoots = Array.from(document.querySelectorAll('.NUDen'));
   let removedPlaceholders = 0;
   let adjusted = 0;
   let rows = 0;
+  let skippedScrolledRoots = 0;
 
   for (const root of listRoots) {
+    const rootOffset = parseTranslateYRem(root.style?.transform, 0) || 0;
     const rowNodes = Array.from(root.querySelectorAll(':scope > .TXB27d, :scope > .TXB27d.RuKowd, :scope > .TXB27d.zylon-partial, :scope > .TXB27d.zylon-hidden'));
     if (!rowNodes.length) continue;
     rows += rowNodes.length;
 
-    const originalPositions = rowNodes
-      .map((row) => parseTranslateYRem(row.style.transform, null))
-      .filter((v) => Number.isFinite(v))
-      .sort((a, b) => a - b);
+    const rowEntries = rowNodes.map((row) => ({
+      row,
+      yRem: parseTranslateYRem(row.style.transform, null)
+    }));
+    const spacing = getPlaylistVirtualRowSpacingRem(rowEntries.map((entry) => entry.yRem), 8.25);
+    const removedPositions = [];
 
-    let spacing = 8.25;
-    if (originalPositions.length >= 2) {
-      const diffs = [];
-      for (let i = 1; i < originalPositions.length; i++) {
-        const d = originalPositions[i] - originalPositions[i - 1];
-        if (d > 0.1) diffs.push(d);
-      }
-      if (diffs.length) spacing = diffs.reduce((a, b) => a + b, 0) / diffs.length;
-    }
-
-    const baseRem = originalPositions.length ? originalPositions[0] : 6.75;
-    const keptRows = [];
-    let removedInRoot = 0;
     for (const row of rowNodes) {
       const hasTile = !!row.querySelector('ytlr-tile-renderer');
       const classText = String(row.className || '');
       const isPlaceholder = !hasTile || classText.includes('fitbrf') || classText.includes('B3hoEd');
       if (isPlaceholder) {
+        const yRem = parseTranslateYRem(row.style.transform, null);
+        if (Number.isFinite(yRem)) removedPositions.push(yRem);
         row.remove();
         removedPlaceholders++;
-        removedInRoot++;
-        continue;
       }
-      keptRows.push(row);
     }
 
-    if (removedInRoot === 0) continue;
+    if (!removedPositions.length) continue;
+    if (Math.abs(rootOffset) > 0.25) {
+      skippedScrolledRoots++;
+      continue;
+    }
 
-    let currentRem = baseRem;
-    for (const row of keptRows) {
-      row.style.transition = 'none';
-      row.style.transform = `translateY(${currentRem}rem)`;
-      currentRem += spacing;
+    const sortedRemoved = removedPositions.sort((a, b) => a - b);
+    for (const entry of rowEntries) {
+      if (!entry?.row?.isConnected || !Number.isFinite(entry.yRem)) continue;
+
+      let removedBefore = 0;
+      for (const removedY of sortedRemoved) {
+        if (removedY < (entry.yRem - 0.01)) removedBefore++;
+      }
+      if (!removedBefore) continue;
+
+      const nextY = Math.max(0, entry.yRem - (removedBefore * spacing));
+      entry.row.style.transition = 'none';
+      entry.row.style.transform = `translateY(${nextY}rem)`;
       adjusted++;
     }
   }
 
-  appendFileOnlyLog('playlist.row_compact', { reason, rows, removedPlaceholders, adjusted });
+  appendFileOnlyLog('playlist.row_compact', { reason, rows, removedPlaceholders, adjusted, skippedScrolledRoots });
   return { rows, removedPlaceholders, adjusted };
 }
 
