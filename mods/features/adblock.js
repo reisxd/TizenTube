@@ -513,6 +513,21 @@ function getPlaylistTileNodes() {
   return Array.from(document.querySelectorAll('ytlr-tile-renderer, ytlr-grid-tile, ytlr-rich-item-renderer'));
 }
 
+function parseTranslateYRem(transformValue, fallbackRem = 0) {
+  const text = String(transformValue || '');
+  const remMatch = text.match(/translateY\(([-\d.]+)rem\)/i);
+  if (remMatch) {
+    const value = Number(remMatch[1]);
+    return Number.isFinite(value) ? value : fallbackRem;
+  }
+  const pxMatch = text.match(/translateY\(([-\d.]+)px\)/i);
+  if (pxMatch) {
+    const value = Number(pxMatch[1]);
+    return Number.isFinite(value) ? (value / 16) : fallbackRem;
+  }
+  return fallbackRem;
+}
+
 function isPlaylistDetailView() {
   if (typeof location === 'undefined') return false;
   const hash = String(location.hash || '').toLowerCase();
@@ -521,14 +536,37 @@ function isPlaylistDetailView() {
 }
 
 function compactPlaylistVirtualRows(reason = 'playlist.row_compact') {
-  appendFileOnlyLog('playlist.row_compact', {
-    reason,
-    rows: 0,
-    removedPlaceholders: 0,
-    adjusted: 0,
-    mode: 'disabled_no_dom_row_mutation'
-  });
-  return { rows: 0, removedPlaceholders: 0, adjusted: 0 };
+  if (!isPlaylistDetailView()) return { rows: 0, removedPlaceholders: 0, adjusted: 0 };
+  const roots = Array.from(document.querySelectorAll('.NUDen'));
+  let rows = 0;
+  let removedPlaceholders = 0;
+  let skippedScrolledRoots = 0;
+
+  for (const root of roots) {
+    const rootOffset = parseTranslateYRem(root?.style?.transform, 0);
+    const rowNodes = Array.from(root.querySelectorAll(':scope > .TXB27d'));
+    if (!rowNodes.length) continue;
+    rows += rowNodes.length;
+
+    if (Math.abs(rootOffset) > 0.1) {
+      skippedScrolledRoots++;
+      continue;
+    }
+
+    for (const row of rowNodes) {
+      const hasTile = !!row.querySelector('ytlr-tile-renderer, ytlr-grid-tile, ytlr-rich-item-renderer');
+      const classText = String(row.className || '');
+      const focused = classText.includes('lxpVI') || classText.includes('zylon-focus') || !!row.querySelector('.zylon-focus');
+      const isPlaceholder = !hasTile || classText.includes('fitbrf') || classText.includes('B3hoEd');
+      if (isPlaceholder && !focused) {
+        row.remove();
+        removedPlaceholders++;
+      }
+    }
+  }
+
+  appendFileOnlyLog('playlist.row_compact', { reason, rows, removedPlaceholders, adjusted: 0, skippedScrolledRoots, mode: 'remove_empty_rows_top_only' });
+  return { rows, removedPlaceholders, adjusted: 0 };
 }
 
 function removeRetiredHelpersFromTiles(reason = 'playlist.helper.tile_scan') {
@@ -538,7 +576,8 @@ function removeRetiredHelpersFromTiles(reason = 'playlist.helper.tile_scan') {
   const tiles = getPlaylistTileNodes();
   let matchedTiles = 0;
   let removed = 0;
-  const removedRows = new Set();
+  const removedTiles = new Set();
+  let skippedUnsafe = 0;
   const matchedIds = new Set();
 
   for (const tile of tiles) {
@@ -550,9 +589,15 @@ function removeRetiredHelpersFromTiles(reason = 'playlist.helper.tile_scan') {
       matchedTiles++;
       try {
         const rowNode = tile.closest('.TXB27d');
-        if (rowNode && !removedRows.has(rowNode)) {
-          removedRows.add(rowNode);
-          rowNode.remove();
+        const rowClass = String(rowNode?.className || '');
+        const focused = rowClass.includes('lxpVI') || rowClass.includes('zylon-focus') || tile.classList?.contains('zylon-focus');
+        if (focused) {
+          skippedUnsafe++;
+          break;
+        }
+        if (!removedTiles.has(tile)) {
+          removedTiles.add(tile);
+          tile.remove();
           removed++;
         }
       } catch (_) {
@@ -574,6 +619,7 @@ function removeRetiredHelpersFromTiles(reason = 'playlist.helper.tile_scan') {
     scannedTiles: tiles.length,
     removed,
     matchedTiles,
+    skippedUnsafe,
     matchedIds: Array.from(matchedIds),
     compactRemovedPlaceholders: compactResult.removedPlaceholders,
     compactAdjusted: compactResult.adjusted
@@ -694,9 +740,15 @@ function cleanupPlaylistHelpersFromDom(helperIds, reason = 'playlist.helper.clea
           skippedUnsafe++;
           continue;
         }
-        const rowNode = node?.closest?.('.TXB27d');
-        const safeNode = rowNode || node?.closest?.('ytlr-tile-renderer, ytlr-grid-tile, ytlr-rich-item-renderer') || null;
+        const safeNode = node?.closest?.('ytlr-tile-renderer, ytlr-grid-tile, ytlr-rich-item-renderer') || null;
         if (!safeNode) {
+          skippedUnsafe++;
+          continue;
+        }
+        const rowNode = safeNode.closest?.('.TXB27d');
+        const rowClass = String(rowNode?.className || '');
+        const focused = rowClass.includes('lxpVI') || rowClass.includes('zylon-focus') || safeNode.classList?.contains('zylon-focus');
+        if (focused) {
           skippedUnsafe++;
           continue;
         }
