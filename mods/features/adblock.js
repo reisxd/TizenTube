@@ -400,6 +400,22 @@ function getPlaylistHelperVideoIdSet() {
   return window.__ttPlaylistHelperVideoIds;
 }
 
+function logPlaylistDomSnapshot(reason = 'playlist.dom.snapshot', attempt = -1) {
+  if (!configRead('enableDebugLogging')) return;
+  if (typeof document === 'undefined') return;
+
+  const root = document.querySelector('ytlr-player, ytlr-app, body');
+  const html = String(root?.outerHTML || '').slice(0, 200000);
+  appendFileOnlyLog('playlist.helper.dom.snapshot.meta', {
+    reason,
+    attempt,
+    length: html.length,
+    rootTag: root?.tagName || 'none',
+    activePage: getActivePage()
+  });
+  appendFileOnlyLog('playlist.helper.dom.snapshot.html', html);
+}
+
 function cleanupPlaylistHelpersFromDom(helperIds, reason = 'playlist.helper.cleanup', attempt = 0) {
   if (!Array.isArray(helperIds) || helperIds.length === 0) return { matched: 0, removed: 0 };
   if (typeof document === 'undefined' || !document?.querySelectorAll) return { matched: 0, removed: 0 };
@@ -493,6 +509,10 @@ function cleanupPlaylistHelpersFromDom(helperIds, reason = 'playlist.helper.clea
     page: getActivePage()
   });
 
+  if (attempt >= 3 && matched === 0 && removed === 0 && getActivePage() === 'playlist') {
+    logPlaylistDomSnapshot(reason, attempt);
+  }
+
   return { matched, removed };
 }
 
@@ -565,10 +585,11 @@ function filterContinuationItems(items, pageName, hasContinuation = false, label
   const filteredItems = hideVideo(items, pageName);
   const allowKeepOneFallback = hasContinuation && pageName === 'playlist';
   if (allowKeepOneFallback && filteredItems.length === 0 && Array.isArray(items) && items.length > 0) {
+    const reverseItems = [...items].reverse();
     const fallbackItem =
-      items.find((item) => item?.tileRenderer?.header?.tileHeaderRenderer?.thumbnail?.thumbnails?.length) ||
-      items.find((item) => item?.tileRenderer) ||
-      items[0];
+      reverseItems.find((item) => item?.tileRenderer?.header?.tileHeaderRenderer?.thumbnail?.thumbnails?.length) ||
+      reverseItems.find((item) => item?.tileRenderer) ||
+      items[items.length - 1];
 
     const fallbackType = fallbackItem && typeof fallbackItem === 'object'
       ? Object.keys(fallbackItem).slice(0, 4)
