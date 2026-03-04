@@ -563,6 +563,7 @@ function compactPlaylistVirtualRows(reason = 'playlist.row_compact') {
   let rows = 0;
   let removedPlaceholders = 0;
   let skippedScrolledRoots = 0;
+  let removedHiddenShells = 0;
 
   for (const root of roots) {
     const rootOffset = parseTranslateYRem(root?.style?.transform, 0);
@@ -570,16 +571,24 @@ function compactPlaylistVirtualRows(reason = 'playlist.row_compact') {
     if (!rowNodes.length) continue;
     rows += rowNodes.length;
 
-    if (Math.abs(rootOffset) > 0.1) {
-      skippedScrolledRoots++;
-      continue;
-    }
-
     for (const row of rowNodes) {
       const hasTile = !!row.querySelector('ytlr-tile-renderer, ytlr-grid-tile, ytlr-rich-item-renderer');
       const hasButtonRow = !!row.querySelector('ytlr-button-renderer, ytlr-button');
       const classText = String(row.className || '');
       const softHidden = classText.includes('tt-helper-soft-hidden');
+      const rowHtml = String(row.innerHTML || '').trim();
+      const noRenderableContent = !hasTile && !hasButtonRow && !rowHtml;
+      const isHardHiddenShell = row.getAttribute('aria-hidden') === 'true' && String(row.style?.visibility || '').toLowerCase() === 'hidden';
+      if (noRenderableContent || isHardHiddenShell) {
+        row.remove();
+        removedHiddenShells++;
+        continue;
+      }
+
+      if (Math.abs(rootOffset) > 0.1) {
+        continue;
+      }
+
       const focused = classText.includes('lxpVI') || classText.includes('zylon-focus') || !!row.querySelector('.zylon-focus');
       const isPlaceholder = softHidden || (!hasButtonRow && (!hasTile || classText.includes('fitbrf') || classText.includes('B3hoEd')));
       if (isPlaceholder && !focused) {
@@ -590,9 +599,13 @@ function compactPlaylistVirtualRows(reason = 'playlist.row_compact') {
         removedPlaceholders++;
       }
     }
+
+    if (Math.abs(rootOffset) > 0.1) {
+      skippedScrolledRoots++;
+    }
   }
 
-  appendFileOnlyLog('playlist.row_compact', { reason, rows, removedPlaceholders, adjusted: 0, skippedScrolledRoots, mode: 'remove_empty_rows_top_only' });
+  appendFileOnlyLog('playlist.row_compact', { reason, rows, removedPlaceholders, removedHiddenShells, adjusted: 0, skippedScrolledRoots, mode: 'remove_empty_rows_top_only' });
   return { rows, removedPlaceholders, adjusted: 0 };
 }
 
