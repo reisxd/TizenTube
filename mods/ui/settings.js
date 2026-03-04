@@ -566,6 +566,19 @@ export default function modernUI(update, parameters) {
                                     value: 'watch'
                                 }
                             ]
+                        },
+                        {
+                            name: 'Choose Library Tabs / Buttons to Hide',
+                            icon: 'TAB_LIBRARY',
+                            value: null,
+                            arrayToEdit: 'hiddenLibraryTabIds',
+                            menuId: 'tt-hidden-library-tabs',
+                            options: [
+                                { name: 'Music', value: 'femusic_last_played' },
+                                { name: 'Movies & Shows', value: 'festorefront' },
+                                { name: 'Podcasts', value: 'fecollection_podcasts' },
+                                { name: 'My Videos', value: 'femy_videos' }
+                            ]
                         }
                     ]
                 },
