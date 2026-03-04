@@ -1,7 +1,7 @@
 import { configRead } from '../config.js';
 import Chapters from '../ui/chapters.js';
 import resolveCommand from '../resolveCommand.js';
-import { timelyAction, longPressData, MenuServiceItemRenderer, ShelfRenderer, TileRenderer, ButtonRenderer } from '../ui/ytUI.js';
+import { timelyAction, longPressData, MenuServiceItemRenderer, ShelfRenderer, TileRenderer, ButtonRenderer, showToast } from '../ui/ytUI.js';
 import { PatchSettings } from '../ui/customYTSettings.js';
 
 
@@ -405,6 +405,76 @@ function getRetiredPlaylistHelperVideoIdSet() {
   return window.__ttRetiredPlaylistHelperVideoIds;
 }
 
+function attemptPlaylistAutoLoad(reason = 'playlist.auto_load', attempt = 0) {
+  if (getActivePage() !== 'playlist') return;
+
+  const containers = Array.from(document.querySelectorAll('ytlr-surface-page, ytlr-grid-renderer, ytlr-player, body'));
+  for (const container of containers) {
+    try {
+      if (container && typeof container.scrollBy === 'function') {
+        container.scrollBy({ top: 2000, left: 0, behavior: 'auto' });
+      }
+    } catch (_) {
+      // ignore scroll failures
+    }
+  }
+
+  try {
+    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', code: 'ArrowDown', bubbles: true }));
+    document.dispatchEvent(new KeyboardEvent('keyup', { key: 'ArrowDown', code: 'ArrowDown', bubbles: true }));
+  } catch (_) {
+    // ignore keyboard simulation failures
+  }
+
+  appendFileOnlyLog('playlist.auto_load.trigger', { reason, attempt, page: getActivePage() });
+}
+
+function schedulePlaylistAutoLoad(reason = 'playlist.auto_load') {
+  const delays = [0, 150, 500, 1000, 1800];
+  delays.forEach((delay, index) => {
+    setTimeout(() => attemptPlaylistAutoLoad(reason, index), delay);
+  });
+}
+
+function showPlaylistAllHiddenNotice(reason = 'playlist.all_hidden') {
+  try {
+    showToast('TizenTube', 'All videos in this playlist are hidden (watched/shorts).');
+  } catch (_) {
+    // best effort only
+  }
+
+  if (typeof document === 'undefined') return;
+  const id = 'tt-playlist-empty-notice';
+  let notice = document.getElementById(id);
+  if (!notice) {
+    notice = document.createElement('div');
+    notice.id = id;
+    notice.style.position = 'fixed';
+    notice.style.left = '50%';
+    notice.style.bottom = '4%';
+    notice.style.transform = 'translateX(-50%)';
+    notice.style.background = 'rgba(0,0,0,0.85)';
+    notice.style.color = '#fff';
+    notice.style.padding = '12px 16px';
+    notice.style.borderRadius = '10px';
+    notice.style.zIndex = '999999';
+    notice.style.fontSize = '18px';
+    document.body?.appendChild(notice);
+  }
+  notice.textContent = 'All videos in this playlist are hidden. Leave playlist to dismiss.';
+
+  if (!window.__ttPlaylistNoticeCleanupBound) {
+    window.__ttPlaylistNoticeCleanupBound = true;
+    window.addEventListener('hashchange', () => {
+      if (getActivePage() === 'playlist') return;
+      const n = document.getElementById(id);
+      if (n) n.remove();
+    });
+  }
+
+  appendFileOnlyLog('playlist.all_hidden.notice', { reason, page: getActivePage() });
+}
+
 function retirePlaylistHelperVideoId(videoId, label = 'playlist.helper') {
   const id = String(videoId || '').trim();
   if (!id) return;
@@ -444,6 +514,8 @@ function removeRetiredHelpersFromTiles(reason = 'playlist.helper.tile_scan') {
       break;
     }
   }
+
+  if (removed > 0 && getActivePage() === 'playlist') schedulePlaylistAutoLoad(`${reason}.tile_removed`);
 
   appendFileOnlyLog('playlist.helper.tile_scan', {
     reason,
@@ -715,7 +787,12 @@ function filterContinuationItems(items, pageName, hasContinuation = false, label
         helperVideoId
       });
     }
+    schedulePlaylistAutoLoad(`${label}.keep-one`);
     return [fallbackItem];
+  }
+
+  if (pageName === 'playlist' && !hasContinuation && filteredItems.length === 0) {
+    showPlaylistAllHiddenNotice(`${label}.no_continuation_all_hidden`);
   }
 
   if (hasContinuation && filteredItems.length === 0 && pageName !== 'playlist') {
