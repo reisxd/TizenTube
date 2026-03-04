@@ -417,6 +417,15 @@ function unregisterPlaylistHelperVideoId(videoId, label = 'playlist.helper') {
   }
 }
 
+function clearPlaylistHelperVideoIdSet(label = 'playlist.helper') {
+  const set = getPlaylistHelperVideoIdSet();
+  const cleared = set.size;
+  if (cleared > 0) {
+    set.clear();
+    appendFileOnlyLog(`${label}.registry.cleared`, { cleared });
+  }
+}
+
 function clearKeepOneMarkers(items, label = 'continuation') {
   if (!Array.isArray(items)) return 0;
   let cleared = 0;
@@ -438,6 +447,9 @@ function clearKeepOneMarkers(items, label = 'continuation') {
 }
 
 function filterContinuationItems(items, pageName, hasContinuation = false, label = 'continuation') {
+  if (pageName === 'playlist' && !hasContinuation) {
+    clearPlaylistHelperVideoIdSet(label);
+  }
   clearKeepOneMarkers(items, label);
   const filteredItems = hideVideo(items, pageName);
   const allowKeepOneFallback = hasContinuation && pageName === 'playlist';
@@ -1436,23 +1448,26 @@ function hideVideo(items, pageHint = null) {
     const progressBar = tileProgressBar ?? cachedProgress ?? (textWatched ? { percentDurationWatched: 100 } : null);
     const progressSource = tileProgressBar?.source || (cachedProgress ? 'entity_cache' : 'none');
 
+    const currentParseSeq = Number(window.__ttParseSeq || 0);
+    const itemParseSeq = Number(item?.__ttKeepOneForContinuationParseSeq || 0);
+    const keepOneStillValid = pageName === 'playlist' && itemParseSeq > 0 && itemParseSeq === currentParseSeq;
+
     const playlistHelperIds = getPlaylistHelperVideoIdSet();
     const isKnownPlaylistHelper = pageName === 'playlist' && videoId && playlistHelperIds.has(videoId);
-    if (isKnownPlaylistHelper && !item?.__ttKeepOneForContinuation) {
+    if (isKnownPlaylistHelper && !keepOneStillValid) {
       appendFileOnlyLog('hideVideo.item.playlist_helper.pruned', {
         pageName,
         title,
         videoId,
-        reason: 'known_helper_reappeared_without_marker'
+        reason: item?.__ttKeepOneForContinuation ? 'stale_marker' : 'known_helper_reappeared_without_marker',
+        itemParseSeq,
+        currentParseSeq
       });
       unregisterPlaylistHelperVideoId(videoId, 'hideVideo.item.playlist_helper');
       return false;
     }
 
     if (item?.__ttKeepOneForContinuation) {
-      const currentParseSeq = Number(window.__ttParseSeq || 0);
-      const itemParseSeq = Number(item?.__ttKeepOneForContinuationParseSeq || 0);
-      const keepOneStillValid = pageName === 'playlist' && itemParseSeq > 0 && itemParseSeq === currentParseSeq;
       if (keepOneStillValid) {
         appendFileOnlyLog('hideVideo.item.keep_one', {
           pageName,
