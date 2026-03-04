@@ -577,10 +577,11 @@ function compactPlaylistVirtualRows(reason = 'playlist.row_compact') {
 
     for (const row of rowNodes) {
       const hasTile = !!row.querySelector('ytlr-tile-renderer, ytlr-grid-tile, ytlr-rich-item-renderer');
+      const hasButtonRow = !!row.querySelector('ytlr-button-renderer, ytlr-button');
       const classText = String(row.className || '');
       const softHidden = classText.includes('tt-helper-soft-hidden');
       const focused = classText.includes('lxpVI') || classText.includes('zylon-focus') || !!row.querySelector('.zylon-focus');
-      const isPlaceholder = !hasTile || classText.includes('fitbrf') || classText.includes('B3hoEd') || softHidden;
+      const isPlaceholder = softHidden || (!hasButtonRow && (!hasTile || classText.includes('fitbrf') || classText.includes('B3hoEd')));
       if (isPlaceholder && !focused) {
         row.remove();
         removedPlaceholders++;
