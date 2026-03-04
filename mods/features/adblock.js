@@ -394,7 +394,25 @@ function normalizeGridRenderer(gridRenderer, context = '') {
   });
 }
 
+function clearKeepOneMarkers(items, label = 'continuation') {
+  if (!Array.isArray(items)) return 0;
+  let cleared = 0;
+  for (const item of items) {
+    if (!item || typeof item !== 'object') continue;
+    if (item.__ttKeepOneForContinuation) {
+      delete item.__ttKeepOneForContinuation;
+      delete item.__ttKeepOneForContinuationLabel;
+      cleared++;
+    }
+  }
+  if (cleared > 0) {
+    appendFileOnlyLog(`${label}.keep-one.cleared`, { cleared });
+  }
+  return cleared;
+}
+
 function filterContinuationItems(items, pageName, hasContinuation = false, label = 'continuation') {
+  clearKeepOneMarkers(items, label);
   const filteredItems = hideVideo(items, pageName);
   const allowKeepOneFallback = hasContinuation && pageName === 'playlist';
   if (allowKeepOneFallback && filteredItems.length === 0 && Array.isArray(items) && items.length > 0) {
