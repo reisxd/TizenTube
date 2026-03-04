@@ -400,20 +400,42 @@ function getPlaylistHelperVideoIdSet() {
   return window.__ttPlaylistHelperVideoIds;
 }
 
+function getRetiredPlaylistHelperVideoIdSet() {
+  if (!window.__ttRetiredPlaylistHelperVideoIds) window.__ttRetiredPlaylistHelperVideoIds = new Set();
+  return window.__ttRetiredPlaylistHelperVideoIds;
+}
+
+function retirePlaylistHelperVideoId(videoId, label = 'playlist.helper') {
+  const id = String(videoId || '').trim();
+  if (!id) return;
+  const retired = getRetiredPlaylistHelperVideoIdSet();
+  retired.add(id);
+  appendFileOnlyLog(`${label}.retire`, { videoId: id, totalRetired: retired.size });
+}
+
 function logPlaylistDomSnapshot(reason = 'playlist.dom.snapshot', attempt = -1) {
   if (!configRead('enableDebugLogging')) return;
   if (typeof document === 'undefined') return;
 
   const root = document.querySelector('ytlr-player, ytlr-app, body');
-  const html = String(root?.outerHTML || '').slice(0, 200000);
+  const html = String(root?.outerHTML || '');
+  const chunkSize = 100000;
+  const totalChunks = Math.max(1, Math.ceil(html.length / chunkSize));
+
   appendFileOnlyLog('playlist.helper.dom.snapshot.meta', {
     reason,
     attempt,
     length: html.length,
     rootTag: root?.tagName || 'none',
-    activePage: getActivePage()
+    activePage: getActivePage(),
+    totalChunks
   });
-  appendFileOnlyLog('playlist.helper.dom.snapshot.html', html);
+
+  for (let i = 0; i < totalChunks; i++) {
+    const start = i * chunkSize;
+    const end = start + chunkSize;
+    appendFileOnlyLog(`playlist.helper.dom.snapshot.html.${i + 1}/${totalChunks}`, html.slice(start, end));
+  }
 }
 
 function cleanupPlaylistHelpersFromDom(helperIds, reason = 'playlist.helper.cleanup', attempt = 0) {
@@ -542,6 +564,7 @@ function unregisterPlaylistHelperVideoId(videoId, label = 'playlist.helper') {
   if (!id) return;
   const set = getPlaylistHelperVideoIdSet();
   if (set.delete(id)) {
+    retirePlaylistHelperVideoId(id, label);
     appendFileOnlyLog(`${label}.unregister`, { videoId: id, total: set.size });
   }
 }
@@ -552,6 +575,7 @@ function clearPlaylistHelperVideoIdSet(label = 'playlist.helper') {
   const cleared = helperIds.length;
   if (cleared > 0) {
     schedulePlaylistHelperDomCleanup(helperIds, `${label}.registry.cleared`);
+    for (const helperId of helperIds) retirePlaylistHelperVideoId(helperId, `${label}.registry`);
     set.clear();
     appendFileOnlyLog(`${label}.registry.cleared`, { cleared, helperIds });
   }
@@ -1574,6 +1598,17 @@ function hideVideo(items, pageHint = null) {
     const tileProgressBar = getTileWatchProgress(item);
     const videoId = getItemVideoId(item);
     const title = item?.tileRenderer?.metadata?.tileMetadataRenderer?.title?.simpleText || videoId || 'unknown';
+
+    const retiredHelperIds = getRetiredPlaylistHelperVideoIdSet();
+    if (pageName === 'playlist' && videoId && retiredHelperIds.has(videoId)) {
+      appendFileOnlyLog('hideVideo.item.playlist_helper.retired_pruned', {
+        pageName,
+        title,
+        videoId,
+        retiredCount: retiredHelperIds.size
+      });
+      return false;
+    }
     const contentId = videoId.toLowerCase();
     const cachedProgress = window._ttVideoProgressCache?.[videoId] ?? null;
     const textWatched = isWatchedByTextSignals(item);
