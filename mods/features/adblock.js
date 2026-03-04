@@ -431,6 +431,13 @@ function attemptPlaylistAutoLoad(reason = 'playlist.auto_load', attempt = 0) {
 
 function schedulePlaylistAutoLoad(reason = 'playlist.auto_load') {
   if (getActivePage() !== 'playlist') return;
+  const reasonText = String(reason || '');
+  const allowAutoLoad = reasonText.includes('keep-one');
+  if (!allowAutoLoad) {
+    appendFileOnlyLog('playlist.auto_load.skipped', { reason, skip: 'reason_not_whitelisted', page: getActivePage() });
+    return;
+  }
+
   const now = Date.now();
   const cooldownUntil = Number(window.__ttPlaylistAutoLoadCooldownUntil || 0);
   if (now < cooldownUntil) {
