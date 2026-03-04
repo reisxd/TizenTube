@@ -7,6 +7,13 @@ import { PatchSettings } from '../ui/customYTSettings.js';
 
 function appendFileOnlyLog(label, payload) {
   if (!configRead('enableDebugLogging')) return;
+
+  const activePage = window.__ttLastDetectedPage || detectCurrentPage();
+  const labelStr = String(label || '');
+  const isPlaylistPage = activePage === 'playlist' || activePage === 'playlists';
+  const isPlaylistLog = labelStr.startsWith('playlist.') || labelStr.startsWith('hideVideo.') || labelStr.startsWith('json.parse.meta') || labelStr.startsWith('page-detect');
+  if (!isPlaylistPage && !isPlaylistLog) return;
+
   if (!Array.isArray(window.__ttFileOnlyLogs)) window.__ttFileOnlyLogs = [];
 
   const stamp = new Date().toISOString();
@@ -437,12 +444,6 @@ function schedulePlaylistAutoLoad(reason = 'playlist.auto_load') {
 }
 
 function showPlaylistAllHiddenNotice(reason = 'playlist.all_hidden') {
-  try {
-    showToast('TizenTube', 'All videos in this playlist are hidden (watched/shorts).');
-  } catch (_) {
-    // best effort only
-  }
-
   if (typeof document === 'undefined') return;
   const id = 'tt-playlist-empty-notice';
   let notice = document.getElementById(id);
@@ -463,17 +464,29 @@ function showPlaylistAllHiddenNotice(reason = 'playlist.all_hidden') {
   }
   notice.textContent = 'All videos in this playlist are hidden. Leave playlist to dismiss.';
 
+  const cleanupNoticeIfNeeded = () => {
+    const currentPage = detectCurrentPage();
+    if (currentPage === 'playlist') return;
+    const n = document.getElementById(id);
+    if (n) n.remove();
+    if (window.__ttPlaylistNoticeInterval) {
+      clearInterval(window.__ttPlaylistNoticeInterval);
+      window.__ttPlaylistNoticeInterval = null;
+    }
+  };
+
   if (!window.__ttPlaylistNoticeCleanupBound) {
     window.__ttPlaylistNoticeCleanupBound = true;
-    window.addEventListener('hashchange', () => {
-      if (getActivePage() === 'playlist') return;
-      const n = document.getElementById(id);
-      if (n) n.remove();
-    });
+    window.addEventListener('hashchange', cleanupNoticeIfNeeded);
+    window.addEventListener('popstate', cleanupNoticeIfNeeded);
+  }
+  if (!window.__ttPlaylistNoticeInterval) {
+    window.__ttPlaylistNoticeInterval = setInterval(cleanupNoticeIfNeeded, 500);
   }
 
-  appendFileOnlyLog('playlist.all_hidden.notice', { reason, page: getActivePage() });
+  appendFileOnlyLog('playlist.all_hidden.notice', { reason, page: detectCurrentPage() });
 }
+
 
 function retirePlaylistHelperVideoId(videoId, label = 'playlist.helper') {
   const id = String(videoId || '').trim();
@@ -813,6 +826,9 @@ function filterPlaylistRendererContents(playlistRenderer, pageName, label = 'pla
     hasContinuation,
     label
   );
+  if (pageName === 'playlist' && !hasContinuation && playlistRenderer.contents.length === 0) {
+    showPlaylistAllHiddenNotice(`${label}.all_hidden_after_filter`);
+  }
   appendFileOnlyLog(`${label}.result`, {
     pageName,
     hasContinuation,
@@ -1815,6 +1831,17 @@ function hideVideo(items, pageHint = null) {
       delete item.__ttKeepOneForContinuationLabel;
       delete item.__ttKeepOneForContinuationParseSeq;
       unregisterPlaylistHelperVideoId(videoId, 'hideVideo.item.keep_one.expired');
+    }
+
+    const retiredHelperIds = getRetiredPlaylistHelperVideoIdSet();
+    if (pageName === 'playlist' && videoId && retiredHelperIds.has(videoId)) {
+      appendFileOnlyLog('hideVideo.item.playlist_helper.retired_pruned', {
+        pageName,
+        title,
+        videoId,
+        retiredCount: retiredHelperIds.size
+      });
+      return false;
     }
 
     if (pageName === 'library' && isHiddenLibraryBrowseId(contentId)) {
