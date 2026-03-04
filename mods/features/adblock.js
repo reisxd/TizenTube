@@ -571,10 +571,17 @@ function compactPlaylistVirtualRows(reason = 'playlist.row_compact') {
       const softHidden = classText.includes('tt-helper-soft-hidden');
       const tileNode = row.querySelector('ytlr-tile-renderer, ytlr-grid-tile, ytlr-rich-item-renderer');
       const rowHtml = String(row.innerHTML || '').trim();
+      const childCount = Number(row.children?.length || 0);
       const noRenderableContent = !hasTile && !hasButtonRow && !rowHtml;
+      const explicitPlaceholderShell = !hasTile && !hasButtonRow && (classText.includes('fitbrf') || classText.includes('B3hoEd') || childCount === 0);
       const isHardHiddenShell = row.getAttribute('aria-hidden') === 'true' && String(row.style?.visibility || '').toLowerCase() === 'hidden';
       if (softHidden) restoreSoftHiddenPlaylistRow(row, tileNode);
-      if (noRenderableContent || isHardHiddenShell) {
+      if (noRenderableContent || explicitPlaceholderShell) {
+        row.remove();
+        removedHiddenShells++;
+        continue;
+      }
+      if (isHardHiddenShell) {
         if (Math.abs(rootOffset) <= 0.1) {
           row.remove();
           removedHiddenShells++;
