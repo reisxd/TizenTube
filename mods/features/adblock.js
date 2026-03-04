@@ -394,15 +394,40 @@ function normalizeGridRenderer(gridRenderer, context = '') {
   });
 }
 
+
+function getPlaylistHelperVideoIdSet() {
+  if (!window.__ttPlaylistHelperVideoIds) window.__ttPlaylistHelperVideoIds = new Set();
+  return window.__ttPlaylistHelperVideoIds;
+}
+
+function registerPlaylistHelperVideoId(videoId, label = 'playlist.helper') {
+  const id = String(videoId || '').trim();
+  if (!id) return;
+  const set = getPlaylistHelperVideoIdSet();
+  set.add(id);
+  appendFileOnlyLog(`${label}.register`, { videoId: id, total: set.size });
+}
+
+function unregisterPlaylistHelperVideoId(videoId, label = 'playlist.helper') {
+  const id = String(videoId || '').trim();
+  if (!id) return;
+  const set = getPlaylistHelperVideoIdSet();
+  if (set.delete(id)) {
+    appendFileOnlyLog(`${label}.unregister`, { videoId: id, total: set.size });
+  }
+}
+
 function clearKeepOneMarkers(items, label = 'continuation') {
   if (!Array.isArray(items)) return 0;
   let cleared = 0;
   for (const item of items) {
     if (!item || typeof item !== 'object') continue;
     if (item.__ttKeepOneForContinuation) {
+      const helperVideoId = getItemVideoId(item);
       delete item.__ttKeepOneForContinuation;
       delete item.__ttKeepOneForContinuationLabel;
       delete item.__ttKeepOneForContinuationParseSeq;
+      unregisterPlaylistHelperVideoId(helperVideoId, `${label}.keep-one`);
       cleared++;
     }
   }
@@ -435,9 +460,12 @@ function filterContinuationItems(items, pageName, hasContinuation = false, label
       fallbackItem.__ttKeepOneForContinuation = true;
       fallbackItem.__ttKeepOneForContinuationLabel = label;
       fallbackItem.__ttKeepOneForContinuationParseSeq = Number(window.__ttParseSeq || 0);
+      const helperVideoId = getItemVideoId(fallbackItem);
+      registerPlaylistHelperVideoId(helperVideoId, label);
       appendFileOnlyLog(`${label}.keep-one.marked`, {
         pageName,
-        parseSeq: fallbackItem.__ttKeepOneForContinuationParseSeq
+        parseSeq: fallbackItem.__ttKeepOneForContinuationParseSeq,
+        helperVideoId
       });
     }
     return [fallbackItem];
@@ -1408,6 +1436,19 @@ function hideVideo(items, pageHint = null) {
     const progressBar = tileProgressBar ?? cachedProgress ?? (textWatched ? { percentDurationWatched: 100 } : null);
     const progressSource = tileProgressBar?.source || (cachedProgress ? 'entity_cache' : 'none');
 
+    const playlistHelperIds = getPlaylistHelperVideoIdSet();
+    const isKnownPlaylistHelper = pageName === 'playlist' && videoId && playlistHelperIds.has(videoId);
+    if (isKnownPlaylistHelper && !item?.__ttKeepOneForContinuation) {
+      appendFileOnlyLog('hideVideo.item.playlist_helper.pruned', {
+        pageName,
+        title,
+        videoId,
+        reason: 'known_helper_reappeared_without_marker'
+      });
+      unregisterPlaylistHelperVideoId(videoId, 'hideVideo.item.playlist_helper');
+      return false;
+    }
+
     if (item?.__ttKeepOneForContinuation) {
       const currentParseSeq = Number(window.__ttParseSeq || 0);
       const itemParseSeq = Number(item?.__ttKeepOneForContinuationParseSeq || 0);
@@ -1435,6 +1476,7 @@ function hideVideo(items, pageHint = null) {
       delete item.__ttKeepOneForContinuation;
       delete item.__ttKeepOneForContinuationLabel;
       delete item.__ttKeepOneForContinuationParseSeq;
+      unregisterPlaylistHelperVideoId(videoId, 'hideVideo.item.keep_one.expired');
     }
 
     if (pageName === 'library' && isHiddenLibraryBrowseId(contentId)) {
