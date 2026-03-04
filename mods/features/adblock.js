@@ -415,28 +415,30 @@ function getRetiredPlaylistHelperVideoIdSet() {
 function attemptPlaylistAutoLoad(reason = 'playlist.auto_load', attempt = 0) {
   if (getActivePage() !== 'playlist') return;
 
-  const containers = Array.from(document.querySelectorAll('ytlr-surface-page, ytlr-grid-renderer, ytlr-player, body'));
-  for (const container of containers) {
-    try {
-      if (container && typeof container.scrollBy === 'function') {
-        container.scrollBy({ top: 2000, left: 0, behavior: 'auto' });
-      }
-    } catch (_) {
-      // ignore scroll failures
-    }
-  }
-
+  const container =
+    document.querySelector('ytlr-playlist-video-list-renderer, ytlr-surface-page, body') ||
+    document.body;
   try {
-    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', code: 'ArrowDown', bubbles: true }));
-    document.dispatchEvent(new KeyboardEvent('keyup', { key: 'ArrowDown', code: 'ArrowDown', bubbles: true }));
+    if (container && typeof container.scrollBy === 'function') {
+      container.scrollBy({ top: 900, left: 0, behavior: 'auto' });
+    }
   } catch (_) {
-    // ignore keyboard simulation failures
+    // ignore scroll failures
   }
 
   appendFileOnlyLog('playlist.auto_load.trigger', { reason, attempt, page: getActivePage() });
 }
 
 function schedulePlaylistAutoLoad(reason = 'playlist.auto_load') {
+  if (getActivePage() !== 'playlist') return;
+  const now = Date.now();
+  const cooldownUntil = Number(window.__ttPlaylistAutoLoadCooldownUntil || 0);
+  if (now < cooldownUntil) {
+    appendFileOnlyLog('playlist.auto_load.skipped', { reason, waitMs: cooldownUntil - now, page: getActivePage() });
+    return;
+  }
+  window.__ttPlaylistAutoLoadCooldownUntil = now + 2600;
+
   const delays = [0, 150, 500, 1000, 1800];
   delays.forEach((delay, index) => {
     setTimeout(() => attemptPlaylistAutoLoad(reason, index), delay);
