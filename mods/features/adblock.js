@@ -958,8 +958,7 @@ function filterContinuationItems(items, pageName, hasContinuation = false, label
   }
   clearKeepOneMarkers(items, label);
   const filteredItems = hideVideo(items, pageName);
-  const allowKeepOneFallback = false;
-  if (allowKeepOneFallback && filteredItems.length === 0 && Array.isArray(items) && items.length > 0) {
+  if (pageName === 'playlist' && hasContinuation && filteredItems.length === 0 && Array.isArray(items) && items.length > 0) {
     const reverseItems = [...items].reverse();
     const fallbackItem =
       reverseItems.find((item) => item?.tileRenderer?.header?.tileHeaderRenderer?.thumbnail?.thumbnails?.length) ||
@@ -970,24 +969,11 @@ function filterContinuationItems(items, pageName, hasContinuation = false, label
       ? Object.keys(fallbackItem).slice(0, 4)
       : typeof fallbackItem;
 
-    appendFileOnlyLog(`${label}.keep-one`, {
+    appendFileOnlyLog(`${label}.keep-one.visible`, {
       pageName,
       originalCount: items.length,
       fallbackType
     });
-    if (fallbackItem && typeof fallbackItem === 'object') {
-      fallbackItem.__ttKeepOneForContinuation = true;
-      fallbackItem.__ttKeepOneForContinuationLabel = label;
-      fallbackItem.__ttKeepOneForContinuationParseSeq = Number(window.__ttParseSeq || 0);
-      const helperVideoId = getItemVideoId(fallbackItem);
-      registerPlaylistHelperVideoId(helperVideoId, label);
-      appendFileOnlyLog(`${label}.keep-one.marked`, {
-        pageName,
-        parseSeq: fallbackItem.__ttKeepOneForContinuationParseSeq,
-        helperVideoId
-      });
-    }
-    schedulePlaylistAutoLoad(`${label}.keep-one`);
     return [fallbackItem];
   }
 
