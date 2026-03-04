@@ -504,6 +504,54 @@ function getPlaylistTileNodes() {
   return Array.from(document.querySelectorAll('ytlr-tile-renderer, ytlr-grid-tile, ytlr-rich-item-renderer'));
 }
 
+function parseCssLengthToRem(value, fallbackRem = 6.75) {
+  const text = String(value || '').trim();
+  if (!text) return fallbackRem;
+  if (text.endsWith('rem')) return Number(text.replace('rem', '')) || fallbackRem;
+  if (text.endsWith('px')) return (Number(text.replace('px', '')) || 0) / 16 || fallbackRem;
+  return Number(text) || fallbackRem;
+}
+
+function compactPlaylistVirtualRows(reason = 'playlist.row_compact') {
+  if (typeof document === 'undefined') return { rows: 0, removedPlaceholders: 0, adjusted: 0 };
+
+  const listRoots = Array.from(document.querySelectorAll('.NUDen'));
+  let removedPlaceholders = 0;
+  let adjusted = 0;
+  let rows = 0;
+
+  for (const root of listRoots) {
+    const rowNodes = Array.from(root.querySelectorAll(':scope > .TXB27d, :scope > .TXB27d.RuKowd, :scope > .TXB27d.zylon-partial, :scope > .TXB27d.zylon-hidden'));
+    if (!rowNodes.length) continue;
+    rows += rowNodes.length;
+
+    const keptRows = [];
+    for (const row of rowNodes) {
+      const hasTile = !!row.querySelector('ytlr-tile-renderer');
+      const classText = String(row.className || '');
+      const isPlaceholder = !hasTile || classText.includes('fitbrf') || classText.includes('B3hoEd');
+      if (isPlaceholder) {
+        row.remove();
+        removedPlaceholders++;
+        continue;
+      }
+      keptRows.push(row);
+    }
+
+    let currentRem = 0;
+    for (const row of keptRows) {
+      const h = parseCssLengthToRem(row.style.height || row.getAttribute('data-height') || '6.75rem', 6.75);
+      row.style.transition = 'none';
+      row.style.transform = `translateY(${currentRem}rem)`;
+      currentRem += h + 1.5;
+      adjusted++;
+    }
+  }
+
+  appendFileOnlyLog('playlist.row_compact', { reason, rows, removedPlaceholders, adjusted });
+  return { rows, removedPlaceholders, adjusted };
+}
+
 function removeRetiredHelpersFromTiles(reason = 'playlist.helper.tile_scan') {
   const retiredIds = Array.from(getRetiredPlaylistHelperVideoIdSet());
   if (!retiredIds.length) return { scannedTiles: 0, removed: 0, matchedIds: [] };
@@ -528,14 +576,20 @@ function removeRetiredHelpersFromTiles(reason = 'playlist.helper.tile_scan') {
     }
   }
 
-  if (removed > 0 && getActivePage() === 'playlist') schedulePlaylistAutoLoad(`${reason}.tile_removed`);
+  const compactResult = compactPlaylistVirtualRows(`${reason}.tile_scan`);
+
+  if ((removed > 0 || compactResult.removedPlaceholders > 0) && getActivePage() === 'playlist') {
+    schedulePlaylistAutoLoad(`${reason}.tile_removed`);
+  }
 
   appendFileOnlyLog('playlist.helper.tile_scan', {
     reason,
     retiredCount: retiredIds.length,
     scannedTiles: tiles.length,
     removed,
-    matchedIds: Array.from(matchedIds)
+    matchedIds: Array.from(matchedIds),
+    compactRemovedPlaceholders: compactResult.removedPlaceholders,
+    compactAdjusted: compactResult.adjusted
   });
 
   return { scannedTiles: tiles.length, removed, matchedIds: Array.from(matchedIds) };
