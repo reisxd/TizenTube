@@ -39,6 +39,7 @@ const defaultConfig = {
   enableHideWatchedVideos: false,
   hideWatchedVideosThreshold: 80,
   hideWatchedVideosPages: [],
+  hiddenLibraryTabIds: ['femusic_last_played', 'festorefront', 'fecollection_podcasts', 'femy_videos'],
   enableHideEndScreenCards: false,
   enableYouThereRenderer: true,
   lastAnnouncementCheck: 0,
