@@ -528,6 +528,20 @@ function parseTranslateYRem(transformValue, fallbackRem = 0) {
   return fallbackRem;
 }
 
+function softHidePlaylistHelperRow(rowNode, tileNode) {
+  if (!rowNode) return false;
+  try {
+    rowNode.classList?.add('tt-helper-soft-hidden');
+    rowNode.style.visibility = 'hidden';
+    rowNode.style.pointerEvents = 'none';
+    rowNode.setAttribute('aria-hidden', 'true');
+    if (tileNode) tileNode.style.display = 'none';
+    return true;
+  } catch (_) {
+    return false;
+  }
+}
+
 function isPlaylistDetailView() {
   if (typeof location === 'undefined') return false;
   const hash = String(location.hash || '').toLowerCase();
@@ -557,7 +571,7 @@ function compactPlaylistVirtualRows(reason = 'playlist.row_compact') {
       const hasTile = !!row.querySelector('ytlr-tile-renderer, ytlr-grid-tile, ytlr-rich-item-renderer');
       const classText = String(row.className || '');
       const focused = classText.includes('lxpVI') || classText.includes('zylon-focus') || !!row.querySelector('.zylon-focus');
-      const isPlaceholder = !hasTile || classText.includes('fitbrf') || classText.includes('B3hoEd');
+      const isPlaceholder = !hasTile || classText.includes('fitbrf') || classText.includes('B3hoEd') || classText.includes('tt-helper-soft-hidden');
       if (isPlaceholder && !focused) {
         row.remove();
         removedPlaceholders++;
@@ -578,6 +592,7 @@ function removeRetiredHelpersFromTiles(reason = 'playlist.helper.tile_scan') {
   let removed = 0;
   const removedTiles = new Set();
   let skippedUnsafe = 0;
+  let softHidden = 0;
   const matchedIds = new Set();
 
   for (const tile of tiles) {
@@ -592,7 +607,8 @@ function removeRetiredHelpersFromTiles(reason = 'playlist.helper.tile_scan') {
         const rowClass = String(rowNode?.className || '');
         const focused = rowClass.includes('lxpVI') || rowClass.includes('zylon-focus') || tile.classList?.contains('zylon-focus');
         if (focused) {
-          skippedUnsafe++;
+          if (softHidePlaylistHelperRow(rowNode, tile)) softHidden++;
+          else skippedUnsafe++;
           break;
         }
         if (!removedTiles.has(tile)) {
@@ -620,6 +636,7 @@ function removeRetiredHelpersFromTiles(reason = 'playlist.helper.tile_scan') {
     removed,
     matchedTiles,
     skippedUnsafe,
+    softHidden,
     matchedIds: Array.from(matchedIds),
     compactRemovedPlaceholders: compactResult.removedPlaceholders,
     compactAdjusted: compactResult.adjusted
@@ -692,6 +709,7 @@ function cleanupPlaylistHelpersFromDom(helperIds, reason = 'playlist.helper.clea
   let matched = 0;
   let removed = 0;
   let skippedUnsafe = 0;
+  let softHidden = 0;
   const removedNodes = new Set();
 
   const isNodeMatchingVideoId = (node, id) => {
@@ -749,7 +767,8 @@ function cleanupPlaylistHelpersFromDom(helperIds, reason = 'playlist.helper.clea
         const rowClass = String(rowNode?.className || '');
         const focused = rowClass.includes('lxpVI') || rowClass.includes('zylon-focus') || safeNode.classList?.contains('zylon-focus');
         if (focused) {
-          skippedUnsafe++;
+          if (softHidePlaylistHelperRow(rowNode, safeNode)) softHidden++;
+          else skippedUnsafe++;
           continue;
         }
         if (removedNodes.has(safeNode)) continue;
@@ -774,6 +793,7 @@ function cleanupPlaylistHelpersFromDom(helperIds, reason = 'playlist.helper.clea
     matched,
     removed,
     skippedUnsafe,
+    softHidden,
     tileScanRemoved: tileScanResult.removed,
     tileScanMatchedIds: tileScanResult.matchedIds,
     page: getActivePage()
