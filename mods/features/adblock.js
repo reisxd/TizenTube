@@ -909,7 +909,7 @@ function filterContinuationItems(items, pageName, hasContinuation = false, label
   }
   clearKeepOneMarkers(items, label);
   const filteredItems = hideVideo(items, pageName);
-  const allowKeepOneFallback = hasContinuation && pageName === 'playlist';
+  const allowKeepOneFallback = false;
   if (allowKeepOneFallback && filteredItems.length === 0 && Array.isArray(items) && items.length > 0) {
     const reverseItems = [...items].reverse();
     const fallbackItem =
