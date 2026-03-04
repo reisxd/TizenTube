@@ -175,18 +175,17 @@ function getItemTitle(item) {
 
 const HIDDEN_LIBRARY_TAB_IDS = new Set(['femusic_last_played', 'festorefront', 'fecollection_podcasts', 'femy_videos']);
 
+function getConfiguredHiddenLibraryTabIds() {
+  const configured = configRead('hiddenLibraryTabIds');
+  if (!Array.isArray(configured) || configured.length === 0) return HIDDEN_LIBRARY_TAB_IDS;
+  return new Set(configured.map((id) => String(id || '').toLowerCase()).filter(Boolean));
+}
+
 function isHiddenLibraryBrowseId(value) {
   const id = String(value || '').toLowerCase();
   if (!id) return false;
 
-  if (configRead('hideAllLibraryTabs')) {
-    if (id.startsWith('fe') || id.startsWith('femusic_') || id.startsWith('femy_') || id.startsWith('fecollection_')) {
-      // Keep core navigation entries when "all" is enabled to avoid breaking library navigation itself.
-      return !(id === 'fehistory' || id === 'feplaylist_aggregation' || id === 'femy_youtube');
-    }
-  }
-
-  for (const hiddenId of HIDDEN_LIBRARY_TAB_IDS) {
+  for (const hiddenId of getConfiguredHiddenLibraryTabIds()) {
     if (id === hiddenId || id.includes(hiddenId)) return true;
   }
   return false;
