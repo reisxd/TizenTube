@@ -407,11 +407,45 @@ function cleanupPlaylistHelpersFromDom(helperIds, reason = 'playlist.helper.clea
   const seenContainers = new Set();
   let matched = 0;
   let removed = 0;
+  let skippedUnsafe = 0;
 
-  const tryRemoveNode = (node) => {
-    const container = node?.closest?.('ytlr-tile-renderer, ytlr-grid-tile, ytlr-rich-item-renderer, [role="listitem"], [idomkey]') || node;
+  const isNodeMatchingVideoId = (node, id) => {
+    if (!node || !id) return false;
+    const attrCandidates = [
+      node.getAttribute?.('data-video-id'),
+      node.getAttribute?.('video-id'),
+      node.getAttribute?.('data-content-id'),
+      node.getAttribute?.('content-id')
+    ].map((v) => String(v || '').trim());
+    if (attrCandidates.includes(id)) return true;
+
+    const href = String(node.getAttribute?.('href') || '').trim();
+    if (!href) return false;
+    return (
+      href.includes(`v=${id}`) ||
+      href.includes(`/watch/${id}`) ||
+      href.includes(`/watch?v=${id}`)
+    );
+  };
+
+  const tryRemoveNode = (node, id) => {
+    const tileContainer = node?.closest?.('ytlr-tile-renderer, ytlr-grid-tile, ytlr-rich-item-renderer');
+    const container = tileContainer || node;
     if (!container || container === document.body || container === document.documentElement) return;
     if (seenContainers.has(container)) return;
+
+    const nestedTiles = container.querySelectorAll?.('ytlr-tile-renderer, ytlr-grid-tile, ytlr-rich-item-renderer')?.length || 0;
+    const selfIsTile = /YTLR-(TILE-RENDERER|GRID-TILE|RICH-ITEM-RENDERER)/.test(container.tagName || '');
+    if (!selfIsTile && nestedTiles > 1) {
+      skippedUnsafe++;
+      return;
+    }
+
+    if (!isNodeMatchingVideoId(node, id) && !isNodeMatchingVideoId(container, id)) {
+      skippedUnsafe++;
+      return;
+    }
+
     seenContainers.add(container);
     if (container?.remove) {
       try {
@@ -428,12 +462,12 @@ function cleanupPlaylistHelpersFromDom(helperIds, reason = 'playlist.helper.clea
     if (!id) continue;
 
     const selectors = [
-      `a[href*="${id}"]`,
-      `[href*="${id}"]`,
       `[data-video-id="${id}"]`,
       `[video-id="${id}"]`,
       `[data-content-id="${id}"]`,
-      `[content-id="${id}"]`
+      `[content-id="${id}"]`,
+      `a[href*="v=${id}"]`,
+      `a[href*="/watch?v=${id}"]`
     ];
 
     for (const selector of selectors) {
@@ -445,20 +479,8 @@ function cleanupPlaylistHelpersFromDom(helperIds, reason = 'playlist.helper.clea
       }
       if (!nodes.length) continue;
       matched += nodes.length;
-      for (const node of nodes) tryRemoveNode(node);
+      for (const node of nodes) tryRemoveNode(node, id);
     }
-
-    // Fallback: brute-force scan likely tile containers for embedded id references.
-    const containers = Array.from(document.querySelectorAll('ytlr-tile-renderer, ytlr-grid-tile, ytlr-rich-item-renderer, [role="listitem"], [idomkey]'));
-    let fallbackMatches = 0;
-    for (const container of containers) {
-      const haystack = `${container?.getAttribute?.('idomkey') || ''} ${container?.getAttribute?.('href') || ''} ${container?.getAttribute?.('data-video-id') || ''} ${container?.getAttribute?.('video-id') || ''} ${container?.outerHTML || ''}`;
-      if (haystack.includes(id)) {
-        fallbackMatches++;
-        tryRemoveNode(container);
-      }
-    }
-    matched += fallbackMatches;
   }
 
   appendFileOnlyLog('playlist.helper.dom.cleanup', {
@@ -467,6 +489,7 @@ function cleanupPlaylistHelpersFromDom(helperIds, reason = 'playlist.helper.clea
     attempt,
     matched,
     removed,
+    skippedUnsafe,
     page: getActivePage()
   });
 
