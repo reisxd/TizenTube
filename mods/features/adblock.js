@@ -512,31 +512,14 @@ function isPlaylistDetailView() {
 }
 
 function compactPlaylistVirtualRows(reason = 'playlist.row_compact') {
-  if (typeof document === 'undefined') return { rows: 0, removedPlaceholders: 0, adjusted: 0 };
-  if (!isPlaylistDetailView()) return { rows: 0, removedPlaceholders: 0, adjusted: 0 };
-
-  const listRoots = Array.from(document.querySelectorAll('.NUDen'));
-  let removedPlaceholders = 0;
-  let rows = 0;
-
-  for (const root of listRoots) {
-    const rowNodes = Array.from(root.querySelectorAll(':scope > .TXB27d, :scope > .TXB27d.RuKowd, :scope > .TXB27d.zylon-partial, :scope > .TXB27d.zylon-hidden'));
-    if (!rowNodes.length) continue;
-    rows += rowNodes.length;
-
-    for (const row of rowNodes) {
-      const hasTile = !!row.querySelector('ytlr-tile-renderer');
-      const classText = String(row.className || '');
-      const isPlaceholder = !hasTile || classText.includes('fitbrf') || classText.includes('B3hoEd');
-      if (isPlaceholder) {
-        row.remove();
-        removedPlaceholders++;
-      }
-    }
-  }
-
-  appendFileOnlyLog('playlist.row_compact', { reason, rows, removedPlaceholders, adjusted: 0, mode: 'remove_placeholders_only' });
-  return { rows, removedPlaceholders, adjusted: 0 };
+  appendFileOnlyLog('playlist.row_compact', {
+    reason,
+    rows: 0,
+    removedPlaceholders: 0,
+    adjusted: 0,
+    mode: 'disabled_no_dom_row_mutation'
+  });
+  return { rows: 0, removedPlaceholders: 0, adjusted: 0 };
 }
 
 function removeRetiredHelpersFromTiles(reason = 'playlist.helper.tile_scan') {
@@ -544,7 +527,7 @@ function removeRetiredHelpersFromTiles(reason = 'playlist.helper.tile_scan') {
   if (!retiredIds.length) return { scannedTiles: 0, removed: 0, matchedIds: [] };
 
   const tiles = getPlaylistTileNodes();
-  let removed = 0;
+  let matchedTiles = 0;
   const matchedIds = new Set();
 
   for (const tile of tiles) {
@@ -553,35 +536,29 @@ function removeRetiredHelpersFromTiles(reason = 'playlist.helper.tile_scan') {
     for (const id of retiredIds) {
       if (!id || !html.includes(id)) continue;
       matchedIds.add(id);
-      try {
-        const rowNode = tile.closest('.TXB27d');
-        if (rowNode) rowNode.remove();
-        else tile.remove();
-        removed++;
-      } catch (_) {
-        // ignore
-      }
+      matchedTiles++;
       break;
     }
   }
 
   const compactResult = compactPlaylistVirtualRows(`${reason}.tile_scan`);
 
-  if ((removed > 0 || compactResult.removedPlaceholders > 0) && getActivePage() === 'playlist') {
-    schedulePlaylistAutoLoad(`${reason}.tile_removed`);
+  if (matchedTiles > 0 && getActivePage() === 'playlist') {
+    schedulePlaylistAutoLoad(`${reason}.tile_detected`);
   }
 
   appendFileOnlyLog('playlist.helper.tile_scan', {
     reason,
     retiredCount: retiredIds.length,
     scannedTiles: tiles.length,
-    removed,
+    removed: 0,
+    matchedTiles,
     matchedIds: Array.from(matchedIds),
     compactRemovedPlaceholders: compactResult.removedPlaceholders,
     compactAdjusted: compactResult.adjusted
   });
 
-  return { scannedTiles: tiles.length, removed, matchedIds: Array.from(matchedIds) };
+  return { scannedTiles: tiles.length, removed: 0, matchedIds: Array.from(matchedIds), matchedTiles };
 }
 
 function ensurePlaylistHelperObserver() {
@@ -599,11 +576,12 @@ function ensurePlaylistHelperObserver() {
     }
 
     const result = removeRetiredHelpersFromTiles('observer.mutation');
-    if (added > 0 || result.removed > 0) {
+    if (added > 0 || result.removed > 0 || result.matchedTiles > 0) {
       appendFileOnlyLog('playlist.helper.observer.tick', {
         added,
         retiredCount,
         removed: result.removed,
+        matchedTiles: result.matchedTiles || 0,
         scannedTiles: result.scannedTiles
       });
     }
@@ -644,7 +622,6 @@ function cleanupPlaylistHelpersFromDom(helperIds, reason = 'playlist.helper.clea
   if (!Array.isArray(helperIds) || helperIds.length === 0) return { matched: 0, removed: 0 };
   if (typeof document === 'undefined' || !document?.querySelectorAll) return { matched: 0, removed: 0 };
 
-  const seenContainers = new Set();
   let matched = 0;
   let removed = 0;
   let skippedUnsafe = 0;
@@ -666,35 +643,6 @@ function cleanupPlaylistHelpersFromDom(helperIds, reason = 'playlist.helper.clea
       href.includes(`/watch/${id}`) ||
       href.includes(`/watch?v=${id}`)
     );
-  };
-
-  const tryRemoveNode = (node, id) => {
-    const tileContainer = node?.closest?.('ytlr-tile-renderer, ytlr-grid-tile, ytlr-rich-item-renderer');
-    const container = tileContainer || node;
-    if (!container || container === document.body || container === document.documentElement) return;
-    if (seenContainers.has(container)) return;
-
-    const nestedTiles = container.querySelectorAll?.('ytlr-tile-renderer, ytlr-grid-tile, ytlr-rich-item-renderer')?.length || 0;
-    const selfIsTile = /YTLR-(TILE-RENDERER|GRID-TILE|RICH-ITEM-RENDERER)/.test(container.tagName || '');
-    if (!selfIsTile && nestedTiles > 1) {
-      skippedUnsafe++;
-      return;
-    }
-
-    if (!isNodeMatchingVideoId(node, id) && !isNodeMatchingVideoId(container, id)) {
-      skippedUnsafe++;
-      return;
-    }
-
-    seenContainers.add(container);
-    if (container?.remove) {
-      try {
-        container.remove();
-        removed++;
-      } catch (_) {
-        // ignore DOM remove failures
-      }
-    }
   };
 
   for (const rawId of helperIds) {
@@ -719,7 +667,11 @@ function cleanupPlaylistHelpersFromDom(helperIds, reason = 'playlist.helper.clea
       }
       if (!nodes.length) continue;
       matched += nodes.length;
-      for (const node of nodes) tryRemoveNode(node, id);
+      for (const node of nodes) {
+        if (!isNodeMatchingVideoId(node, id) && !node?.closest?.(`[data-video-id="${id}"],[video-id="${id}"],[data-content-id="${id}"],[content-id="${id}"]`)) {
+          skippedUnsafe++;
+        }
+      }
     }
   }
 
