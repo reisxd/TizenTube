@@ -410,7 +410,81 @@ function retirePlaylistHelperVideoId(videoId, label = 'playlist.helper') {
   if (!id) return;
   const retired = getRetiredPlaylistHelperVideoIdSet();
   retired.add(id);
+  ensurePlaylistHelperObserver();
+  removeRetiredHelpersFromTiles(`${label}.retire`);
   appendFileOnlyLog(`${label}.retire`, { videoId: id, totalRetired: retired.size });
+}
+
+
+function getPlaylistTileNodes() {
+  if (typeof document === 'undefined' || !document?.querySelectorAll) return [];
+  return Array.from(document.querySelectorAll('ytlr-tile-renderer, ytlr-grid-tile, ytlr-rich-item-renderer'));
+}
+
+function removeRetiredHelpersFromTiles(reason = 'playlist.helper.tile_scan') {
+  const retiredIds = Array.from(getRetiredPlaylistHelperVideoIdSet());
+  if (!retiredIds.length) return { scannedTiles: 0, removed: 0, matchedIds: [] };
+
+  const tiles = getPlaylistTileNodes();
+  let removed = 0;
+  const matchedIds = new Set();
+
+  for (const tile of tiles) {
+    const html = String(tile?.outerHTML || '');
+    if (!html) continue;
+    for (const id of retiredIds) {
+      if (!id || !html.includes(id)) continue;
+      matchedIds.add(id);
+      try {
+        tile.remove();
+        removed++;
+      } catch (_) {
+        // ignore
+      }
+      break;
+    }
+  }
+
+  appendFileOnlyLog('playlist.helper.tile_scan', {
+    reason,
+    retiredCount: retiredIds.length,
+    scannedTiles: tiles.length,
+    removed,
+    matchedIds: Array.from(matchedIds)
+  });
+
+  return { scannedTiles: tiles.length, removed, matchedIds: Array.from(matchedIds) };
+}
+
+function ensurePlaylistHelperObserver() {
+  if (window.__ttPlaylistHelperObserverInstalled) return;
+  if (typeof MutationObserver === 'undefined' || typeof document === 'undefined' || !document?.documentElement) return;
+
+  const observer = new MutationObserver((mutations) => {
+    if (getActivePage() !== 'playlist') return;
+    const retiredCount = getRetiredPlaylistHelperVideoIdSet().size;
+    if (retiredCount === 0) return;
+
+    let added = 0;
+    for (const mutation of mutations) {
+      added += mutation?.addedNodes?.length || 0;
+    }
+
+    const result = removeRetiredHelpersFromTiles('observer.mutation');
+    if (added > 0 || result.removed > 0) {
+      appendFileOnlyLog('playlist.helper.observer.tick', {
+        added,
+        retiredCount,
+        removed: result.removed,
+        scannedTiles: result.scannedTiles
+      });
+    }
+  });
+
+  observer.observe(document.documentElement, { childList: true, subtree: true });
+  window.__ttPlaylistHelperObserverInstalled = true;
+  window.__ttPlaylistHelperObserver = observer;
+  appendFileOnlyLog('playlist.helper.observer.installed', { page: getActivePage() });
 }
 
 function logPlaylistDomSnapshot(reason = 'playlist.dom.snapshot', attempt = -1) {
@@ -521,6 +595,9 @@ function cleanupPlaylistHelpersFromDom(helperIds, reason = 'playlist.helper.clea
     }
   }
 
+  const tileScanResult = removeRetiredHelpersFromTiles(`${reason}.cleanup_attempt_${attempt}`);
+  removed += Number(tileScanResult.removed || 0);
+
   appendFileOnlyLog('playlist.helper.dom.cleanup', {
     reason,
     helperIds,
@@ -528,6 +605,8 @@ function cleanupPlaylistHelpersFromDom(helperIds, reason = 'playlist.helper.clea
     matched,
     removed,
     skippedUnsafe,
+    tileScanRemoved: tileScanResult.removed,
+    tileScanMatchedIds: tileScanResult.matchedIds,
     page: getActivePage()
   });
 
