@@ -445,6 +445,73 @@ function isLikelyShortItem(item) {
   return false;
 }
 
+function processResponsePayload(payload, detectedPage) {
+  if (!payload || typeof payload !== 'object') return;
+
+  if (payload?.contents?.sectionListRenderer?.contents) {
+    processShelves(payload.contents.sectionListRenderer.contents, true, detectedPage);
+  }
+
+  if (payload?.contents?.tvBrowseRenderer?.content?.tvSurfaceContentRenderer?.content?.sectionListRenderer?.contents) {
+    processShelves(payload.contents.tvBrowseRenderer.content.tvSurfaceContentRenderer.content.sectionListRenderer.contents, true, detectedPage);
+  }
+
+  if (payload?.contents?.tvBrowseRenderer?.content?.tvSurfaceContentRenderer?.content?.gridRenderer?.items) {
+    const grid = payload.contents.tvBrowseRenderer.content.tvSurfaceContentRenderer.content.gridRenderer;
+    grid.items = hideVideo(grid.items, detectedPage);
+    normalizeGridRenderer(grid, 'arrayPayload.contents.tvBrowseRenderer.grid');
+  }
+
+  if (payload?.continuationContents?.sectionListContinuation?.contents) {
+    processShelves(payload.continuationContents.sectionListContinuation.contents, true, detectedPage);
+  }
+
+  if (payload?.continuationContents?.horizontalListContinuation?.items) {
+    const continuation = payload.continuationContents.horizontalListContinuation;
+    deArrowify(continuation.items);
+    hqify(continuation.items);
+    addLongPress(continuation.items);
+    continuation.items = filterContinuationItems(
+      continuation.items,
+      detectedPage,
+      !!continuation?.continuations,
+      'arrayPayload.horizontalListContinuation'
+    );
+    normalizeHorizontalListRenderer(continuation, 'arrayPayload.continuation.horizontal');
+  }
+
+  if (payload?.continuationContents?.gridContinuation?.items) {
+    const gc = payload.continuationContents.gridContinuation;
+    gc.items = filterContinuationItems(
+      gc.items,
+      detectedPage,
+      !!gc?.continuations,
+      'arrayPayload.gridContinuation'
+    );
+    normalizeGridRenderer(gc, 'arrayPayload.continuation.grid');
+  }
+
+  if (payload?.continuationContents?.playlistVideoListContinuation?.contents) {
+    const plc = payload.continuationContents.playlistVideoListContinuation;
+    plc.contents = filterContinuationItems(
+      plc.contents,
+      detectedPage,
+      !!plc?.continuations,
+      'arrayPayload.playlist.continuation'
+    );
+  }
+
+  if (payload?.contents?.tvBrowseRenderer?.content?.tvSecondaryNavRenderer?.sections) {
+    filterLibraryNavTabs(payload.contents.tvBrowseRenderer.content.tvSecondaryNavRenderer.sections, detectedPage);
+  }
+
+  if (detectedPage === 'library') {
+    pruneLibraryTabsInResponse(payload, 'arrayPayload');
+  }
+
+  processTileArraysDeep(payload, detectedPage, 'arrayPayload');
+}
+
 /**
  * This is a minimal reimplementation of the following uBlock Origin rule:
  * https://github.com/uBlockOrigin/uAssets/blob/3497eebd440f4871830b9b45af0afc406c6eb593/filters/filters.txt#L116
@@ -472,6 +539,14 @@ JSON.parse = function () {
   });
   appendFileOnlyLog('json.parse.full', r);
   const signinReminderEnabled = configRead('enableSigninReminder');
+
+  if (Array.isArray(r)) {
+    appendFileOnlyLog('json.parse.array.root', { detectedPage, length: r.length });
+    for (let i = 0; i < r.length; i++) {
+      processResponsePayload(r[i], detectedPage);
+    }
+    return r;
+  }
 
   if (r.adPlacements && adBlockEnabled) {
     r.adPlacements = [];
