@@ -974,6 +974,16 @@ function filterContinuationItems(items, pageName, hasContinuation = false, label
       originalCount: items.length,
       fallbackType
     });
+    if (fallbackItem && typeof fallbackItem === 'object') {
+      fallbackItem.__ttKeepOneForContinuation = true;
+      fallbackItem.__ttKeepOneForContinuationLabel = `${label}.visible`;
+      fallbackItem.__ttKeepOneForContinuationParseSeq = Number(window.__ttParseSeq || 0);
+      appendFileOnlyLog(`${label}.keep-one.visible.marked`, {
+        pageName,
+        parseSeq: fallbackItem.__ttKeepOneForContinuationParseSeq,
+        helperVideoId: getItemVideoId(fallbackItem)
+      });
+    }
     return [fallbackItem];
   }
 
