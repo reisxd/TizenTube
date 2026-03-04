@@ -512,8 +512,19 @@ function parseCssLengthToRem(value, fallbackRem = 6.75) {
   return Number(text) || fallbackRem;
 }
 
+function parseTranslateYRem(transformValue, fallbackRem = null) {
+  const text = String(transformValue || '');
+  const match = text.match(/translateY\(([-\d.]+)rem\)/i) || text.match(/translateY\(([-\d.]+)px\)/i);
+  if (!match) return fallbackRem;
+  const value = Number(match[1]);
+  if (!Number.isFinite(value)) return fallbackRem;
+  if (text.toLowerCase().includes('px')) return value / 16;
+  return value;
+}
+
 function compactPlaylistVirtualRows(reason = 'playlist.row_compact') {
   if (typeof document === 'undefined') return { rows: 0, removedPlaceholders: 0, adjusted: 0 };
+  if (detectCurrentPage() !== 'playlist') return { rows: 0, removedPlaceholders: 0, adjusted: 0 };
 
   const listRoots = Array.from(document.querySelectorAll('.NUDen'));
   let removedPlaceholders = 0;
@@ -525,7 +536,24 @@ function compactPlaylistVirtualRows(reason = 'playlist.row_compact') {
     if (!rowNodes.length) continue;
     rows += rowNodes.length;
 
+    const originalPositions = rowNodes
+      .map((row) => parseTranslateYRem(row.style.transform, null))
+      .filter((v) => Number.isFinite(v))
+      .sort((a, b) => a - b);
+
+    let spacing = 8.25;
+    if (originalPositions.length >= 2) {
+      const diffs = [];
+      for (let i = 1; i < originalPositions.length; i++) {
+        const d = originalPositions[i] - originalPositions[i - 1];
+        if (d > 0.1) diffs.push(d);
+      }
+      if (diffs.length) spacing = diffs.reduce((a, b) => a + b, 0) / diffs.length;
+    }
+
+    const baseRem = originalPositions.length ? originalPositions[0] : 6.75;
     const keptRows = [];
+    let removedInRoot = 0;
     for (const row of rowNodes) {
       const hasTile = !!row.querySelector('ytlr-tile-renderer');
       const classText = String(row.className || '');
@@ -533,17 +561,19 @@ function compactPlaylistVirtualRows(reason = 'playlist.row_compact') {
       if (isPlaceholder) {
         row.remove();
         removedPlaceholders++;
+        removedInRoot++;
         continue;
       }
       keptRows.push(row);
     }
 
-    let currentRem = 0;
+    if (removedInRoot === 0) continue;
+
+    let currentRem = baseRem;
     for (const row of keptRows) {
-      const h = parseCssLengthToRem(row.style.height || row.getAttribute('data-height') || '6.75rem', 6.75);
       row.style.transition = 'none';
       row.style.transform = `translateY(${currentRem}rem)`;
-      currentRem += h + 1.5;
+      currentRem += spacing;
       adjusted++;
     }
   }
