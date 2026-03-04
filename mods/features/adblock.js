@@ -426,6 +426,25 @@ function filterContinuationItems(items, pageName, hasContinuation = false, label
   return filteredItems;
 }
 
+
+function filterPlaylistRendererContents(playlistRenderer, pageName, label = 'playlist.renderer') {
+  if (!playlistRenderer || !Array.isArray(playlistRenderer.contents)) return;
+  const hasContinuation = !!playlistRenderer?.continuations;
+  const before = playlistRenderer.contents.length;
+  playlistRenderer.contents = filterContinuationItems(
+    playlistRenderer.contents,
+    pageName,
+    hasContinuation,
+    label
+  );
+  appendFileOnlyLog(`${label}.result`, {
+    pageName,
+    hasContinuation,
+    before,
+    after: playlistRenderer.contents.length
+  });
+}
+
 function isLikelyShortItem(item) {
   const tile = item?.tileRenderer;
   if (!tile) return false;
@@ -505,6 +524,11 @@ function processResponsePayload(payload, detectedPage) {
       !!plc?.continuations,
       'arrayPayload.playlist.continuation'
     );
+  }
+
+  const arrayTopPlaylistRenderer = payload?.contents?.tvBrowseRenderer?.content?.tvSurfaceContentRenderer?.content?.twoColumnRenderer?.rightColumn?.playlistVideoListRenderer;
+  if (arrayTopPlaylistRenderer?.contents) {
+    filterPlaylistRendererContents(arrayTopPlaylistRenderer, detectedPage, 'arrayPayload.playlist.renderer');
   }
 
   if (payload?.contents?.tvBrowseRenderer?.content?.tvSecondaryNavRenderer?.sections) {
@@ -704,6 +728,11 @@ JSON.parse = function () {
     normalizeGridRenderer(r.contents.tvBrowseRenderer.content.tvSurfaceContentRenderer.content.gridRenderer, 'contents.tvBrowseRenderer.grid');
   }
 
+  const topPlaylistRenderer = r?.contents?.tvBrowseRenderer?.content?.tvSurfaceContentRenderer?.content?.twoColumnRenderer?.rightColumn?.playlistVideoListRenderer;
+  if (topPlaylistRenderer?.contents) {
+    filterPlaylistRendererContents(topPlaylistRenderer, detectedPage, 'playlist.renderer');
+  }
+
   if (r?.continuationContents?.sectionListContinuation?.contents) {
     processShelves(r.continuationContents.sectionListContinuation.contents, true, detectedPage);
   }
@@ -795,9 +824,9 @@ JSON.parse = function () {
           normalizeGridRenderer(tab.tabRenderer.content.tvSurfaceContentRenderer.content.gridRenderer, 'tab.grid');
         }
 
-        const playlistItems = tab?.tabRenderer?.content?.tvSurfaceContentRenderer?.content?.playlistVideoListRenderer?.contents;
-        if (Array.isArray(playlistItems)) {
-          tab.tabRenderer.content.tvSurfaceContentRenderer.content.playlistVideoListRenderer.contents = hideVideo(playlistItems, tabPage);
+        const tabPlaylistRenderer = tab?.tabRenderer?.content?.tvSurfaceContentRenderer?.content?.playlistVideoListRenderer;
+        if (tabPlaylistRenderer?.contents) {
+          filterPlaylistRendererContents(tabPlaylistRenderer, tabPage, 'tab.playlist.renderer');
         }
       }
     }
