@@ -566,6 +566,11 @@ export default function modernUI(update, parameters) {
                                     value: 'watch'
                                 }
                             ]
+                        },
+                        {
+                            name: 'Hide All Library Tabs / Buttons',
+                            icon: 'TAB_LIBRARY',
+                            value: 'hideAllLibraryTabs'
                         }
                     ]
                 },
