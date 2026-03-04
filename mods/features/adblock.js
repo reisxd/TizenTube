@@ -530,6 +530,18 @@ function parseTranslateYRem(transformValue, fallbackRem = 0) {
   return fallbackRem;
 }
 
+function isHelperLikePlaylistNode(rowNode, tileNode) {
+  const rowClass = String(rowNode?.className || '');
+  const tileClass = String(tileNode?.className || '');
+  return (
+    rowClass.includes('fitbrf') ||
+    rowClass.includes('B3hoEd') ||
+    rowClass.includes('tt-helper-soft-hidden') ||
+    tileClass.includes('HTybHf') ||
+    tileClass.includes('IYlICe')
+  );
+}
+
 function restoreSoftHiddenPlaylistRow(rowNode, tileNode) {
   if (!rowNode) return;
   rowNode.classList?.remove('tt-helper-soft-hidden');
@@ -636,6 +648,11 @@ function removeRetiredHelpersFromTiles(reason = 'playlist.helper.tile_scan') {
         const rowNode = tile.closest('.TXB27d');
         const rowClass = String(rowNode?.className || '');
         const focused = rowClass.includes('lxpVI') || rowClass.includes('zylon-focus') || tile.classList?.contains('zylon-focus');
+        const helperLike = isHelperLikePlaylistNode(rowNode, tile);
+        if (!helperLike) {
+          skippedUnsafe++;
+          break;
+        }
         if (focused) {
           skippedUnsafe++;
           break;
@@ -795,6 +812,11 @@ function cleanupPlaylistHelpersFromDom(helperIds, reason = 'playlist.helper.clea
         const rowNode = safeNode.closest?.('.TXB27d');
         const rowClass = String(rowNode?.className || '');
         const focused = rowClass.includes('lxpVI') || rowClass.includes('zylon-focus') || safeNode.classList?.contains('zylon-focus');
+        const helperLike = isHelperLikePlaylistNode(rowNode, safeNode);
+        if (!helperLike) {
+          skippedUnsafe++;
+          continue;
+        }
         if (focused) {
           skippedUnsafe++;
           continue;
