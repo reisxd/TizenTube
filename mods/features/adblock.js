@@ -1,7 +1,7 @@
 import { configRead } from '../config.js';
 import Chapters from '../ui/chapters.js';
 import resolveCommand from '../resolveCommand.js';
-import { timelyAction, longPressData, MenuServiceItemRenderer, ShelfRenderer, TileRenderer, ButtonRenderer } from '../ui/ytUI.js';
+import { timelyAction, longPressData, MenuServiceItemRenderer, ShelfRenderer, TileRenderer, ButtonRenderer, showToast } from '../ui/ytUI.js';
 import { PatchSettings } from '../ui/customYTSettings.js';
 
 
@@ -1830,6 +1830,17 @@ function hideVideo(items, pageHint = null) {
     const tileProgressBar = getTileWatchProgress(item);
     const videoId = getItemVideoId(item);
     const title = item?.tileRenderer?.metadata?.tileMetadataRenderer?.title?.simpleText || videoId || 'unknown';
+
+    const retiredHelperIds = getRetiredPlaylistHelperVideoIdSet();
+    if (pageName === 'playlist' && videoId && retiredHelperIds.has(videoId)) {
+      appendFileOnlyLog('hideVideo.item.playlist_helper.retired_pruned', {
+        pageName,
+        title,
+        videoId,
+        retiredCount: retiredHelperIds.size
+      });
+      return false;
+    }
     const contentId = videoId.toLowerCase();
     const cachedProgress = window._ttVideoProgressCache?.[videoId] ?? null;
     const textWatched = isWatchedByTextSignals(item);
