@@ -504,41 +504,6 @@ function getPlaylistTileNodes() {
   return Array.from(document.querySelectorAll('ytlr-tile-renderer, ytlr-grid-tile, ytlr-rich-item-renderer'));
 }
 
-function parseCssLengthToRem(value, fallbackRem = 6.75) {
-  const text = String(value || '').trim();
-  if (!text) return fallbackRem;
-  if (text.endsWith('rem')) return Number(text.replace('rem', '')) || fallbackRem;
-  if (text.endsWith('px')) return (Number(text.replace('px', '')) || 0) / 16 || fallbackRem;
-  return Number(text) || fallbackRem;
-}
-
-function parseTranslateYRem(transformValue, fallbackRem = null) {
-  const text = String(transformValue || '');
-  const match = text.match(/translateY\(([-\d.]+)rem\)/i) || text.match(/translateY\(([-\d.]+)px\)/i);
-  if (!match) return fallbackRem;
-  const value = Number(match[1]);
-  if (!Number.isFinite(value)) return fallbackRem;
-  if (text.toLowerCase().includes('px')) return value / 16;
-  return value;
-}
-
-function getPlaylistVirtualRowSpacingRem(positions = [], fallbackRem = 8.25) {
-  if (!positions.length) return fallbackRem;
-  const sorted = [...positions].filter((v) => Number.isFinite(v)).sort((a, b) => a - b);
-  if (sorted.length < 2) return fallbackRem;
-
-  const diffs = [];
-  for (let i = 1; i < sorted.length; i++) {
-    const diff = sorted[i] - sorted[i - 1];
-    if (diff > 0.25) diffs.push(diff);
-  }
-  if (!diffs.length) return fallbackRem;
-
-  diffs.sort((a, b) => a - b);
-  const median = diffs[Math.floor(diffs.length / 2)];
-  return Number.isFinite(median) ? median : fallbackRem;
-}
-
 function isPlaylistDetailView() {
   if (typeof location === 'undefined') return false;
   const hash = String(location.hash || '').toLowerCase();
@@ -552,60 +517,26 @@ function compactPlaylistVirtualRows(reason = 'playlist.row_compact') {
 
   const listRoots = Array.from(document.querySelectorAll('.NUDen'));
   let removedPlaceholders = 0;
-  let adjusted = 0;
   let rows = 0;
-  let skippedScrolledRoots = 0;
 
   for (const root of listRoots) {
-    const rootOffset = parseTranslateYRem(root.style?.transform, 0) || 0;
     const rowNodes = Array.from(root.querySelectorAll(':scope > .TXB27d, :scope > .TXB27d.RuKowd, :scope > .TXB27d.zylon-partial, :scope > .TXB27d.zylon-hidden'));
     if (!rowNodes.length) continue;
     rows += rowNodes.length;
-
-    const rowEntries = rowNodes.map((row) => ({
-      row,
-      yRem: parseTranslateYRem(row.style.transform, null)
-    }));
-    const spacing = getPlaylistVirtualRowSpacingRem(rowEntries.map((entry) => entry.yRem), 8.25);
-    const removedPositions = [];
 
     for (const row of rowNodes) {
       const hasTile = !!row.querySelector('ytlr-tile-renderer');
       const classText = String(row.className || '');
       const isPlaceholder = !hasTile || classText.includes('fitbrf') || classText.includes('B3hoEd');
       if (isPlaceholder) {
-        const yRem = parseTranslateYRem(row.style.transform, null);
-        if (Number.isFinite(yRem)) removedPositions.push(yRem);
         row.remove();
         removedPlaceholders++;
       }
     }
-
-    if (!removedPositions.length) continue;
-    if (Math.abs(rootOffset) > 0.25) {
-      skippedScrolledRoots++;
-      continue;
-    }
-
-    const sortedRemoved = removedPositions.sort((a, b) => a - b);
-    for (const entry of rowEntries) {
-      if (!entry?.row?.isConnected || !Number.isFinite(entry.yRem)) continue;
-
-      let removedBefore = 0;
-      for (const removedY of sortedRemoved) {
-        if (removedY < (entry.yRem - 0.01)) removedBefore++;
-      }
-      if (!removedBefore) continue;
-
-      const nextY = Math.max(0, entry.yRem - (removedBefore * spacing));
-      entry.row.style.transition = 'none';
-      entry.row.style.transform = `translateY(${nextY}rem)`;
-      adjusted++;
-    }
   }
 
-  appendFileOnlyLog('playlist.row_compact', { reason, rows, removedPlaceholders, adjusted, skippedScrolledRoots });
-  return { rows, removedPlaceholders, adjusted };
+  appendFileOnlyLog('playlist.row_compact', { reason, rows, removedPlaceholders, adjusted: 0, mode: 'remove_placeholders_only' });
+  return { rows, removedPlaceholders, adjusted: 0 };
 }
 
 function removeRetiredHelpersFromTiles(reason = 'playlist.helper.tile_scan') {
@@ -623,7 +554,9 @@ function removeRetiredHelpersFromTiles(reason = 'playlist.helper.tile_scan') {
       if (!id || !html.includes(id)) continue;
       matchedIds.add(id);
       try {
-        tile.remove();
+        const rowNode = tile.closest('.TXB27d');
+        if (rowNode) rowNode.remove();
+        else tile.remove();
         removed++;
       } catch (_) {
         // ignore
