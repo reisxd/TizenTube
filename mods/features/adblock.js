@@ -720,6 +720,12 @@ function registerPlaylistHelperVideoId(videoId, label = 'playlist.helper') {
     for (const staleId of staleIds) unregisterPlaylistHelperVideoId(staleId, `${label}.register.stale`);
   }
   set.add(id);
+
+  const retired = getRetiredPlaylistHelperVideoIdSet();
+  if (retired.delete(id)) {
+    appendFileOnlyLog(`${label}.register.unretire`, { videoId: id, retiredRemaining: retired.size });
+  }
+
   appendFileOnlyLog(`${label}.register`, { videoId: id, total: set.size });
 }
 
@@ -1834,12 +1840,14 @@ function hideVideo(items, pageHint = null) {
     }
 
     const retiredHelperIds = getRetiredPlaylistHelperVideoIdSet();
-    if (pageName === 'playlist' && videoId && retiredHelperIds.has(videoId)) {
+    const activeHelperIds = getPlaylistHelperVideoIdSet();
+    if (pageName === 'playlist' && videoId && retiredHelperIds.has(videoId) && !activeHelperIds.has(videoId)) {
       appendFileOnlyLog('hideVideo.item.playlist_helper.retired_pruned', {
         pageName,
         title,
         videoId,
-        retiredCount: retiredHelperIds.size
+        retiredCount: retiredHelperIds.size,
+        activeHelpers: activeHelperIds.size
       });
       return false;
     }
