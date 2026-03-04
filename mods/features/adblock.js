@@ -402,6 +402,7 @@ function clearKeepOneMarkers(items, label = 'continuation') {
     if (item.__ttKeepOneForContinuation) {
       delete item.__ttKeepOneForContinuation;
       delete item.__ttKeepOneForContinuationLabel;
+      delete item.__ttKeepOneForContinuationParseSeq;
       cleared++;
     }
   }
@@ -433,6 +434,11 @@ function filterContinuationItems(items, pageName, hasContinuation = false, label
     if (fallbackItem && typeof fallbackItem === 'object') {
       fallbackItem.__ttKeepOneForContinuation = true;
       fallbackItem.__ttKeepOneForContinuationLabel = label;
+      fallbackItem.__ttKeepOneForContinuationParseSeq = Number(window.__ttParseSeq || 0);
+      appendFileOnlyLog(`${label}.keep-one.marked`, {
+        pageName,
+        parseSeq: fallbackItem.__ttKeepOneForContinuationParseSeq
+      });
     }
     return [fallbackItem];
   }
@@ -577,11 +583,14 @@ JSON.parse = function () {
 
   const detectedPage = detectPageFromResponse(r) || detectCurrentPage();
   window.__ttLastDetectedPage = detectedPage;
+  window.__ttParseSeq = Number(window.__ttParseSeq || 0) + 1;
+  const parseSeq = window.__ttParseSeq;
   appendFileOnlyLog('json.parse.meta', {
     hash: location.hash || '',
     path: location.pathname || '',
     search: location.search || '',
     detectedPage,
+    parseSeq,
     rootType: Array.isArray(r) ? 'array' : typeof r,
     rootKeys: r && typeof r === 'object' ? Object.keys(r).slice(0, 40) : []
   });
@@ -1400,13 +1409,32 @@ function hideVideo(items, pageHint = null) {
     const progressSource = tileProgressBar?.source || (cachedProgress ? 'entity_cache' : 'none');
 
     if (item?.__ttKeepOneForContinuation) {
-      appendFileOnlyLog('hideVideo.item.keep_one', {
+      const currentParseSeq = Number(window.__ttParseSeq || 0);
+      const itemParseSeq = Number(item?.__ttKeepOneForContinuationParseSeq || 0);
+      const keepOneStillValid = pageName === 'playlist' && itemParseSeq > 0 && itemParseSeq === currentParseSeq;
+      if (keepOneStillValid) {
+        appendFileOnlyLog('hideVideo.item.keep_one', {
+          pageName,
+          title,
+          videoId,
+          keepOneLabel: item?.__ttKeepOneForContinuationLabel || 'unknown',
+          parseSeq: itemParseSeq
+        });
+        return true;
+      }
+
+      appendFileOnlyLog('hideVideo.item.keep_one.expired', {
         pageName,
         title,
         videoId,
-        keepOneLabel: item?.__ttKeepOneForContinuationLabel || 'unknown'
+        keepOneLabel: item?.__ttKeepOneForContinuationLabel || 'unknown',
+        itemParseSeq,
+        currentParseSeq,
+        reason: pageName !== 'playlist' ? 'page_not_playlist' : 'parse_seq_mismatch'
       });
-      return true;
+      delete item.__ttKeepOneForContinuation;
+      delete item.__ttKeepOneForContinuationLabel;
+      delete item.__ttKeepOneForContinuationParseSeq;
     }
 
     if (pageName === 'library' && isHiddenLibraryBrowseId(contentId)) {
