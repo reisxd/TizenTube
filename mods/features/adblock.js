@@ -528,6 +528,8 @@ function removeRetiredHelpersFromTiles(reason = 'playlist.helper.tile_scan') {
 
   const tiles = getPlaylistTileNodes();
   let matchedTiles = 0;
+  let removed = 0;
+  const removedRows = new Set();
   const matchedIds = new Set();
 
   for (const tile of tiles) {
@@ -537,13 +539,23 @@ function removeRetiredHelpersFromTiles(reason = 'playlist.helper.tile_scan') {
       if (!id || !html.includes(id)) continue;
       matchedIds.add(id);
       matchedTiles++;
+      try {
+        const rowNode = tile.closest('.TXB27d');
+        if (rowNode && !removedRows.has(rowNode)) {
+          removedRows.add(rowNode);
+          rowNode.remove();
+          removed++;
+        }
+      } catch (_) {
+        // ignore DOM failures
+      }
       break;
     }
   }
 
   const compactResult = compactPlaylistVirtualRows(`${reason}.tile_scan`);
 
-  if (matchedTiles > 0 && getActivePage() === 'playlist') {
+  if ((matchedTiles > 0 || removed > 0) && getActivePage() === 'playlist') {
     schedulePlaylistAutoLoad(`${reason}.tile_detected`);
   }
 
@@ -551,14 +563,14 @@ function removeRetiredHelpersFromTiles(reason = 'playlist.helper.tile_scan') {
     reason,
     retiredCount: retiredIds.length,
     scannedTiles: tiles.length,
-    removed: 0,
+    removed,
     matchedTiles,
     matchedIds: Array.from(matchedIds),
     compactRemovedPlaceholders: compactResult.removedPlaceholders,
     compactAdjusted: compactResult.adjusted
   });
 
-  return { scannedTiles: tiles.length, removed: 0, matchedIds: Array.from(matchedIds), matchedTiles };
+  return { scannedTiles: tiles.length, removed, matchedIds: Array.from(matchedIds), matchedTiles };
 }
 
 function ensurePlaylistHelperObserver() {
@@ -625,6 +637,7 @@ function cleanupPlaylistHelpersFromDom(helperIds, reason = 'playlist.helper.clea
   let matched = 0;
   let removed = 0;
   let skippedUnsafe = 0;
+  const removedNodes = new Set();
 
   const isNodeMatchingVideoId = (node, id) => {
     if (!node || !id) return false;
@@ -669,6 +682,21 @@ function cleanupPlaylistHelpersFromDom(helperIds, reason = 'playlist.helper.clea
       matched += nodes.length;
       for (const node of nodes) {
         if (!isNodeMatchingVideoId(node, id) && !node?.closest?.(`[data-video-id="${id}"],[video-id="${id}"],[data-content-id="${id}"],[content-id="${id}"]`)) {
+          skippedUnsafe++;
+          continue;
+        }
+        const rowNode = node?.closest?.('.TXB27d');
+        const safeNode = rowNode || node?.closest?.('ytlr-tile-renderer, ytlr-grid-tile, ytlr-rich-item-renderer') || null;
+        if (!safeNode) {
+          skippedUnsafe++;
+          continue;
+        }
+        if (removedNodes.has(safeNode)) continue;
+        try {
+          removedNodes.add(safeNode);
+          safeNode.remove();
+          removed++;
+        } catch (_) {
           skippedUnsafe++;
         }
       }
