@@ -104,6 +104,10 @@
 name: Build, publish and cleanup old npm versions
 
 on:
+  pull_request:
+    paths-ignore:
+      - 'dist/**'
+      - 'package.json'
   push:
     branches:
       - main
@@ -117,6 +121,7 @@ on:
       - 'package.json'
       - 'tizen.log'
       - 'dist/**'
+      - 'scripts/**'
   workflow_dispatch:
 
 # Allow this workflow to push back changes to the repo
@@ -600,4 +605,5 @@ jobs:
 
       - name: Cache purge complete
         if: steps.publish_npm.outcome == 'success'
+
         run: echo "✅ jsDelivr cache purge complete (npm + GitHub)"
