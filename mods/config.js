@@ -39,6 +39,7 @@ const defaultConfig = {
   enableHideWatchedVideos: false,
   hideWatchedVideosThreshold: 80,
   hideWatchedVideosPages: [],
+  hiddenLibraryTabIds: [],
   enableHideEndScreenCards: false,
   enableYouThereRenderer: true,
   lastAnnouncementCheck: 0,
