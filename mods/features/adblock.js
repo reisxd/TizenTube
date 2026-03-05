@@ -39,6 +39,8 @@ function appendFileOnlyLogOnce(key, payload) {
   appendFileOnlyLog(key, serialized);
 }
 
+
+
 function detectCurrentPage() {
   const hash = location.hash ? location.hash.substring(1) : '';
   const cParam = (hash.match(/[?&]c=([^&]+)/i)?.[1] || '').toLowerCase();
@@ -46,6 +48,7 @@ function detectCurrentPage() {
 
   if (hash.startsWith('/watch')) pageName = 'watch';
   else if (cParam.includes('fesubscription')) pageName = 'subscriptions';
+  else if (cParam.startsWith('uc')) pageName = 'channel';
   else if (cParam === 'fehistory') pageName = 'history';
   else if (cParam === 'felibrary') pageName = 'library';
   else if (cParam === 'feplaylist_aggregation') pageName = 'playlists';
@@ -73,17 +76,6 @@ function detectCurrentPage() {
   return pageName;
 }
 
-function normalizeBrowseIdToPage(rawBrowseId = '') {
-  const browseId = String(rawBrowseId || '').toLowerCase();
-  if (!browseId) return null;
-  if (browseId.includes('fesubscription')) return 'subscriptions';
-  if (browseId.startsWith('uc')) return 'channel';
-  if (browseId === 'fehistory') return 'history';
-  if (browseId === 'felibrary') return 'library';
-  if (browseId === 'feplaylist_aggregation') return 'playlists';
-  if (browseId === 'femy_youtube' || browseId === 'vlwl' || browseId === 'vlll' || browseId.startsWith('vlpl')) return 'playlist';
-  return null;
-}
 
 function detectPageFromResponse(response) {
   if (response?.contents?.singleColumnWatchNextResults || response?.playerOverlays || response?.videoDetails) {
@@ -94,16 +86,27 @@ function detectPageFromResponse(response) {
   for (const entry of serviceParams) {
     for (const param of (entry?.params || [])) {
       if (param?.key === 'browse_id') {
-        const detected = normalizeBrowseIdToPage(param?.value);
-        if (detected) return detected;
+        const browseId = String(param?.value || '').toLowerCase();
+        if (!browseId) continue;
+        if (browseId.includes('fesubscription')) return 'subscriptions';
+        if (browseId.startsWith('uc')) return 'channel';
+        if (browseId === 'fehistory') return 'history';
+        if (browseId === 'felibrary') return 'library';
+        if (browseId === 'feplaylist_aggregation') return 'playlists';
+        if (browseId === 'femy_youtube' || browseId === 'vlwl' || browseId === 'vlll' || browseId.startsWith('vlpl')) return 'playlist';
       }
     }
   }
 
-  const targetId = String(response?.contents?.tvBrowseRenderer?.targetId || '');
+  const targetId = String(response?.contents?.tvBrowseRenderer?.targetId || '').toLowerCase();
   if (targetId.startsWith('browse-feed')) {
-    const detected = normalizeBrowseIdToPage(targetId.replace('browse-feed', ''));
-    if (detected) return detected;
+    const browseId = targetId.replace('browse-feed', '');
+    if (browseId.includes('fesubscription')) return 'subscriptions';
+    if (browseId.startsWith('uc')) return 'channel';
+    if (browseId === 'fehistory') return 'history';
+    if (browseId === 'felibrary') return 'library';
+    if (browseId === 'feplaylist_aggregation') return 'playlists';
+    if (browseId === 'femy_youtube' || browseId === 'vlwl' || browseId === 'vlll' || browseId.startsWith('vlpl')) return 'playlist';
   }
 
   return null;
@@ -1286,7 +1289,13 @@ JSON.parse = function () {
 
       for (const tab of section.tvSecondaryNavSectionRenderer.tabs) {
         const tabBrowseId = String(extractNavTabBrowseId(tab)).toLowerCase();
-        const tabPage = normalizeBrowseIdToPage(tabBrowseId) || detectedPage;
+        let tabPage = detectedPage;
+        if (tabBrowseId.includes('fesubscription')) tabPage = 'subscriptions';
+        else if (tabBrowseId.startsWith('uc')) tabPage = 'channel';
+        else if (tabBrowseId === 'fehistory') tabPage = 'history';
+        else if (tabBrowseId === 'felibrary') tabPage = 'library';
+        else if (tabBrowseId === 'feplaylist_aggregation') tabPage = 'playlists';
+        else if (tabBrowseId === 'femy_youtube' || tabBrowseId === 'vlwl' || tabBrowseId === 'vlll' || tabBrowseId.startsWith('vlpl')) tabPage = 'playlist';
         const contents = tab?.tabRenderer?.content?.tvSurfaceContentRenderer?.content?.sectionListRenderer?.contents;
         if (Array.isArray(contents)) {
           processShelves(contents, true, tabPage);
