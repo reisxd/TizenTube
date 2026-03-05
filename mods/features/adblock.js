@@ -39,6 +39,8 @@ function appendFileOnlyLogOnce(key, payload) {
   appendFileOnlyLog(key, serialized);
 }
 
+
+
 function detectCurrentPage() {
   const hash = location.hash ? location.hash.substring(1) : '';
   const cParam = (hash.match(/[?&]c=([^&]+)/i)?.[1] || '').toLowerCase();
@@ -46,6 +48,7 @@ function detectCurrentPage() {
 
   if (hash.startsWith('/watch')) pageName = 'watch';
   else if (cParam.includes('fesubscription')) pageName = 'subscriptions';
+  else if (cParam.startsWith('uc')) pageName = 'channel';
   else if (cParam === 'fehistory') pageName = 'history';
   else if (cParam === 'felibrary') pageName = 'library';
   else if (cParam === 'feplaylist_aggregation') pageName = 'playlists';
@@ -73,17 +76,6 @@ function detectCurrentPage() {
   return pageName;
 }
 
-function normalizeBrowseIdToPage(rawBrowseId = '') {
-  const browseId = String(rawBrowseId || '').toLowerCase();
-  if (!browseId) return null;
-  if (browseId.includes('fesubscription')) return 'subscriptions';
-  if (browseId.startsWith('uc')) return 'channel';
-  if (browseId === 'fehistory') return 'history';
-  if (browseId === 'felibrary') return 'library';
-  if (browseId === 'feplaylist_aggregation') return 'playlists';
-  if (browseId === 'femy_youtube' || browseId === 'vlwl' || browseId === 'vlll' || browseId.startsWith('vlpl')) return 'playlist';
-  return null;
-}
 
 function detectPageFromResponse(response) {
   if (response?.contents?.singleColumnWatchNextResults || response?.playerOverlays || response?.videoDetails) {
@@ -94,16 +86,27 @@ function detectPageFromResponse(response) {
   for (const entry of serviceParams) {
     for (const param of (entry?.params || [])) {
       if (param?.key === 'browse_id') {
-        const detected = normalizeBrowseIdToPage(param?.value);
-        if (detected) return detected;
+        const browseId = String(param?.value || '').toLowerCase();
+        if (!browseId) continue;
+        if (browseId.includes('fesubscription')) return 'subscriptions';
+        if (browseId.startsWith('uc')) return 'channel';
+        if (browseId === 'fehistory') return 'history';
+        if (browseId === 'felibrary') return 'library';
+        if (browseId === 'feplaylist_aggregation') return 'playlists';
+        if (browseId === 'femy_youtube' || browseId === 'vlwl' || browseId === 'vlll' || browseId.startsWith('vlpl')) return 'playlist';
       }
     }
   }
 
-  const targetId = String(response?.contents?.tvBrowseRenderer?.targetId || '');
+  const targetId = String(response?.contents?.tvBrowseRenderer?.targetId || '').toLowerCase();
   if (targetId.startsWith('browse-feed')) {
-    const detected = normalizeBrowseIdToPage(targetId.replace('browse-feed', ''));
-    if (detected) return detected;
+    const browseId = targetId.replace('browse-feed', '');
+    if (browseId.includes('fesubscription')) return 'subscriptions';
+    if (browseId.startsWith('uc')) return 'channel';
+    if (browseId === 'fehistory') return 'history';
+    if (browseId === 'felibrary') return 'library';
+    if (browseId === 'feplaylist_aggregation') return 'playlists';
+    if (browseId === 'femy_youtube' || browseId === 'vlwl' || browseId === 'vlll' || browseId.startsWith('vlpl')) return 'playlist';
   }
 
   return null;
@@ -180,78 +183,8 @@ function getItemTitle(item) {
     || 'unknown';
 }
 
-const HIDDEN_LIBRARY_TAB_IDS = new Set(['femusic_last_played', 'festorefront', 'fecollection_podcasts', 'femy_videos']);
 
-function getConfiguredHiddenLibraryTabIds() {
-  const configured = configRead('hiddenLibraryTabIds');
-  if (!Array.isArray(configured) || configured.length === 0) return HIDDEN_LIBRARY_TAB_IDS;
-  return new Set(configured.map((id) => String(id || '').toLowerCase()).filter(Boolean));
-}
-
-function isHiddenLibraryBrowseId(value) {
-  const id = String(value || '').toLowerCase();
-  if (!id) return false;
-
-  for (const hiddenId of getConfiguredHiddenLibraryTabIds()) {
-    if (id === hiddenId || id.includes(hiddenId)) return true;
-  }
-  return false;
-}
-
-function filterHiddenLibraryTabs(items, context = '') {
-  if (!Array.isArray(items)) return items;
-  const before = items.length;
-  const filtered = items.filter((item) => {
-    const contentId = String(item?.tileRenderer?.contentId || '').toLowerCase();
-    return !isHiddenLibraryBrowseId(contentId);
-  });
-
-  if (before !== filtered.length) {
-    appendFileOnlyLog('library.tabs.filter', {
-      context,
-      before,
-      after: filtered.length,
-      removed: before - filtered.length
-    });
-  }
-
-  return filtered;
-}
-
-
-
-function pruneLibraryTabsInResponse(node, path = 'root') {
-  if (!node || typeof node !== 'object') return;
-
-  if (Array.isArray(node)) {
-    const before = node.length;
-    for (let i = node.length - 1; i >= 0; i--) {
-      const browseIds = Array.from(extractBrowseIdsDeep(node[i])).map((v) => String(v).toLowerCase());
-      if (browseIds.some((id) => isHiddenLibraryBrowseId(id))) {
-        appendFileOnlyLog('library.array.pruned', { path, index: i, browseIds });
-        node.splice(i, 1);
-      }
-    }
-    if (before !== node.length) {
-      appendFileOnlyLog('library.array.pruned.summary', { path, before, after: node.length, removed: before - node.length });
-    }
-    for (let i = 0; i < node.length; i++) {
-      pruneLibraryTabsInResponse(node[i], `${path}[${i}]`);
-    }
-    return;
-  }
-
-  if (Array.isArray(node?.horizontalListRenderer?.items)) {
-    node.horizontalListRenderer.items = filterHiddenLibraryTabs(node.horizontalListRenderer.items, `${path}.horizontalListRenderer.items`);
-  }
-
-  for (const key of Object.keys(node)) {
-    pruneLibraryTabsInResponse(node[key], `${path}.${key}`);
-  }
-}
-
-// FIX (Bug 4): Broaden browseId extraction to cover all known TV nav tab endpoint paths,
-// including navigationEndpoint which YouTube TV uses most commonly.
+// Extract browse IDs from nested renderer structures.
 function extractBrowseIdsDeep(node, out = new Set(), depth = 0) {
   if (!node || depth > 8) return out;
   if (Array.isArray(node)) {
@@ -271,26 +204,6 @@ function extractBrowseIdsDeep(node, out = new Set(), depth = 0) {
 
 function extractNavTabBrowseId(tab) {
   return Array.from(extractBrowseIdsDeep(tab)).join(',');
-}
-
-function filterLibraryNavTabs(sections, detectedPage) {
-  if (detectedPage !== 'library') return;
-  if (!Array.isArray(sections)) return;
-  for (const section of sections) {
-    const tabs = section?.tvSecondaryNavSectionRenderer?.tabs;
-    if (!Array.isArray(tabs)) continue;
-    const before = tabs.length;
-    for (let i = tabs.length - 1; i >= 0; i--) {
-      const browseIds = Array.from(extractBrowseIdsDeep(tabs[i])).map((id) => String(id).toLowerCase());
-      appendFileOnlyLog('library.navtab.check', { browseIds, index: i });
-      if (browseIds.some((id) => isHiddenLibraryBrowseId(id))) {
-        appendFileOnlyLog('library.navtab.removed', { browseIds, index: i });
-        tabs.splice(i, 1);
-      }
-    }
-    if (tabs.length !== before)
-      appendFileOnlyLog('library.navtabs.result', { before, after: tabs.length });
-  }
 }
 
 function isShortsShelf(shelve) {
@@ -1111,13 +1024,6 @@ function processResponsePayload(payload, detectedPage) {
     filterPlaylistRendererContents(arrayTopPlaylistRenderer, detectedPage, 'arrayPayload.playlist.renderer');
   }
 
-  if (payload?.contents?.tvBrowseRenderer?.content?.tvSecondaryNavRenderer?.sections) {
-    filterLibraryNavTabs(payload.contents.tvBrowseRenderer.content.tvSecondaryNavRenderer.sections, detectedPage);
-  }
-
-  if (detectedPage === 'library') {
-    pruneLibraryTabsInResponse(payload, 'arrayPayload');
-  }
 
   processTileArraysDeep(payload, detectedPage, 'arrayPayload');
 }
@@ -1269,12 +1175,6 @@ JSON.parse = function () {
     processShelves(r.contents.tvBrowseRenderer.content.tvSurfaceContentRenderer.content.sectionListRenderer.contents, true, detectedPage);
   }
 
-  // Library tab pruning: must run unconditionally whenever we're on the library page,
-  // because the library page sends its nav tabs via tvSecondaryNavRenderer (not tvSurfaceContentRenderer),
-  // so gating this inside the tvSurfaceContentRenderer block meant it never fired on library.
-  if (detectedPage === 'library') {
-    pruneLibraryTabsInResponse(r, 'response');
-  }
 
   if (r.endscreen && configRead('enableHideEndScreenCards')) {
     r.endscreen = null;
@@ -1332,10 +1232,6 @@ JSON.parse = function () {
       'horizontalListContinuation'
     );
     normalizeHorizontalListRenderer(r.continuationContents.horizontalListContinuation, 'continuation.horizontal');
-    if (detectedPage === 'library') {
-      r.continuationContents.horizontalListContinuation.items = filterHiddenLibraryTabs(r.continuationContents.horizontalListContinuation.items, 'continuation.horizontalListContinuation.items');
-      pruneLibraryTabsInResponse(r.continuationContents, 'response.continuationContents');
-    }
   }
 
   if (r?.continuationContents?.gridContinuation?.items) {
@@ -1368,8 +1264,6 @@ JSON.parse = function () {
   }
 
   if (r?.contents?.tvBrowseRenderer?.content?.tvSecondaryNavRenderer?.sections) {
-    filterLibraryNavTabs(r.contents.tvBrowseRenderer.content.tvSecondaryNavRenderer.sections, detectedPage);
-
     for (const section of r.contents.tvBrowseRenderer.content.tvSecondaryNavRenderer.sections) {
       if (!Array.isArray(section?.tvSecondaryNavSectionRenderer?.tabs)) continue;
 
@@ -1395,7 +1289,13 @@ JSON.parse = function () {
 
       for (const tab of section.tvSecondaryNavSectionRenderer.tabs) {
         const tabBrowseId = String(extractNavTabBrowseId(tab)).toLowerCase();
-        const tabPage = normalizeBrowseIdToPage(tabBrowseId) || detectedPage;
+        let tabPage = detectedPage;
+        if (tabBrowseId.includes('fesubscription')) tabPage = 'subscriptions';
+        else if (tabBrowseId.startsWith('uc')) tabPage = 'channel';
+        else if (tabBrowseId === 'fehistory') tabPage = 'history';
+        else if (tabBrowseId === 'felibrary') tabPage = 'library';
+        else if (tabBrowseId === 'feplaylist_aggregation') tabPage = 'playlists';
+        else if (tabBrowseId === 'femy_youtube' || tabBrowseId === 'vlwl' || tabBrowseId === 'vlll' || tabBrowseId.startsWith('vlpl')) tabPage = 'playlist';
         const contents = tab?.tabRenderer?.content?.tvSurfaceContentRenderer?.content?.sectionListRenderer?.contents;
         if (Array.isArray(contents)) {
           processShelves(contents, true, tabPage);
@@ -1603,10 +1503,6 @@ function processShelves(shelves, shouldAddPreviews = true, pageHint = null) {
     }
     shelve.shelfRenderer.content.horizontalListRenderer.items = hideVideo(shelfItems, activePage);
     normalizeHorizontalListRenderer(shelve.shelfRenderer.content.horizontalListRenderer, `shelf:${activePage}:${i}`);
-    if (activePage === 'library') {
-      shelve.shelfRenderer.content.horizontalListRenderer.items = filterHiddenLibraryTabs(shelve.shelfRenderer.content.horizontalListRenderer.items, 'processShelves.shelfRenderer.horizontalListRenderer.items');
-      normalizeHorizontalListRenderer(shelve.shelfRenderer.content.horizontalListRenderer, `shelf:${activePage}:${i}:library`);
-    }
     if (!configRead('enableShorts')) {
       const shelfTitleDirect = String(shelve?.shelfRenderer?.title?.simpleText || '').toLowerCase();
       const shelfTitleFromHeader = collectAllText(shelve?.shelfRenderer?.header).join(' ').toLowerCase();
@@ -1862,9 +1758,6 @@ function processTileArraysDeep(node, pageHint = null, path = 'root', depth = 0) 
           });
         }
       }
-      if (pageName === 'library') {
-        filtered = filterHiddenLibraryTabs(filtered, `deep:${path}`);
-      }
       if (before !== filtered.length) {
         appendFileOnlyLog('deep.tiles.filtered', {
           pageName,
@@ -1959,7 +1852,6 @@ function hideVideo(items, pageHint = null) {
     const videoId = getItemVideoId(item);
     const title = item?.tileRenderer?.metadata?.tileMetadataRenderer?.title?.simpleText || videoId || 'unknown';
 
-    const contentId = videoId.toLowerCase();
     const cachedProgress = window._ttVideoProgressCache?.[videoId] ?? null;
     const textWatched = isWatchedByTextSignals(item);
     const progressBar = tileProgressBar ?? cachedProgress ?? (textWatched ? { percentDurationWatched: 100 } : null);
@@ -2024,10 +1916,6 @@ function hideVideo(items, pageHint = null) {
       return false;
     }
 
-    if (pageName === 'library' && isHiddenLibraryBrowseId(contentId)) {
-      appendFileOnlyLog('hideVideo.item', { pageName, title, contentId, hasProgress: !!progressBar, remove: true, reason: 'library_tab_hidden' });
-      return false;
-    }
 
     const shortLike = isLikelyShortItem(item);
     if (!shortsEnabled && shortLike) {
