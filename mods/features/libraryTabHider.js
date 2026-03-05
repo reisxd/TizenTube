@@ -1,7 +1,4 @@
-import { configRead } from '../config.js';
-
-const getHiddenLibraryTabIds = () => {
-  const configured = configRead('hiddenLibraryTabIds');
+const getHiddenLibraryTabIds = (configured) => {
   if (!Array.isArray(configured) || configured.length === 0) return new Set();
   return new Set(configured.map((id) => String(id || '').toLowerCase()).filter(Boolean));
 };
@@ -57,8 +54,8 @@ const pruneLibraryTabs = (node, hiddenIds) => {
   }
 };
 
-export const applyLibraryTabHiding = (response) => {
-  const hiddenIds = getHiddenLibraryTabIds();
+export const applyLibraryTabHiding = (response, configuredHiddenIds) => {
+  const hiddenIds = getHiddenLibraryTabIds(configuredHiddenIds);
   if (hiddenIds.size === 0) return;
 
   pruneLibraryTabs(response, hiddenIds);

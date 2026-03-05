@@ -51,7 +51,10 @@ JSON.parse = function () {
       }
     }
 
-    applyLibraryTabHiding(r);
+    const hiddenLibraryTabIds = configRead('hiddenLibraryTabIds');
+    if (Array.isArray(hiddenLibraryTabIds) && hiddenLibraryTabIds.length > 0) {
+      applyLibraryTabHiding(r, hiddenLibraryTabIds);
+    }
 
     // Drop "masthead" ad from home screen
     if (
