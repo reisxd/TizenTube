@@ -3,6 +3,7 @@ import Chapters from '../ui/chapters.js';
 import resolveCommand from '../resolveCommand.js';
 import { timelyAction, longPressData, MenuServiceItemRenderer, ShelfRenderer, TileRenderer, ButtonRenderer } from '../ui/ytUI.js';
 import { PatchSettings } from '../ui/customYTSettings.js';
+import { applyLibraryTabHiding } from './libraryTabHider.js';
 
 /**
  * This is a minimal reimplementation of the following uBlock Origin rule:
@@ -16,221 +17,231 @@ import { PatchSettings } from '../ui/customYTSettings.js';
 const origParse = JSON.parse;
 JSON.parse = function () {
   const r = origParse.apply(this, arguments);
-  const adBlockEnabled = configRead('enableAdBlock');
-  const signinReminderEnabled = configRead('enableSigninReminder');
 
-  if (r.adPlacements && adBlockEnabled) {
-    r.adPlacements = [];
-  }
+  try {
+    const adBlockEnabled = configRead('enableAdBlock');
+    const signinReminderEnabled = configRead('enableSigninReminder');
 
-  // Also set playerAds to false, just incase.
-  if (r.playerAds && adBlockEnabled) {
-    r.playerAds = false;
-  }
-
-  // Also set adSlots to an empty array, emptying only the adPlacements won't work.
-  if (r.adSlots && adBlockEnabled) {
-    r.adSlots = [];
-  }
-
-  if (r.paidContentOverlay && !configRead('enablePaidPromotionOverlay')) {
-    r.paidContentOverlay = null;
-  }
-
-  if (r?.streamingData?.adaptiveFormats && configRead('videoPreferredCodec') !== 'any') {
-    const preferredCodec = configRead('videoPreferredCodec');
-    const hasPreferredCodec = r.streamingData.adaptiveFormats.find(format => format.mimeType.includes(preferredCodec));
-    if (hasPreferredCodec) {
-      r.streamingData.adaptiveFormats = r.streamingData.adaptiveFormats.filter(format => {
-        if (format.mimeType.startsWith('audio/')) return true;
-        return format.mimeType.includes(preferredCodec);
-      });
-    }
-  }
-
-  // Drop "masthead" ad from home screen
-  if (
-    r?.contents?.tvBrowseRenderer?.content?.tvSurfaceContentRenderer?.content
-      ?.sectionListRenderer?.contents
-  ) {
-    if (!signinReminderEnabled) {
-      r.contents.tvBrowseRenderer.content.tvSurfaceContentRenderer.content.sectionListRenderer.contents =
-        r.contents.tvBrowseRenderer.content.tvSurfaceContentRenderer.content.sectionListRenderer.contents.filter(
-          (elm) => !elm.feedNudgeRenderer
-        );
+    if (r.adPlacements && adBlockEnabled) {
+      r.adPlacements = [];
     }
 
-    if (adBlockEnabled) {
-      r.contents.tvBrowseRenderer.content.tvSurfaceContentRenderer.content.sectionListRenderer.contents =
-        r.contents.tvBrowseRenderer.content.tvSurfaceContentRenderer.content.sectionListRenderer.contents.filter(
-          (elm) => !elm.adSlotRenderer
-        );
-
-      for (const shelve of r.contents.tvBrowseRenderer.content.tvSurfaceContentRenderer.content.sectionListRenderer.contents) {
-        if (shelve.shelfRenderer) {
-          shelve.shelfRenderer.content.horizontalListRenderer.items =
-            shelve.shelfRenderer.content.horizontalListRenderer.items.filter(
-              (item) => !item.adSlotRenderer
-            );
-        }
-      }
+    // Also set playerAds to false, just incase.
+    if (r.playerAds && adBlockEnabled) {
+      r.playerAds = false;
     }
 
-    processShelves(r.contents.tvBrowseRenderer.content.tvSurfaceContentRenderer.content.sectionListRenderer.contents);
-  }
-
-  if (r.endscreen && configRead('enableHideEndScreenCards')) {
-    r.endscreen = null;
-  }
-
-  if (r.messages && Array.isArray(r.messages) && !configRead('enableYouThereRenderer')) {
-    r.messages = r.messages.filter(
-      (msg) => !msg?.youThereRenderer
-    );
-  }
-
-  // Remove shorts ads
-  if (!Array.isArray(r) && r?.entries && adBlockEnabled) {
-    r.entries = r.entries?.filter(
-      (elm) => !elm?.command?.reelWatchEndpoint?.adClientParams?.isAd
-    );
-  }
-
-  // Patch settings
-
-  if (r?.title?.runs) {
-    PatchSettings(r);
-  }
-
-  // DeArrow Implementation. I think this is the best way to do it. (DOM manipulation would be a pain)
-
-  if (r?.contents?.sectionListRenderer?.contents) {
-    processShelves(r.contents.sectionListRenderer.contents);
-  }
-
-  if (r?.continuationContents?.sectionListContinuation?.contents) {
-    processShelves(r.continuationContents.sectionListContinuation.contents);
-  }
-
-  if (r?.continuationContents?.horizontalListContinuation?.items) {
-    deArrowify(r.continuationContents.horizontalListContinuation.items);
-    hqify(r.continuationContents.horizontalListContinuation.items);
-    addLongPress(r.continuationContents.horizontalListContinuation.items);
-    r.continuationContents.horizontalListContinuation.items = hideVideo(r.continuationContents.horizontalListContinuation.items);
-  }
-
-  if (r?.contents?.tvBrowseRenderer?.content?.tvSecondaryNavRenderer?.sections) {
-    for (const section of r.contents.tvBrowseRenderer.content.tvSecondaryNavRenderer.sections) {
-      for (const tab of section.tvSecondaryNavSectionRenderer.tabs) {
-        processShelves(tab.tabRenderer.content.tvSurfaceContentRenderer.content.sectionListRenderer.contents);
-      }
+    // Also set adSlots to an empty array, emptying only the adPlacements won't work.
+    if (r.adSlots && adBlockEnabled) {
+      r.adSlots = [];
     }
-  }
 
-  if (r?.contents?.singleColumnWatchNextResults?.pivot?.sectionListRenderer) {
-    if (!signinReminderEnabled) {
-      r.contents.singleColumnWatchNextResults.pivot.sectionListRenderer.contents =
-        r.contents.singleColumnWatchNextResults.pivot.sectionListRenderer.contents.filter(
-          (elm) => !elm.alertWithActionsRenderer
-        );
+    if (r.paidContentOverlay && !configRead('enablePaidPromotionOverlay')) {
+      r.paidContentOverlay = null;
     }
-    processShelves(r.contents.singleColumnWatchNextResults.pivot.sectionListRenderer.contents, false);
-    if (window.queuedVideos.videos.length > 0) {
-      const queuedVideosClone = window.queuedVideos.videos.slice();
-      queuedVideosClone.unshift(TileRenderer(
-        'Clear Queue',
-        {
-          customAction: {
-            action: 'CLEAR_QUEUE'
-          }
-        }));
-      r.contents.singleColumnWatchNextResults.pivot.sectionListRenderer.contents.unshift(ShelfRenderer(
-        'Queued Videos',
-        queuedVideosClone,
-        queuedVideosClone.findIndex(v => v.contentId === window.queuedVideos.lastVideoId) !== -1 ?
-          queuedVideosClone.findIndex(v => v.contentId === window.queuedVideos.lastVideoId)
-          : 0
-      ));
-    }
-  }
-  /*
- 
-  Chapters are disabled due to the API removing description data which was used to generate chapters
- 
-  if (r?.contents?.singleColumnWatchNextResults?.results?.results?.contents && configRead('enableChapters')) {
-    const chapterData = Chapters(r);
-    r.frameworkUpdates.entityBatchUpdate.mutations.push(chapterData);
-    resolveCommand({
-      "clickTrackingParams": "null",
-      "loadMarkersCommand": {
-        "visibleOnLoadKeys": [
-          chapterData.entityKey
-        ],
-        "entityKeys": [
-          chapterData.entityKey
-        ]
-      }
-    });
-  }*/
 
-  // Manual SponsorBlock Skips
-
-  if (configRead('sponsorBlockManualSkips').length > 0 && r?.playerOverlays?.playerOverlayRenderer) {
-    const manualSkippedSegments = configRead('sponsorBlockManualSkips');
-    let timelyActions = [];
-    if (window?.sponsorblock?.segments) {
-      for (const segment of window.sponsorblock.segments) {
-        if (manualSkippedSegments.includes(segment.category)) {
-          const timelyActionData = timelyAction(
-            `Skip ${segment.category}`,
-            'SKIP_NEXT',
-            {
-              clickTrackingParams: null,
-              showEngagementPanelEndpoint: {
-                customAction: {
-                  action: 'SKIP',
-                  parameters: {
-                    time: segment.segment[1]
-                  }
-                }
-              }
-            },
-            segment.segment[0] * 1000,
-            segment.segment[1] * 1000 - segment.segment[0] * 1000
-          );
-          timelyActions.push(timelyActionData);
-        }
-      }
-      r.playerOverlays.playerOverlayRenderer.timelyActionRenderers = timelyActions;
-    }
-  } else if (r?.playerOverlays?.playerOverlayRenderer) {
-    r.playerOverlays.playerOverlayRenderer.timelyActionRenderers = [];
-  }
-
-  if (r?.transportControls?.transportControlsRenderer?.promotedActions && configRead('enableSponsorBlockHighlight')) {
-    if (window?.sponsorblock?.segments) {
-      const category = window.sponsorblock.segments.find(seg => seg.category === 'poi_highlight');
-      if (category) {
-        r.transportControls.transportControlsRenderer.promotedActions.push({
-          type: 'TRANSPORT_CONTROLS_BUTTON_TYPE_SPONSORBLOCK_HIGHLIGHT',
-          button: {
-            buttonRenderer: ButtonRenderer(
-              false,
-              'Skip to highlight',
-              'SKIP_NEXT',
-              {
-                clickTrackingParams: null,
-                customAction: {
-                  action: 'SKIP',
-                  parameters: {
-                    time: category.segment[0]
-                  }
-                }
-              })
-          }
+    if (r?.streamingData?.adaptiveFormats && configRead('videoPreferredCodec') !== 'any') {
+      const preferredCodec = configRead('videoPreferredCodec');
+      const hasPreferredCodec = r.streamingData.adaptiveFormats.find(format => format.mimeType.includes(preferredCodec));
+      if (hasPreferredCodec) {
+        r.streamingData.adaptiveFormats = r.streamingData.adaptiveFormats.filter(format => {
+          if (format.mimeType.startsWith('audio/')) return true;
+          return format.mimeType.includes(preferredCodec);
         });
       }
     }
+
+    const hiddenLibraryTabIds = configRead('hiddenLibraryTabIds');
+    if (Array.isArray(hiddenLibraryTabIds) && hiddenLibraryTabIds.length > 0) {
+      applyLibraryTabHiding(r, hiddenLibraryTabIds);
+    }
+
+    // Drop "masthead" ad from home screen
+    if (
+      r?.contents?.tvBrowseRenderer?.content?.tvSurfaceContentRenderer?.content
+        ?.sectionListRenderer?.contents
+    ) {
+      if (!signinReminderEnabled) {
+        r.contents.tvBrowseRenderer.content.tvSurfaceContentRenderer.content.sectionListRenderer.contents =
+          r.contents.tvBrowseRenderer.content.tvSurfaceContentRenderer.content.sectionListRenderer.contents.filter(
+            (elm) => !elm.feedNudgeRenderer
+          );
+      }
+
+      if (adBlockEnabled) {
+        r.contents.tvBrowseRenderer.content.tvSurfaceContentRenderer.content.sectionListRenderer.contents =
+          r.contents.tvBrowseRenderer.content.tvSurfaceContentRenderer.content.sectionListRenderer.contents.filter(
+            (elm) => !elm.adSlotRenderer
+          );
+
+        for (const shelve of r.contents.tvBrowseRenderer.content.tvSurfaceContentRenderer.content.sectionListRenderer.contents) {
+          if (shelve.shelfRenderer) {
+            shelve.shelfRenderer.content.horizontalListRenderer.items =
+              shelve.shelfRenderer.content.horizontalListRenderer.items.filter(
+                (item) => !item.adSlotRenderer
+              );
+          }
+        }
+      }
+
+      processShelves(r.contents.tvBrowseRenderer.content.tvSurfaceContentRenderer.content.sectionListRenderer.contents);
+    }
+
+    if (r.endscreen && configRead('enableHideEndScreenCards')) {
+      r.endscreen = null;
+    }
+
+    if (r.messages && Array.isArray(r.messages) && !configRead('enableYouThereRenderer')) {
+      r.messages = r.messages.filter(
+        (msg) => !msg?.youThereRenderer
+      );
+    }
+
+    // Remove shorts ads
+    if (!Array.isArray(r) && r?.entries && adBlockEnabled) {
+      r.entries = r.entries?.filter(
+        (elm) => !elm?.command?.reelWatchEndpoint?.adClientParams?.isAd
+      );
+    }
+
+    // Patch settings
+    
+    if (r?.title?.runs) {
+      PatchSettings(r);
+    }
+
+    // DeArrow Implementation. I think this is the best way to do it. (DOM manipulation would be a pain)
+
+    if (r?.contents?.sectionListRenderer?.contents) {
+      processShelves(r.contents.sectionListRenderer.contents);
+    }
+
+    if (r?.continuationContents?.sectionListContinuation?.contents) {
+      processShelves(r.continuationContents.sectionListContinuation.contents);
+    }
+
+    if (r?.continuationContents?.horizontalListContinuation?.items) {
+      deArrowify(r.continuationContents.horizontalListContinuation.items);
+      hqify(r.continuationContents.horizontalListContinuation.items);
+      addLongPress(r.continuationContents.horizontalListContinuation.items);
+      r.continuationContents.horizontalListContinuation.items = hideVideo(r.continuationContents.horizontalListContinuation.items);
+    }
+
+    if (r?.contents?.tvBrowseRenderer?.content?.tvSecondaryNavRenderer?.sections) {
+      for (const section of r.contents.tvBrowseRenderer.content.tvSecondaryNavRenderer.sections) {
+        for (const tab of section.tvSecondaryNavSectionRenderer.tabs) {
+            processShelves(tab.tabRenderer.content.tvSurfaceContentRenderer.content.sectionListRenderer.contents);
+        }
+      }
+    }
+
+    if (r?.contents?.singleColumnWatchNextResults?.pivot?.sectionListRenderer) {
+      if (!signinReminderEnabled) {
+        r.contents.singleColumnWatchNextResults.pivot.sectionListRenderer.contents =
+          r.contents.singleColumnWatchNextResults.pivot.sectionListRenderer.contents.filter(
+            (elm) => !elm.alertWithActionsRenderer
+          );
+      }
+      processShelves(r.contents.singleColumnWatchNextResults.pivot.sectionListRenderer.contents, false);
+      if (window.queuedVideos.videos.length > 0) {
+        const queuedVideosClone = window.queuedVideos.videos.slice();
+        queuedVideosClone.unshift(TileRenderer(
+          'Clear Queue',
+          {
+            customAction: {
+              action: 'CLEAR_QUEUE'
+            }
+          }));
+        r.contents.singleColumnWatchNextResults.pivot.sectionListRenderer.contents.unshift(ShelfRenderer(
+          'Queued Videos',
+          queuedVideosClone,
+          queuedVideosClone.findIndex(v => v.contentId === window.queuedVideos.lastVideoId) !== -1 ?
+            queuedVideosClone.findIndex(v => v.contentId === window.queuedVideos.lastVideoId)
+            : 0
+        ));
+      }
+    }
+    /*
+
+    Chapters are disabled due to the API removing description data which was used to generate chapters
+
+    if (r?.contents?.singleColumnWatchNextResults?.results?.results?.contents && configRead('enableChapters')) {
+      const chapterData = Chapters(r);
+      r.frameworkUpdates.entityBatchUpdate.mutations.push(chapterData);
+      resolveCommand({
+        "clickTrackingParams": "null",
+        "loadMarkersCommand": {
+          "visibleOnLoadKeys": [
+            chapterData.entityKey
+          ],
+          "entityKeys": [
+            chapterData.entityKey
+          ]
+        }
+      });
+    }*/
+
+    // Manual SponsorBlock Skips
+
+    if (configRead('sponsorBlockManualSkips').length > 0 && r?.playerOverlays?.playerOverlayRenderer) {
+      const manualSkippedSegments = configRead('sponsorBlockManualSkips');
+      let timelyActions = [];
+      if (window?.sponsorblock?.segments) {
+        for (const segment of window.sponsorblock.segments) {
+          if (manualSkippedSegments.includes(segment.category)) {
+            const timelyActionData = timelyAction(
+              `Skip ${segment.category}`,
+              'SKIP_NEXT',
+              {
+                clickTrackingParams: null,
+                showEngagementPanelEndpoint: {
+                  customAction: {
+                    action: 'SKIP',
+                    parameters: {
+                      time: segment.segment[1]
+                    }
+                  }
+                }
+              },
+              segment.segment[0] * 1000,
+              segment.segment[1] * 1000 - segment.segment[0] * 1000
+            );
+            timelyActions.push(timelyActionData);
+          }
+        }
+        r.playerOverlays.playerOverlayRenderer.timelyActionRenderers = timelyActions;
+      }
+    } else if (r?.playerOverlays?.playerOverlayRenderer) {
+      r.playerOverlays.playerOverlayRenderer.timelyActionRenderers = [];
+    }
+
+    if (r?.transportControls?.transportControlsRenderer?.promotedActions && configRead('enableSponsorBlockHighlight')) {
+      if (window?.sponsorblock?.segments) {
+        const category = window.sponsorblock.segments.find(seg => seg.category === 'poi_highlight');
+        if (category) {
+          r.transportControls.transportControlsRenderer.promotedActions.push({
+            type: 'TRANSPORT_CONTROLS_BUTTON_TYPE_SPONSORBLOCK_HIGHLIGHT',
+            button: {
+              buttonRenderer: ButtonRenderer(
+                false,
+                'Skip to highlight',
+                'SKIP_NEXT',
+                {
+                  clickTrackingParams: null,
+                  customAction: {
+                    action: 'SKIP',
+                    parameters: {
+                      time: category.segment[0]
+                    }
+                  }
+                })
+            }
+          });
+        }
+      }
+    }
+  } catch (_) {
+    // Keep response unchanged if parsing hook hits an edge-case.
   }
 
   return r;
