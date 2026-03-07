@@ -324,6 +324,23 @@ export function hideVideo(items, pageHint = null) {
       // Skip non-video tiles (channel cards, playlist nav buttons, etc.)
       if (!item.tileRenderer.contentId) return true;
 
+      // Keep-one marker: filterContinuationItems in adblock.js marks one item per batch
+      // to stay visible so YouTube triggers the next batch load. Always respect it here.
+      if (item.__ttKeepOneForContinuation) {
+        const currentParseSeq = Number(window.__ttParseSeq || 0);
+        const itemParseSeq = Number(item.__ttKeepOneForContinuationParseSeq || 0);
+        const stillValid = pageName === 'playlist' && itemParseSeq > 0 && itemParseSeq === currentParseSeq;
+        if (stillValid) {
+          appendFileOnlyLog('hideVideo.item.keep_one', { pageName, videoId: getItemVideoId(item), parseSeq: itemParseSeq });
+          return true;
+        }
+        // Expired marker — fall through and filter normally
+        appendFileOnlyLog('hideVideo.item.keep_one.expired', { pageName, videoId: getItemVideoId(item), itemParseSeq, currentParseSeq });
+        delete item.__ttKeepOneForContinuation;
+        delete item.__ttKeepOneForContinuationLabel;
+        delete item.__ttKeepOneForContinuationParseSeq;
+      }
+
       const shortLike = isLikelyShortItem(item);
       if (!shortsEnabled && shortLike) {
         removedShorts++;
