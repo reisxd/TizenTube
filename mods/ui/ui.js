@@ -13,10 +13,19 @@ import { initMediaHooks } from '../features/mediaHooks.js';
 // Initialize low-level media hooks as early as possible
 initMediaHooks();
 
-// It just works, okay?
 const interval = setInterval(() => {
   const videoElement = document.querySelector('video');
-  if (videoElement) {
+  let yttvReady = false;
+  if (window._yttv) {
+    for (const key in window._yttv) {
+      if (window._yttv[key] && window._yttv[key].instance && window._yttv[key].instance.resolveCommand) {
+        yttvReady = true;
+        break;
+      }
+    }
+  }
+
+  if (videoElement && yttvReady) {
     execute_once_dom_loaded();
     patchResolveCommand();
     clearInterval(interval);
