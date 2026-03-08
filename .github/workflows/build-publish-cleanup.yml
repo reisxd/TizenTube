@@ -1,0 +1,194 @@
+name: Build, publish and cleanup old npm versions
+
+on:
+  pull_request:
+    paths-ignore:
+      - 'dist/**'
+      - 'package.json'
+  push:
+    branches:
+      - get_debug_logs_on_browser
+    paths-ignore:
+      - '.github/**'
+      - '.gitattributes'
+      - '.gitignore'
+      - '.npmignore'
+      - 'LICENSE'
+      - 'README.md'
+      - 'package.json'
+      - 'tizen.log'
+      - 'dist/**'
+      - 'scripts/**'
+  workflow_dispatch:
+
+# Allow this workflow to push back changes to the repo
+permissions:
+  contents: write
+
+env:
+  NODE_VERSION: '20'
+
+jobs:
+  build-publish-clean:
+    runs-on: ubuntu-latest
+
+    # Prevent loop on bot commits and on our own "[skip ci]" commits
+    if: >
+      github.event_name != 'pull_request' &&
+      (github.event_name != 'push' ||
+      (github.actor != 'github-actions[bot]' && !contains(github.event.head_commit.message, '[skip ci]')))
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          # ensure the checkout action leaves credentials so we can push
+          persist-credentials: true
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      # ----------------------------
+      # Version bump - MUST happen BEFORE building dist
+      # ----------------------------
+      - name: Bump root package.json version (+10 patch, rollover -> minor)
+        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+        run: |
+          set -euo pipefail
+          node - <<'NODE'
+          const fs = require('fs');
+          const path = 'package.json';
+          const pkg = JSON.parse(fs.readFileSync(path, 'utf8'));
+
+          const ver = pkg.version || '0.0.0';
+          const m = ver.match(/^(\d+)\.(\d+)\.(\d+)$/);
+          if (!m) throw new Error(`Invalid version in package.json: ${ver}`);
+
+          let major = parseInt(m[1], 10);
+          let minor = parseInt(m[2], 10);
+          let patch = parseInt(m[3], 10);
+
+          patch += 10;
+          if (patch >= 1000) {
+            minor += 1;
+            patch = 0;
+          }
+
+          const newVer = `${major}.${minor}.${patch}`;
+          pkg.version = newVer;
+
+          fs.writeFileSync(path, JSON.stringify(pkg, null, 2) + '\n', 'utf8');
+          console.log(`Bumped version: ${ver} -> ${newVer}`);
+          NODE
+
+      - name: Show current version (old -> new)
+        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+        run: |
+          set -euo pipefail
+
+          OLD_VER="$(git show HEAD^:package.json 2>/dev/null | node -e "let s='';process.stdin.on('data',d=>s+=d);process.stdin.on('end',()=>{try{console.log(JSON.parse(s).version||'');}catch{console.log('');}})")"
+          NEW_VER="$(node -p "require('./package.json').version")"
+
+          if [ -z "${OLD_VER:-}" ]; then
+            echo "Version: (unknown) -> ${NEW_VER}"
+          else
+            echo "Version: ${OLD_VER} -> ${NEW_VER}"
+          fi
+
+      # ----------------------------
+      # Build mods (userScript.js)
+      # ----------------------------
+      - name: Clean dist
+        run: |
+          set -euo pipefail
+          rm -rf dist
+          mkdir -p dist
+
+      - name: Install mods dependencies
+        run: |
+          set -euo pipefail
+          cd mods
+          npm ci
+
+      - name: Update Browserslist DB (mods)
+        run: |
+          set -euo pipefail
+          cd mods
+          npx update-browserslist-db@latest
+
+      - name: Build mods (rollup)
+        run: |
+          set -euo pipefail
+          cd mods
+          npm install
+          npx rollup -c
+
+      # ----------------------------
+      # Build service (service.js)
+      # ----------------------------
+      - name: Install service dependencies
+        run: |
+          set -euo pipefail
+          cd service
+          npm ci
+
+      - name: Build service (rollup)
+        run: |
+          set -euo pipefail
+          cd service
+          npm install
+          npx rollup -c
+
+      # ----------------------------
+      # Verify output
+      # ----------------------------
+      - name: Verify dist output
+        run: |
+          set -euo pipefail
+          echo "Listing dist/ (should contain built outputs):"
+          ls -lah dist || true
+          test -f dist/userScript.js
+          test -f dist/service.js
+
+      # ----------------------------
+      # Commit version bump + built JS to repo
+      # NOTE: dist is often gitignored, so we force-add the built files.
+      # ----------------------------
+      - name: Commit version bump + built files in dist/ (if changed)
+        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+        run: |
+          set -euo pipefail
+          echo "Committing version bump + built files (if any changes)..."
+
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+          # stage what you actually want to commit
+          git add package.json
+
+          # stage dist files (use -f because dist/ is in .gitignore)
+          git add -f dist/userScript.js dist/service.js
+
+          if git diff --cached --quiet; then
+            echo "No changes to commit."
+            exit 0
+          fi
+
+          NEWVER=$(node -p "require('./package.json').version")
+          git commit -m "chore: bump version to ${NEWVER} + rebuild dist [skip ci]"
+
+          # IMPORTANT: ensure clean tree before rebase/pull
+          # (drops any lockfile drift etc. that you didn't commit)
+          git reset --hard HEAD
+          git clean -fd
+
+          git fetch origin get_debug_logs_on_browser
+          #git pull --rebase origin get_debug_logs_on_browser
+          git rebase origin/get_debug_logs_on_browser
+          # git reset --hard
+
+          echo "Pushing changes back to get_debug_logs_on_browser..."
+          git push origin HEAD:get_debug_logs_on_browser

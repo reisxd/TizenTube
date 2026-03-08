@@ -21,6 +21,20 @@ const interval = setInterval(() => {
 
 let keyTimeout = null;
 
+
+function mapDesktopColorKey(evt) {
+  const code = evt.code || '';
+  const key = (evt.key || '').toLowerCase();
+
+  // Desktop fallbacks for TV remote color keys when testing on Windows.
+  if (code === 'KeyR' || key === 'r' || code === 'F1' || code === 'Digit1') return 403; // RED
+  if (code === 'KeyG' || key === 'g' || code === 'F2' || code === 'Digit2') return 404; // GREEN
+  if (code === 'KeyY' || key === 'y' || code === 'F3' || code === 'Digit3') return 405; // YELLOW
+  if (code === 'KeyB' || key === 'b' || code === 'F4' || code === 'Digit4') return 406; // BLUE
+
+  return evt.keyCode;
+}
+
 function execute_once_dom_loaded() {
 
   // Add CSS to head.
@@ -128,14 +142,9 @@ function execute_once_dom_loaded() {
   } catch (e) { }
 
   var eventHandler = (evt) => {
+    const mappedKeyCode = mapDesktopColorKey(evt);
+
     // We handle key events ourselves.
-    console.info(
-      'Key event:',
-      evt.type,
-      evt.keyCode,
-      evt.keyCode,
-      evt.defaultPrevented
-    );
     if (configRead('enableScreenDimming')) {
       if (keyTimeout) {
         clearTimeout(keyTimeout);
@@ -148,7 +157,7 @@ function execute_once_dom_loaded() {
         document.getElementById('container').style.setProperty('opacity', (1 - configRead('dimmingOpacity')).toString(), 'important');
       }, configRead('dimmingTimeout') * 1000);
     }
-    if (evt.keyCode == 403) {
+    if (mappedKeyCode == 403) {
       console.info('Taking over!');
       evt.preventDefault();
       evt.stopPropagation();
@@ -166,9 +175,15 @@ function execute_once_dom_loaded() {
         } catch (e) { }
       }
       return false;
-    } else if (evt.keyCode == 404) {
+    } else if (mappedKeyCode == 404) {
       if (evt.type === 'keydown') {
         modernUI();
+      }
+    } else if (mappedKeyCode == 405 || mappedKeyCode == 170) {
+      if (evt.type === 'keydown' && typeof window.toggleDebugConsole === 'function') {
+        evt.preventDefault();
+        evt.stopPropagation();
+        window.toggleDebugConsole();
       }
     } else if (evt.keyCode == 39) {
       // Right key, for PiP
@@ -181,17 +196,16 @@ function execute_once_dom_loaded() {
       }
     };
     return true;
-  }
+  };
 
   // Red, Green, Yellow, Blue
-  // 403, 404, 405, 406
-  // ---, 172, 170, 191
+  // TV key codes: 403, 404, 405, 406
+  // Alternative key codes: ---, 172, 170, 191
+  // Desktop test fallbacks: R/G/Y/B, F1/F2/F3/F4, 1/2/3/4
   document.addEventListener('keydown', eventHandler, true);
-  document.addEventListener('keypress', eventHandler, true);
-  document.addEventListener('keyup', eventHandler, true);
   if (configRead('showWelcomeToast')) {
     setTimeout(() => {
-      showToast('Welcome to TizenTube', 'Go to settings and click on TizenTube Settings for settings, press [RED] to open TizenTube Theme Settings.');
+      showToast('Welcome to TizenTube', 'Press [GREEN]/G to open TizenTube Settings, [RED]/R for Theme Settings, [YELLOW]/Y for Debug Console.');
     }, 2000);
   }
 

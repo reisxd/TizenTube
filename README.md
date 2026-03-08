@@ -60,7 +60,9 @@ Tampermonkey scripts are stored in:
 6. In Tampermonkey, create/import `scripts/tampermonkey/tizentube-log-button.user.js` (configured for `youtube.com/tv*` only).
 7. In Tampermonkey script settings, set **Sandbox mode = ALL** for these scripts.
 8. Open `https://www.youtube.com/tv` and sign in if needed.
-9. Click **TT Logs** (bottom-right corner of the page, floating above the YouTube TV UI) to download logs without typing console commands.
+9. Verify TizenTube loaded:
+   - Open DevTools Console (F12) and run `typeof window.toggleDebugConsole` (should return `"function"`).
+10. Click **TT Logs** (bottom-right corner of the page, floating above the YouTube TV UI) to download logs without typing console commands.
 
 
 ### Keyboard shortcuts for Windows testing (no TV remote)

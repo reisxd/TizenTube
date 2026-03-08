@@ -302,6 +302,48 @@ export default function modernUI(update, parameters) {
                 {
                     name: 'Reload Home on Startup',
                     value: 'reloadHomeOnStartup'
+                },
+                {
+                    name: 'Debug Console',
+                    icon: 'BUG_REPORT',
+                    value: null,
+                    menuId: 'tt-debug-console-settings',
+                    options: [
+                        {
+                            name: 'Enable Debug Console',
+                            icon: 'BUG_REPORT',
+                            value: 'enableDebugConsole'
+                        },
+                        {
+                            name: 'Enable Background Debug Logging',
+                            icon: 'ARTICLE',
+                            value: 'enableDebugLogging'
+                        },
+                        {
+                            name: 'Console Position',
+                            value: null,
+                            menuId: 'tt-debug-console-position',
+                            options: [
+                                { name: 'Top Left', key: 'debugConsolePosition', value: 'top-left' },
+                                { name: 'Top Right', key: 'debugConsolePosition', value: 'top-right' },
+                                { name: 'Bottom Left', key: 'debugConsolePosition', value: 'bottom-left' },
+                                { name: 'Bottom Right', key: 'debugConsolePosition', value: 'bottom-right' },
+                                { name: 'Center', key: 'debugConsolePosition', value: 'center' }
+                            ]
+                        },
+                        {
+                            name: 'Console Height',
+                            value: null,
+                            menuId: 'tt-debug-console-height',
+                            options: [300, 400, 500, 600, 700, 800, 1054].map((height) => {
+                                return {
+                                    name: `${height}px`,
+                                    key: 'debugConsoleHeight',
+                                    value: height
+                                }
+                            })
+                        }
+                    ]
                 }
             ]
         },
