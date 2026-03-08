@@ -296,8 +296,12 @@ export default function modernUI(update, parameters) {
                     value: 'showWelcomeToast',
                 },
                 {
-                    name: 'Show Sign In Reminder',
+                    name: 'Show Guest Sign In Reminder',
                     value: 'enableSigninReminder'
+                },
+                {
+                    name: 'Reload Home on Startup',
+                    value: 'reloadHomeOnStartup'
                 }
             ]
         },

@@ -122,7 +122,9 @@ JSON.parse = function () {
   if (r?.contents?.tvBrowseRenderer?.content?.tvSecondaryNavRenderer?.sections) {
     for (const section of r.contents.tvBrowseRenderer.content.tvSecondaryNavRenderer.sections) {
       for (const tab of section.tvSecondaryNavSectionRenderer.tabs) {
-        processShelves(tab.tabRenderer.content.tvSurfaceContentRenderer.content.sectionListRenderer.contents);
+        if (tab.tabRenderer.content?.tvSurfaceContentRenderer?.content?.sectionListRenderer?.contents) {
+          processShelves(tab.tabRenderer.content.tvSurfaceContentRenderer?.content?.sectionListRenderer.contents);
+        }
       }
     }
   }
