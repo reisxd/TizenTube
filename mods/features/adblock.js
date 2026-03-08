@@ -970,25 +970,26 @@ function deArrowify(items) {
 // ===== hqify =====
 
 function hqify(items) {
-  if (!Array.isArray(items)) return;
   for (const item of items) {
-    try {
-      if (!item?.tileRenderer) continue;
-      if (
-        item.tileRenderer.style !== 'TILE_STYLE_YTLR_DEFAULT' &&
-        item.tileRenderer.style !== 'TILE_STYLE_YTLR_VERTICAL_LIST'
-      ) continue;
-      if (!configRead('enableHqThumbnails')) continue;
-      const videoID = item.tileRenderer.onSelectCommand?.watchEndpoint?.videoId;
-      if (!videoID) continue;
-      const queryArgs = item.tileRenderer.header?.tileHeaderRenderer?.thumbnail?.thumbnails?.[0]?.url?.split('?')[1];
-      item.tileRenderer.header.tileHeaderRenderer.thumbnail.thumbnails = [{
-        url: `https://i.ytimg.com/vi/${videoID}/sddefault.jpg${queryArgs ? `?${queryArgs}` : ''}`,
-        width: 640, height: 480
-      }];
-    } catch (error) {
-      appendFileOnlyLog('hqify.item.error', { message: error?.message || String(error) });
-    }
+    if (!item.tileRenderer) continue;
+    if (item.tileRenderer.style !== 'TILE_STYLE_YTLR_DEFAULT') continue;
+    if (!configRead('enableHqThumbnails')) continue;
+    const videoID = item.tileRenderer.onSelectCommand?.watchEndpoint?.videoId;
+    if (!videoID) continue;
+    // Guard: some home page tiles have no thumbnail yet (lazy-loaded) — skip rather than crash.
+    const existingUrl = item.tileRenderer.header?.tileHeaderRenderer?.thumbnail?.thumbnails?.[0]?.url;
+    if (!existingUrl) continue;
+    // Do NOT carry over query args: the original `sqp` param is a signed token tied to the
+    // original filename — reusing it on a different filename causes a CDN signature mismatch
+    // and YouTube returns the grey "not available" placeholder instead of the real thumbnail.
+    // Start with hqdefault (guaranteed for every video), then async-upgrade to
+    // sddefault (640x480) if it exists on the CDN. On a TV the JSON parse →
+    // layout pipeline is slow enough that the HEAD usually resolves in time.
+    const thumbs = item.tileRenderer.header.tileHeaderRenderer.thumbnail.thumbnails;
+    thumbs[0] = { url: `https://i.ytimg.com/vi/${videoID}/hqdefault.jpg`, width: 480, height: 360 };
+    fetch(`https://i.ytimg.com/vi/${videoID}/sddefault.jpg`, { method: 'HEAD' })
+      .then(res => { if (res.ok) thumbs[0] = { url: `https://i.ytimg.com/vi/${videoID}/sddefault.jpg`, width: 640, height: 480 }; })
+      .catch(() => {});
   }
 }
 
