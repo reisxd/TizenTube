@@ -317,6 +317,12 @@ export default function modernUI(update, parameters) {
                 {
                     name: 'Show Hidden Subtitles',
                     value: 'enableShowOtherLanguages'
+                },
+                {
+                    name: 'Default Speed for Music Videos',
+                    icon: 'MUSIC_NOTE',
+                    value: 'force1xForMusic',
+                    subtitle: 'Force 1x speed for music videos'
                 }
             ]
         },
