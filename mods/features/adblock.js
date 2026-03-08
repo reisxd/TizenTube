@@ -5,18 +5,81 @@ import { timelyAction, longPressData, MenuServiceItemRenderer, ShelfRenderer, Ti
 import { PatchSettings } from '../ui/customYTSettings.js';
 import {
   appendFileOnlyLog,
-  appendFileOnlyLogOnce,
   detectAndStorePage,
   detectPageFromResponse,
   detectCurrentPage,
   hideVideo,
   processTileArraysDeep,
   consolidateShelves,
-  isLikelyShortItem,
-  getItemVideoId,
-  collectAllText,
-  collectWatchProgressEntries,
 } from './hideWatched.js';
+
+// ===== Local utilities (not exported from hideWatched.js) =====
+
+function collectAllText(node, out = [], seen = new WeakSet(), depth = 0) {
+  if (depth > 12) return out;
+  if (!node) return out;
+  if (typeof node === 'string') { out.push(node); return out; }
+  if (Array.isArray(node)) {
+    for (const child of node) collectAllText(child, out, seen, depth + 1);
+    return out;
+  }
+  if (typeof node === 'object') {
+    if (seen.has(node)) return out;
+    seen.add(node);
+    if (typeof node.simpleText === 'string') out.push(node.simpleText);
+    if (Array.isArray(node.runs)) {
+      for (const run of node.runs) if (typeof run?.text === 'string') out.push(run.text);
+    }
+    for (const key of Object.keys(node)) {
+      if (key === 'runs' || key === 'simpleText') continue;
+      collectAllText(node[key], out, seen, depth + 1);
+    }
+  }
+  return out;
+}
+
+function getItemVideoId(item) {
+  return String(
+    item?.tileRenderer?.contentId ||
+    item?.tileRenderer?.onSelectCommand?.watchEndpoint?.videoId ||
+    item?.tileRenderer?.onSelectCommand?.watchEndpoint?.playlistId ||
+    item?.tileRenderer?.onSelectCommand?.reelWatchEndpoint?.videoId ||
+    ''
+  );
+}
+
+function isLikelyShortItem(item) {
+  const tile = item?.tileRenderer;
+  if (!tile) return false;
+  if (tile?.tvhtml5ShelfRendererType === 'TVHTML5_TILE_RENDERER_TYPE_SHORTS') return true;
+  if (tile?.onSelectCommand?.reelWatchEndpoint) return true;
+  const title = String(tile?.metadata?.tileMetadataRenderer?.title?.simpleText || tile?.contentId || '').toLowerCase();
+  if (title.includes('#shorts')) return true;
+  const hashtagMatches = title.match(/#[a-z0-9_]+/gi);
+  if (hashtagMatches && hashtagMatches.length >= 2) return true;
+  return false;
+}
+
+function collectWatchProgressEntries(node, out = [], depth = 0, seen = new WeakSet()) {
+  if (!node || depth > 10) return out;
+  if (Array.isArray(node)) {
+    for (const child of node) collectWatchProgressEntries(child, out, depth + 1, seen);
+    return out;
+  }
+  if (typeof node !== 'object') return out;
+  if (seen.has(node)) return out;
+  seen.add(node);
+  const id = node.videoId || node.externalVideoId || node.contentId || null;
+  const pctRaw = node.watchProgressPercentage ?? node.percentDurationWatched ?? node.watchedPercent ?? null;
+  const pct = Number(pctRaw);
+  if (id && Number.isFinite(pct)) {
+    out.push({ id: String(id), percent: pct, source: 'deep_scan' });
+  }
+  for (const key of Object.keys(node)) {
+    collectWatchProgressEntries(node[key], out, depth + 1, seen);
+  }
+  return out;
+}
 
 // ===== Normalizers =====
 
@@ -544,31 +607,27 @@ JSON.parse = function () {
     // === Watch progress entity cache ===
     if (r?.frameworkUpdates?.entityBatchUpdate?.mutations) {
       if (!window._ttVideoProgressCache) window._ttVideoProgressCache = {};
-      let directHits = 0, deepHits = 0;
       for (const mutation of r.frameworkUpdates.entityBatchUpdate.mutations) {
         const key = String(mutation?.entityKey || '');
         const payload = mutation?.payload || {};
-        const pct =
-          payload?.videoAttributionModel?.watchProgressPercentage ??
-          payload?.videoData?.watchProgressPercentage ??
-          payload?.macroMarkersListEntity?.watchProgressPercentage ??
-          payload?.videoAnnotationsEntity?.watchProgressPercentage ?? null;
+        const pct = payload?.videoAttributionModel?.watchProgressPercentage
+          ?? payload?.videoData?.watchProgressPercentage
+          ?? payload?.macroMarkersListEntity?.watchProgressPercentage
+          ?? null;
         if (pct !== null) {
           const videoId = key.includes('|') ? key.split('|')[0] : key;
-          window._ttVideoProgressCache[videoId] = { percentDurationWatched: Number(pct), source: 'entityMutation' };
-          directHits++;
+          window._ttVideoProgressCache[videoId] = Number(pct);
+          const explicitId = payload?.videoAttributionModel?.externalVideoId
+            || payload?.videoData?.videoId || null;
+          if (explicitId) window._ttVideoProgressCache[String(explicitId)] = Number(pct);
         }
-        const explicitId = payload?.videoAttributionModel?.externalVideoId || payload?.videoData?.videoId || null;
-        if (explicitId && pct !== null) {
-          window._ttVideoProgressCache[String(explicitId)] = { percentDurationWatched: Number(pct), source: 'entityMutationExplicit' };
-        }
-        const deepEntries = collectWatchProgressEntries(payload);
-        for (const entry of deepEntries) {
-          window._ttVideoProgressCache[entry.id] = { percentDurationWatched: Number(entry.percent), source: entry.source };
-          deepHits++;
+        // Deep scan for any additional progress fields inside the mutation payload
+        for (const entry of collectWatchProgressEntries(payload)) {
+          if (window._ttVideoProgressCache[entry.id] === undefined) {
+            window._ttVideoProgressCache[entry.id] = Number(entry.percent);
+          }
         }
       }
-      appendFileOnlyLog('mutation.cache.result', { count: r.frameworkUpdates.entityBatchUpdate.mutations.length, directHits, deepHits, total: Object.keys(window._ttVideoProgressCache).length });
     }
 
     if (r.paidContentOverlay && !configRead('enablePaidPromotionOverlay')) r.paidContentOverlay = null;
@@ -677,7 +736,6 @@ JSON.parse = function () {
       for (const section of r.contents.tvBrowseRenderer.content.tvSecondaryNavRenderer.sections) {
         if (!Array.isArray(section?.tvSecondaryNavSectionRenderer?.tabs)) continue;
 
-        // Remove Shorts tab when shorts are disabled
         if (!configRead('enableShorts')) {
           const tabs = section.tvSecondaryNavSectionRenderer.tabs;
           for (let i = tabs.length - 1; i >= 0; i--) {
@@ -816,13 +874,11 @@ function processShelves(shelves, shouldAddPreviews = true, pageHint = null) {
   for (let i = shelves.length - 1; i >= 0; i--) {
     const shelve = shelves[i];
 
-    // Remove Shorts shelves (reelShelfRenderer or shorts-titled shelves)
     if (!configRead('enableShorts') && isShortsShelf(shelve)) {
       shelves.splice(i, 1);
       continue;
     }
 
-    // Remove generic shorts-like non-shelf rows
     if (!configRead('enableShorts') && !shelve?.shelfRenderer) {
       const allText = collectAllText(shelve).join(' ').toLowerCase();
       if (/\bshorts?\b/i.test(allText)) {
@@ -841,7 +897,6 @@ function processShelves(shelves, shouldAddPreviews = true, pageHint = null) {
     addLongPress(shelfItems);
     if (shouldAddPreviews) addPreviews(shelfItems);
 
-    // Preserve original row size for consolidateShelves
     shelve.shelfRenderer.content.horizontalListRenderer._originalRowSize = shelfItems.length;
     shelve.shelfRenderer.content.horizontalListRenderer.items = hideVideo(shelfItems, activePage);
     normalizeHorizontalListRenderer(shelve.shelfRenderer.content.horizontalListRenderer, `shelf:${activePage}:${i}`);
@@ -912,7 +967,7 @@ function deArrowify(items) {
   }
 }
 
-// ===== hqify (with optional chaining fix) =====
+// ===== hqify =====
 
 function hqify(items) {
   if (!Array.isArray(items)) return;
@@ -937,7 +992,7 @@ function hqify(items) {
   }
 }
 
-// ===== addLongPress (with optional chaining fix) =====
+// ===== addLongPress =====
 
 function addLongPress(items) {
   if (!Array.isArray(items)) return;
