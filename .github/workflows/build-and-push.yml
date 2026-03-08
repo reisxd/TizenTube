@@ -1,0 +1,49 @@
+name: Build and Push Dist
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: '**/package-lock.json'
+
+      - name: Build Mods
+        run: |
+          cd mods
+          npm install
+          npx rollup -c
+
+      - name: Build Service
+        run: |
+          cd service
+          npm install
+          npx rollup -c
+
+      - name: Commit and Push changes
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add dist/
+          if git diff --cached --quiet; then
+            echo "No changes in dist/ to commit"
+          else
+            git commit -m "Auto-build: Update dist files [skip ci]"
+            git push
+          fi

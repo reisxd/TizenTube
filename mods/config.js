@@ -26,6 +26,8 @@ const defaultConfig = {
   enableShorts: true,
   dontCheckUpdateUntil: 0,
   enableWhoIsWatchingMenu: false,
+  permanentlyEnableWhoIsWatchingMenu: false,
+  enableWhosWatchingMenuOnAppExit: false,
   enableShowUserLanguage: true,
   enableShowOtherLanguages: false,
   showWelcomeToast: true,
@@ -47,11 +49,18 @@ const defaultConfig = {
   speedSettingsIncrement: 0.25,
   videoPreferredCodec: 'any',
   launchToOnStartup: null,
+  reloadHomeOnStartup: true,
   disabledSidebarContents: [],
+  disable60fps: false,
+  disableAV1: false,
+  disableVP9: false,
+  disableAVC: false,
+  disableVP8: false,
+  disableHEVC: false,
   enableUpdater: true,
   autoFrameRate: false,
   autoFrameRatePauseVideoFor: 0,
-  force1xForMusic: false
+  force1xForMusic: false,
   enableSigninReminder: false
 };
 
