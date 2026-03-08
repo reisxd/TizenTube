@@ -59,6 +59,7 @@ const defaultConfig = {
   speedSettingsIncrement: 0.25,
   videoPreferredCodec: 'any',
   launchToOnStartup: null,
+  reloadHomeOnStartup: true,
   disabledSidebarContents: ['TROPHY', 'NEWS', 'YOUTUBE_MUSIC', 'BROADCAST', 'CLAPPERBOARD', 'LIVE', 'GAMING', 'TAB_MORE'],
   enableUpdater: true,
   autoFrameRate: false,
