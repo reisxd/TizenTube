@@ -20,48 +20,49 @@ const defaultConfig = {
   focusContainerColor: '#0f0f0f',
   routeColor: '#0f0f0f',
   enableFixedUI: (window.h5vcc && window.h5vcc.tizentube) ? false : true,
-  enableHqThumbnails: false,
-  enableChapters: true,
-  enableLongPress: true,
-  enableShorts: true,
-  dontCheckUpdateUntil: 0,
-  enableWhoIsWatchingMenu: false,
-  permanentlyEnableWhoIsWatchingMenu: false,
-  enableWhosWatchingMenuOnAppExit: false,
-  enableShowUserLanguage: true,
-  enableShowOtherLanguages: false,
-  showWelcomeToast: true,
-  enablePreviousNextButtons: true,
-  enableSuperThanksButton: false,
-  enableSpeedControlsButton: true,
-  enablePatchingVideoPlayer: true,
-  enablePreviews: true,
-  enableHideWatchedVideos: false,
-  hideWatchedVideosThreshold: 80,
-  hideWatchedVideosPages: [],
+    enableHqThumbnails: false,
+    enableChapters: true,
+    enableLongPress: true,
+    enableShorts: true,
+    dontCheckUpdateUntil: 0,
+    enableWhoIsWatchingMenu: false,
+    permanentlyEnableWhoIsWatchingMenu: false,
+    enableWhosWatchingMenuOnAppExit: false,
+    enableShowUserLanguage: true,
+    enableShowOtherLanguages: false,
+    showWelcomeToast: true,
+    enablePreviousNextButtons: true,
+    enableSuperThanksButton: false,
+    enableSpeedControlsButton: true,
+    enablePatchingVideoPlayer: true,
+    enablePreviews: true,
+    enableHideWatchedVideos: false,
+    hideWatchedVideosThreshold: 80,
+    hideWatchedVideosPages: [],
   enableHideEndScreenCards: false,
-  enableYouThereRenderer: true,
-  lastAnnouncementCheck: 0,
-  enableScreenDimming: false,
-  dimmingTimeout: 60,
-  dimmingOpacity: 0.5,
-  enablePaidPromotionOverlay: true,
-  speedSettingsIncrement: 0.25,
-  videoPreferredCodec: 'any',
-  launchToOnStartup: null,
-  reloadHomeOnStartup: true,
-  disabledSidebarContents: [],
-  enableUpdater: true,
-  autoFrameRate: false,
-  autoFrameRatePauseVideoFor: 0,
-  enableSigninReminder: false,
-  enableDebugConsole: false,
-  enableDebugLogging: false,
-  debugConsolePosition: 'top-left',
-  debugConsoleHeight: 500
+    enableYouThereRenderer: true,
+    lastAnnouncementCheck: 0,
+    enableScreenDimming: false,
+    dimmingTimeout: 60,
+    dimmingOpacity: 0.5,
+    enablePaidPromotionOverlay: true,
+    speedSettingsIncrement: 0.25,
+    videoPreferredCodec: 'any',
+    launchToOnStartup: null,
+    reloadHomeOnStartup: true,
+    disabledSidebarContents: [],
+    enableUpdater: true,
+    autoFrameRate: false,
+    autoFrameRatePauseVideoFor: 0,
+    enableSigninReminder: false,
+    enableDebugConsole: false,
+    enableDebugLogging: false,
+    debugConsolePosition: 'top-left',
+    debugConsoleHeight: 500
 };
 
 let localConfig;
+const populatedConfigWarnings = new Set();
 
 try {
   localConfig = JSON.parse(window.localStorage[CONFIG_KEY]);
@@ -70,10 +71,18 @@ try {
   localConfig = defaultConfig;
 }
 
+if (!localConfig || typeof localConfig !== 'object') {
+  localConfig = { ...defaultConfig };
+}
+
 export function configRead(key) {
   if (localConfig[key] === undefined) {
-    console.warn('Populating key', key, 'with default value', defaultConfig[key]);
-    localConfig[key] = defaultConfig[key];
+    const hasDefault = Object.prototype.hasOwnProperty.call(defaultConfig, key);
+    localConfig[key] = hasDefault ? defaultConfig[key] : undefined;
+    if (hasDefault && !populatedConfigWarnings.has(key)) {
+      populatedConfigWarnings.add(key);
+      console.warn('Populating key', key, 'with default value', defaultConfig[key]);
+    }
   }
 
   return localConfig[key];
