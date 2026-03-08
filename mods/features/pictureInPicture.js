@@ -144,7 +144,7 @@ const observerPipEnter = new MutationObserver(() => {
                     if (originalClasses.ytlrSearchVoiceMicButton.length === 0) {
                         originalClasses.ytlrSearchVoiceMicButton.length = voiceButton.children[0].classList.length;
                     }
-
+                    
                     if (originalClasses.ytlrSearchVoiceMicButton.length !== voiceButton.children[0].classList.length) {
                         for (const className of originalClasses.ytlrSearchVoiceMicButton.classes) {
                             pipButtonMicButton.classList.add(className);
@@ -169,7 +169,7 @@ const observerPipEnter = new MutationObserver(() => {
                 searchBar.appendChild(pipButton);
             } else {
                 const pipButton = document.createElement('ytlr-search-voice');
-                pipButton.style.left = '15.25em';
+                pipButton.style.left = '10.25em';
                 pipButton.id = 'tt-pip-button';
                 pipButton.setAttribute('idomkey', 'ytLrSearchBarSearchVoice');
                 pipButton.setAttribute('tabindex', '0');

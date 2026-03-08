@@ -107,72 +107,51 @@ div[idomkey="shadow"] {
 }
 
 .ytLrSearchBarSearchVoice {
-  display: block;
-  position: absolute;
-  left: 0;
-  top: 0;
-  pointer-events: auto;
+    display: block;
+    position: absolute;
+    left: 0;
+    top: 0;
+    pointer-events: auto
 }
 
 .ytLrSearchVoiceHost {
-  font-size: 3rem;
+    font-size: 3rem;
 }
 
 .ytLrSearchVoiceMicButtonHost {
-  color: rgba(255, 255, 255, 0.7);
+    color: rgba(255, 255, 255, 0.7);
 }
 
 .ytLrSearchVoiceMicButtonHost {
-  background-color: rgba(255, 255, 255, 0.1);
-  border-radius: 50%;
-  color: #f1f1f1;
-  display: block;
-  text-align: center;
-  width: 1em;
-  height: 1em;
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    color: #f1f1f1;
+    display: block;
+    text-align: center;
+    width: 1em;
+    height: 1em;
 }
 
 .ytLrSearchVoiceMicButtonIcon {
-  display: inline-block;
-  width: 1em;
-  height: 1em;
-  vertical-align: middle !important;
-}
-
-#tt-voice-search-button {
-  transform: scale(0.85);
-  margin-top: 0.1em;
+    display: inline-block;
+    font-size: .5em;
+    height: .5em;
+    width: .5em;
+    height: 1em;
+    width: 1em;
+    margin-top: .5em;
+    vertical-align: top !important;
 }
 
 .ytContribIconHost {
-  display: inline-block;
-  vertical-align: middle;
+    display: inline-block;
+    vertical-align: middle;
 }
 
 .ytContribIconTvArrowLeft::before {
-  content: "\e822";
+    content: "\e822";
 }
 
 .ytContribIconHost::before {
-  font-family: "YouTube Icons Outlined";
-}
-
-.tt-voice-dimmer {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background: rgba(0, 0, 0, 0.6);
-  z-index: 10;
-  pointer-events: none;
-}
-
-#tt-voice-search-button.tt-active {
-  z-index: 2100;
-}
-
-#tt-voice-search-button.tt-active .ytLrSearchVoiceMicButtonHost {
-  background-color: red !important;
-  color: white !important;
+    font-family: "YouTube Icons Outlined";
 }

@@ -1,7 +1,7 @@
 {
   "name": "@jensorx/tizentube",
   "appName": "TizenTubeJX",
-  "version": "2.1.49",
+  "version": "1.12.13",
   "description": "TizenTube is an ad-free and sponsor-free solution for your favourite streaming website on your Tizen (Samsung) TVs.",
   "packageType": "mods",
   "websiteURL": "https://youtube.com/tv?additionalDataUrl=http%3A%2F%2Flocalhost%3A8085%2Fdial%2Fapps%2FYouTube",
@@ -21,16 +21,5 @@
   "repository": {
     "url": "https://github.com/JensorX/TizenTube"
   },
-  "license": "GPL-3.0-only",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "keywords": [],
-  "bugs": {
-    "url": "https://github.com/JensorX/TizenTube/issues"
-  },
-  "homepage": "https://github.com/JensorX/TizenTube#readme",
-  "dependencies": {
-    "ncc": "^0.3.6"
-  }
+  "license": "GPL-3.0-only"
 }

@@ -2,6 +2,7 @@ const CONFIG_KEY = 'ytaf-configuration';
 const defaultConfig = {
   enableAdBlock: true,
   enableSponsorBlock: true,
+  enableSponsorBlockToasts: true,
   sponsorBlockManualSkips: ['intro', 'outro', 'filler'],
   enableSponsorBlockSponsor: true,
   enableSponsorBlockIntro: true,
@@ -25,6 +26,8 @@ const defaultConfig = {
   enableShorts: true,
   dontCheckUpdateUntil: 0,
   enableWhoIsWatchingMenu: false,
+  permanentlyEnableWhoIsWatchingMenu: false,
+  enableWhosWatchingMenuOnAppExit: false,
   enableShowUserLanguage: true,
   enableShowOtherLanguages: false,
   showWelcomeToast: true,
@@ -46,20 +49,12 @@ const defaultConfig = {
   speedSettingsIncrement: 0.25,
   videoPreferredCodec: 'any',
   launchToOnStartup: null,
+  reloadHomeOnStartup: true,
   disabledSidebarContents: [],
-  disable60fps: false,
-  disableAV1: false,
-  disableVP9: false,
-  disableAVC: false,
-  disableVP8: false,
-  disableHEVC: false,
   enableUpdater: true,
-  enableCpuStressOptimization: true,
-  enableDecoderMonitor: true,
   autoFrameRate: false,
-  enablePerformanceMode: false,
-  enableVoiceSearch: true,
-  force1xForMusic: true
+  autoFrameRatePauseVideoFor: 0,
+  enableSigninReminder: false
 };
 
 let localConfig;
@@ -103,7 +98,7 @@ export const configChangeEmitter = {
     this.listeners[type].forEach(cb => {
       try {
         cb.call(this, event)
-      } catch (_) { };
+      } catch (_) {};
     });
   }
 };

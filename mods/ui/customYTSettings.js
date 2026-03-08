@@ -1,5 +1,4 @@
 import { SettingActionRenderer, SettingsCategory } from './ytUI.js';
-import pkg from '../../package.json';
 
 function PatchSettings(settingsObject) {
     const tizentubeOpenAction = SettingActionRenderer(
@@ -11,7 +10,7 @@ function PatchSettings(settingsObject) {
                 parameters: []
             }
         },
-        `Version: ${pkg.version}`,
+        'Open TizenTube Settings',
         'https://www.gstatic.com/ytlr/img/parent_code.png'
     )
 

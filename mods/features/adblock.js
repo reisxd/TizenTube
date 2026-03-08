@@ -17,6 +17,7 @@ const origParse = JSON.parse;
 JSON.parse = function () {
   const r = origParse.apply(this, arguments);
   const adBlockEnabled = configRead('enableAdBlock');
+  const signinReminderEnabled = configRead('enableSigninReminder');
 
   if (r.adPlacements && adBlockEnabled) {
     r.adPlacements = [];
@@ -36,50 +37,14 @@ JSON.parse = function () {
     r.paidContentOverlay = null;
   }
 
-
-  if (r?.streamingData?.adaptiveFormats) {
-    const performanceMode = configRead('enablePerformanceMode');
-    const disableAV1 = configRead('disableAV1') || performanceMode;
-    const disableVP9 = configRead('disableVP9'); // Performance mode shouldn't necessarily block VP9 if we want >360p
-    const disableAVC = configRead('disableAVC');
-    const disableVP8 = configRead('disableVP8') || performanceMode;
-    const disableHEVC = configRead('disableHEVC') || performanceMode;
-    const disable60fps = configRead('disable60fps') || performanceMode;
-
-    r.streamingData.adaptiveFormats = r.streamingData.adaptiveFormats.filter(format => {
-      if (format.mimeType.startsWith('audio/')) return true;
-
-      const lowerType = format.mimeType.toLowerCase();
-
-      // Codec filtering
-      if (disableAV1 && (lowerType.includes('av1') || lowerType.includes('av01'))) return false;
-      if (disableVP9 && (lowerType.includes('vp9') || lowerType.includes('vp09'))) return false;
-      if (disableAVC && (lowerType.includes('avc') || lowerType.includes('avc1'))) return false;
-      if (disableVP8 && (lowerType.includes('vp8') || lowerType.includes('vp08'))) return false;
-      if (disableHEVC && (lowerType.includes('hev') || lowerType.includes('hvc'))) return false;
-
-      // 60fps filtering
-      if (disable60fps && format.fps > 30) return false;
-
-      // Performance mode cap
-      if (performanceMode && format.height > 1080) return false;
-
-      return true;
-    });
-  }
-
-  // Music Video Detection
-  if (r?.videoDetails) {
-    const musicType = r.videoDetails.musicVideoType;
-    if (musicType) {
-      // Exclude NONE and ensure it's a music type
-      window.__isMusicVideo = musicType.startsWith('MUSIC_VIDEO_TYPE_') &&
-        musicType !== 'MUSIC_VIDEO_TYPE_NONE' &&
-        musicType !== 'MUSIC_VIDEO_TYPE_OMV_NONE';
-      console.info('[AdBlock] Music Video status:', window.__isMusicVideo, 'Type:', musicType);
-    } else {
-      // If it's a player response (videoDetails exists) but no musicType, it's NOT a music video
-      window.__isMusicVideo = false;
+  if (r?.streamingData?.adaptiveFormats && configRead('videoPreferredCodec') !== 'any') {
+    const preferredCodec = configRead('videoPreferredCodec');
+    const hasPreferredCodec = r.streamingData.adaptiveFormats.find(format => format.mimeType.includes(preferredCodec));
+    if (hasPreferredCodec) {
+      r.streamingData.adaptiveFormats = r.streamingData.adaptiveFormats.filter(format => {
+        if (format.mimeType.startsWith('audio/')) return true;
+        return format.mimeType.includes(preferredCodec);
+      });
     }
   }
 
@@ -88,6 +53,13 @@ JSON.parse = function () {
     r?.contents?.tvBrowseRenderer?.content?.tvSurfaceContentRenderer?.content
       ?.sectionListRenderer?.contents
   ) {
+    if (!signinReminderEnabled) {
+      r.contents.tvBrowseRenderer.content.tvSurfaceContentRenderer.content.sectionListRenderer.contents =
+        r.contents.tvBrowseRenderer.content.tvSurfaceContentRenderer.content.sectionListRenderer.contents.filter(
+          (elm) => !elm.feedNudgeRenderer
+        );
+    }
+
     if (adBlockEnabled) {
       r.contents.tvBrowseRenderer.content.tvSurfaceContentRenderer.content.sectionListRenderer.contents =
         r.contents.tvBrowseRenderer.content.tvSurfaceContentRenderer.content.sectionListRenderer.contents.filter(
@@ -150,12 +122,20 @@ JSON.parse = function () {
   if (r?.contents?.tvBrowseRenderer?.content?.tvSecondaryNavRenderer?.sections) {
     for (const section of r.contents.tvBrowseRenderer.content.tvSecondaryNavRenderer.sections) {
       for (const tab of section.tvSecondaryNavSectionRenderer.tabs) {
-        processShelves(tab.tabRenderer.content.tvSurfaceContentRenderer.content.sectionListRenderer.contents);
+        if (tab.tabRenderer.content?.tvSurfaceContentRenderer?.content?.sectionListRenderer?.contents) {
+          processShelves(tab.tabRenderer.content.tvSurfaceContentRenderer?.content?.sectionListRenderer.contents);
+        }
       }
     }
   }
 
   if (r?.contents?.singleColumnWatchNextResults?.pivot?.sectionListRenderer) {
+    if (!signinReminderEnabled) {
+      r.contents.singleColumnWatchNextResults.pivot.sectionListRenderer.contents =
+        r.contents.singleColumnWatchNextResults.pivot.sectionListRenderer.contents.filter(
+          (elm) => !elm.alertWithActionsRenderer
+        );
+    }
     processShelves(r.contents.singleColumnWatchNextResults.pivot.sectionListRenderer.contents, false);
     if (window.queuedVideos.videos.length > 0) {
       const queuedVideosClone = window.queuedVideos.videos.slice();
@@ -289,7 +269,7 @@ function processShelves(shelves, shouldAddPreviews = true) {
 }
 
 function addPreviews(items) {
-  if (!configRead('enablePreviews') || configRead('enablePerformanceMode')) return;
+  if (!configRead('enablePreviews')) return;
   for (const item of items) {
     if (item.tileRenderer) {
       const watchEndpoint = item.tileRenderer.onSelectCommand;

@@ -7,8 +7,6 @@ import '@formatjs/intl-displaynames/polyfill.iife'
 import '@formatjs/intl-displaynames/locale-data/en';
 
 import "./domrect-polyfill";
-import "./features/playbackSync.js";
-import "./features/decoderHealthMonitor.js";
 import "./features/adblock.js";
 import "./features/sponsorblock.js";
 import "./ui/ui.js";
@@ -25,4 +23,3 @@ import "./features/enableFeatures.js";
 import "./ui/customUI.js";
 import "./ui/customGuideAction.js";
 import "./features/autoFrameRate.js";
-import "./features/voiceSearch.js";

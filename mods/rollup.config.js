@@ -3,7 +3,7 @@ import terser from '@rollup/plugin-terser';
 import getBabelOutputPlugin from '@rollup/plugin-babel';
 import { nodeResolve } from '@rollup/plugin-node-resolve';
 import commonjs from '@rollup/plugin-commonjs';
-import json from '@rollup/plugin-json';
+import replace from '@rollup/plugin-replace';
 
 export default {
     input: "userScript.js",
@@ -12,7 +12,6 @@ export default {
         string({
             include: "**/*.css",
         }),
-        json(),
         nodeResolve({
             browser: true,
             preferBuiltins: false,
@@ -33,5 +32,8 @@ export default {
             ecma: '5',
             mangle: true,
         }),
+        replace({
+            '\uFFFF': '\u0000',
+        })
     ]
 };

@@ -19,6 +19,7 @@ export default function modernUI(update, parameters) {
                     overlayMessageRenderer('1. Star the GitHub repository to help increase its visibility.'),
                     overlayMessageRenderer('2. Share TizenTube with others.'),
                     overlayMessageRenderer('If you would like to contribute financially, consider donating:'),
+                    overlayMessageRenderer('- Buy Me A Coffee: https://www.buymeacoffee.com/reisxd (preferably)'),
                     overlayMessageRenderer('- GitHub Sponsors: https://github.com/sponsors/reisxd')
                 ])
             }
@@ -51,6 +52,14 @@ export default function modernUI(update, parameters) {
                 {
                     name: 'Website',
                     link: 'https://tizentube.6513006.xyz',
+                },
+                {
+                    name: 'Buy Me A Coffee',
+                    link: 'https://www.buymeacoffee.com/reisxd',
+                },
+                {
+                    name: 'GitHub Sponsors',
+                    link: 'https:///github.com/sponsors/reisxd',
                 }
             ].map((option) => {
                 if (!qrcodes[option.name]) {
@@ -186,6 +195,10 @@ export default function modernUI(update, parameters) {
                             value: 'enableSponsorBlockHighlight'
                         }
                     ]
+                },
+                {
+                    name: 'Show SponsorBlock Toasts',
+                    value: 'enableSponsorBlockToasts'
                 }
             ]
         },
@@ -233,7 +246,22 @@ export default function modernUI(update, parameters) {
                 {
                     name: "Who's Watching Menu",
                     icon: 'ACCOUNT_CIRCLE',
-                    value: 'enableWhoIsWatchingMenu'
+                    menuId: 'tt-whos-watching-menu-settings',
+                    value: null,
+                    options: [
+                        {
+                            name: "Enable Who's Watching Menu",
+                            value: 'enableWhoIsWatchingMenu'
+                        },
+                        {
+                            name: "Permanently Enable Who's Watching Menu",
+                            value: 'permanentlyEnableWhoIsWatchingMenu'
+                        },
+                        {
+                            name: "Enable Who's Watching Menu on App Exit",
+                            value: 'enableWhosWatchingMenuOnAppExit'
+                        }
+                    ]
                 },
                 {
                     name: 'Fix UI',
@@ -266,6 +294,14 @@ export default function modernUI(update, parameters) {
                 {
                     name: 'Welcome Message',
                     value: 'showWelcomeToast',
+                },
+                {
+                    name: 'Show Guest Sign In Reminder',
+                    value: 'enableSigninReminder'
+                },
+                {
+                    name: 'Reload Home on Startup',
+                    value: 'reloadHomeOnStartup'
                 }
             ]
         },
@@ -322,24 +358,6 @@ export default function modernUI(update, parameters) {
                     ]
                 },
                 {
-                    name: 'Performance Mode (HTML5)',
-                    icon: 'SPEED',
-                    value: 'enablePerformanceMode',
-                    subtitle: 'Prioritize stability: H.264 only, no previews, less animations'
-                },
-                {
-                    name: 'Audio Video Sync (Resync)',
-                    icon: 'SYNC',
-                    value: 'enableCpuStressOptimization',
-                    subtitle: 'Optional: Fixes A/V drift at high speeds (may cause buffering on AVC)'
-                },
-                {
-                    name: 'Default Speed for Music Videos',
-                    icon: 'MUSIC_NOTE',
-                    value: 'force1xForMusic',
-                    subtitle: 'Force 1x speed for music videos'
-                },
-                {
                     name: 'Preferred Video Quality',
                     icon: 'VIDEO_QUALITY',
                     value: null,
@@ -391,43 +409,6 @@ export default function modernUI(update, parameters) {
                             value: codec
                         }
                     })
-                },
-                {
-                    name: 'Advanced Codec Settings',
-                    icon: 'SETTINGS',
-                    value: null,
-                    menuId: 'tt-advanced-codec-settings',
-                    menuHeader: {
-                        title: 'Advanced Codec Settings',
-                        subtitle: 'Individually deactivate specific codecs and high frame rates',
-                    },
-                    options: [
-                        {
-                            name: 'Disable 60fps (High Frame Rate)',
-                            icon: 'SLOW_MOTION_VIDEO',
-                            value: 'disable60fps'
-                        },
-                        {
-                            name: 'Disable AV1',
-                            value: 'disableAV1'
-                        },
-                        {
-                            name: 'Disable VP9',
-                            value: 'disableVP9'
-                        },
-                        {
-                            name: 'Disable AVC (H.264)',
-                            value: 'disableAVC'
-                        },
-                        {
-                            name: 'Disable VP8',
-                            value: 'disableVP8'
-                        },
-                        {
-                            name: 'Disable HEVC',
-                            value: 'disableHEVC'
-                        }
-                    ]
                 },
                 window.h5vcc && window.h5vcc.tizentube && window.h5vcc.tizentube.SetFrameRate ? {
                     name: 'Auto Frame Rate',
