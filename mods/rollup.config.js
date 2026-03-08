@@ -3,6 +3,7 @@ import terser from '@rollup/plugin-terser';
 import getBabelOutputPlugin from '@rollup/plugin-babel';
 import { nodeResolve } from '@rollup/plugin-node-resolve';
 import commonjs from '@rollup/plugin-commonjs';
+import replace from '@rollup/plugin-replace';
 import json from '@rollup/plugin-json';
 
 export default {
@@ -33,5 +34,8 @@ export default {
             ecma: '5',
             mangle: true,
         }),
+        replace({
+            '\uFFFF': '\u0000',
+        })
     ]
 };
