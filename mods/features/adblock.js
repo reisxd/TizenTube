@@ -647,6 +647,7 @@ function filterContinuationItems(items, pageName, hasContinuation = false, label
   if (pageName === 'playlist' && !hasContinuation) clearPlaylistHelperVideoIdSet(label);
   clearKeepOneMarkers(items, label);
   const filteredItems = hideVideo(items, pageName);
+  filteredItems = filterShortsFromItems(filteredItems, pageName);
 
   if (pageName === 'playlist' && hasContinuation && filteredItems.length === 0 && Array.isArray(items) && items.length > 0) {
     const reverseItems = [...items].reverse();
@@ -1259,4 +1260,33 @@ function addLongPress(items) {
       appendFileOnlyLog('addLongPress.item.error', { message: error?.message || String(error) });
     }
   }
+}
+
+function filterShortsFromItems(items, pageName) {
+  if (!Array.isArray(items) || configRead('enableShorts')) return items;
+  const before = items.length;
+  const filtered = items.filter(item => {
+    const info = getShortInfo(item, { pageName });
+    if (info.isShort) return false;
+    // keep existing shorts.miss diagnostic log
+    const r = item?.tileRenderer || item?.videoRenderer || item?.richItemRenderer?.content?.videoRenderer || null;
+    const rendererType = item ? Object.keys(item)[0] : 'none';
+    const overlays = r?.header?.tileHeaderRenderer?.thumbnailOverlays || r?.thumbnailOverlays || [];
+    const overlayStyles = Array.isArray(overlays)
+      ? overlays.map(o => o?.thumbnailOverlayTimeStatusRenderer?.style).filter(Boolean)
+      : [];
+    const thumbnails = getThumbnailCandidates(r, item);
+    const thumbnailRatios = thumbnails
+      .map(t => { const w = Number(t?.width), h = Number(t?.height); return (w > 0 && Number.isFinite(w) && Number.isFinite(h)) ? Number((h/w).toFixed(3)) : null; })
+      .filter(v => v !== null).slice(0, 6);
+    const lines = r?.metadata?.tileMetadataRenderer?.lines;
+    const lineTexts = Array.isArray(lines)
+      ? lines.flatMap(l => (l?.lineRenderer?.items||[]).map(li => li?.lineItemRenderer?.text?.simpleText).filter(Boolean))
+      : [];
+    appendFileOnlyLog('shorts.miss', { reason: info.reason, title: info.title, rendererType, shelfType: r?.tvhtml5ShelfRendererType||null, overlayStyles, lengthText: info.lengthText||null, lineTexts, thumbnailRatios, hasReelCmd: !!(r?.onSelectCommand?.reelWatchEndpoint) });
+    return true;
+  });
+  if (before !== filtered.length)
+    appendFileOnlyLog('shorts.continuation.filter', { pageName, before, after: filtered.length });
+  return filtered;
 }
