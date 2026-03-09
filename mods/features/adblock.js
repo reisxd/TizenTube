@@ -92,16 +92,6 @@ function hasShortsEndpointMarkers(node, depth = 0, seen = new WeakSet()) {
   return false;
 }
 
-function getThumbnailCandidates(renderer, item) {
-  return [
-    ...(renderer?.header?.tileHeaderRenderer?.thumbnail?.thumbnails || []),
-    ...(renderer?.thumbnail?.thumbnails || []),
-    ...(renderer?.richThumbnail?.movingThumbnailRenderer?.movingThumbnailDetails?.thumbnails || []),
-    ...(item?.tileRenderer?.header?.tileHeaderRenderer?.thumbnail?.thumbnails || []),
-    ...(item?.tileRenderer?.thumbnail?.thumbnails || []),
-  ];
-}
-
 // Comprehensive Shorts detection — ported from KrX3D/TizenTube working branch.
 // Returns { isShort, reason, title, lengthText, totalSeconds }.
 // Handles tileRenderer, videoRenderer, reelItemRenderer, lockupViewModel, and all
@@ -220,6 +210,9 @@ function getShortInfo(item, opts = {}) {
   // Do not classify Shorts by duration alone globally.
   return { isShort: false, reason: 'duration_only_not_used', title, lengthText, totalSeconds };
 }
+
+// Expose Shorts checker so hideWatched.js deep scan can filter continuation grids too.
+window.__ttShortsFilterItem = (item, pageName = null) => getShortInfo(item, { pageName }).isShort;
 
 
 function collectWatchProgressEntries(node, out = [], depth = 0, seen = new WeakSet()) {
