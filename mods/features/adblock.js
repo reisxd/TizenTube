@@ -748,26 +748,26 @@ const origParse = JSON.parse;
 JSON.parse = function () {
   const r = origParse.apply(this, arguments);
   try {
-    const adBlockEnabled = configRead('enableAdBlock');
-    const signinReminderEnabled = configRead('enableSigninReminder');
     const detectedPage = detectPageFromResponse(r) || detectCurrentPage();
     window.__ttLastDetectedPage = detectedPage;
     window.__ttParseSeq = Number(window.__ttParseSeq || 0) + 1;
 
     appendFileOnlyLog('parse.begin', { detectedPage, hash: location.hash || '' });
 
-    // Array-root responses (some TV endpoints return arrays)
+    // Array-root responses
     if (Array.isArray(r)) {
       for (let i = 0; i < r.length; i++) processResponsePayload(r[i], detectedPage);
       return r;
     }
 
-    // === Ads ===
+    const adBlockEnabled = configRead('enableAdBlock');
+
+    // === Ads (needed on all pages) ===
     if (r.adPlacements && adBlockEnabled) r.adPlacements = [];
     if (r.playerAds && adBlockEnabled) r.playerAds = false;
     if (r.adSlots && adBlockEnabled) r.adSlots = [];
 
-    // === Watch progress entity cache ===
+    // === Watch progress entity cache (needed on all pages for hideWatched) ===
     if (r?.frameworkUpdates?.entityBatchUpdate?.mutations) {
       if (!window._ttVideoProgressCache) window._ttVideoProgressCache = {};
       for (const mutation of r.frameworkUpdates.entityBatchUpdate.mutations) {
@@ -784,7 +784,6 @@ JSON.parse = function () {
             || payload?.videoData?.videoId || null;
           if (explicitId) window._ttVideoProgressCache[String(explicitId)] = Number(pct);
         }
-        // Deep scan for any additional progress fields inside the mutation payload
         for (const entry of collectWatchProgressEntries(payload)) {
           if (window._ttVideoProgressCache[entry.id] === undefined) {
             window._ttVideoProgressCache[entry.id] = Number(entry.percent);
@@ -792,6 +791,91 @@ JSON.parse = function () {
         }
       }
     }
+
+    // =========================================================
+    // === WATCH PAGE FAST PATH — skip all feed processing   ===
+    // === Only handle player-specific fields to keep the    ===
+    // === main thread free during video playback.           ===
+    // =========================================================
+    if (detectedPage === 'watch') {
+      if (r.paidContentOverlay && !configRead('enablePaidPromotionOverlay')) r.paidContentOverlay = null;
+      if (r.endscreen && configRead('enableHideEndScreenCards')) r.endscreen = null;
+      if (r.messages && Array.isArray(r.messages) && !configRead('enableYouThereRenderer')) {
+        r.messages = r.messages.filter(msg => !msg?.youThereRenderer);
+      }
+      if (r?.title?.runs) PatchSettings(r);
+
+      if (r?.streamingData?.adaptiveFormats && configRead('videoPreferredCodec') !== 'any') {
+        const preferredCodec = configRead('videoPreferredCodec');
+        if (r.streamingData.adaptiveFormats.find(f => f.mimeType.includes(preferredCodec))) {
+          r.streamingData.adaptiveFormats = r.streamingData.adaptiveFormats.filter(f =>
+            f.mimeType.startsWith('audio/') || f.mimeType.includes(preferredCodec)
+          );
+        }
+      }
+
+      // SponsorBlock
+      if (configRead('sponsorBlockManualSkips').length > 0 && r?.playerOverlays?.playerOverlayRenderer) {
+        const manualSkippedSegments = configRead('sponsorBlockManualSkips');
+        const timelyActions = [];
+        if (window?.sponsorblock?.segments) {
+          for (const segment of window.sponsorblock.segments) {
+            if (manualSkippedSegments.includes(segment.category)) {
+              timelyActions.push(timelyAction(
+                `Skip ${segment.category}`, 'SKIP_NEXT',
+                { clickTrackingParams: null, showEngagementPanelEndpoint: { customAction: { action: 'SKIP', parameters: { time: segment.segment[1] } } } },
+                segment.segment[0] * 1000,
+                segment.segment[1] * 1000 - segment.segment[0] * 1000
+              ));
+            }
+          }
+          r.playerOverlays.playerOverlayRenderer.timelyActionRenderers = timelyActions;
+        }
+      } else if (r?.playerOverlays?.playerOverlayRenderer) {
+        r.playerOverlays.playerOverlayRenderer.timelyActionRenderers = [];
+      }
+
+      if (r?.transportControls?.transportControlsRenderer?.promotedActions && configRead('enableSponsorBlockHighlight')) {
+        if (window?.sponsorblock?.segments) {
+          const category = window.sponsorblock.segments.find(seg => seg.category === 'poi_highlight');
+          if (category) {
+            r.transportControls.transportControlsRenderer.promotedActions.push({
+              type: 'TRANSPORT_CONTROLS_BUTTON_TYPE_SPONSORBLOCK_HIGHLIGHT',
+              button: { buttonRenderer: ButtonRenderer(false, 'Skip to highlight', 'SKIP_NEXT', { clickTrackingParams: null, customAction: { action: 'SKIP', parameters: { time: category.segment[0] } } }) }
+            });
+          }
+        }
+      }
+
+      // watchNext shelves — process once on initial load only
+      if (r?.contents?.singleColumnWatchNextResults?.pivot?.sectionListRenderer) {
+        const signinReminderEnabled = configRead('enableSigninReminder');
+        if (!signinReminderEnabled) {
+          r.contents.singleColumnWatchNextResults.pivot.sectionListRenderer.contents =
+            r.contents.singleColumnWatchNextResults.pivot.sectionListRenderer.contents.filter(elm => !elm.alertWithActionsRenderer);
+        }
+        processShelves(r.contents.singleColumnWatchNextResults.pivot.sectionListRenderer.contents, false, detectedPage);
+        consolidateShelves(r.contents.singleColumnWatchNextResults.pivot.sectionListRenderer.contents, 'watchNext', detectedPage);
+        if (window.queuedVideos.videos.length > 0) {
+          const queuedVideosClone = window.queuedVideos.videos.slice();
+          queuedVideosClone.unshift(TileRenderer('Clear Queue', { customAction: { action: 'CLEAR_QUEUE' } }));
+          r.contents.singleColumnWatchNextResults.pivot.sectionListRenderer.contents.unshift(ShelfRenderer(
+            'Queued Videos',
+            queuedVideosClone,
+            queuedVideosClone.findIndex(v => v.contentId === window.queuedVideos.lastVideoId) !== -1
+              ? queuedVideosClone.findIndex(v => v.contentId === window.queuedVideos.lastVideoId)
+              : 0
+          ));
+        }
+      }
+
+      return r; // ← skip all feed processing, deep scan, normalizers
+    }
+    // =========================================================
+    // === END WATCH PAGE FAST PATH                          ===
+    // =========================================================
+
+    const signinReminderEnabled = configRead('enableSigninReminder');
 
     if (r.paidContentOverlay && !configRead('enablePaidPromotionOverlay')) r.paidContentOverlay = null;
 
@@ -896,7 +980,7 @@ JSON.parse = function () {
       plc.contents = filterContinuationItems(plc.contents, detectedPage, hasContinuation, 'playlist.continuation');
     }
 
-    // === Tab sections (channel nav, library tabs, etc.) ===
+    // === Tab sections ===
     if (r?.contents?.tvBrowseRenderer?.content?.tvSecondaryNavRenderer?.sections) {
       for (const section of r.contents.tvBrowseRenderer.content.tvSecondaryNavRenderer.sections) {
         if (!Array.isArray(section?.tvSecondaryNavSectionRenderer?.tabs)) continue;
@@ -948,7 +1032,7 @@ JSON.parse = function () {
       }
     }
 
-    // === Watch Next ===
+    // === Watch Next (non-watch page, e.g. mini-player) ===
     if (r?.contents?.singleColumnWatchNextResults) {
       appendFileOnlyLog('watchNext.shape', {
         hasPivot: !!r.contents.singleColumnWatchNextResults.pivot,
@@ -1009,10 +1093,8 @@ JSON.parse = function () {
       }
     }
 
-    // === Safety net deep scan (skip watch page to avoid empty visual rows) ===
-    if (detectedPage !== 'watch') {
-      processTileArraysDeep(r, detectedPage, 'response', 0, filterShortsFromItems);
-    }
+    // === Safety net deep scan (non-watch pages only) ===
+    processTileArraysDeep(r, detectedPage, 'response', 0, filterShortsFromItems);
 
     return r;
   } catch (error) {
