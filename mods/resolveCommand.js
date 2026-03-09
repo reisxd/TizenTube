@@ -27,13 +27,20 @@ export function findFunction(funcName) {
 // Patch resolveCommand to be able to change TizenTube settings
 
 export function patchResolveCommand() {
+    let patched = false;
+
     for (const key in window._yttv) {
         if (window._yttv[key] && window._yttv[key].instance && window._yttv[key].instance.resolveCommand) {
+            // Prevent double-patching
+            if (window._yttv[key].instance.resolveCommand.__ttPatched) {
+                patched = true;
+                continue;
+            }
 
             const ogResolve = window._yttv[key].instance.resolveCommand;
             window._yttv[key].instance.resolveCommand = function (cmd, _) {
                 if (cmd.setClientSettingEndpoint) {
-                    // Command to change client settings. Use TizenTube configuration to change settings.
+                                    // Command to change client settings. Use TizenTube configuration to change settings.
                     for (const settings of cmd.setClientSettingEndpoint.settingDatas) {
                         if (!settings.clientSettingEnum.item.includes('_')) {
                             for (const setting of cmd.setClientSettingEndpoint.settingDatas) {
@@ -75,7 +82,7 @@ export function patchResolveCommand() {
                     customAction(cmd.playlistEditEndpoint.customAction.action, cmd.playlistEditEndpoint.customAction.parameters);
                     return true;
                 } else if (cmd?.openPopupAction?.uniqueId === 'playback-settings') {
-                    // Patch the playback settings popup to use TizenTube speed settings
+                                    // Patch the playback settings popup to use TizenTube speed settings
                     const items = cmd.openPopupAction.popup.overlaySectionRenderer.overlay.overlayTwoPanelRenderer.actionPanel.overlayPanelRenderer.content.overlayPanelItemListRenderer.items;
                     for (const item of items) {
                         if (item?.compactLinkRenderer?.icon?.iconType === 'SLOW_MOTION_VIDEO') {
@@ -128,7 +135,7 @@ export function patchResolveCommand() {
                     return true;
                 }
 
-                if (cmd?.requestAccountSelectorCommand 
+                if (cmd?.requestAccountSelectorCommand
                     && cmd.requestAccountSelectorCommand?.identityActionContext?.eventTrigger === 'ACCOUNT_EVENT_TRIGGER_ON_EXIT') {
                     if (!configRead('enableWhosWatchingMenuOnAppExit')) {
                         ogResolve.call(this, {
@@ -142,7 +149,15 @@ export function patchResolveCommand() {
 
                 return ogResolve.call(this, cmd, _);
             }
+
+            window._yttv[key].instance.resolveCommand.__ttPatched = true;
+            patched = true;
         }
+    }
+
+    // If nothing was patchable yet, retry
+    if (!patched) {
+        setTimeout(patchResolveCommand, 500);
     }
 }
 

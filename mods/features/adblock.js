@@ -301,32 +301,39 @@ function deArrowify(items) {
     if (configRead('enableDeArrow')) {
       const videoID = item.tileRenderer.contentId;
 
-      // Skip playlists, channels, etc. — only real video IDs are 11 chars
+      // Skip playlists, channels — only real video IDs are 11 chars
       if (!videoID || videoID.length !== 11) continue;
-      
-      fetch(`https://sponsor.ajay.app/api/branding?videoID=${videoID}`).then(res => res.json()).then(data => {
-        if (data.titles.length > 0) {
-          const mostVoted = data.titles.reduce((max, title) => max.votes > title.votes ? max : title);
-          item.tileRenderer.metadata.tileMetadataRenderer.title.simpleText = mostVoted.title;
-        }
 
-        if (data.thumbnails.length > 0 && configRead('enableDeArrowThumbnails')) {
-          const mostVotedThumbnail = data.thumbnails.reduce((max, thumbnail) => max.votes > thumbnail.votes ? max : thumbnail);
-          if (mostVotedThumbnail.timestamp) {
-            item.tileRenderer.header.tileHeaderRenderer.thumbnail.thumbnails = [
-              {
-                url: `https://dearrow-thumb.ajay.app/api/v1/getThumbnail?videoID=${videoID}&time=${mostVotedThumbnail.timestamp}`,
-                width: 1280,
-                height: 640
-              }
-            ]
+      fetch(`https://sponsor.ajay.app/api/branding?videoID=${videoID}`)
+        .then(res => {
+          if (!res.ok) return null; // 404 = no DeArrow data, skip silently
+          return res.json();
+        })
+        .then(data => {
+          if (!data) return;
+
+          if (data.titles.length > 0) {
+            const mostVoted = data.titles.reduce((max, title) => max.votes > title.votes ? max : title);
+            item.tileRenderer.metadata.tileMetadataRenderer.title.simpleText = mostVoted.title;
           }
-        }
-      }).catch(() => { });
+
+          if (data.thumbnails.length > 0 && configRead('enableDeArrowThumbnails')) {
+            const mostVotedThumbnail = data.thumbnails.reduce((max, thumbnail) => max.votes > thumbnail.votes ? max : thumbnail);
+            if (mostVotedThumbnail.timestamp) {
+              item.tileRenderer.header.tileHeaderRenderer.thumbnail.thumbnails = [
+                {
+                  url: `https://dearrow-thumb.ajay.app/api/v1/getThumbnail?videoID=${videoID}&time=${mostVotedThumbnail.timestamp}`,
+                  width: 1280,
+                  height: 640
+                }
+              ];
+            }
+          }
+        })
+        .catch(() => { });
     }
   }
 }
-
 
 function hqify(items) {
   for (const item of items) {
