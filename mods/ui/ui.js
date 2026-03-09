@@ -120,12 +120,35 @@ function execute_once_dom_loaded() {
   );
 
   try {
-    uiContainer.innerHTML = `
-<h1>TizenTube Theme Configuration</h1>
-<label for="__barColor">Navigation Bar Color: <input type="text" id="__barColor"/></label>
-<label for="__routeColor">Main Content Color: <input type="text" id="__routeColor"/></label>
-<div><small>Sponsor segments skipping - https://sponsor.ajay.app</small></div>
-`;
+    // Build theme UI without innerHTML to avoid TrustedHTML CSP warnings
+    const h1 = document.createElement('h1');
+    h1.textContent = 'TizenTube Theme Configuration';
+    uiContainer.appendChild(h1);
+
+    const label1 = document.createElement('label');
+    label1.setAttribute('for', '__barColor');
+    label1.textContent = 'Navigation Bar Color: ';
+    const input1 = document.createElement('input');
+    input1.type = 'text';
+    input1.id = '__barColor';
+    label1.appendChild(input1);
+    uiContainer.appendChild(label1);
+
+    const label2 = document.createElement('label');
+    label2.setAttribute('for', '__routeColor');
+    label2.textContent = 'Main Content Color: ';
+    const input2 = document.createElement('input');
+    input2.type = 'text';
+    input2.id = '__routeColor';
+    label2.appendChild(input2);
+    uiContainer.appendChild(label2);
+
+    const infoDiv = document.createElement('div');
+    const small = document.createElement('small');
+    small.textContent = 'Sponsor segments skipping - https://sponsor.ajay.app';
+    infoDiv.appendChild(small);
+    uiContainer.appendChild(infoDiv);
+
     document.querySelector('body').appendChild(uiContainer);
 
     uiContainer.querySelector('#__barColor').value = configRead('focusContainerColor');

@@ -300,6 +300,10 @@ function deArrowify(items) {
     if (!item.tileRenderer) continue;
     if (configRead('enableDeArrow')) {
       const videoID = item.tileRenderer.contentId;
+
+      // Skip playlists, channels, etc. — only real video IDs are 11 chars
+      if (!videoID || videoID.length !== 11) continue;
+      
       fetch(`https://sponsor.ajay.app/api/branding?videoID=${videoID}`).then(res => res.json()).then(data => {
         if (data.titles.length > 0) {
           const mostVoted = data.titles.reduce((max, title) => max.votes > title.votes ? max : title);
