@@ -48,75 +48,112 @@ function getItemVideoId(item) {
   );
 }
 
-function isLikelyShortItem(item) {
-  const tile = item?.tileRenderer;
-  if (!tile) return false;
-  if (tile?.tvhtml5ShelfRendererType === 'TVHTML5_TILE_RENDERER_TYPE_SHORTS') return true;
-  if (tile?.onSelectCommand?.reelWatchEndpoint) return true;
-  // Check the overlay style flag — YouTube sets style='SHORTS' on converted Shorts
-  // even when they appear as normal tiles in subscription/channel feeds.
-  const overlays = tile?.header?.tileHeaderRenderer?.thumbnailOverlays || tile?.thumbnailOverlays || [];
-  for (const overlay of overlays) {
-    const style = overlay?.thumbnailOverlayTimeStatusRenderer?.style;
-    if (style === 'SHORTS' || style === 'SHORTS_TIME_STATUS_STYLE') return true;
-  }
-  const title = String(tile?.metadata?.tileMetadataRenderer?.title?.simpleText || tile?.contentId || '').toLowerCase();
-  if (title.includes('#shorts')) return true;
-  const hashtagMatches = title.match(/#[a-z0-9_]+/gi);
-  if (hashtagMatches && hashtagMatches.length >= 2) return true;
-  return false;
-}
-
-// Parses a duration string ("M:SS" or "H:MM:SS") from any known location in a TV tile.
-// YouTube TV stores duration in different places depending on the feed:
-//   - thumbnailOverlayTimeStatusRenderer (most common in subscription tiles)
-//   - metadata lines (some grid/shelf layouts)
-//   - lengthText (some tile variants)
-// Returns seconds as a number, or null if not found.
-function parseDurationText(text) {
-  const m = String(text || '').trim().match(/^(\d{1,2}):(\d{2})(?::(\d{2}))?$/);
-  if (!m) return null;
-  return m[3] !== undefined
-    ? Number(m[1]) * 3600 + Number(m[2]) * 60 + Number(m[3])
-    : Number(m[1]) * 60 + Number(m[2]);
-}
-
-function getTileDurationSeconds(item) {
-  try {
-    const tile = item?.tileRenderer;
-    if (!tile) return null;
-
-    // 1. thumbnailOverlayTimeStatusRenderer — primary location for subscription/shelf tiles
-    const overlays = tile?.header?.tileHeaderRenderer?.thumbnailOverlays
-      || tile?.thumbnailOverlays || [];
-    for (const overlay of overlays) {
-      const tsr = overlay?.thumbnailOverlayTimeStatusRenderer;
-      if (!tsr) continue;
-      const text = tsr?.text?.simpleText || tsr?.text?.runs?.[0]?.text || '';
-      const secs = parseDurationText(text);
-      if (secs !== null) return secs;
-    }
-
-    // 2. metadata lines — used in some grid/shelf layouts
-    const lines = tile?.metadata?.tileMetadataRenderer?.lines || [];
-    for (const line of lines) {
-      for (const li of line?.lineRenderer?.items || []) {
-        const text = li?.lineItemRenderer?.text?.simpleText
-          || li?.lineItemRenderer?.text?.runs?.[0]?.text || '';
-        const secs = parseDurationText(text);
-        if (secs !== null) return secs;
-      }
-    }
-
-    // 3. lengthText (some tile variants)
-    const lengthText = tile?.lengthText?.simpleText || tile?.lengthText?.runs?.[0]?.text || '';
-    if (lengthText) {
-      const secs = parseDurationText(lengthText);
-      if (secs !== null) return secs;
-    }
-  } catch (_) {}
+// Shared duration parser — handles "M:SS" and "H:MM:SS".
+function parseDurationToSeconds(lengthText) {
+  const parts = String(lengthText).trim().split(':').map((p) => Number(p));
+  if (parts.some((p) => Number.isNaN(p))) return null;
+  if (parts.length === 2) return (parts[0] * 60) + parts[1];
+  if (parts.length === 3) return (parts[0] * 3600) + (parts[1] * 60) + parts[2];
   return null;
 }
+
+// Comprehensive Shorts detection — ported from KrX3D/TizenTube working branch.
+// Returns { isShort, reason, title, lengthText, totalSeconds }.
+// Handles tileRenderer, videoRenderer, reelItemRenderer, lockupViewModel, and all
+// richItemRenderer variants — not just tileRenderer — so it works across all feed types.
+function getShortInfo(item) {
+  if (!item) return { isShort: false, reason: 'no_item', title: 'unknown' };
+
+  const title = item?.tileRenderer?.metadata?.tileMetadataRenderer?.title?.simpleText
+    || item?.videoRenderer?.title?.runs?.[0]?.text
+    || item?.videoRenderer?.title?.simpleText
+    || item?.richItemRenderer?.content?.videoRenderer?.title?.runs?.[0]?.text
+    || 'unknown';
+
+  // reel items are always Shorts
+  if (item.reelItemRenderer || item.richItemRenderer?.content?.reelItemRenderer) {
+    return { isShort: true, reason: 'reel', title };
+  }
+
+  // Resolve the concrete renderer from all known shapes
+  const renderer = item.tileRenderer
+    || item.videoRenderer
+    || item.playlistVideoRenderer
+    || item.playlistPanelVideoRenderer
+    || item.gridVideoRenderer
+    || item.compactVideoRenderer
+    || item.richItemRenderer?.content?.videoRenderer
+    || item.richItemRenderer?.content?.playlistVideoRenderer
+    || item.richItemRenderer?.content?.compactVideoRenderer
+    || item.richItemRenderer?.content?.gridVideoRenderer
+    || item.richItemRenderer?.content?.videoWithContextRenderer
+    || item.richItemRenderer?.content?.lockupViewModel
+    || item.lockupViewModel;
+
+  if (!renderer) return { isShort: false, reason: 'no_renderer', title };
+
+  // Explicit Shorts renderer type flag
+  if (renderer.tvhtml5ShelfRendererType === 'TVHTML5_TILE_RENDERER_TYPE_SHORTS') {
+    return { isShort: true, reason: 'renderer_type', title };
+  }
+
+  // reelWatchEndpoint on the select command
+  if (renderer.onSelectCommand?.reelWatchEndpoint) {
+    return { isShort: true, reason: 'reelWatchEndpoint', title };
+  }
+
+  // thumbnailOverlay style flags AND duration text
+  let lengthText = null;
+  const thumbnailOverlays = renderer.header?.tileHeaderRenderer?.thumbnailOverlays
+    || renderer.thumbnailOverlays;
+  if (Array.isArray(thumbnailOverlays)) {
+    for (const overlay of thumbnailOverlays) {
+      const tsr = overlay?.thumbnailOverlayTimeStatusRenderer;
+      if (!tsr) continue;
+      const style = tsr.style;
+      if (style === 'SHORTS' || style === 'SHORTS_TIME_STATUS_STYLE') {
+        return { isShort: true, reason: 'overlay_style', title };
+      }
+      // Capture duration text from this overlay for the seconds check below
+      if (!lengthText) lengthText = tsr.text?.simpleText || null;
+    }
+  }
+
+  // lengthText field (some renderer variants)
+  if (!lengthText) {
+    lengthText = renderer.lengthText?.simpleText || renderer.lengthText?.runs?.[0]?.text || null;
+  }
+
+  // metadata lines — subscription tiles store duration here across multiple line positions
+  if (!lengthText) {
+    const lines = renderer.metadata?.tileMetadataRenderer?.lines;
+    if (Array.isArray(lines)) {
+      for (const line of lines) {
+        const found = line?.lineRenderer?.items?.find(
+          (li) => li.lineItemRenderer?.badge || li.lineItemRenderer?.text?.simpleText
+        )?.lineItemRenderer?.text?.simpleText;
+        if (found && parseDurationToSeconds(found) !== null) {
+          lengthText = found;
+          break;
+        }
+      }
+    }
+  }
+
+  if (!lengthText) return { isShort: false, reason: 'no_length', title };
+
+  const totalSeconds = parseDurationToSeconds(lengthText);
+  if (totalSeconds === null) return { isShort: false, reason: 'length_format_miss', title, lengthText };
+
+  const isShort = totalSeconds <= 180;
+  return { isShort, reason: isShort ? 'duration' : 'long_duration', title, lengthText, totalSeconds };
+}
+
+// Convenience wrapper — returns true/false only.
+function isLikelyShortItem(item) {
+  return getShortInfo(item).isShort;
+}
+
 
 function collectWatchProgressEntries(node, out = [], depth = 0, seen = new WeakSet()) {
   if (!node || depth > 10) return out;
@@ -961,21 +998,43 @@ function processShelves(shelves, shouldAddPreviews = true, pageHint = null) {
 
     if (!configRead('enableShorts')) {
       if (isShortsShelf(shelve)) { shelves.splice(i, 1); continue; }
-      const beforeShorts = shelve.shelfRenderer.content.horizontalListRenderer.items.length;
-      shelve.shelfRenderer.content.horizontalListRenderer.items =
-        shelve.shelfRenderer.content.horizontalListRenderer.items.filter(item => {
-          if (isLikelyShortItem(item)) return false;
-          // Catch converted Shorts: videos ≤180s that YouTube shows as normal tiles
-          // with no Shorts-specific flags (common in subscription feeds).
-          const secs = getTileDurationSeconds(item);
-          if (secs !== null && secs <= 180) {
-            appendFileOnlyLog('shorts.duration.removed', { videoId: item?.tileRenderer?.contentId, secs });
-            return false;
-          }
-          return true;
-        });
-      normalizeHorizontalListRenderer(shelve.shelfRenderer.content.horizontalListRenderer, `shelf:${activePage}:${i}:shorts`);
-      appendFileOnlyLog('shorts.tiles.filter', { page: activePage, before: beforeShorts, after: shelve.shelfRenderer.content.horizontalListRenderer.items.length });
+      // Filter Shorts from ALL list types — ported from KrX3D working branch.
+      // getShortInfo handles every renderer type (tileRenderer, videoRenderer, reelItemRenderer,
+      // lockupViewModel, etc.) and reads duration from overlays, lengthText, and metadata lines.
+      const filterShortItems = (items) => {
+        if (!Array.isArray(items)) return items;
+        const before = items.length;
+        const filtered = items.filter(item => !getShortInfo(item).isShort);
+        if (before !== filtered.length) {
+          appendFileOnlyLog('shorts.tiles.filter', { page: activePage, shelf: i, before, after: filtered.length });
+        }
+        return filtered;
+      };
+      const base = shelve?.richSectionRenderer?.content || shelve;
+      if (Array.isArray(base?.shelfRenderer?.content?.horizontalListRenderer?.items)) {
+        base.shelfRenderer.content.horizontalListRenderer.items =
+          filterShortItems(base.shelfRenderer.content.horizontalListRenderer.items);
+        normalizeHorizontalListRenderer(base.shelfRenderer.content.horizontalListRenderer, `shelf:${activePage}:${i}:shorts`);
+      }
+      if (Array.isArray(base?.shelfRenderer?.content?.verticalListRenderer?.items)) {
+        base.shelfRenderer.content.verticalListRenderer.items =
+          filterShortItems(base.shelfRenderer.content.verticalListRenderer.items);
+      }
+      if (Array.isArray(base?.shelfRenderer?.content?.gridRenderer?.items)) {
+        base.shelfRenderer.content.gridRenderer.items =
+          filterShortItems(base.shelfRenderer.content.gridRenderer.items);
+      }
+      if (Array.isArray(base?.shelfRenderer?.content?.expandedShelfContentsRenderer?.items)) {
+        base.shelfRenderer.content.expandedShelfContentsRenderer.items =
+          filterShortItems(base.shelfRenderer.content.expandedShelfContentsRenderer.items);
+      }
+      if (Array.isArray(base?.richShelfRenderer?.content?.richGridRenderer?.contents)) {
+        base.richShelfRenderer.content.richGridRenderer.contents =
+          filterShortItems(base.richShelfRenderer.content.richGridRenderer.contents);
+      }
+      if (Array.isArray(base?.reelShelfRenderer?.items)) {
+        base.reelShelfRenderer.items = filterShortItems(base.reelShelfRenderer.items);
+      }
     }
 
     if (shelve.shelfRenderer.content.horizontalListRenderer.items.length === 0) {
