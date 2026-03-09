@@ -60,6 +60,28 @@ function isLikelyShortItem(item) {
   return false;
 }
 
+// Parses a "M:SS" or "H:MM:SS" duration string from a tile's metadata lines.
+// Returns seconds as a number, or null if not found / not parseable.
+function getTileDurationSeconds(item) {
+  try {
+    const lines = item?.tileRenderer?.metadata?.tileMetadataRenderer?.lines || [];
+    for (const line of lines) {
+      for (const li of line?.lineRenderer?.items || []) {
+        const text = li?.lineItemRenderer?.text?.simpleText
+          || li?.lineItemRenderer?.text?.runs?.[0]?.text
+          || '';
+        const m = String(text).match(/^(\d{1,2}):(\d{2})(?::(\d{2}))?$/);
+        if (m) {
+          return m[3] !== undefined
+            ? Number(m[1]) * 3600 + Number(m[2]) * 60 + Number(m[3])
+            : Number(m[1]) * 60 + Number(m[2]);
+        }
+      }
+    }
+  } catch (_) {}
+  return null;
+}
+
 function collectWatchProgressEntries(node, out = [], depth = 0, seen = new WeakSet()) {
   if (!node || depth > 10) return out;
   if (Array.isArray(node)) {
@@ -905,7 +927,17 @@ function processShelves(shelves, shouldAddPreviews = true, pageHint = null) {
       if (isShortsShelf(shelve)) { shelves.splice(i, 1); continue; }
       const beforeShorts = shelve.shelfRenderer.content.horizontalListRenderer.items.length;
       shelve.shelfRenderer.content.horizontalListRenderer.items =
-        shelve.shelfRenderer.content.horizontalListRenderer.items.filter(item => !isLikelyShortItem(item));
+        shelve.shelfRenderer.content.horizontalListRenderer.items.filter(item => {
+          if (isLikelyShortItem(item)) return false;
+          // Catch converted Shorts: videos ≤180s that YouTube shows as normal tiles
+          // with no Shorts-specific flags (common in subscription feeds).
+          const secs = getTileDurationSeconds(item);
+          if (secs !== null && secs <= 180) {
+            appendFileOnlyLog('shorts.duration.removed', { videoId: item?.tileRenderer?.contentId, secs });
+            return false;
+          }
+          return true;
+        });
       normalizeHorizontalListRenderer(shelve.shelfRenderer.content.horizontalListRenderer, `shelf:${activePage}:${i}:shorts`);
       appendFileOnlyLog('shorts.tiles.filter', { page: activePage, before: beforeShorts, after: shelve.shelfRenderer.content.horizontalListRenderer.items.length });
     }
