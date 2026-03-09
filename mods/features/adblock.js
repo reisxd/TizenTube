@@ -793,9 +793,7 @@ JSON.parse = function () {
     }
 
     // =========================================================
-    // === WATCH PAGE FAST PATH — skip all feed processing   ===
-    // === Only handle player-specific fields to keep the    ===
-    // === main thread free during video playback.           ===
+    // === WATCH PAGE FAST PATH                              ===
     // =========================================================
     if (detectedPage === 'watch') {
       if (r.paidContentOverlay && !configRead('enablePaidPromotionOverlay')) r.paidContentOverlay = null;
@@ -847,7 +845,7 @@ JSON.parse = function () {
         }
       }
 
-      // watchNext shelves — process once on initial load only
+      // watchNext initial load — no hqify/deArrowify to avoid competing with video stream
       if (r?.contents?.singleColumnWatchNextResults?.pivot?.sectionListRenderer) {
         const signinReminderEnabled = configRead('enableSigninReminder');
         if (!signinReminderEnabled) {
@@ -869,7 +867,25 @@ JSON.parse = function () {
         }
       }
 
-      return r; // ← skip all feed processing, deep scan, normalizers
+      // watchNext scroll-down continuations — filter watched/shorts, skip hqify/deArrowify
+      if (r?.continuationContents?.sectionListContinuation?.contents) {
+        processShelves(r.continuationContents.sectionListContinuation.contents, false, detectedPage);
+        consolidateShelves(r.continuationContents.sectionListContinuation.contents, 'watchNext.continuation.sectionList', detectedPage);
+      }
+
+      if (r?.continuationContents?.horizontalListContinuation?.items) {
+        const continuation = r.continuationContents.horizontalListContinuation;
+        addLongPress(continuation.items);
+        continuation.items = filterContinuationItems(continuation.items, detectedPage, !!continuation?.continuations, 'watchNext.continuation.horizontal');
+        normalizeHorizontalListRenderer(continuation, 'watchNext.continuation.horizontal');
+      }
+
+      if (r?.continuationContents?.pivotContinuation?.contents) {
+        processShelves(r.continuationContents.pivotContinuation.contents, false, detectedPage);
+        consolidateShelves(r.continuationContents.pivotContinuation.contents, 'watchNext.continuation.pivot', detectedPage);
+      }
+
+      return r;
     }
     // =========================================================
     // === END WATCH PAGE FAST PATH                          ===
