@@ -944,9 +944,9 @@ JSON.parse = function () {
 
     // === sectionListContinuation ===
     if (r?.continuationContents?.sectionListContinuation?.contents) {
-      processShelves(r.continuationContents.sectionListContinuation.contents, true, detectedPage);
-      consolidateShelves(r.continuationContents.sectionListContinuation.contents, 'continuation.sectionList', detectedPage);
-    }
+        processShelves(r.continuationContents.sectionListContinuation.contents, false, detectedPage);
+        consolidateShelves(r.continuationContents.sectionListContinuation.contents, 'watchNext.continuation.sectionList', detectedPage);
+      }
 
     // === pivotContinuation ===
     if (r?.continuationContents?.pivotContinuation?.contents) {
@@ -957,13 +957,13 @@ JSON.parse = function () {
 
     // === horizontalListContinuation ===
     if (r?.continuationContents?.horizontalListContinuation?.items) {
-      const continuation = r.continuationContents.horizontalListContinuation;
-      deArrowify(continuation.items);
-      hqify(continuation.items);
-      addLongPress(continuation.items);
-      continuation.items = filterContinuationItems(continuation.items, detectedPage, !!continuation?.continuations, 'horizontalListContinuation');
-      normalizeHorizontalListRenderer(continuation, 'continuation.horizontal');
-    }
+        const continuation = r.continuationContents.horizontalListContinuation;
+        deArrowify(continuation.items);
+        hqify(continuation.items);
+        addLongPress(continuation.items);
+        continuation.items = filterContinuationItems(continuation.items, detectedPage, !!continuation?.continuations, 'watchNext.continuation.horizontal');
+        normalizeHorizontalListRenderer(continuation, 'watchNext.continuation.horizontal');
+      }
 
     // === gridContinuation ===
     if (r?.continuationContents?.gridContinuation?.items) {
