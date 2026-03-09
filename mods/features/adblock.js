@@ -53,6 +53,13 @@ function isLikelyShortItem(item) {
   if (!tile) return false;
   if (tile?.tvhtml5ShelfRendererType === 'TVHTML5_TILE_RENDERER_TYPE_SHORTS') return true;
   if (tile?.onSelectCommand?.reelWatchEndpoint) return true;
+  // Check the overlay style flag — YouTube sets style='SHORTS' on converted Shorts
+  // even when they appear as normal tiles in subscription/channel feeds.
+  const overlays = tile?.header?.tileHeaderRenderer?.thumbnailOverlays || tile?.thumbnailOverlays || [];
+  for (const overlay of overlays) {
+    const style = overlay?.thumbnailOverlayTimeStatusRenderer?.style;
+    if (style === 'SHORTS' || style === 'SHORTS_TIME_STATUS_STYLE') return true;
+  }
   const title = String(tile?.metadata?.tileMetadataRenderer?.title?.simpleText || tile?.contentId || '').toLowerCase();
   if (title.includes('#shorts')) return true;
   const hashtagMatches = title.match(/#[a-z0-9_]+/gi);
@@ -961,7 +968,6 @@ function processShelves(shelves, shouldAddPreviews = true, pageHint = null) {
           // Catch converted Shorts: videos ≤180s that YouTube shows as normal tiles
           // with no Shorts-specific flags (common in subscription feeds).
           const secs = getTileDurationSeconds(item);
-          appendFileOnlyLog('shorts.duration.check', { videoId: item?.tileRenderer?.contentId, secs });
           if (secs !== null && secs <= 180) {
             appendFileOnlyLog('shorts.duration.removed', { videoId: item?.tileRenderer?.contentId, secs });
             return false;
