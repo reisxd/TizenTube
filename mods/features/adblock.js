@@ -213,7 +213,7 @@ function getShortInfo(item, opts = {}) {
 
   // Converted Shorts in subscriptions can arrive as plain tileRenderer entries with
   // no Shorts/reel endpoint marker. Keep duration fallback narrowly scoped there.
-  if (pageName === 'subscriptions' && totalSeconds <= 95) {
+  if (pageName === 'subscriptions' && totalSeconds <= 180) {
     return { isShort: true, reason: 'subscriptions_duration_fallback', title, lengthText, totalSeconds };
   }
 
