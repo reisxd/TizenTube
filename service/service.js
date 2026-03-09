@@ -73,7 +73,7 @@ const dialServer = new dial.Server({
                 
                 if (parsedData.yumi) {
                     app.additionalData = parsedData;
-                    app.state = "running"
+                    app.state = "running";
                     callback("");
                     return;
                 }
