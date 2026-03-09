@@ -60,23 +60,52 @@ function isLikelyShortItem(item) {
   return false;
 }
 
-// Parses a "M:SS" or "H:MM:SS" duration string from a tile's metadata lines.
-// Returns seconds as a number, or null if not found / not parseable.
+// Parses a duration string ("M:SS" or "H:MM:SS") from any known location in a TV tile.
+// YouTube TV stores duration in different places depending on the feed:
+//   - thumbnailOverlayTimeStatusRenderer (most common in subscription tiles)
+//   - metadata lines (some grid/shelf layouts)
+//   - lengthText (some tile variants)
+// Returns seconds as a number, or null if not found.
+function parseDurationText(text) {
+  const m = String(text || '').trim().match(/^(\d{1,2}):(\d{2})(?::(\d{2}))?$/);
+  if (!m) return null;
+  return m[3] !== undefined
+    ? Number(m[1]) * 3600 + Number(m[2]) * 60 + Number(m[3])
+    : Number(m[1]) * 60 + Number(m[2]);
+}
+
 function getTileDurationSeconds(item) {
   try {
-    const lines = item?.tileRenderer?.metadata?.tileMetadataRenderer?.lines || [];
+    const tile = item?.tileRenderer;
+    if (!tile) return null;
+
+    // 1. thumbnailOverlayTimeStatusRenderer — primary location for subscription/shelf tiles
+    const overlays = tile?.header?.tileHeaderRenderer?.thumbnailOverlays
+      || tile?.thumbnailOverlays || [];
+    for (const overlay of overlays) {
+      const tsr = overlay?.thumbnailOverlayTimeStatusRenderer;
+      if (!tsr) continue;
+      const text = tsr?.text?.simpleText || tsr?.text?.runs?.[0]?.text || '';
+      const secs = parseDurationText(text);
+      if (secs !== null) return secs;
+    }
+
+    // 2. metadata lines — used in some grid/shelf layouts
+    const lines = tile?.metadata?.tileMetadataRenderer?.lines || [];
     for (const line of lines) {
       for (const li of line?.lineRenderer?.items || []) {
         const text = li?.lineItemRenderer?.text?.simpleText
-          || li?.lineItemRenderer?.text?.runs?.[0]?.text
-          || '';
-        const m = String(text).match(/^(\d{1,2}):(\d{2})(?::(\d{2}))?$/);
-        if (m) {
-          return m[3] !== undefined
-            ? Number(m[1]) * 3600 + Number(m[2]) * 60 + Number(m[3])
-            : Number(m[1]) * 60 + Number(m[2]);
-        }
+          || li?.lineItemRenderer?.text?.runs?.[0]?.text || '';
+        const secs = parseDurationText(text);
+        if (secs !== null) return secs;
       }
+    }
+
+    // 3. lengthText (some tile variants)
+    const lengthText = tile?.lengthText?.simpleText || tile?.lengthText?.runs?.[0]?.text || '';
+    if (lengthText) {
+      const secs = parseDurationText(lengthText);
+      if (secs !== null) return secs;
     }
   } catch (_) {}
   return null;
@@ -932,6 +961,7 @@ function processShelves(shelves, shouldAddPreviews = true, pageHint = null) {
           // Catch converted Shorts: videos ≤180s that YouTube shows as normal tiles
           // with no Shorts-specific flags (common in subscription feeds).
           const secs = getTileDurationSeconds(item);
+          appendFileOnlyLog('shorts.duration.check', { videoId: item?.tileRenderer?.contentId, secs });
           if (secs !== null && secs <= 180) {
             appendFileOnlyLog('shorts.duration.removed', { videoId: item?.tileRenderer?.contentId, secs });
             return false;
