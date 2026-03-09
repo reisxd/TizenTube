@@ -1017,7 +1017,7 @@ JSON.parse = function () {
     return r;
   } catch (error) {
     appendFileOnlyLog('parse.error', { msg: String(error), stack: String(error?.stack || '').slice(0, 200) });
-    if (!window.__ttAdblockParseWarned) {
+    if (!window.__ttAdblockParseWarned && configRead('enableDebugConsole')) {
       window.__ttAdblockParseWarned = true;
       console.warn('[TizenTube] adblock parser patch failed', error);
     }
@@ -1184,22 +1184,33 @@ function deArrowify(items) {
     if (configRead('enableDeArrow')) {
       const capturedItem = item;
       const videoID = capturedItem.tileRenderer.contentId;
-      if (!videoID) continue;
-      fetch(`https://sponsor.ajay.app/api/branding?videoID=${videoID}`).then(res => res.json()).then(data => {
-        if (data.titles.length > 0) {
-          const mostVoted = data.titles.reduce((max, title) => max.votes > title.votes ? max : title);
-          capturedItem.tileRenderer.metadata.tileMetadataRenderer.title.simpleText = mostVoted.title;
-        }
-        if (data.thumbnails.length > 0 && configRead('enableDeArrowThumbnails')) {
-          const mostVotedThumbnail = data.thumbnails.reduce((max, thumbnail) => max.votes > thumbnail.votes ? max : thumbnail);
-          if (mostVotedThumbnail.timestamp) {
-            capturedItem.tileRenderer.header.tileHeaderRenderer.thumbnail.thumbnails = [{
-              url: `https://dearrow-thumb.ajay.app/api/v1/getThumbnail?videoID=${videoID}&time=${mostVotedThumbnail.timestamp}`,
-              width: 1280, height: 640
-            }];
-          }
-        }
-      }).catch(() => { });
+      // Skip playlists, channels — only real video IDs are 11 chars
+      if (!videoID || videoID.length !== 11) continue;
+      const delay = i * 80;
+      setTimeout(() => {
+        fetch(`https://sponsor.ajay.app/api/branding?videoID=${videoID}`)
+          .then(res => {
+            if (!res.ok) return null; // 404 = no DeArrow data, skip silently
+            return res.json();
+          })
+          .then(data => {
+            if (!data) return;
+            if (data.titles.length > 0) {
+              const mostVoted = data.titles.reduce((max, title) => max.votes > title.votes ? max : title);
+              capturedItem.tileRenderer.metadata.tileMetadataRenderer.title.simpleText = mostVoted.title;
+            }
+            if (data.thumbnails.length > 0 && configRead('enableDeArrowThumbnails')) {
+              const mostVotedThumbnail = data.thumbnails.reduce((max, thumbnail) => max.votes > thumbnail.votes ? max : thumbnail);
+              if (mostVotedThumbnail.timestamp) {
+                capturedItem.tileRenderer.header.tileHeaderRenderer.thumbnail.thumbnails = [{
+                  url: `https://dearrow-thumb.ajay.app/api/v1/getThumbnail?videoID=${videoID}&time=${mostVotedThumbnail.timestamp}`,
+                  width: 1280, height: 640
+                }];
+              }
+            }
+          })
+          .catch(() => { });
+      }, delay);
     }
   }
 }
@@ -1207,27 +1218,22 @@ function deArrowify(items) {
 // ===== hqify =====
 
 function hqify(items) {
-  for (const item of items) {
-    if (!item.tileRenderer) continue;
-    if (item.tileRenderer.style !== 'TILE_STYLE_YTLR_DEFAULT') continue;
-    if (!configRead('enableHqThumbnails')) continue;
+  items.forEach((item, index) => {
+    if (!item.tileRenderer) return;
+    if (item.tileRenderer.style !== 'TILE_STYLE_YTLR_DEFAULT') return;
+    if (!configRead('enableHqThumbnails')) return;
     const videoID = item.tileRenderer.onSelectCommand?.watchEndpoint?.videoId;
-    if (!videoID) continue;
-    // Guard: some home page tiles have no thumbnail yet (lazy-loaded) — skip rather than crash.
+    if (!videoID) return;
     const existingUrl = item.tileRenderer.header?.tileHeaderRenderer?.thumbnail?.thumbnails?.[0]?.url;
-    if (!existingUrl) continue;
-    // Do NOT carry over query args: the original `sqp` param is a signed token tied to the
-    // original filename — reusing it on a different filename causes a CDN signature mismatch
-    // and YouTube returns the grey "not available" placeholder instead of the real thumbnail.
-    // Start with hqdefault (guaranteed for every video), then async-upgrade to
-    // sddefault (640x480) if it exists on the CDN. On a TV the JSON parse →
-    // layout pipeline is slow enough that the HEAD usually resolves in time.
+    if (!existingUrl) return;
     const thumbs = item.tileRenderer.header.tileHeaderRenderer.thumbnail.thumbnails;
     thumbs[0] = { url: `https://i.ytimg.com/vi/${videoID}/hqdefault.jpg`, width: 480, height: 360 };
-    fetch(`https://i.ytimg.com/vi/${videoID}/sddefault.jpg`, { method: 'HEAD' })
-      .then(res => { if (res.ok) thumbs[0] = { url: `https://i.ytimg.com/vi/${videoID}/sddefault.jpg`, width: 640, height: 480 }; })
-      .catch(() => {});
-  }
+    setTimeout(() => {
+      fetch(`https://i.ytimg.com/vi/${videoID}/sddefault.jpg`, { method: 'HEAD' })
+        .then(res => { if (res.ok) thumbs[0] = { url: `https://i.ytimg.com/vi/${videoID}/sddefault.jpg`, width: 640, height: 480 }; })
+        .catch(() => {});
+    }, index * 50);
+  });
 }
 
 // ===== addLongPress =====

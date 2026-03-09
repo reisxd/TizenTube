@@ -39,11 +39,11 @@ const defaultConfig = {
   enableHideWatchedVideos: true,
   hideWatchedVideosThreshold: 5,
   hideWatchedVideosPages: [
-      'home', 
-      'search', 
-      'music', 
-      'gaming', 
-      'subscriptions', 
+      'home',
+      'search',
+      'music',
+      'gaming',
+      'subscriptions',
       'channel',
       'playlist',
       'more',
@@ -75,10 +75,15 @@ let localConfig;
 const populatedConfigWarnings = new Set();
 
 try {
-  localConfig = JSON.parse(window.localStorage[CONFIG_KEY]);
+  const raw = window.localStorage[CONFIG_KEY];
+  if (raw === undefined || raw === null || raw === '' || raw === 'undefined') {
+    localConfig = { ...defaultConfig };
+  } else {
+    localConfig = JSON.parse(raw);
+  }
 } catch (err) {
   console.warn('Config read failed:', err);
-  localConfig = defaultConfig;
+  localConfig = { ...defaultConfig };
 }
 
 if (!localConfig || typeof localConfig !== 'object') {
@@ -94,13 +99,16 @@ export function configRead(key) {
       console.warn('Populating key', key, 'with default value', defaultConfig[key]);
     }
   }
-
   return localConfig[key];
 }
 
 export function configWrite(key, value) {
   console.info('Setting key', key, 'to', value);
-  localConfig[key] = value;
+  if (value === undefined) {
+    delete localConfig[key];
+  } else {
+    localConfig[key] = value;
+  }
   window.localStorage[CONFIG_KEY] = JSON.stringify(localConfig);
   configChangeEmitter.dispatchEvent(new CustomEvent('configChange', { detail: { key, value } }));
 }
