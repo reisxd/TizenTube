@@ -1004,7 +1004,34 @@ function processShelves(shelves, shouldAddPreviews = true, pageHint = null) {
       const filterShortItems = (items) => {
         if (!Array.isArray(items)) return items;
         const before = items.length;
-        const filtered = items.filter(item => !getShortInfo(item).isShort);
+        const filtered = items.filter(item => {
+          const info = getShortInfo(item);
+          if (!info.isShort) {
+            // Diagnostic: dump renderer shape to understand what we're missing
+            const r = item?.tileRenderer || item?.videoRenderer || item?.richItemRenderer?.content?.videoRenderer || null;
+            const rendererType = item ? Object.keys(item)[0] : 'none';
+            const overlays = r?.header?.tileHeaderRenderer?.thumbnailOverlays || r?.thumbnailOverlays || [];
+            const overlayStyles = Array.isArray(overlays)
+              ? overlays.map(o => o?.thumbnailOverlayTimeStatusRenderer?.style).filter(Boolean)
+              : [];
+            const shelfType = r?.tvhtml5ShelfRendererType || null;
+            const lines = r?.metadata?.tileMetadataRenderer?.lines;
+            const lineTexts = Array.isArray(lines)
+              ? lines.flatMap(l => (l?.lineRenderer?.items || []).map(li => li?.lineItemRenderer?.text?.simpleText).filter(Boolean))
+              : [];
+            appendFileOnlyLog('shorts.miss', {
+              reason: info.reason,
+              title: info.title,
+              rendererType,
+              shelfType,
+              overlayStyles,
+              lengthText: info.lengthText || null,
+              lineTexts,
+              hasReelCmd: !!(r?.onSelectCommand?.reelWatchEndpoint),
+            });
+          }
+          return info.isShort;
+        });
         if (before !== filtered.length) {
           appendFileOnlyLog('shorts.tiles.filter', { page: activePage, shelf: i, before, after: filtered.length });
         }
