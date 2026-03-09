@@ -190,9 +190,7 @@ export function processTileArraysDeep(node, pageHint = null, path = 'root', dept
       }
 
       // Optional Shorts filter hook provided by adblock.js.
-      // Keep this deep Shorts pass scoped to subscriptions only.
-      // Other pages rely on dedicated shelf processing and should not be affected.
-      if (pageHint === 'subscriptions' && !configRead('enableShorts') && typeof window.__ttShortsFilterItem === 'function') {
+      if (!configRead('enableShorts') && typeof window.__ttShortsFilterItem === 'function') {
         const shortsBefore = filtered.length;
         filtered = filtered.filter((item) => {
           try {
