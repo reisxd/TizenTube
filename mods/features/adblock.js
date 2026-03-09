@@ -102,6 +102,22 @@ function getShortInfo(item) {
     return { isShort: true, reason: 'reelWatchEndpoint', title };
   }
 
+  // URL/browse metadata hints (covers converted Shorts rendered as normal videos)
+  const allText = collectAllText(item).join(' ').toLowerCase();
+  if (/\bshorts?\b/.test(allText)) {
+    return { isShort: true, reason: 'shorts_text', title };
+  }
+
+  const commandUrl = String(
+    renderer?.onSelectCommand?.watchEndpoint?.commandMetadata?.webCommandMetadata?.url
+    || renderer?.navigationEndpoint?.commandMetadata?.webCommandMetadata?.url
+    || item?.navigationEndpoint?.commandMetadata?.webCommandMetadata?.url
+    || ''
+  ).toLowerCase();
+  if (commandUrl.includes('/shorts/') || commandUrl.includes('shorts')) {
+    return { isShort: true, reason: 'shorts_url', title };
+  }
+
   // thumbnailOverlay style flags AND duration text
   let lengthText = null;
   const thumbnailOverlays = renderer.header?.tileHeaderRenderer?.thumbnailOverlays
@@ -145,8 +161,9 @@ function getShortInfo(item) {
   const totalSeconds = parseDurationToSeconds(lengthText);
   if (totalSeconds === null) return { isShort: false, reason: 'length_format_miss', title, lengthText };
 
-  const isShort = totalSeconds <= 180;
-  return { isShort, reason: isShort ? 'duration' : 'long_duration', title, lengthText, totalSeconds };
+  // Do not classify Shorts by duration alone. Some Shorts are converted and exceed
+  // classic thresholds, while normal videos can be legitimately short.
+  return { isShort: false, reason: 'duration_only_not_used', title, lengthText, totalSeconds };
 }
 
 // Convenience wrapper — returns true/false only.
@@ -1030,7 +1047,7 @@ function processShelves(shelves, shouldAddPreviews = true, pageHint = null) {
               hasReelCmd: !!(r?.onSelectCommand?.reelWatchEndpoint),
             });
           }
-          return info.isShort;
+          return !info.isShort;
         });
         if (before !== filtered.length) {
           appendFileOnlyLog('shorts.tiles.filter', { page: activePage, shelf: i, before, after: filtered.length });
