@@ -646,7 +646,7 @@ function clearKeepOneMarkers(items, label = 'continuation') {
 function filterContinuationItems(items, pageName, hasContinuation = false, label = 'continuation') {
   if (pageName === 'playlist' && !hasContinuation) clearPlaylistHelperVideoIdSet(label);
   clearKeepOneMarkers(items, label);
-  const filteredItems = hideVideo(items, pageName);
+  let filteredItems = hideVideo(items, pageName);
   filteredItems = filterShortsFromItems(filteredItems, pageName);
 
   if (pageName === 'playlist' && hasContinuation && filteredItems.length === 0 && Array.isArray(items) && items.length > 0) {
