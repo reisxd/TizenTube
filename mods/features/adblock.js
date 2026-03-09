@@ -1155,6 +1155,7 @@ function addPreviews(items) {
     if (item.tileRenderer) {
       const watchEndpoint = item.tileRenderer.onSelectCommand;
       if (item.tileRenderer?.onFocusCommand?.playbackEndpoint) continue;
+      if (item.tileRenderer?.onFocusCommand?.commandExecutorCommand) continue;
       item.tileRenderer.onFocusCommand = {
         startInlinePlaybackCommand: {
           blockAdoption: true, caption: false, delayMs: 3000, durationMs: 40000,
@@ -1235,7 +1236,7 @@ function addLongPress(items) {
         item.tileRenderer.style !== 'TILE_STYLE_YTLR_DEFAULT' &&
         item.tileRenderer.style !== 'TILE_STYLE_YTLR_VERTICAL_LIST'
       ) continue;
-      if (item.tileRenderer.onLongPressCommand) {
+      if (item.tileRenderer.onLongPressCommand?.showMenuCommand) {
         item.tileRenderer.onLongPressCommand.showMenuCommand?.menu?.menuRenderer?.items?.push(MenuServiceItemRenderer('Add to Queue', {
           clickTrackingParams: null,
           playlistEditEndpoint: { customAction: { action: 'ADD_TO_QUEUE', parameters: item } }
@@ -1243,6 +1244,7 @@ function addLongPress(items) {
         continue;
       }
       if (!configRead('enableLongPress')) continue;
+      if (!item.tileRenderer?.metadata?.tileMetadataRenderer) continue;
       const subtitle = item.tileRenderer.metadata.tileMetadataRenderer.lines[0].lineRenderer.items[0].lineItemRenderer.text;
       const data = longPressData({
         videoId: item.tileRenderer.contentId,
