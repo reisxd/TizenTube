@@ -1074,6 +1074,15 @@ function processShelves(shelves, shouldAddPreviews = true, pageHint = null) {
             const overlayStyles = Array.isArray(overlays)
               ? overlays.map(o => o?.thumbnailOverlayTimeStatusRenderer?.style).filter(Boolean)
               : [];
+            const thumbnails = getThumbnailCandidates(r, item);
+            const thumbnailRatios = thumbnails
+              .map((t) => {
+                const w = Number(t?.width);
+                const h = Number(t?.height);
+                return (Number.isFinite(w) && Number.isFinite(h) && w > 0) ? Number((h / w).toFixed(3)) : null;
+              })
+              .filter((v) => v !== null)
+              .slice(0, 6);
             const shelfType = r?.tvhtml5ShelfRendererType || null;
             const lines = r?.metadata?.tileMetadataRenderer?.lines;
             const lineTexts = Array.isArray(lines)
@@ -1087,6 +1096,7 @@ function processShelves(shelves, shouldAddPreviews = true, pageHint = null) {
               overlayStyles,
               lengthText: info.lengthText || null,
               lineTexts,
+              thumbnailRatios,
               hasReelCmd: !!(r?.onSelectCommand?.reelWatchEndpoint),
             });
           }
