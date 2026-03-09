@@ -57,6 +57,60 @@ function parseDurationToSeconds(lengthText) {
   return null;
 }
 
+function hasShortsEndpointMarkers(node, depth = 0, seen = new WeakSet()) {
+  if (!node || depth > 7) return false;
+  if (Array.isArray(node)) {
+    return node.some((child) => hasShortsEndpointMarkers(child, depth + 1, seen));
+  }
+  if (typeof node !== 'object') return false;
+  if (seen.has(node)) return false;
+  seen.add(node);
+
+  for (const [key, value] of Object.entries(node)) {
+    if (
+      key === 'reelWatchEndpoint' ||
+      key === 'shortsLockupViewModel' ||
+      key === 'shortsPivotItemRenderer'
+    ) {
+      return true;
+    }
+    if (typeof value === 'string') {
+      const str = value.toLowerCase();
+      if (
+        str.includes('/shorts/') ||
+        str.includes('web_page_type_shorts') ||
+        str.includes('reel_watch') ||
+        str.includes('tvhtml5_tile_renderer_type_shorts')
+      ) {
+        return true;
+      }
+    }
+    if (value && typeof value === 'object' && hasShortsEndpointMarkers(value, depth + 1, seen)) {
+      return true;
+    }
+  }
+  return false;
+}
+
+function getThumbnailCandidates(renderer, item) {
+  return [
+    ...(renderer?.header?.tileHeaderRenderer?.thumbnail?.thumbnails || []),
+    ...(renderer?.thumbnail?.thumbnails || []),
+    ...(renderer?.richThumbnail?.movingThumbnailRenderer?.movingThumbnailDetails?.thumbnails || []),
+    ...(item?.tileRenderer?.header?.tileHeaderRenderer?.thumbnail?.thumbnails || []),
+    ...(item?.tileRenderer?.thumbnail?.thumbnails || []),
+  ];
+}
+
+function hasPortraitShortsThumbnail(renderer, item) {
+  const thumbs = getThumbnailCandidates(renderer, item);
+  return thumbs.some((t) => {
+    const w = Number(t?.width);
+    const h = Number(t?.height);
+    return Number.isFinite(w) && Number.isFinite(h) && w > 0 && h > 0 && (h / w) >= 1.2;
+  });
+}
+
 // Comprehensive Shorts detection — ported from KrX3D/TizenTube working branch.
 // Returns { isShort, reason, title, lengthText, totalSeconds }.
 // Handles tileRenderer, videoRenderer, reelItemRenderer, lockupViewModel, and all
@@ -100,6 +154,14 @@ function getShortInfo(item) {
   // reelWatchEndpoint on the select command
   if (renderer.onSelectCommand?.reelWatchEndpoint) {
     return { isShort: true, reason: 'reelWatchEndpoint', title };
+  }
+
+  if (hasShortsEndpointMarkers(item) || hasShortsEndpointMarkers(renderer)) {
+    return { isShort: true, reason: 'endpoint_marker', title };
+  }
+
+  if (hasPortraitShortsThumbnail(renderer, item)) {
+    return { isShort: true, reason: 'portrait_thumbnail', title };
   }
 
   // URL/browse metadata hints (covers converted Shorts rendered as normal videos)
@@ -1031,6 +1093,15 @@ function processShelves(shelves, shouldAddPreviews = true, pageHint = null) {
             const overlayStyles = Array.isArray(overlays)
               ? overlays.map(o => o?.thumbnailOverlayTimeStatusRenderer?.style).filter(Boolean)
               : [];
+            const thumbnails = getThumbnailCandidates(r, item);
+            const thumbnailRatios = thumbnails
+              .map((t) => {
+                const w = Number(t?.width);
+                const h = Number(t?.height);
+                return (Number.isFinite(w) && Number.isFinite(h) && w > 0) ? Number((h / w).toFixed(3)) : null;
+              })
+              .filter((v) => v !== null)
+              .slice(0, 6);
             const shelfType = r?.tvhtml5ShelfRendererType || null;
             const lines = r?.metadata?.tileMetadataRenderer?.lines;
             const lineTexts = Array.isArray(lines)
@@ -1044,6 +1115,7 @@ function processShelves(shelves, shouldAddPreviews = true, pageHint = null) {
               overlayStyles,
               lengthText: info.lengthText || null,
               lineTexts,
+              thumbnailRatios,
               hasReelCmd: !!(r?.onSelectCommand?.reelWatchEndpoint),
             });
           }
