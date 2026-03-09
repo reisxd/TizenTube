@@ -843,10 +843,12 @@ JSON.parse = function () {
       consolidateShelves(r.contents.sectionListRenderer.contents, 'sectionList', detectedPage);
     }
 
-    // === tvBrowse gridRenderer ===
+    // tvBrowse top-level gridRenderer
     if (r?.contents?.tvBrowseRenderer?.content?.tvSurfaceContentRenderer?.content?.gridRenderer?.items) {
       const grid = r.contents.tvBrowseRenderer.content.tvSurfaceContentRenderer.content.gridRenderer;
-      grid.items = hideVideo(grid.items, detectedPage);
+      let gridItems = hideVideo(grid.items, detectedPage);
+      gridItems = filterShortsFromItems(gridItems, detectedPage);
+      grid.items = gridItems;
       normalizeGridRenderer(grid, 'contents.tvBrowseRenderer.grid');
     }
 
@@ -932,7 +934,9 @@ JSON.parse = function () {
 
           const tabGridItems = tab?.tabRenderer?.content?.tvSurfaceContentRenderer?.content?.gridRenderer?.items;
           if (Array.isArray(tabGridItems)) {
-            tab.tabRenderer.content.tvSurfaceContentRenderer.content.gridRenderer.items = hideVideo(tabGridItems, tabPage);
+            let filteredTabGrid = hideVideo(tabGridItems, tabPage);
+            filteredTabGrid = filterShortsFromItems(filteredTabGrid, tabPage);
+            tab.tabRenderer.content.tvSurfaceContentRenderer.content.gridRenderer.items = filteredTabGrid;
             normalizeGridRenderer(tab.tabRenderer.content.tvSurfaceContentRenderer.content.gridRenderer, 'tab.grid');
           }
 
