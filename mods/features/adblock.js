@@ -57,11 +57,57 @@ function parseDurationToSeconds(lengthText) {
   return null;
 }
 
+function hasShortsEndpointMarkers(node, depth = 0, seen = new WeakSet()) {
+  if (!node || depth > 7) return false;
+  if (Array.isArray(node)) {
+    return node.some((child) => hasShortsEndpointMarkers(child, depth + 1, seen));
+  }
+  if (typeof node !== 'object') return false;
+  if (seen.has(node)) return false;
+  seen.add(node);
+
+  for (const [key, value] of Object.entries(node)) {
+    if (
+      key === 'reelWatchEndpoint' ||
+      key === 'shortsLockupViewModel' ||
+      key === 'shortsPivotItemRenderer'
+    ) {
+      return true;
+    }
+    if (typeof value === 'string') {
+      const str = value.toLowerCase();
+      if (
+        str.includes('/shorts/') ||
+        str.includes('web_page_type_shorts') ||
+        str.includes('reel_watch') ||
+        str.includes('tvhtml5_tile_renderer_type_shorts')
+      ) {
+        return true;
+      }
+    }
+    if (value && typeof value === 'object' && hasShortsEndpointMarkers(value, depth + 1, seen)) {
+      return true;
+    }
+  }
+  return false;
+}
+
+function getThumbnailCandidates(renderer, item) {
+  return [
+    ...(renderer?.header?.tileHeaderRenderer?.thumbnail?.thumbnails || []),
+    ...(renderer?.thumbnail?.thumbnails || []),
+    ...(renderer?.richThumbnail?.movingThumbnailRenderer?.movingThumbnailDetails?.thumbnails || []),
+    ...(item?.tileRenderer?.header?.tileHeaderRenderer?.thumbnail?.thumbnails || []),
+    ...(item?.tileRenderer?.thumbnail?.thumbnails || []),
+  ];
+}
+
 // Comprehensive Shorts detection — ported from KrX3D/TizenTube working branch.
 // Returns { isShort, reason, title, lengthText, totalSeconds }.
 // Handles tileRenderer, videoRenderer, reelItemRenderer, lockupViewModel, and all
 // richItemRenderer variants — not just tileRenderer — so it works across all feed types.
-function getShortInfo(item) {
+function getShortInfo(item, opts = {}) {
+  const { pageName = null } = opts;
   if (!item) return { isShort: false, reason: 'no_item', title: 'unknown' };
 
   const title = item?.tileRenderer?.metadata?.tileMetadataRenderer?.title?.simpleText
@@ -100,6 +146,26 @@ function getShortInfo(item) {
   // reelWatchEndpoint on the select command
   if (renderer.onSelectCommand?.reelWatchEndpoint) {
     return { isShort: true, reason: 'reelWatchEndpoint', title };
+  }
+
+  if (hasShortsEndpointMarkers(item) || hasShortsEndpointMarkers(renderer)) {
+    return { isShort: true, reason: 'endpoint_marker', title };
+  }
+
+  // URL/browse metadata hints (covers converted Shorts rendered as normal videos)
+  const allText = collectAllText(item).join(' ').toLowerCase();
+  if (/\bshorts?\b/.test(allText)) {
+    return { isShort: true, reason: 'shorts_text', title };
+  }
+
+  const commandUrl = String(
+    renderer?.onSelectCommand?.watchEndpoint?.commandMetadata?.webCommandMetadata?.url
+    || renderer?.navigationEndpoint?.commandMetadata?.webCommandMetadata?.url
+    || item?.navigationEndpoint?.commandMetadata?.webCommandMetadata?.url
+    || ''
+  ).toLowerCase();
+  if (commandUrl.includes('/shorts/') || commandUrl.includes('shorts')) {
+    return { isShort: true, reason: 'shorts_url', title };
   }
 
   // thumbnailOverlay style flags AND duration text
@@ -145,13 +211,14 @@ function getShortInfo(item) {
   const totalSeconds = parseDurationToSeconds(lengthText);
   if (totalSeconds === null) return { isShort: false, reason: 'length_format_miss', title, lengthText };
 
-  const isShort = totalSeconds <= 180;
-  return { isShort, reason: isShort ? 'duration' : 'long_duration', title, lengthText, totalSeconds };
-}
+  // Converted Shorts in subscriptions can arrive as plain tileRenderer entries with
+  // no Shorts/reel endpoint marker. Keep duration fallback narrowly scoped there.
+  if (pageName === 'subscriptions' && totalSeconds <= 95) {
+    return { isShort: true, reason: 'subscriptions_duration_fallback', title, lengthText, totalSeconds };
+  }
 
-// Convenience wrapper — returns true/false only.
-function isLikelyShortItem(item) {
-  return getShortInfo(item).isShort;
+  // Do not classify Shorts by duration alone globally.
+  return { isShort: false, reason: 'duration_only_not_used', title, lengthText, totalSeconds };
 }
 
 
@@ -1005,7 +1072,7 @@ function processShelves(shelves, shouldAddPreviews = true, pageHint = null) {
         if (!Array.isArray(items)) return items;
         const before = items.length;
         const filtered = items.filter(item => {
-          const info = getShortInfo(item);
+          const info = getShortInfo(item, { pageName: activePage });
           if (!info.isShort) {
             // Diagnostic: dump renderer shape to understand what we're missing
             const r = item?.tileRenderer || item?.videoRenderer || item?.richItemRenderer?.content?.videoRenderer || null;
@@ -1014,6 +1081,15 @@ function processShelves(shelves, shouldAddPreviews = true, pageHint = null) {
             const overlayStyles = Array.isArray(overlays)
               ? overlays.map(o => o?.thumbnailOverlayTimeStatusRenderer?.style).filter(Boolean)
               : [];
+            const thumbnails = getThumbnailCandidates(r, item);
+            const thumbnailRatios = thumbnails
+              .map((t) => {
+                const w = Number(t?.width);
+                const h = Number(t?.height);
+                return (Number.isFinite(w) && Number.isFinite(h) && w > 0) ? Number((h / w).toFixed(3)) : null;
+              })
+              .filter((v) => v !== null)
+              .slice(0, 6);
             const shelfType = r?.tvhtml5ShelfRendererType || null;
             const lines = r?.metadata?.tileMetadataRenderer?.lines;
             const lineTexts = Array.isArray(lines)
@@ -1027,10 +1103,11 @@ function processShelves(shelves, shouldAddPreviews = true, pageHint = null) {
               overlayStyles,
               lengthText: info.lengthText || null,
               lineTexts,
+              thumbnailRatios,
               hasReelCmd: !!(r?.onSelectCommand?.reelWatchEndpoint),
             });
           }
-          return info.isShort;
+          return !info.isShort;
         });
         if (before !== filtered.length) {
           appendFileOnlyLog('shorts.tiles.filter', { page: activePage, shelf: i, before, after: filtered.length });
