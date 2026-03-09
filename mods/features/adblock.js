@@ -102,20 +102,12 @@ function getThumbnailCandidates(renderer, item) {
   ];
 }
 
-function hasPortraitShortsThumbnail(renderer, item) {
-  const thumbs = getThumbnailCandidates(renderer, item);
-  return thumbs.some((t) => {
-    const w = Number(t?.width);
-    const h = Number(t?.height);
-    return Number.isFinite(w) && Number.isFinite(h) && w > 0 && h > 0 && (h / w) >= 1.2;
-  });
-}
-
 // Comprehensive Shorts detection — ported from KrX3D/TizenTube working branch.
 // Returns { isShort, reason, title, lengthText, totalSeconds }.
 // Handles tileRenderer, videoRenderer, reelItemRenderer, lockupViewModel, and all
 // richItemRenderer variants — not just tileRenderer — so it works across all feed types.
-function getShortInfo(item) {
+function getShortInfo(item, opts = {}) {
+  const { pageName = null } = opts;
   if (!item) return { isShort: false, reason: 'no_item', title: 'unknown' };
 
   const title = item?.tileRenderer?.metadata?.tileMetadataRenderer?.title?.simpleText
@@ -158,10 +150,6 @@ function getShortInfo(item) {
 
   if (hasShortsEndpointMarkers(item) || hasShortsEndpointMarkers(renderer)) {
     return { isShort: true, reason: 'endpoint_marker', title };
-  }
-
-  if (hasPortraitShortsThumbnail(renderer, item)) {
-    return { isShort: true, reason: 'portrait_thumbnail', title };
   }
 
   // URL/browse metadata hints (covers converted Shorts rendered as normal videos)
@@ -223,14 +211,14 @@ function getShortInfo(item) {
   const totalSeconds = parseDurationToSeconds(lengthText);
   if (totalSeconds === null) return { isShort: false, reason: 'length_format_miss', title, lengthText };
 
-  // Do not classify Shorts by duration alone. Some Shorts are converted and exceed
-  // classic thresholds, while normal videos can be legitimately short.
-  return { isShort: false, reason: 'duration_only_not_used', title, lengthText, totalSeconds };
-}
+  // Converted Shorts in subscriptions can arrive as plain tileRenderer entries with
+  // no Shorts/reel endpoint marker. Keep duration fallback narrowly scoped there.
+  if (pageName === 'subscriptions' && totalSeconds <= 95) {
+    return { isShort: true, reason: 'subscriptions_duration_fallback', title, lengthText, totalSeconds };
+  }
 
-// Convenience wrapper — returns true/false only.
-function isLikelyShortItem(item) {
-  return getShortInfo(item).isShort;
+  // Do not classify Shorts by duration alone globally.
+  return { isShort: false, reason: 'duration_only_not_used', title, lengthText, totalSeconds };
 }
 
 
@@ -1084,7 +1072,7 @@ function processShelves(shelves, shouldAddPreviews = true, pageHint = null) {
         if (!Array.isArray(items)) return items;
         const before = items.length;
         const filtered = items.filter(item => {
-          const info = getShortInfo(item);
+          const info = getShortInfo(item, { pageName: activePage });
           if (!info.isShort) {
             // Diagnostic: dump renderer shape to understand what we're missing
             const r = item?.tileRenderer || item?.videoRenderer || item?.richItemRenderer?.content?.videoRenderer || null;
