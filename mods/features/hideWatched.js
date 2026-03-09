@@ -183,8 +183,33 @@ export function processTileArraysDeep(node, pageHint = null, path = 'root', dept
   if (Array.isArray(node)) {
     if (node.some(isVideoItem)) {
       const before = node.length;
-      const filtered = hideVideo(node, pageHint);
-      if (before !== filtered.length) appendFileOnlyLog('deep.tiles.filtered', { path, pageHint, before, after: filtered.length, removed: before - filtered.length });
+      let filtered = hideVideo(node, pageHint);
+      const afterHideWatched = filtered.length;
+      if (before !== afterHideWatched) {
+        appendFileOnlyLog('deep.tiles.filtered', { path, pageHint, before, after: afterHideWatched, removed: before - afterHideWatched });
+      }
+
+      // Optional Shorts filter hook provided by adblock.js.
+      if (!configRead('enableShorts') && typeof window.__ttShortsFilterItem === 'function') {
+        const shortsBefore = filtered.length;
+        filtered = filtered.filter((item) => {
+          try {
+            return !window.__ttShortsFilterItem(item, pageHint);
+          } catch {
+            return true;
+          }
+        });
+        if (shortsBefore !== filtered.length) {
+          appendFileOnlyLog('deep.shorts.filtered', {
+            path,
+            pageHint,
+            before: shortsBefore,
+            after: filtered.length,
+            removed: shortsBefore - filtered.length,
+          });
+        }
+      }
+
       node.splice(0, node.length, ...filtered);
       return;
     }
