@@ -739,7 +739,7 @@ function processResponsePayload(payload, detectedPage) {
     filterPlaylistRendererContents(arrayTopPlaylistRenderer, detectedPage, 'arrayPayload.playlist.renderer');
   }
 
-  processTileArraysDeep(payload, detectedPage, 'arrayPayload');
+  processTileArraysDeep(payload, detectedPage, 'arrayPayload', 0, filterShortsFromItems);
 }
 
 // ===== JSON.parse Patch =====
@@ -1007,7 +1007,7 @@ JSON.parse = function () {
 
     // === Safety net deep scan (skip watch page to avoid empty visual rows) ===
     if (detectedPage !== 'watch') {
-      processTileArraysDeep(r, detectedPage, 'response');
+      processTileArraysDeep(r, detectedPage, 'response', 0, filterShortsFromItems);
     }
 
     return r;

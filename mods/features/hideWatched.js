@@ -176,23 +176,24 @@ export function hideVideo(items, pageHint = null) {
 function isVideoItem(item) {
   return !!(item?.tileRenderer || item?.videoRenderer || item?.gridVideoRenderer
     || item?.compactVideoRenderer || item?.lockupViewModel);
-}
 
-export function processTileArraysDeep(node, pageHint = null, path = 'root', depth = 0) {
+}
+export function processTileArraysDeep(node, pageHint = null, path = 'root', depth = 0, extraFilter = null) {
   if (!node || depth > 10) return;
   if (Array.isArray(node)) {
     if (node.some(isVideoItem)) {
       const before = node.length;
-      const filtered = hideVideo(node, pageHint);
+      let filtered = hideVideo(node, pageHint);
+      if (extraFilter) filtered = extraFilter(filtered, pageHint);
       if (before !== filtered.length) appendFileOnlyLog('deep.tiles.filtered', { path, pageHint, before, after: filtered.length, removed: before - filtered.length });
       node.splice(0, node.length, ...filtered);
       return;
     }
-    for (let i = 0; i < node.length; i++) processTileArraysDeep(node[i], pageHint, `${path}[${i}]`, depth + 1);
+    for (let i = 0; i < node.length; i++) processTileArraysDeep(node[i], pageHint, `${path}[${i}]`, depth + 1, extraFilter);
     return;
   }
   if (typeof node !== 'object') return;
-  for (const key of Object.keys(node)) processTileArraysDeep(node[key], pageHint, `${path}.${key}`, depth + 1);
+  for (const key of Object.keys(node)) processTileArraysDeep(node[key], pageHint, `${path}.${key}`, depth + 1, extraFilter);
 }
 
 // ── consolidateShelves ────────────────────────────────────────────────────────
