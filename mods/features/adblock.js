@@ -794,7 +794,7 @@ JSON.parse = function () {
     if (r.playerAds && adBlockEnabled) r.playerAds = false;
     if (r.adSlots && adBlockEnabled) r.adSlots = [];
 
-    // === Watch progress entity cache (needed on all pages for hideWatched) ===
+    // === Watch progress entity cache ===
     if (r?.frameworkUpdates?.entityBatchUpdate?.mutations) {
       if (!window._ttVideoProgressCache) window._ttVideoProgressCache = {};
       for (const mutation of r.frameworkUpdates.entityBatchUpdate.mutations) {
@@ -811,9 +811,13 @@ JSON.parse = function () {
             || payload?.videoData?.videoId || null;
           if (explicitId) window._ttVideoProgressCache[String(explicitId)] = Number(pct);
         }
-        for (const entry of collectWatchProgressEntries(payload)) {
-          if (window._ttVideoProgressCache[entry.id] === undefined) {
-            window._ttVideoProgressCache[entry.id] = Number(entry.percent);
+        // Deep scan only on feed pages — on watch page these are player heartbeats
+        // and the deep scan is pure wasted CPU that competes with the video stream
+        if (detectedPage !== 'watch') {
+          for (const entry of collectWatchProgressEntries(payload)) {
+            if (window._ttVideoProgressCache[entry.id] === undefined) {
+              window._ttVideoProgressCache[entry.id] = Number(entry.percent);
+            }
           }
         }
       }
