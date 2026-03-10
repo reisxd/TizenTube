@@ -487,37 +487,49 @@ function compactPlaylistVirtualRows(reason = 'playlist.row_compact') {
 }
 
 function removeRetiredHelpersFromTiles(reason = 'playlist.helper.tile_scan') {
+  // Prevent re-entrant calls triggered by our own DOM removals
+  if (window.__ttRemovingHelperTiles) return { scannedTiles: 0, removed: 0, matchedIds: [] };
   const retiredIds = Array.from(getRetiredPlaylistHelperVideoIdSet());
   if (!retiredIds.length) return { scannedTiles: 0, removed: 0, matchedIds: [] };
 
   const tiles = getPlaylistTileNodes();
+  if (!tiles.length) return { scannedTiles: 0, removed: 0, matchedIds: [] };
+
+  window.__ttRemovingHelperTiles = true;
   let matchedTiles = 0, removed = 0, skippedUnsafe = 0;
   const removedTiles = new Set(), matchedIds = new Set();
 
-  for (const tile of tiles) {
-    const html = String(tile?.outerHTML || '');
-    if (!html) continue;
-    for (const id of retiredIds) {
-      if (!id || !html.includes(id)) continue;
-      matchedIds.add(id);
-      matchedTiles++;
-      try {
-        const rowNode = tile.closest('.TXB27d');
-        const rowClass = String(rowNode?.className || '');
-        const focused = rowClass.includes('lxpVI') || rowClass.includes('zylon-focus') || tile.classList?.contains('zylon-focus');
-        if (!isHelperLikePlaylistNode(rowNode, tile) || focused) { skippedUnsafe++; break; }
-        if (!removedTiles.has(tile)) { removedTiles.add(tile); tile.remove(); removed++; }
-      } catch (_) { }
-      break;
+  try {
+    for (const tile of tiles) {
+      const html = String(tile?.outerHTML || '');
+      if (!html) continue;
+      for (const id of retiredIds) {
+        if (!id || !html.includes(id)) continue;
+        matchedIds.add(id);
+        matchedTiles++;
+        try {
+          const rowNode = tile.closest('.TXB27d');
+          const rowClass = String(rowNode?.className || '');
+          const focused = rowClass.includes('lxpVI') || rowClass.includes('zylon-focus') || tile.classList?.contains('zylon-focus');
+          if (!isHelperLikePlaylistNode(rowNode, tile) || focused) { skippedUnsafe++; break; }
+          if (!removedTiles.has(tile)) { removedTiles.add(tile); tile.remove(); removed++; }
+        } catch (_) { }
+        break;
+      }
     }
+
+    // Only compact if we actually removed something — avoids unnecessary DOM queries
+    if (removed > 0) {
+      compactPlaylistVirtualRows(`${reason}.tile_scan`);
+      if (detectCurrentPage() === 'playlist') {
+        schedulePlaylistAutoLoad(`${reason}.tile_detected`);
+      }
+    }
+  } finally {
+    window.__ttRemovingHelperTiles = false;
   }
 
-  const compactResult = compactPlaylistVirtualRows(`${reason}.tile_scan`);
-  if ((matchedTiles > 0 || removed > 0) && detectCurrentPage() === 'playlist') {
-    schedulePlaylistAutoLoad(`${reason}.tile_detected`);
-  }
-
-  appendFileOnlyLog('playlist.helper.tile_scan', { reason, retiredCount: retiredIds.length, scannedTiles: tiles.length, removed, matchedTiles, skippedUnsafe, matchedIds: Array.from(matchedIds), compactRemovedPlaceholders: compactResult.removedPlaceholders });
+  appendFileOnlyLog('playlist.helper.tile_scan', { reason, retiredCount: retiredIds.length, scannedTiles: tiles.length, removed, matchedTiles, skippedUnsafe, matchedIds: Array.from(matchedIds) });
   return { scannedTiles: tiles.length, removed, matchedIds: Array.from(matchedIds), matchedTiles };
 }
 
@@ -525,15 +537,30 @@ function ensurePlaylistHelperObserver() {
   if (window.__ttPlaylistHelperObserverInstalled) return;
   if (typeof MutationObserver === 'undefined' || typeof document === 'undefined' || !document?.documentElement) return;
 
-  const observer = new MutationObserver((mutations) => {
+  let debounceTimer = null;
+  let isProcessing = false;
+
+  const process = () => {
+    if (isProcessing) return;
     if (detectCurrentPage() !== 'playlist') return;
     if (getRetiredPlaylistHelperVideoIdSet().size === 0) return;
-    let added = 0;
-    for (const mutation of mutations) added += mutation?.addedNodes?.length || 0;
-    const result = removeRetiredHelpersFromTiles('observer.mutation');
-    if (added > 0 || result.removed > 0) {
-      appendFileOnlyLog('playlist.helper.observer.tick', { added, removed: result.removed, matchedTiles: result.matchedTiles || 0 });
+    isProcessing = true;
+    try {
+      const result = removeRetiredHelpersFromTiles('observer.mutation');
+      if (result.removed > 0) {
+        appendFileOnlyLog('playlist.helper.observer.tick', { removed: result.removed, matchedTiles: result.matchedTiles || 0 });
+      }
+    } finally {
+      isProcessing = false;
     }
+  };
+
+  const observer = new MutationObserver(() => {
+    if (isProcessing) return; // drop mutations caused by our own DOM removals
+    if (detectCurrentPage() !== 'playlist') return;
+    if (getRetiredPlaylistHelperVideoIdSet().size === 0) return;
+    if (debounceTimer) clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(process, 300); // batch all rapid mutations into one pass
   });
 
   observer.observe(document.documentElement, { childList: true, subtree: true });
