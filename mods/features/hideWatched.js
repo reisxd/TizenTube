@@ -214,6 +214,24 @@ export function consolidateShelves(contents, path = 'unknown', pageName = null) 
   const allItems = shelves.flatMap(s => s.shelfRenderer.content.horizontalListRenderer.items || []);
   if (!allItems.length) return;
 
+  // Deduplicate by contentId — continuations sometimes re-send items from the
+  // previous batch as context, causing the same video to appear twice in allItems
+  const seenIds = new Set();
+  const dedupedItems = allItems.filter(item => {
+    const id = item?.tileRenderer?.contentId
+      || item?.tileRenderer?.onSelectCommand?.watchEndpoint?.videoId
+      || null;
+    if (!id) return true; // non-video items (buttons etc) — always keep
+    if (seenIds.has(id)) {
+      appendFileOnlyLog('consolidate.dedup', { path, videoId: id });
+      return false;
+    }
+    seenIds.add(id);
+    return true;
+  });
+
+  if (!dedupedItems.length) return;
+
   const insertAt = contents.findIndex(c => c.shelfRenderer);
   for (let i = contents.length - 1; i >= 0; i--) if (contents[i].shelfRenderer) contents.splice(i, 1);
 
@@ -222,17 +240,30 @@ export function consolidateShelves(contents, path = 'unknown', pageName = null) 
   const template = shelves[0];
   const newShelves = [];
 
-  for (let i = 0; i + perRow <= allItems.length; i += perRow) {
+  for (let i = 0; i + perRow <= dedupedItems.length; i += perRow) {
     newShelves.push({
       shelfRenderer: {
         ...template.shelfRenderer,
-        content: { horizontalListRenderer: { ...template.shelfRenderer.content.horizontalListRenderer, items: allItems.slice(i, i + perRow) } }
+        content: { horizontalListRenderer: { ...template.shelfRenderer.content.horizontalListRenderer, items: dedupedItems.slice(i, i + perRow) } }
+      }
+    });
+  }
+
+  // If the last batch doesn't fill a complete row, add it as a partial row
+  // rather than silently dropping those videos
+  const remainder = dedupedItems.length % perRow;
+  if (remainder > 0) {
+    const lastBatch = dedupedItems.slice(dedupedItems.length - remainder);
+    newShelves.push({
+      shelfRenderer: {
+        ...template.shelfRenderer,
+        content: { horizontalListRenderer: { ...template.shelfRenderer.content.horizontalListRenderer, items: lastBatch } }
       }
     });
   }
 
   contents.splice(insertAt, 0, ...newShelves);
-  appendFileOnlyLog('consolidate.done', { path, totalItems: allItems.length, newRows: newShelves.length });
+  appendFileOnlyLog('consolidate.done', { path, totalItems: allItems.length, deduped: allItems.length - dedupedItems.length, newRows: newShelves.length });
 }
 
 // ── Entity mutation progress cache ────────────────────────────────────────────
