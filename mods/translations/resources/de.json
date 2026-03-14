@@ -1,0 +1,190 @@
+{
+    "__contributors": ["CrazyWolf13"],
+    "settings": {
+        "options": {
+            "socialMedia": {
+                "title": "Social-Media-Links",
+                "qrCodeScanMessage": "Du kannst die {{name}}-Seite besuchen, indem du den untenstehenden QR-Code scannst."
+            },
+            "adBlock": "Werbeblocker",
+            "sponsorblock": {
+                "title": "SponsorBlock-Einstellungen",
+                "options": {
+                    "enableSB": "SponsorBlock aktivieren",
+                    "manualSkip": "Manuelles Überspringen von SponsorBlock-Segmenten",
+                    "segments": "Segmente",
+                    "categories": {
+                        "sponsor": "Sponsor-Segmente überspringen",
+                        "intro": "Intro-Segmente überspringen",
+                        "outro": "Outro-Segmente überspringen",
+                        "interaction": "Interaktionsaufforderungen überspringen",
+                        "selfpromo": "Eigenwerbung überspringen",
+                        "preview": "Vorschau-/Zusammenfassungs-Segmente überspringen",
+                        "filler": "Abschweifungen/Witze überspringen",
+                        "music_offtopic": "Off-Topic-Musiksegmente überspringen",
+                        "highlights": "Highlights aktivieren"
+                    },
+                    "showSBToasts": "SponsorBlock-Pop-Ups anzeigen"
+                }
+            },
+            "dearrow": {
+                "title": "DeArrow-Einstellungen",
+                "options": {
+                    "enableDA": "DeArrow aktivieren",
+                    "enableDAThumbnails": "DeArrow-Thumbnails aktivieren"
+                }
+            },
+            "misc": {
+                "title": "Sonstige Einstellungen",
+                "options": {
+                    "endScreenCards": "Endbildschirm-Karten ausblenden",
+                    "youThereRenderer": "'Schaust du noch?' anzeigen",
+                    "paidPromoOverlay": "'Enthält bezahlte Werbung'-Overlay anzeigen",
+                    "whosWatching": {
+                        "title": "„Wer schaut?“ Menü",
+                        "options": {
+                            "enableWW": "„Wer schaut?“ Menü aktivieren",
+                            "permaEnableWW": "„Wer schaut?“ Menü dauerhaft aktivieren",
+                            "enableWWOnExit": "„Wer schaut?“ Menü beim Beenden der App anzeigen"
+                        }
+                    },
+                    "fixUI": "UI korrigieren",
+                    "hqThumbnails": "Hochqualitative Thumbnails aktivieren",
+                    "longPress": "Gedrückthalten-Aktionen aktivieren"
+                    "shorts": "Shorts aktivieren",
+                    "videoPreviews": "Videovorschauen aktivieren",
+                    "ttWelcomeMsg": "TT-Begrüßungsnachricht anzeigen",
+                    "guestSignInReminder": "Gast-Anmeldeerinnerung anzeigen",
+                    "reloadHomeOnStartup": "Startseite beim Start neu laden"
+                }
+            },
+            "subtitles": {
+                "title": "Untertitel-Einstellungen",
+                "options": {
+                    "showLocalSubtitle": "Lokale Untertitel anzeigen",
+                    "showHiddenSubtitles": "Versteckte Untertitel anzeigen"
+                }
+            },
+            "videoPlayer": {
+                "title": "Videoplayer-Einstellungen",
+                "subtitle": "Videoplayer-Funktionen anpassen",
+                "options": {
+                    "patching": {
+                        "title": "Videoplayer-UI patchen",
+                        "options": {
+                            "enableVPUIPatching": "Videoplayer-UI-Patching aktivieren",
+                            "previousNextBtns": "Vorheriger-/Nächster-Buttons aktivieren",
+                            "showSuperThxBtn": "Super-Thanks-Button anzeigen",
+                            "showSpeedCtrlBtn": "Geschwindigkeitssteuerungs-Button anzeigen"
+                        }
+                    },
+                    "preferredVideoQuality": {
+                        "title": "Bevorzugte Videoqualität",
+                        "subtitle": "Wähle die bevorzugte oder nächstbeste Videoqualität, die beim Start der Wiedergabe verwendet wird"
+                    },
+                    "speedSettings": {
+                        "title": "Geschwindigkeitsstufen",
+                        "subtitle": "Lege die Schritte für Anpassungen der Wiedergabegeschwindigkeit fest"
+                    },
+                    "preferredVideoCodec": {
+                        "title": "Bevorzugter Videocodec",
+                        "subtitle": "Wähle den bevorzugten Videocodec für die Wiedergabe"
+                    },
+                    "afr": "Automatische Bildrate",
+                    "afrPauseDuration": {
+                        "title": "Pause bei automatischer Bildrate",
+                        "subtitle": "Lege fest, wie lange (in Sekunden) das Video pausiert wird, wenn die Bildrate angepasst wird"
+                    }
+                }
+            },
+            "uiSettings": {
+                "title": "Benutzeroberflächen-Einstellungen",
+                "subtitle": "Passe die Oberfläche nach deinen Wünschen an",
+                "options": {
+                    "hideWatchedVideos": {
+                        "title": "Angesehene Videos ausblenden",
+                        "options": {
+                            "enableHideWatchedVideos": "Ausblenden angesehener Videos aktivieren",
+                            "watchedVideosThreshold": {
+                                "title": "Schwellenwert für angesehene Videos",
+                                "subtitle": "Lege den Prozentsatz fest, ab dem Videos als angesehen gelten und ausgeblendet werden"
+                            },
+                            "setPagesToHideWatchedVideos": "Seiten festlegen, auf denen angesehene Videos ausgeblendet werden"
+                        }
+                    },
+                    "screenDimming": {
+                        "title": "Bildschirmabdunklung",
+                        "options": {
+                            "enableScreenDimming": "Bildschirmabdunklung aktivieren",
+                            "dimmingTimeout": {
+                                "title": "Timeout für Abdunklung",
+                                "subtitle": "Lege die Inaktivitätszeit (in Sekunden) fest, bevor der Bildschirm abgedunkelt wird"
+                            },
+                            "dimmingOpacity": {
+                                "title": "Abdunklungs-Deckkraft",
+                                "subtitle": "Lege die Deckkraft der Bildschirmabdunklung fest"
+                            }
+                        }
+                    },
+                    "disableSidebarContents": {
+                        "title": "Seitenleisten-Inhalte deaktivieren",
+                        "subtitle": "Wähle Seitenleisten-Inhalte aus, die deaktiviert werden sollen"
+                    },
+                    "launchToOnStartup": {
+                        "title": "Startseite beim Start",
+                        "subtitle": "Wähle die Standardseite, die TizenTube beim Start öffnet"
+                    }
+                },
+                "updater": {
+                    "title": "TizenTube Cobalt Updater",
+                    "menuSubtitle": "TizenTube Cobalt Updates verwalten",
+                    "versionSubtitle": "Aktuelle Version: {{version}}",
+                    "options": {
+                        "checkForUpdates": "Nach Updates suchen",
+                        "checkForUpdatesOnStartup": "Beim Start nach Updates suchen"
+                    }
+                }
+            }
+        },
+        "ttSettings": {
+            "title": "TizenTube-Einstellungen",
+            "madeByText": "Erstellt von Reis Can (reisxd) mit ❤️",
+            "summary": "TizenTube-Einstellungen öffnen"
+        },
+        "supportTT": {
+            "title": "TizenTube unterstützen",
+            "subtitle": "❤️ Unterstütze TizenTube und seine Entwicklung",
+            "content": {
+                "1": "Wenn dir TizenTube gefällt und du seine Entwicklung unterstützen möchtest, ziehe Folgendes in Betracht:",
+                "2": "1. Markiere das GitHub-Repository mit einem Stern, um seine Sichtbarkeit zu erhöhen.",
+                "3": "2. Teile TizenTube mit anderen.",
+                "4": "Wenn du finanziell beitragen möchtest, kannst du spenden:",
+                "5": "- Buy Me A Coffee: https://www.buymeacoffee.com/reisxd (bevorzugt)",
+                "6": "- GitHub Sponsors: https://github.com/sponsors/reisxd"
+            }
+        }
+    },
+    "welcomeMsg": {
+        "title": "Willkommen bei TizenTube",
+        "subtitle": "Gehe zu den Einstellungen und klicke auf TizenTube-Einstellungen."
+    },
+    "sponsorblock": {
+        "segments": {
+            "sponsor": "Sponsor-Segment",
+            "intro": "Intro",
+            "outro": "Outro",
+            "interaction": "Interaktionshinweis",
+            "selfpromo": "Eigenwerbung",
+            "preview": "Zusammenfassung oder Vorschau",
+            "filler": "Abschweifung",
+            "music_offtopic": "Nicht-Musik-Teil",
+            "poi_highlight": "Highlight"
+        },
+        "toasts": {
+            "skipping": "{{segment}} wird übersprungen",
+            "notSkipping": "{{segment}} wird nicht übersprungen (wurde {{count}} mal übersprungen)",
+            "skip": "{{segment}} überspringen",
+            "skipToHighlight": "Zum Highlight springen"
+        }
+    }
+}
