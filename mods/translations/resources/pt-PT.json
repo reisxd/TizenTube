@@ -1,0 +1,190 @@
+{
+    "__contributors": ["joaopferreira19"],
+    "settings": {
+        "options": {
+            "socialMedia": {
+                "title": "Ligações de Redes Sociais",
+                "qrCodeScanMessage": "Podes visitar a página {{name}} ao digitalizar o código QR abaixo."
+            },
+            "adBlock": "Bloqueador de Anúncios",
+            "sponsorblock": {
+                "title": "Definições do SponsorBlock",
+                "options": {
+                    "enableSB": "Ativar SponsorBlock",
+                    "manualSkip": "Ignorar segmento do SponsorBlock manualmente",
+                    "segments": "Segmentos",
+                    "categories": {
+                        "sponsor": "Ignorar segmentos patrocinados",
+                        "intro": "Ignorar segmentos de introdução",
+                        "outro": "Ignorar segmentos de final",
+                        "interaction": "Ignorar lembretes de interação",
+                        "selfpromo": "Ignorar autopromoções",
+                        "preview": "Ignorar pré-visualizações/recapitulações",
+                        "filler": "Ignorar tangentes/piadas",
+                        "music_offtopic": "Ignorar música fora de contexto",
+                        "highlights": "Ativar destaques"
+                    },
+                    "showSBToasts": "Mostrar notificações do SponsorBlock"
+                }
+            },
+            "dearrow": {
+                "title": "Definições do DeArrow",
+                "options": {
+                    "enableDA": "Ativar DeArrow",
+                    "enableDAThumbnails": "Ativar miniaturas do DeArrow"
+                }
+            },
+            "misc": {
+                "title": "Outras Definições",
+                "options": {
+                    "endScreenCards": "Ocultar cartões de ecrã final",
+                    "youThereRenderer": "Ativar mensagem 'Ainda estás a ver?'",
+                    "paidPromoOverlay": "Ativar sobreposição 'Inclui promoção paga'",
+                    "whosWatching": {
+                        "title": "Menu 'Quem está a ver'",
+                        "options": {
+                            "enableWW": "Ativar menu 'Quem está a ver'",
+                            "permaEnableWW": "Ativar permanentemente o menu 'Quem está a ver'",
+                            "enableWWOnExit": "Ativar menu 'Quem está a ver' ao sair da aplicação"
+                        }
+                    },
+                    "fixUI": "Corrigir interface",
+                    "hqThumbnails": "Ativar miniaturas de alta qualidade",
+                    "longPress": "Ativar ações com pressão longa",
+                    "shorts": "Ativar Shorts",
+                    "videoPreviews": "Ativar pré-visualizações de vídeo",
+                    "ttWelcomeMsg": "Mostrar mensagem de boas-vindas do TT",
+                    "guestSignInReminder": "Mostrar lembrete de início de sessão para convidados",
+                    "reloadHomeOnStartup": "Recarregar página inicial ao iniciar"
+                }
+            },
+            "subtitles": {
+                "title": "Definições de Legendas",
+                "options": {
+                    "showLocalSubtitle": "Mostrar legendas locais",
+                    "showHiddenSubtitles": "Mostrar legendas ocultas"
+                }
+            },
+            "videoPlayer": {
+                "title": "Definições do Reprodutor de Vídeo",
+                "subtitle": "Personaliza as funcionalidades do reprodutor de vídeo",
+                "options": {
+                    "patching": {
+                        "title": "Modificar interface do reprodutor de vídeo",
+                        "options": {
+                            "enableVPUIPatching": "Ativar modificação da interface do reprodutor",
+                            "previousNextBtns": "Ativar botões Anterior e Seguinte",
+                            "showSuperThxBtn": "Mostrar botão 'Super Thanks'",
+                            "showSpeedCtrlBtn": "Mostrar botão de controlo de velocidade"
+                        }
+                    },
+                    "preferredVideoQuality": {
+                        "title": "Qualidade de vídeo preferida",
+                        "subtitle": "Escolhe a qualidade preferida ou a melhor disponível ao iniciar a reprodução"
+                    },
+                    "speedSettings": {
+                        "title": "Incrementos da velocidade de reprodução",
+                        "subtitle": "Define os incrementos da velocidade de reprodução do vídeo"
+                    },
+                    "preferredVideoCodec": {
+                        "title": "Codec de vídeo preferido",
+                        "subtitle": "Escolhe o codec de vídeo preferido para reprodução"
+                    },
+                    "afr": "Taxa de fotogramas automática",
+                    "afrPauseDuration": {
+                        "title": "Duração da pausa da taxa de fotogramas automática",
+                        "subtitle": "Define a duração (em segundos) da pausa do vídeo ao ajustar a taxa de fotogramas"
+                    }
+                }
+            },
+            "uiSettings": {
+                "title": "Definições da Interface",
+                "subtitle": "Personaliza a interface ao teu gosto",
+                "options": {
+                    "hideWatchedVideos": {
+                        "title": "Ocultar vídeos vistos",
+                        "options": {
+                            "enableHideWatchedVideos": "Ativar ocultação de vídeos vistos",
+                            "watchedVideosThreshold": {
+                                "title": "Limite de vídeos vistos",
+                                "subtitle": "Define a percentagem a partir da qual os vídeos vistos são ocultados"
+                            },
+                            "setPagesToHideWatchedVideos": "Definir páginas onde ocultar vídeos vistos"
+                        }
+                    },
+                    "screenDimming": {
+                        "title": "Escurecimento do ecrã",
+                        "options": {
+                            "enableScreenDimming": "Ativar escurecimento do ecrã",
+                            "dimmingTimeout": {
+                                "title": "Tempo de inatividade",
+                                "subtitle": "Define o tempo de inatividade (em segundos) antes de o ecrã escurecer"
+                            },
+                            "dimmingOpacity": {
+                                "title": "Opacidade do escurecimento",
+                                "subtitle": "Define o nível de opacidade do escurecimento do ecrã"
+                            }
+                        }
+                    },
+                    "disableSidebarContents": {
+                        "title": "Desativar conteúdos da barra lateral",
+                        "subtitle": "Seleciona os conteúdos da barra lateral a desativar"
+                    },
+                    "launchToOnStartup": {
+                        "title": "Abrir ao iniciar",
+                        "subtitle": "Escolhe a página padrão que o TizenTube abre ao iniciar"
+                    }
+                },
+                "updater": {
+                    "title": "Atualizador do TizenTube Cobalt",
+                    "menuSubtitle": "Gerir atualizações do TizenTube Cobalt",
+                    "versionSubtitle": "Versão atual: {{version}}",
+                    "options": {
+                        "checkForUpdates": "Verificar atualizações",
+                        "checkForUpdatesOnStartup": "Verificar atualizações ao iniciar"
+                    }
+                }
+            }
+        },
+        "ttSettings": {
+            "title": "Definições do TizenTube",
+            "madeByText": "Feito por Reis Can (reisxd) com ❤️",
+            "summary": "Abrir definições do TizenTube"
+        },
+        "supportTT": {
+            "title": "Apoiar o TizenTube",
+            "subtitle": "❤️ Demonstra apoio ao TizenTube e ao seu desenvolvimento",
+            "content": {
+                "1": "Se gostas de usar o TizenTube e queres apoiar o seu desenvolvimento, considera o seguinte:",
+                "2": "1. Dá uma estrela ao repositório no GitHub para ajudar a aumentar a sua visibilidade.",
+                "3": "2. Partilha o TizenTube com outras pessoas.",
+                "4": "Se quiseres contribuir financeiramente, considera fazer uma doação:",
+                "5": "- Buy Me A Coffee: https://www.buymeacoffee.com/reisxd (preferencialmente)",
+                "6": "- GitHub Sponsors: https://github.com/sponsors/reisxd"
+            }
+        }
+    },
+    "welcomeMsg": {
+        "title": "Bem-vindo ao TizenTube",
+        "subtitle": "Navega até às definições e clica em 'Definições do TizenTube'."
+    },
+    "sponsorblock": {
+        "segments": {
+            "sponsor": "segmento patrocinado",
+            "intro": "introdução",
+            "outro": "final",
+            "interaction": "lembrete de interação",
+            "selfpromo": "autopromoção",
+            "preview": "recapitulação ou pré-visualização",
+            "filler": "tangentes",
+            "music_offtopic": "parte não musical",
+            "poi_highlight": "destaque"
+        },
+        "toasts": {
+            "skipping": "A ignorar {{segment}}",
+            "notSkipping": "A mostrar {{segment}} (foi ignorado {{count}} vezes)",
+            "skip": "Ignorar {{segment}}",
+            "skipToHighlight": "Saltar para o destaque"
+        }
+    }
+}
