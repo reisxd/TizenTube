@@ -1,0 +1,190 @@
+{
+    "__contributors": ["reisxd", "palincat"],
+    "settings": {
+        "options": {
+            "socialMedia": {
+                "title": "Link-uri rețele de socializare",
+                "qrCodeScanMessage": "Poți vizita pagina {{name}} scanând codul QR de mai jos."
+            },
+            "adBlock": "Ad Block",
+            "sponsorblock": {
+                "title": "Setări SponsorBlock",
+                "options": {
+                    "enableSB": "Activează SponsorBlock",
+                    "manualSkip": "Omitere manuală a segmentelor SponsorBlock",
+                    "segments": "Segmente",
+                    "categories": {
+                        "sponsor": "Sari peste segmentele sponsorizate",
+                        "intro": "Sari peste segmentele intro",
+                        "outro": "Sari peste segmentele outro",
+                        "interaction": "Sari peste segmentele cu reamintiri de interacțiune",
+                        "selfpromo": "Sari peste segmentele de auto-promovare",
+                        "preview": "Sari peste segmentele de previzualizare",
+                        "filler": "Sari peste segmentele cu digresiuni/glume",
+                        "music_offtopic": "Sari peste segmentele muzicale irelevante",
+                        "highlights": "Activează evidențieri/marcaje importante"
+                    },
+                    "showSBToasts": "Afișează notificări SponsorBlock"
+                }
+            },
+            "dearrow": {
+                "title": "Setări DeArrow",
+                "options": {
+                    "enableDA": "Activează DeArrow",
+                    "enableDAThumbnails": "Activează previzualizări DeArrow"
+                }
+            },
+            "misc": {
+                "title": "Setări diverse",
+                "options": {
+                    "endScreenCards": "Ascunde cardurile de la final",
+                    "youThereRenderer": "Activează mesajul 'Încă te uiți?' ",
+                    "paidPromoOverlay": "Activează suprapunerea 'Include promovare plătită' ",
+                    "whosWatching": {
+                        "title": "Meniul 'Cine se uită' ",
+                        "options": {
+                            "enableWW": "Activează meniul 'Cine se uită?'",
+                            "permaEnableWW": "Activează permanent meniul 'Cine se uită?'",
+                            "enableWWOnExit": "Activează meniul 'Cine se uită?' la ieșirea din aplicație"
+                        }
+                    },
+                    "fixUI": "Remediază/Corectează interfața",
+                    "hqThumbnails": "Activează miniaturile de înaltă calitate",
+                    "longPress": "Activează acțiunile la apăsare lungă",
+                    "shorts": "Activează Shorts",
+                    "videoPreviews": "Activează previzualizările video",
+                    "ttWelcomeMsg": "Afișează mesajul de bun venit TizenTube",
+                    "guestSignInReminder": "Afișează reamintirea de conectare ca oaspete",
+                    "reloadHomeOnStartup": "Reîncarcă pagina principală la pornire"
+                }
+            },
+            "subtitles": {
+                "title": "Setări subtitrări",
+                "options": {
+                    "showLocalSubtitle": "Afișează subtitrarea locală",
+                    "showHiddenSubtitles": "Afișează subtitrările ascunse"
+                }
+            },
+            "videoPlayer": {
+                "title": "Setări player video",
+                "subtitle": "Personalizează funcțiile player-ului video",
+                "options": {
+                    "patching": {
+                        "title": "Corectează interfața player-ului video",
+                        "options": {
+                            "enableVPUIPatching": "Activează corectarea interfeței player-ului video",
+                            "previousNextBtns": "Activează butoanele Anterior și Următor",
+                            "showSuperThxBtn": "Afișează butonul Super Thanks",
+                            "showSpeedCtrlBtn": "Afișează butonul de control al vitezei"
+                        }
+                    },
+                    "preferredVideoQuality": {
+                        "title": "Calitatea video preferată",
+                        "subtitle": "Alege calitatea video preferată sau următoarea cea mai bună care se aplică la începutul redării"
+                    },
+                    "speedSettings": {
+                        "title": "Treptele setărilor de viteză",
+                        "subtitle": "Setează treptele de viteză pentru ajustarea vitezei de redare"
+                    },
+                    "preferredVideoCodec": {
+                        "title": "Codec video preferat",
+                        "subtitle": "Alege codec-ul video preferat pentru redare"
+                    },
+                    "afr": "Auto Frame Rate",
+                    "afrPauseDuration": {
+                        "title": "Durata pauzei pentru rata de cadre automată",
+                        "subtitle": "Setează durata (în secunde) pentru pauza redării video la ajustarea ratei de cadre"
+                    }
+                }
+            },
+            "uiSettings": {
+                "title": "Setări interfață",
+                "subtitle": "Personalizează interfața după preferințe",
+                "options": {
+                    "hideWatchedVideos": {
+                        "title": "Ascunde videoclipurile vizionate",
+                        "options": {
+                            "enableHideWatchedVideos": "Activează ascunderea videoclipurilor vizionate",
+                            "watchedVideosThreshold": {
+                                "title": "Pragul videoclipurilor vizionate",
+                                "subtitle": "Setează pragul procentual pentru ascunderea videoclipurilor vizionate"
+                            },
+                            "setPagesToHideWatchedVideos": "Setează paginile pe care să se ascundă videoclipurile vizionate"
+                        }
+                    },
+                    "screenDimming": {
+                        "title": "Întunecarea ecranului",
+                        "options": {
+                            "enableScreenDimming": "Activează întunecarea ecranului",
+                            "dimmingTimeout": {
+                                "title": "Timp de așteptare pentru întunecare",
+                                "subtitle": "Setează timpul de inactivitate (în secunde) înainte ca ecranul să se întunece"
+                            },
+                            "dimmingOpacity": {
+                                "title": "Opacitate pentru nivelul de întunecare",
+                                "subtitle": "Setează nivelul de opacitate pentru întunecarea ecranului"
+                            }
+                        }
+                    },
+                    "disableSidebarContents": {
+                        "title": "Dezactivează conținutul barei laterale",
+                        "subtitle": "Selectează conținutul barei laterale de dezactivat"
+                    },
+                    "launchToOnStartup": {
+                        "title": "Deschidere la pornire",
+                        "subtitle": "Alege pagina implicită pe care TizenTube o deschide la pornire"
+                    }
+                },
+                "updater": {
+                    "title": "Actualizatorul TizenTube Cobalt",
+                    "menuSubtitle": "Gestionează actualizările TizenTube Cobalt",
+                    "versionSubtitle": "Versiunea actuală: {{version}}",
+                    "options": {
+                        "checkForUpdates": "Verifică dacă există actualizări noi",
+                        "checkForUpdatesOnStartup": "Verifică dacă există actualizări noi la pornire"
+                    }
+                }
+            }
+        },
+        "ttSettings": {
+            "title": "Setări TizenTube",
+            "madeByText": "Creat de Reis Can (reisxd), tradus de Alin (palincat) cu ❤️",
+            "summary": "Deschide setările TizenTube"
+        },
+        "supportTT": {
+            "title": "Susține TizenTube",
+            "subtitle": "❤️ Arată-ți sprijinul pentru TizenTube și dezvoltarea sa",
+            "content": {
+                "1": "Dacă îți place să folosești TizenTube și vrei să sprijini dezvoltarea sa, ia în considerare următoarele:",
+                "2": "1. Oferă o star repository-ului de pe GitHub pentru a-i crește vizibilitatea.",
+                "3": "2. Distribuie TizenTube altora.",
+                "4": "Dacă dorești să contribui financiar, ia în considerare donațiile:",
+                "5": "- Buy Me A Coffee: https://www.buymeacoffee.com/reisxd (preferabil)",
+                "6": "- GitHub Sponsors: https://github.com/sponsors/reisxd"
+            }
+        }
+    },
+    "welcomeMsg": {
+        "title": "Bine ai venit la TizenTube",
+        "subtitle": "Mergi la setări și dă click pe Setările TizenTube pentru opțiuni."
+    },
+    "sponsorblock": {
+        "segments": {
+            "sponsor": "Segment sponsorizat",
+            "intro": "Intro",
+            "outro": "Outro",
+            "interaction": "Reamintire de interacțiune",
+            "selfpromo": "Autopromovare",
+            "preview": "Rezumat sau previzualizare",
+            "filler": "Tangente",
+            "music_offtopic": "Secțiune non-muzicală",
+            "poi_highlight": "Moment de interes"
+        },
+        "toasts": {
+            "skipping": "Se omite {{segment}}",
+            "notSkipping": "Nu se omite {{segment}} (a fost omis de {{count}} ori)",
+            "skip": "Omite {{segment}}",
+            "skipToHighlight": "Sari la momentul de interes"
+        }
+    }
+}
