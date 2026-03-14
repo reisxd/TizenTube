@@ -1,5 +1,6 @@
 import EnglishResource from'./resources/en.json';
 import TurkishResource from './resources/tr.json';
+import VietnameseResource from './resources/vi.json';
 import GermanResource from './resources/de.json';
 import LatvianResource from './resources/lv.json';
 
@@ -10,10 +11,12 @@ export default {
     tr: {
         translation: TurkishResource
     },
+    vi: {
+        translation: VietnameseResource
+    },
     de: {
         translation: GermanResource
-    }
-        },
+    },
     lv: {
         translation: LatvianResource
     }
