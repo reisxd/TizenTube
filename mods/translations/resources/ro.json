@@ -38,10 +38,10 @@
                 "title": "Setări diverse",
                 "options": {
                     "endScreenCards": "Ascunde cardurile de la final",
-                    "youThereRenderer": "Activează mesajul 'Încă te uiți?' ",
+                    "youThereRenderer": "Activează mesajul 'Încă te uiți?'",
                     "paidPromoOverlay": "Activează suprapunerea 'Include promovare plătită' ",
                     "whosWatching": {
-                        "title": "Meniul 'Cine se uită' ",
+                        "title": "Meniul 'Cine se uită'",
                         "options": {
                             "enableWW": "Activează meniul 'Cine se uită?'",
                             "permaEnableWW": "Activează permanent meniul 'Cine se uită?'",
@@ -156,7 +156,7 @@
             "subtitle": "❤️ Arată-ți sprijinul pentru TizenTube și dezvoltarea sa",
             "content": {
                 "1": "Dacă îți place să folosești TizenTube și vrei să sprijini dezvoltarea sa, ia în considerare următoarele:",
-                "2": "1. Oferă o star repository-ului de pe GitHub pentru a-i crește vizibilitatea.",
+                "2": "1. Oferă un star repository-ului de pe GitHub pentru a-i crește vizibilitatea.",
                 "3": "2. Distribuie TizenTube altora.",
                 "4": "Dacă dorești să contribui financiar, ia în considerare donațiile:",
                 "5": "- Buy Me A Coffee: https://www.buymeacoffee.com/reisxd (preferabil)",
@@ -171,12 +171,12 @@
     "sponsorblock": {
         "segments": {
             "sponsor": "Segment sponsorizat",
-            "intro": "Intro",
-            "outro": "Outro",
+            "intro": "Introducere",
+            "outro": "Final",
             "interaction": "Reamintire de interacțiune",
-            "selfpromo": "Autopromovare",
+            "selfpromo": "Auto-promovare",
             "preview": "Rezumat sau previzualizare",
-            "filler": "Tangente",
+            "filler": "Umplutură",
             "music_offtopic": "Secțiune non-muzicală",
             "poi_highlight": "Moment de interes"
         },
