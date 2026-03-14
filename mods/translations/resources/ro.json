@@ -3,20 +3,20 @@
     "settings": {
         "options": {
             "socialMedia": {
-                "title": "Link-uri rețele de socializare",
+                "title": "Link-uri pentru rețelele de socializare",
                 "qrCodeScanMessage": "Poți vizita pagina {{name}} scanând codul QR de mai jos."
             },
-            "adBlock": "Ad Block",
+            "adBlock": "AdBlock",
             "sponsorblock": {
                 "title": "Setări SponsorBlock",
                 "options": {
                     "enableSB": "Activează SponsorBlock",
                     "manualSkip": "Omitere manuală a segmentelor SponsorBlock",
-                    "segments": "Segmente",
+                    "segments": "Segmente ale videoclipurilor",
                     "categories": {
                         "sponsor": "Sari peste segmentele sponsorizate",
-                        "intro": "Sari peste segmentele intro",
-                        "outro": "Sari peste segmentele outro",
+                        "intro": "Sari peste segmentele de introducere",
+                        "outro": "Sari peste segmentele de final",
                         "interaction": "Sari peste segmentele cu reamintiri de interacțiune",
                         "selfpromo": "Sari peste segmentele de auto-promovare",
                         "preview": "Sari peste segmentele de previzualizare",
