@@ -1,0 +1,190 @@
+{
+    "__contributors": ["reisxd"],
+    "settings": {
+        "options": {
+            "socialMedia": {
+                "title": "Sosyal Medya Bağlantıları",
+                "qrCodeScanMessage": "Aşağıdaki QR kodu tarayarak {{name}} sayfasını ziyaret edebilirsiniz."
+            },
+            "adBlock": "Reklam Engelleme",
+            "sponsorblock": {
+                "title": "SponsorBlock Ayarları",
+                "options": {
+                    "enableSB": "SponsorBlock'u Etkinleştir",
+                    "manualSkip": "SponsorBlock Bölümlerini Manuel Geç",
+                    "segments": "Bölümler",
+                    "categories": {
+                        "sponsor": "Sponsor Bölümlerini Geç",
+                        "intro": "Giriş Bölümlerini Geç",
+                        "outro": "Çıkış Bölümlerini Geç",
+                        "interaction": "Etkileşim Hatırlatma Bölümlerini Geç",
+                        "selfpromo": "Kendi Tanıtım Bölümlerini Geç",
+                        "preview": "Önizleme/Özet Bölümlerini Geç",
+                        "filler": "Alakasız/Şaka Bölümlerini Geç",
+                        "music_offtopic": "Konu Dışı Müzik Bölümlerini Geç",
+                        "highlights": "Öne Çıkan Anları Etkinleştir"
+                    },
+                    "showSBToasts": "SponsorBlock Bildirimlerini Göster"
+                }
+            },
+            "dearrow": {
+                "title": "DeArrow Ayarları",
+                "options": {
+                    "enableDA": "DeArrow'u Etkinleştir",
+                    "enableDAThumbnails": "DeArrow Küçük Resimlerini Etkinleştir"
+                }
+            },
+            "misc": {
+                "title": "Çeşitli Ayarlar",
+                "options": {
+                    "endScreenCards": "Bitiş Ekranı Kartlarını Gizle",
+                    "youThereRenderer": "'Hâlâ izliyor musunuz?' Öğesini Etkinleştir",
+                    "paidPromoOverlay": "'Ücretli tanıtım içerir' Katmanını Etkinleştir",
+                    "whosWatching": {
+                        "title": "Kim İzliyor Menüsü",
+                        "options": {
+                            "enableWW": "Kim İzliyor Menüsünü Etkinleştir",
+                            "permaEnableWW": "Kim İzliyor Menüsünü Kalıcı Olarak Etkinleştir",
+                            "enableWWOnExit": "Uygulamadan Çıkışta Kim İzliyor Menüsünü Etkinleştir"
+                        }
+                    },
+                    "fixUI": "Arayüzü Düzelt",
+                    "hqThumbnails": "Yüksek Kaliteli Küçük Resimleri Etkinleştir",
+                    "longPress": "Uzun Basma Eylemlerini Etkinleştir",
+                    "shorts": "Shorts'u Etkinleştir",
+                    "videoPreviews": "Video Önizlemelerini Etkinleştir",
+                    "ttWelcomeMsg": "TT Karşılama Mesajını Göster",
+                    "guestSignInReminder": "Misafir Giriş Hatırlatmasını Göster",
+                    "reloadHomeOnStartup": "Açılışta Ana Sayfayı Yeniden Yükle"
+                }
+            },
+            "subtitles": {
+                "title": "Altyazı Ayarları",
+                "options": {
+                    "showLocalSubtitle": "Yerel Altyazıyı Göster",
+                    "showHiddenSubtitles": "Gizli Altyazıları Göster"
+                }
+            },
+            "videoPlayer": {
+                "title": "Video Oynatıcı Ayarları",
+                "subtitle": "Video oynatıcı özelliklerini özelleştirin",
+                "options": {
+                    "patching": {
+                        "title": "Video Oynatıcı Arayüzünü Yama",
+                        "options": {
+                            "enableVPUIPatching": "Video Oynatıcı Arayüzü Yamasını Etkinleştir",
+                            "previousNextBtns": "Önceki ve Sonraki Düğmelerini Etkinleştir",
+                            "showSuperThxBtn": "Süper Teşekkür Düğmesini Göster",
+                            "showSpeedCtrlBtn": "Hız Kontrol Düğmesini Göster"
+                        }
+                    },
+                    "preferredVideoQuality": {
+                        "title": "Tercih Edilen Video Kalitesi",
+                        "subtitle": "Oynatma başladığında uygulanacak tercih edilen veya bir sonraki en iyi video kalitesini seçin"
+                    },
+                    "speedSettings": {
+                        "title": "Hız Ayarı Artışları",
+                        "subtitle": "Video oynatma hızı ayarlamaları için artış miktarını belirleyin"
+                    },
+                    "preferredVideoCodec": {
+                        "title": "Tercih Edilen Video Kodlayıcı",
+                        "subtitle": "Oynatma için tercih edilen video kodlayıcıyı seçin"
+                    },
+                    "afr": "Otomatik Kare Hızı",
+                    "afrPauseDuration": {
+                        "title": "Otomatik Kare Hızı Duraklatma Süresi",
+                        "subtitle": "Kare hızı ayarlanırken video oynatmayı duraklatma süresini (saniye) ayarlayın"
+                    }
+                }
+            },
+            "uiSettings": {
+                "title": "Kullanıcı Arayüzü Ayarları",
+                "subtitle": "Arayüzü istediğiniz gibi özelleştirin",
+                "options": {
+                    "hideWatchedVideos": {
+                        "title": "İzlenen Videoları Gizle",
+                        "options": {
+                            "enableHideWatchedVideos": "İzlenen Videoları Gizlemeyi Etkinleştir",
+                            "watchedVideosThreshold": {
+                                "title": "İzlenen Videolar Eşiği",
+                                "subtitle": "İzlenen videoları gizlemek için yüzde eşiğini ayarlayın"
+                            },
+                            "setPagesToHideWatchedVideos": "İzlenen Videoların Gizleneceği Sayfaları Belirle"
+                        }
+                    },
+                    "screenDimming": {
+                        "title": "Ekran Karartma",
+                        "options": {
+                            "enableScreenDimming": "Ekran Karartmayı Etkinleştir",
+                            "dimmingTimeout": {
+                                "title": "Karartma Zaman Aşımı",
+                                "subtitle": "Ekran kararmadan önceki hareketsizlik süresini (saniye) ayarlayın"
+                            },
+                            "dimmingOpacity": {
+                                "title": "Karartma Opaklığı",
+                                "subtitle": "Ekran karartma için opaklık seviyesini ayarlayın"
+                            }
+                        }
+                    },
+                    "disableSidebarContents": {
+                        "title": "Kenar Çubuğu İçeriklerini Devre Dışı Bırak",
+                        "subtitle": "Devre dışı bırakılacak kenar çubuğu içeriklerini seçin"
+                    },
+                    "launchToOnStartup": {
+                        "title": "Açılışta Başlatılacak Sayfa",
+                        "subtitle": "TizenTube'un açılışta varsayılan olarak açacağı sayfayı seçin"
+                    }
+                },
+                "updater": {
+                    "title": "TizenTube Cobalt Güncelleyici",
+                    "menuSubtitle": "TizenTube Cobalt güncellemelerini yönetin",
+                    "versionSubtitle": "Geçerli sürüm: {{version}}",
+                    "options": {
+                        "checkForUpdates": "Güncellemeleri kontrol et",
+                        "checkForUpdatesOnStartup": "Açılışta güncellemeleri kontrol et"
+                    }
+                }
+            }
+        },
+        "ttSettings": {
+            "title": "TizenTube Ayarları",
+            "madeByText": "Reis Can (reisxd) tarafından ❤️ ile yapıldı",
+            "summary": "TizenTube Ayarlarını Aç"
+        },
+        "supportTT": {
+            "title": "TizenTube'u Destekleyin",
+            "subtitle": "❤️ TizenTube'a ve geliştirilmesine destek olun",
+            "content": {
+                "1": "TizenTube'u kullanmaktan memnunsanız ve geliştirilmesini desteklemek istiyorsanız, şunları değerlendirebilirsiniz:",
+                "2": "1. Görünürlüğünü artırmaya yardımcı olmak için GitHub deposuna yıldız verin.",
+                "3": "2. TizenTube'u başkalarıyla paylaşın.",
+                "4": "Maddi olarak katkıda bulunmak isterseniz bağış yapmayı düşünebilirsiniz:",
+                "5": "- Buy Me A Coffee: https://www.buymeacoffee.com/reisxd (tercihen)",
+                "6": "- GitHub Sponsors: https://github.com/sponsors/reisxd"
+            }
+        }
+    },
+    "welcomeMsg": {
+        "title": "TizenTube'a Hoş Geldiniz",
+        "subtitle": "Ayarlar menüsüne gidip TizenTube Ayarları'na tıklayarak ayarları açabilirsiniz."
+    },
+    "sponsorblock": {
+        "segments": {
+            "sponsor": "Sponsor bölümü",
+            "intro": "Giriş bölümü",
+            "outro": "Çıkış bölümü",
+            "interaction": "Etkileşim hatırlatması",
+            "selfpromo": "Kendi tanıtımı",
+            "preview": "Özet veya önizleme",
+            "filler": "Alakasız bölüm",
+            "music_offtopic": "Müzik dışı bölüm",
+            "poi_highlight": "Öne çıkan an"
+        },
+        "toasts": {
+            "skipping": "{{segment}} geçiliyor",
+            "notSkipping": "{{segment}} geçilmiyor ({{count}} kez geçildi)",
+            "skip": "Geç: {{segment}}",
+            "skipToHighlight": "Öne çıkan âna atla"
+        }
+    }
+}
