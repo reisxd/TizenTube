@@ -1,5 +1,6 @@
 import EnglishResource from'./resources/en.json';
 import TurkishResource from './resources/tr.json';
+import GermanResource from './resources/de.json';
 
 export default {
     en: {
@@ -7,5 +8,8 @@ export default {
     },
     tr: {
         translation: TurkishResource
+    },
+    de: {
+        translation: GermanResource
     }
 };
