@@ -1,9 +1,10 @@
-import EnglishResource from'./resources/en.json';
+import EnglishResource from './resources/en.json';
 import TurkishResource from './resources/tr.json';
 import VietnameseResource from './resources/vi.json';
 import GermanResource from './resources/de.json';
 import LatvianResource from './resources/lv.json';
 import PortuguesePortugalResource from './resources/pt-PT.json';
+import BrazilianPortugueseResource from './resources/pt-BR.json';
 
 export default {
     en: {
@@ -23,5 +24,8 @@ export default {
     },
     "pt-PT": {
         translation: PortuguesePortugalResource
+    },
+    "pt-BR": {
+        translation: BrazilianPortugueseResource
     }
 };
