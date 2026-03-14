@@ -3,6 +3,7 @@ import TurkishResource from './resources/tr.json';
 import VietnameseResource from './resources/vi.json';
 import GermanResource from './resources/de.json';
 import LatvianResource from './resources/lv.json';
+import PortuguesePortugalResource from './resources/pt-PT.json';
 
 export default {
     en: {
@@ -19,5 +20,8 @@ export default {
     },
     lv: {
         translation: LatvianResource
+    },
+    "pt-PT": {
+        translation: PortuguesePortugalResource
     }
 };
