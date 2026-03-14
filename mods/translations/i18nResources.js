@@ -8,6 +8,7 @@ import BosnianResource from './resources/bs.json';
 import CroatianResource from './resources/hr.json';
 import SerbianLatinResource from './resources/sr-Latn.json';
 import SerbianCyrillicResource from './resources/sr.json';
+import KlingonResource from './resources/tlh.json';
 
 export default {
     en: {
@@ -39,5 +40,8 @@ export default {
     },
     sr: {
         translation: SerbianCyrillicResource
-    }
+    },
+    tlh: {
+    translation: KlingonResource
+}
 };
