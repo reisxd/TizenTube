@@ -1,12 +1,22 @@
-import EnglishResource from'./resources/en.json';
+import DanishResource from './resources/da.json';
+import EnglishResource from './resources/en.json';
 import TurkishResource from './resources/tr.json';
 import VietnameseResource from './resources/vi.json';
 import GermanResource from './resources/de.json';
 import LatvianResource from './resources/lv.json';
 import PortuguesePortugalResource from './resources/pt-PT.json';
 import RomanianResource from './resources/ro.json';
+import BosnianResource from './resources/bs.json';
+import CroatianResource from './resources/hr.json';
+import SerbianLatinResource from './resources/sr-Latn.json';
+import SerbianCyrillicResource from './resources/sr.json';
+import KlingonResource from './resources/tlh.json';
+import BrazilianPortugueseResource from './resources/pt-BR.json';
 
 export default {
+    da: {
+        translation: DanishResource
+    },
     en: {
         translation: EnglishResource
     },
@@ -26,6 +36,24 @@ export default {
         translation: PortuguesePortugalResource
     },
     ro: {
-    	translation: RomanianResource
+        translation: RomanianResource
+    },
+    bs: {
+        translation: BosnianResource
+    },
+    hr: {
+        translation: CroatianResource
+    },
+    "sr-Latn": {
+        translation: SerbianLatinResource
+    },
+    sr: {
+        translation: SerbianCyrillicResource
+    },
+    tlh: {
+        translation: KlingonResource
+    },
+    "pt-BR": {
+        translation: BrazilianPortugueseResource
     }
 };
