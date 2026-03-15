@@ -1,5 +1,7 @@
 {
-    "__contributors": ["reisxd"],
+    "__contributors": [
+        "reisxd"
+    ],
     "settings": {
         "options": {
             "socialMedia": {
@@ -133,16 +135,17 @@
                     "launchToOnStartup": {
                         "title": "Abrir en Inicio",
                         "subtitle": "Elige la página predeterminada que TizenTube abre al iniciar"
-                    }
-                },
-                "updater": {
-                    "title": "Actualizador de TizenTube Cobalt",
-                    "menuSubtitle": "Gestionar actualizaciones de TizenTube Cobalt",
-                    "versionSubtitle": "Versión actual: {{version}}",
-                    "options": {
-                        "checkForUpdates": "Buscar actualizaciones",
-                        "checkForUpdatesOnStartup": "Buscar actualizaciones al iniciar"
-                    }
+                    },
+                    "sortSubscriptionsByAlphabet": "Sort Subscriptions Alphabetically"
+                }
+            },
+            "updater": {
+                "title": "Actualizador de TizenTube Cobalt",
+                "menuSubtitle": "Gestionar actualizaciones de TizenTube Cobalt",
+                "versionSubtitle": "Versión actual: {{version}}",
+                "options": {
+                    "checkForUpdates": "Buscar actualizaciones",
+                    "checkForUpdatesOnStartup": "Buscar actualizaciones al iniciar"
                 }
             }
         },

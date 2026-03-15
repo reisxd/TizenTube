@@ -1,5 +1,8 @@
 {
-    "__contributors": ["reisxd", "palincat"],
+    "__contributors": [
+        "reisxd",
+        "palincat"
+    ],
     "settings": {
         "options": {
             "socialMedia": {
@@ -133,16 +136,17 @@
                     "launchToOnStartup": {
                         "title": "Deschidere la pornire",
                         "subtitle": "Alege pagina implicită pe care TizenTube o deschide la pornire"
-                    }
-                },
-                "updater": {
-                    "title": "Actualizatorul TizenTube Cobalt",
-                    "menuSubtitle": "Gestionează actualizările TizenTube Cobalt",
-                    "versionSubtitle": "Versiunea actuală: {{version}}",
-                    "options": {
-                        "checkForUpdates": "Verifică dacă există actualizări noi",
-                        "checkForUpdatesOnStartup": "Verifică dacă există actualizări noi la pornire"
-                    }
+                    },
+                    "sortSubscriptionsByAlphabet": "Sort Subscriptions Alphabetically"
+                }
+            },
+            "updater": {
+                "title": "Actualizatorul TizenTube Cobalt",
+                "menuSubtitle": "Gestionează actualizările TizenTube Cobalt",
+                "versionSubtitle": "Versiunea actuală: {{version}}",
+                "options": {
+                    "checkForUpdates": "Verifică dacă există actualizări noi",
+                    "checkForUpdatesOnStartup": "Verifică dacă există actualizări noi la pornire"
                 }
             }
         },

@@ -135,16 +135,17 @@
                     "launchToOnStartup": {
                         "title": "Página Inicial ao Abrir",
                         "subtitle": "Escolha a página padrão que o TizenTube abrirá na inicialização"
-                    }
-                },
-                "updater": {
-                    "title": "Atualizador do TizenTube Cobalt",
-                    "menuSubtitle": "Gerenciar Atualizações do TizenTube Cobalt",
-                    "versionSubtitle": "Versão Atual: {{version}}",
-                    "options": {
-                        "checkForUpdates": "Verificar Atualizações",
-                        "checkForUpdatesOnStartup": "Verificar Atualizações na Inicialização"
-                    }
+                    },
+                    "sortSubscriptionsByAlphabet": "Sort Subscriptions Alphabetically"
+                }
+            },
+            "updater": {
+                "title": "Atualizador do TizenTube Cobalt",
+                "menuSubtitle": "Gerenciar Atualizações do TizenTube Cobalt",
+                "versionSubtitle": "Versão Atual: {{version}}",
+                "options": {
+                    "checkForUpdates": "Verificar Atualizações",
+                    "checkForUpdatesOnStartup": "Verificar Atualizações na Inicialização"
                 }
             }
         },

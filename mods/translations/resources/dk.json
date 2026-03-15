@@ -1,5 +1,7 @@
 {
-    "__contributors": ["loui771w"],
+    "__contributors": [
+        "loui771w"
+    ],
     "settings": {
         "options": {
             "socialMedia": {
@@ -61,8 +63,8 @@
             "subtitles": {
                 "title": "Undertekstindstillinger",
                 "options": {
-                        "showLocalSubtitle": "Vis Lokale Undertekster",
-                        "showHiddenSubtitles": "Vis Skjulte Undertekster"
+                    "showLocalSubtitle": "Vis Lokale Undertekster",
+                    "showHiddenSubtitles": "Vis Skjulte Undertekster"
                 }
             },
             "videoPlayer": {
@@ -133,16 +135,17 @@
                     "launchToOnStartup": {
                         "title": "Startside ved Opstart",
                         "subtitle": "Vælg den standardside, TizenTube åbner ved opstart"
-                    }
-                },
-                "updater": {
-                    "title": "TizenTube Cobalt Updater",
-                    "menuSubtitle": "Administrér TizenTube Cobalt-opdateringer",
-                    "versionSubtitle": "Nuværende version: {{version}}",
-                    "options": {
-                        "checkForUpdates": "Søg efter opdateringer",
-                        "checkForUpdatesOnStartup": "Søg efter opdateringer ved opstart"
-                    }
+                    },
+                    "sortSubscriptionsByAlphabet": "Sort Subscriptions Alphabetically"
+                }
+            },
+            "updater": {
+                "title": "TizenTube Cobalt Updater",
+                "menuSubtitle": "Administrér TizenTube Cobalt-opdateringer",
+                "versionSubtitle": "Nuværende version: {{version}}",
+                "options": {
+                    "checkForUpdates": "Søg efter opdateringer",
+                    "checkForUpdatesOnStartup": "Søg efter opdateringer ved opstart"
                 }
             }
         },

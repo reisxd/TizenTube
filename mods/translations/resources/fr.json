@@ -1,5 +1,7 @@
 {
-    "__contributors": ["Redje"],
+    "__contributors": [
+        "Redje"
+    ],
     "settings": {
         "options": {
             "socialMedia": {
@@ -133,16 +135,17 @@
                     "launchToOnStartup": {
                         "title": "Ouvrir la page au démarrage",
                         "subtitle": "Choisir la page sur laquelle TizenTube démarrera"
-                    }
-                },
-                "updater": {
-                    "title": "Mise à jour de Tizentube Cobalt",
-                    "menuSubtitle": "Gérer les mises à jour TizenTube Cobalt",
-                    "versionSubtitle": "Version actuelle: {{version}}",
-                    "options": {
-                        "checkForUpdates": "Vérifier les mises à jours",
-                        "checkForUpdatesOnStartup": "Vérifier les mises à jours au démarrage"
-                    }
+                    },
+                    "sortSubscriptionsByAlphabet": "Sort Subscriptions Alphabetically"
+                }
+            },
+            "updater": {
+                "title": "Mise à jour de Tizentube Cobalt",
+                "menuSubtitle": "Gérer les mises à jour TizenTube Cobalt",
+                "versionSubtitle": "Version actuelle: {{version}}",
+                "options": {
+                    "checkForUpdates": "Vérifier les mises à jours",
+                    "checkForUpdatesOnStartup": "Vérifier les mises à jours au démarrage"
                 }
             }
         },

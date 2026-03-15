@@ -1,5 +1,7 @@
 {
-    "__contributors": ["Sikriet"],
+    "__contributors": [
+        "Sikriet"
+    ],
     "settings": {
         "options": {
             "socialMedia": {
@@ -133,16 +135,17 @@
                     "launchToOnStartup": {
                         "title": "Página de inicio al arrancar",
                         "subtitle": "Elige la página predeterminada que abrirá TizenTube al iniciar"
-                    }
-                },
-                "updater": {
-                    "title": "Actualizador de TizenTube Cobalt",
-                    "menuSubtitle": "Administrar actualizaciones de TizenTube Cobalt",
-                    "versionSubtitle": "Versión actual: {{version}}",
-                    "options": {
-                        "checkForUpdates": "Buscar actualizaciones",
-                        "checkForUpdatesOnStartup": "Buscar actualizaciones al iniciar"
-                    }
+                    },
+                    "sortSubscriptionsByAlphabet": "Sort Subscriptions Alphabetically"
+                }
+            },
+            "updater": {
+                "title": "Actualizador de TizenTube Cobalt",
+                "menuSubtitle": "Administrar actualizaciones de TizenTube Cobalt",
+                "versionSubtitle": "Versión actual: {{version}}",
+                "options": {
+                    "checkForUpdates": "Buscar actualizaciones",
+                    "checkForUpdatesOnStartup": "Buscar actualizaciones al iniciar"
                 }
             }
         },

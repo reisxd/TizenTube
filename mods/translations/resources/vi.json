@@ -1,5 +1,7 @@
 {
-    "__contributors": ["reisxd"],
+    "__contributors": [
+        "reisxd"
+    ],
     "settings": {
         "options": {
             "socialMedia": {
@@ -133,16 +135,17 @@
                     "launchToOnStartup": {
                         "title": "Trang khởi động",
                         "subtitle": "Chọn trang mặc định mà TizenTube sẽ mở khi khởi động"
-                    }
-                },
-                "updater": {
-                    "title": "Trình cập nhật TizenTube Cobalt",
-                    "menuSubtitle": "Quản lý các bản cập nhật TizenTube Cobalt",
-                    "versionSubtitle": "Phiên bản hiện tại: {{version}}",
-                    "options": {
-                        "checkForUpdates": "Kiểm tra cập nhật",
-                        "checkForUpdatesOnStartup": "Kiểm tra cập nhật khi khởi động"
-                    }
+                    },
+                    "sortSubscriptionsByAlphabet": "Sort Subscriptions Alphabetically"
+                }
+            },
+            "updater": {
+                "title": "Trình cập nhật TizenTube Cobalt",
+                "menuSubtitle": "Quản lý các bản cập nhật TizenTube Cobalt",
+                "versionSubtitle": "Phiên bản hiện tại: {{version}}",
+                "options": {
+                    "checkForUpdates": "Kiểm tra cập nhật",
+                    "checkForUpdatesOnStartup": "Kiểm tra cập nhật khi khởi động"
                 }
             }
         },

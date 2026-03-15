@@ -1,5 +1,7 @@
 {
-    "__contributors": ["lukapiplica"],
+    "__contributors": [
+        "lukapiplica"
+    ],
     "settings": {
         "options": {
             "socialMedia": {
@@ -133,16 +135,17 @@
                     "launchToOnStartup": {
                         "title": "tagh Page",
                         "subtitle": "tagh Page yInuqlI'"
-                    }
-                },
-                "updater": {
-                    "title": "TizenTube Cobalt chu'ghach",
-                    "menuSubtitle": "chu'ghach yInuqlI'",
-                    "versionSubtitle": "Version: {{version}}",
-                    "options": {
-                        "checkForUpdates": "chu'ghach yISam",
-                        "checkForUpdatesOnStartup": "tagh chu'ghach yISam"
-                    }
+                    },
+                    "sortSubscriptionsByAlphabet": "Sort Subscriptions Alphabetically"
+                }
+            },
+            "updater": {
+                "title": "TizenTube Cobalt chu'ghach",
+                "menuSubtitle": "chu'ghach yInuqlI'",
+                "versionSubtitle": "Version: {{version}}",
+                "options": {
+                    "checkForUpdates": "chu'ghach yISam",
+                    "checkForUpdatesOnStartup": "tagh chu'ghach yISam"
                 }
             }
         },

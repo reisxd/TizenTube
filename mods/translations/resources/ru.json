@@ -1,5 +1,7 @@
 {
-    "__contributors": ["BlackFlux"],
+    "__contributors": [
+        "BlackFlux"
+    ],
     "settings": {
         "options": {
             "socialMedia": {
@@ -133,16 +135,17 @@
                     "launchToOnStartup": {
                         "title": "Открыть при запуске",
                         "subtitle": "Выберите страницу, которая будет открываться при запуске TizenTube"
-                    }
-                },
-                "updater": {
-                    "title": "Обновление TizenTube Cobalt",
-                    "menuSubtitle": "Управление обновлениями TizenTube Cobalt",
-                    "versionSubtitle": "Текущая версия: {{version}}",
-                    "options": {
-                        "checkForUpdates": "Проверить обновления",
-                        "checkForUpdatesOnStartup": "Проверять обновления при запуске"
-                    }
+                    },
+                    "sortSubscriptionsByAlphabet": "Sort Subscriptions Alphabetically"
+                }
+            },
+            "updater": {
+                "title": "Обновление TizenTube Cobalt",
+                "menuSubtitle": "Управление обновлениями TizenTube Cobalt",
+                "versionSubtitle": "Текущая версия: {{version}}",
+                "options": {
+                    "checkForUpdates": "Проверить обновления",
+                    "checkForUpdatesOnStartup": "Проверять обновления при запуске"
                 }
             }
         },

@@ -1,5 +1,7 @@
 {
-    "__contributors": ["thegouhund"],
+    "__contributors": [
+        "thegouhund"
+    ],
     "settings": {
         "options": {
             "socialMedia": {
@@ -133,16 +135,17 @@
                     "launchToOnStartup": {
                         "title": "Halaman yang Dibuka saat Startup",
                         "subtitle": "Pilih halaman default yang dibuka TizenTube saat startup"
-                    }
-                },
-                "updater": {
-                    "title": "Pembaruan TizenTube Cobalt",
-                    "menuSubtitle": "Kelola pembaruan TizenTube Cobalt",
-                    "versionSubtitle": "Versi saat ini: {{version}}",
-                    "options": {
-                        "checkForUpdates": "Periksa pembaruan",
-                        "checkForUpdatesOnStartup": "Periksa pembaruan saat startup"
-                    }
+                    },
+                    "sortSubscriptionsByAlphabet": "Sort Subscriptions Alphabetically"
+                }
+            },
+            "updater": {
+                "title": "Pembaruan TizenTube Cobalt",
+                "menuSubtitle": "Kelola pembaruan TizenTube Cobalt",
+                "versionSubtitle": "Versi saat ini: {{version}}",
+                "options": {
+                    "checkForUpdates": "Periksa pembaruan",
+                    "checkForUpdatesOnStartup": "Periksa pembaruan saat startup"
                 }
             }
         },

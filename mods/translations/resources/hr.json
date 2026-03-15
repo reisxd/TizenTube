@@ -1,5 +1,7 @@
 {
-    "__contributors": ["lukapiplica"],
+    "__contributors": [
+        "lukapiplica"
+    ],
     "settings": {
         "options": {
             "socialMedia": {
@@ -133,16 +135,17 @@
                     "launchToOnStartup": {
                         "title": "Početna stranica pri pokretanju",
                         "subtitle": "Odaberite zadanu stranicu koja se otvara pri pokretanju TizenTubea"
-                    }
-                },
-                "updater": {
-                    "title": "TizenTube Cobalt ažuriranje",
-                    "menuSubtitle": "Upravljajte TizenTube Cobalt ažuriranjima",
-                    "versionSubtitle": "Trenutačna verzija: {{version}}",
-                    "options": {
-                        "checkForUpdates": "Provjeri ažuriranja",
-                        "checkForUpdatesOnStartup": "Provjeri ažuriranja pri pokretanju"
-                    }
+                    },
+                    "sortSubscriptionsByAlphabet": "Sort Subscriptions Alphabetically"
+                }
+            },
+            "updater": {
+                "title": "TizenTube Cobalt ažuriranje",
+                "menuSubtitle": "Upravljajte TizenTube Cobalt ažuriranjima",
+                "versionSubtitle": "Trenutačna verzija: {{version}}",
+                "options": {
+                    "checkForUpdates": "Provjeri ažuriranja",
+                    "checkForUpdatesOnStartup": "Provjeri ažuriranja pri pokretanju"
                 }
             }
         },

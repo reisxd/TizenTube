@@ -1,5 +1,7 @@
 {
-    "__contributors": ["reisxd"],
+    "__contributors": [
+        "reisxd"
+    ],
     "settings": {
         "options": {
             "socialMedia": {
@@ -135,15 +137,15 @@
                         "subtitle": "TizenTube'un açılışta varsayılan olarak açacağı sayfayı seçin"
                     },
                     "sortSubscriptionsByAlphabet": "Abonelikleri Alfabetik Sırala"
-                },
-                "updater": {
-                    "title": "TizenTube Cobalt Güncelleyici",
-                    "menuSubtitle": "TizenTube Cobalt güncellemelerini yönetin",
-                    "versionSubtitle": "Geçerli sürüm: {{version}}",
-                    "options": {
-                        "checkForUpdates": "Güncellemeleri kontrol et",
-                        "checkForUpdatesOnStartup": "Açılışta güncellemeleri kontrol et"
-                    }
+                }
+            },
+            "updater": {
+                "title": "TizenTube Cobalt Güncelleyici",
+                "menuSubtitle": "TizenTube Cobalt güncellemelerini yönetin",
+                "versionSubtitle": "Geçerli sürüm: {{version}}",
+                "options": {
+                    "checkForUpdates": "Güncellemeleri kontrol et",
+                    "checkForUpdatesOnStartup": "Açılışta güncellemeleri kontrol et"
                 }
             }
         },
