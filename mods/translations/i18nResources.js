@@ -1,11 +1,29 @@
-import EnglishResource from'./resources/en.json';
+import DanishResource from './resources/dk.json';
+import EnglishResource from './resources/en.json';
 import TurkishResource from './resources/tr.json';
 import VietnameseResource from './resources/vi.json';
 import GermanResource from './resources/de.json';
 import LatvianResource from './resources/lv.json';
 import PortuguesePortugalResource from './resources/pt-PT.json';
+import SpanishResource from './resources/es.json';
+import SpanishLatinAmericaResource from './resources/es-419.json';
+import IndonesianResource from './resources/id.json';
+import FrenchResource from './resources/fr.json'
+import RomanianResource from './resources/ro.json';
+import BosnianResource from './resources/bs.json';
+import CroatianResource from './resources/hr.json';
+import SerbianLatinResource from './resources/sr-Latn.json';
+import SerbianCyrillicResource from './resources/sr-Cyrl.json';
+import KlingonResource from './resources/tlh.json';
+import BrazilianPortugueseResource from './resources/pt-BR.json';
+import RussianResource from './resources/ru.json';
+import LithuanianResource from './resources/lt.json';
+import HungarianResource from './resources/hu.json';
 
 export default {
+    da: {
+        translation: DanishResource
+    },
     en: {
         translation: EnglishResource
     },
@@ -23,5 +41,47 @@ export default {
     },
     "pt-PT": {
         translation: PortuguesePortugalResource
+    },
+    "es-419": {
+        translation: SpanishLatinAmericaResource
+    },
+    es: {
+        translation: SpanishResource
+    },
+    id: {
+        translation: IndonesianResource
+    },
+    fr: {
+        translation: FrenchResource
+    },
+    ro: {
+        translation: RomanianResource
+    },
+    bs: {
+        translation: BosnianResource
+    },
+    hr: {
+        translation: CroatianResource
+    },
+    "sr-Latn": {
+        translation: SerbianLatinResource
+    },
+    sr: {
+        translation: SerbianCyrillicResource
+    },
+    tlh: {
+        translation: KlingonResource
+    },
+    "pt-BR": {
+        translation: BrazilianPortugueseResource
+    },
+    ru: {
+        translation: RussianResource
+    },
+    lt: {
+        translation: LithuanianResource
+        },
+    hu: {
+        translation: HungarianResource
     }
 };

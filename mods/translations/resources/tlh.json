@@ -1,0 +1,193 @@
+{
+    "__contributors": [
+        "lukapiplica"
+    ],
+    "settings": {
+        "options": {
+            "socialMedia": {
+                "title": "tayqeq ghom",
+                "qrCodeScanMessage": "{{name}} mI' yIbej QR meryaq yImej."
+            },
+            "adBlock": "reH lI' vI'ogh",
+            "sponsorblock": {
+                "title": "Sponsor ghompu' mev choHtaHghach",
+                "options": {
+                    "enableSB": "Sponsor ghompu' yIchu'",
+                    "manualSkip": "ghompu' yIchoS",
+                    "segments": "ghompu'",
+                    "categories": {
+                        "sponsor": "Sponsor ghompu' yIchoS",
+                        "intro": "tagh ghompu' yIchoS",
+                        "outro": "blaH ghompu' yIchoS",
+                        "interaction": "yImev Interaction De'",
+                        "selfpromo": "Self-Promotion yIchoS",
+                        "preview": "Recap yIchoS",
+                        "filler": "Jokes ghompu' yIchoS",
+                        "music_offtopic": "non-music yIchoS",
+                        "highlights": "ghotI' yIchu'"
+                    },
+                    "showSBToasts": "SponsorBlock De' yIcha'"
+                }
+            },
+            "dearrow": {
+                "title": "DeArrow choHtaHghach",
+                "options": {
+                    "enableDA": "DeArrow yIchu'",
+                    "enableDAThumbnails": "DeArrow mI' yIchu'"
+                }
+            },
+            "misc": {
+                "title": "latlh choHtaHghach",
+                "options": {
+                    "endScreenCards": "mej meryaq yISo'",
+                    "youThereRenderer": "'DaHjaj bIbejtaH?' yIchu'",
+                    "paidPromoOverlay": "Hvep De' yIcha'",
+                    "whosWatching": {
+                        "title": "'Iv bejtaH?'",
+                        "options": {
+                            "enableWW": "'Iv bejtaH?' yIchu'",
+                            "permaEnableWW": "reH 'Iv bejtaH?' yIchu'",
+                            "enableWWOnExit": "mej 'Iv bejtaH?' yIchu'"
+                        }
+                    },
+                    "fixUI": "UI yIchoH",
+                    "hqThumbnails": "HQ mI' yIchu'",
+                    "longPress": "nI' meryaq yIchu'",
+                    "shorts": "Shorts video yIchu'",
+                    "videoPreviews": "Video Previews yIchu'",
+                    "ttWelcomeMsg": "TT yI'el De' yIcha'",
+                    "guestSignInReminder": "guest Sign In yImej",
+                    "reloadHomeOnStartup": "Home yIchoH"
+                }
+            },
+            "subtitles": {
+                "title": "Ha'quj choHtaHghach",
+                "options": {
+                    "showLocalSubtitle": "Ha'quj yIcha'",
+                    "showHiddenSubtitles": "So' Ha'quj yIcha'"
+                }
+            },
+            "videoPlayer": {
+                "title": "video pat choHtaHghach",
+                "subtitle": "video pat yIchoH",
+                "options": {
+                    "patching": {
+                        "title": "video pat UI yIchoH",
+                        "options": {
+                            "enableVPUIPatching": "video pat UI yIchu'",
+                            "previousNextBtns": "meryaq yIchu'",
+                            "showSuperThxBtn": "Super Thanks meryaq yIcha'",
+                            "showSpeedCtrlBtn": "Do' choHmeH meryaq yIcha'"
+                        }
+                    },
+                    "preferredVideoQuality": {
+                        "title": "video QaQ",
+                        "subtitle": "video QaQ yInuqlI'"
+                    },
+                    "speedSettings": {
+                        "title": "Do' choHtaHghach",
+                        "subtitle": "Do' yInuqlI'"
+                    },
+                    "preferredVideoCodec": {
+                        "title": "video Codec",
+                        "subtitle": "video Codec yInuqlI'"
+                    },
+                    "afr": "Auto Frame Rate",
+                    "afrPauseDuration": {
+                        "title": "AFR mev Duration",
+                        "subtitle": "mev (seconds) yInuqlI'"
+                    }
+                }
+            },
+            "uiSettings": {
+                "title": "UI choHtaHghach",
+                "subtitle": "UI yIchoH",
+                "options": {
+                    "hideWatchedVideos": {
+                        "title": "bej Video yISo'",
+                        "options": {
+                            "enableHideWatchedVideos": "bej Video yISo' yIchu'",
+                            "watchedVideosThreshold": {
+                                "title": "Threshold",
+                                "subtitle": "% yInuqlI'"
+                            },
+                            "setPagesToHideWatchedVideos": "Pages yInuqlI'"
+                        }
+                    },
+                    "screenDimming": {
+                        "title": "Screen Dimming",
+                        "options": {
+                            "enableScreenDimming": "Screen Dimming yIchu'",
+                            "dimmingTimeout": {
+                                "title": "Timeout",
+                                "subtitle": "Timeout (seconds) yInuqlI'"
+                            },
+                            "dimmingOpacity": {
+                                "title": "Opacity",
+                                "subtitle": "Opacity yInuqlI'"
+                            }
+                        }
+                    },
+                    "disableSidebarContents": {
+                        "title": "Sidebar yImev",
+                        "subtitle": "Sidebar yInuqlI'"
+                    },
+                    "launchToOnStartup": {
+                        "title": "tagh Page",
+                        "subtitle": "tagh Page yInuqlI'"
+                    },
+                    "sortSubscriptionsByAlphabet": "Sort Subscriptions Alphabetically"
+                }
+            },
+            "updater": {
+                "title": "TizenTube Cobalt chu'ghach",
+                "menuSubtitle": "chu'ghach yInuqlI'",
+                "versionSubtitle": "Version: {{version}}",
+                "options": {
+                    "checkForUpdates": "chu'ghach yISam",
+                    "checkForUpdatesOnStartup": "tagh chu'ghach yISam"
+                }
+            }
+        },
+        "ttSettings": {
+            "title": "TizenTube choHtaHghach",
+            "madeByText": "Reis Can (reisxd) bang ❤️",
+            "summary": "TizenTube choHtaHghach yIpoS"
+        },
+        "supportTT": {
+            "title": "TizenTube yIQah",
+            "subtitle": "❤️ TizenTube yIQah",
+            "content": {
+                "1": "TizenTube yIQah:",
+                "2": "1. GitHub Star yIchu'.",
+                "3": "2. TizenTube yIlatlh.",
+                "4": "Hvep yIQah:",
+                "5": "- Buy Me A Coffee: https://www.buymeacoffee.com/reisxd",
+                "6": "- GitHub Sponsors: https://github.com/sponsors/reisxd"
+            }
+        }
+    },
+    "welcomeMsg": {
+        "title": "TizenTube-Daq yI'el!",
+        "subtitle": "choHtaHghach yInuqlI'!"
+    },
+    "sponsorblock": {
+        "segments": {
+            "sponsor": "sponsor ghompu'",
+            "intro": "tagh",
+            "outro": "blaH",
+            "interaction": "interaction De'",
+            "selfpromo": "self-promotion",
+            "preview": "preview",
+            "filler": "tangents",
+            "music_offtopic": "non-music",
+            "poi_highlight": "ghotI'"
+        },
+        "toasts": {
+            "skipping": "{{segment}} yIchoS",
+            "notSkipping": "{{segment}} yImev ({{count}})",
+            "skip": "{{segment}} yIchoS",
+            "skipToHighlight": "ghotI' yIchoS"
+        }
+    }
+}

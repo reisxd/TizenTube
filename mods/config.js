@@ -54,7 +54,8 @@ const defaultConfig = {
   enableUpdater: true,
   autoFrameRate: false,
   autoFrameRatePauseVideoFor: 0,
-  enableSigninReminder: false
+  enableSigninReminder: false,
+  sortSubscriptionsByAlphabet: false,
 };
 
 let localConfig;

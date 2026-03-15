@@ -1,0 +1,193 @@
+{
+    "__contributors": [
+        "lukapiplica"
+    ],
+    "settings": {
+        "options": {
+            "socialMedia": {
+                "title": "Poveznice na društvene mreže",
+                "qrCodeScanMessage": "Stranicu {{name}} možete posjetiti skeniranjem QR koda ispod."
+            },
+            "adBlock": "Blokator oglasa",
+            "sponsorblock": {
+                "title": "SponsorBlock postavke",
+                "options": {
+                    "enableSB": "Omogući SponsorBlock",
+                    "manualSkip": "Ručno preskakanje SponsorBlock segmenta",
+                    "segments": "Segmenti",
+                    "categories": {
+                        "sponsor": "Preskoči sponzorske segmente",
+                        "intro": "Preskoči uvodne segmente",
+                        "outro": "Preskoči završne segmente",
+                        "interaction": "Preskoči podsjetnike za interakciju",
+                        "selfpromo": "Preskoči segmente samopromocije",
+                        "preview": "Preskoči najave/sažetke",
+                        "filler": "Preskoči skretanja s teme/šale",
+                        "music_offtopic": "Preskoči dijelove koji nisu glazba",
+                        "highlights": "Omogući istaknute dijelove"
+                    },
+                    "showSBToasts": "Prikaži SponsorBlock skočne obavijesti"
+                }
+            },
+            "dearrow": {
+                "title": "DeArrow postavke",
+                "options": {
+                    "enableDA": "Omogući DeArrow",
+                    "enableDAThumbnails": "Omogući DeArrow sličice"
+                }
+            },
+            "misc": {
+                "title": "Razne postavke",
+                "options": {
+                    "endScreenCards": "Sakrij završne kartice na zaslonu",
+                    "youThereRenderer": "Omogući prozor 'Jeste li još uvijek tamo?'",
+                    "paidPromoOverlay": "Omogući sloj 'Uključuje plaćenu promociju'",
+                    "whosWatching": {
+                        "title": "Izbornik 'Tko gleda?'",
+                        "options": {
+                            "enableWW": "Omogući izbornik 'Tko gleda?'",
+                            "permaEnableWW": "Trajno omogući izbornik 'Tko gleda?'",
+                            "enableWWOnExit": "Prikaži izbornik 'Tko gleda?' pri izlasku"
+                        }
+                    },
+                    "fixUI": "Popravi korisničko sučelje (UI)",
+                    "hqThumbnails": "Omogući sličice visoke kvalitete",
+                    "longPress": "Omogući radnje na dugi pritisak",
+                    "shorts": "Omogući Shorts videozapise",
+                    "videoPreviews": "Omogući pregled videozapisa",
+                    "ttWelcomeMsg": "Prikaži TT poruku dobrodošlice",
+                    "guestSignInReminder": "Prikaži podsjetnik za prijavu gosta",
+                    "reloadHomeOnStartup": "Osvježi početnu stranicu pri pokretanju"
+                }
+            },
+            "subtitles": {
+                "title": "Postavke titlova",
+                "options": {
+                    "showLocalSubtitle": "Prikaži lokalne titlove",
+                    "showHiddenSubtitles": "Prikaži skrivene titlove"
+                }
+            },
+            "videoPlayer": {
+                "title": "Postavke video playera",
+                "subtitle": "Prilagodite značajke video playera",
+                "options": {
+                    "patching": {
+                        "title": "Zakrpe za sučelje playera",
+                        "options": {
+                            "enableVPUIPatching": "Omogući zakrpe za UI playera",
+                            "previousNextBtns": "Omogući tipke Prethodno i Sljedeće",
+                            "showSuperThxBtn": "Prikaži tipku 'Super hvala'",
+                            "showSpeedCtrlBtn": "Prikaži kontrole brzine"
+                        }
+                    },
+                    "preferredVideoQuality": {
+                        "title": "Željena kvaliteta videozapisa",
+                        "subtitle": "Odaberite željenu ili sljedeću najbolju kvalitetu pri pokretanju"
+                    },
+                    "speedSettings": {
+                        "title": "Koraci promjene brzine",
+                        "subtitle": "Postavite korake za prilagodbu brzine reprodukcije"
+                    },
+                    "preferredVideoCodec": {
+                        "title": "Željeni video kodek",
+                        "subtitle": "Odaberite željeni video kodek za reprodukciju"
+                    },
+                    "afr": "Automatska frekvencija osvježavanja (AFR)",
+                    "afrPauseDuration": {
+                        "title": "Trajanje pauze za AFR",
+                        "subtitle": "Postavite trajanje pauze (u sekundama) pri prilagodbi frekvencije osvježavanja"
+                    }
+                }
+            },
+            "uiSettings": {
+                "title": "Postavke korisničkog sučelja",
+                "subtitle": "Prilagodite sučelje svojim željama",
+                "options": {
+                    "hideWatchedVideos": {
+                        "title": "Sakrij pogledane videozapise",
+                        "options": {
+                            "enableHideWatchedVideos": "Omogući skrivanje pogledanih videozapisa",
+                            "watchedVideosThreshold": {
+                                "title": "Prag pogledanog sadržaja",
+                                "subtitle": "Postavite postotak nakon kojeg se videozapis smatra pogledanim"
+                            },
+                            "setPagesToHideWatchedVideos": "Postavi stranice za skrivanje pogledanih videozapisa"
+                        }
+                    },
+                    "screenDimming": {
+                        "title": "Zatamnjenje zaslona",
+                        "options": {
+                            "enableScreenDimming": "Omogući zatamnjenje zaslona",
+                            "dimmingTimeout": {
+                                "title": "Vrijeme do zatamnjenja",
+                                "subtitle": "Postavite vrijeme neaktivnosti (u sekundama) prije zatamnjenja zaslona"
+                            },
+                            "dimmingOpacity": {
+                                "title": "Razina zatamnjenja",
+                                "subtitle": "Postavite razinu prozirnosti za zatamnjenje zaslona"
+                            }
+                        }
+                    },
+                    "disableSidebarContents": {
+                        "title": "Onemogući sadržaj bočne trake",
+                        "subtitle": "Odaberite sadržaje bočne trake koje želite isključiti"
+                    },
+                    "launchToOnStartup": {
+                        "title": "Početna stranica pri pokretanju",
+                        "subtitle": "Odaberite zadanu stranicu koja se otvara pri pokretanju TizenTubea"
+                    },
+                    "sortSubscriptionsByAlphabet": "Sort Subscriptions Alphabetically"
+                }
+            },
+            "updater": {
+                "title": "TizenTube Cobalt ažuriranje",
+                "menuSubtitle": "Upravljajte TizenTube Cobalt ažuriranjima",
+                "versionSubtitle": "Trenutačna verzija: {{version}}",
+                "options": {
+                    "checkForUpdates": "Provjeri ažuriranja",
+                    "checkForUpdatesOnStartup": "Provjeri ažuriranja pri pokretanju"
+                }
+            }
+        },
+        "ttSettings": {
+            "title": "TizenTube postavke",
+            "madeByText": "Izradio: Reis Can (reisxd) uz ❤️",
+            "summary": "Otvori TizenTube postavke"
+        },
+        "supportTT": {
+            "title": "Podrži TizenTube",
+            "subtitle": "❤️ Podržite razvoj TizenTubea",
+            "content": {
+                "1": "Ako uživate u korištenju TizenTubea i želite podržati njegov razvoj, razmislite o sljedećem:",
+                "2": "1. Označite repozitorij zvjezdicom (Star) na GitHubu radi bolje vidljivosti.",
+                "3": "2. Podijelite TizenTube s drugima.",
+                "4": "Ako želite pridonijeti financijski, razmislite o donaciji:",
+                "5": "- Buy Me A Coffee: https://www.buymeacoffee.com/reisxd (preporučeno)",
+                "6": "- GitHub Sponsors: https://github.com/sponsors/reisxd"
+            }
+        }
+    },
+    "welcomeMsg": {
+        "title": "Dobrodošli u TizenTube",
+        "subtitle": "Idite u postavke i kliknite na 'TizenTube postavke' za konfiguraciju."
+    },
+    "sponsorblock": {
+        "segments": {
+            "sponsor": "sponzorski segment",
+            "intro": "uvod",
+            "outro": "odjava",
+            "interaction": "podsjetnik za interakciju",
+            "selfpromo": "samopromocija",
+            "preview": "sažetak ili najava",
+            "filler": "skretanje s teme",
+            "music_offtopic": "nemuzički dio",
+            "poi_highlight": "istaknuto"
+        },
+        "toasts": {
+            "skipping": "Preskačem {{segment}}",
+            "notSkipping": "Ne preskačem {{segment}} (preskočeno {{count}} puta)",
+            "skip": "Preskoči {{segment}}",
+            "skipToHighlight": "Preskoči na istaknuti dio"
+        }
+    }
+}

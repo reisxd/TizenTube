@@ -1,5 +1,7 @@
 {
-    "__contributors": ["joaopferreira19"],
+    "__contributors": [
+        "joaopferreira19"
+    ],
     "settings": {
         "options": {
             "socialMedia": {
@@ -133,16 +135,17 @@
                     "launchToOnStartup": {
                         "title": "Abrir ao iniciar",
                         "subtitle": "Escolhe a página padrão que o TizenTube abre ao iniciar"
-                    }
-                },
-                "updater": {
-                    "title": "Atualizador do TizenTube Cobalt",
-                    "menuSubtitle": "Gerir atualizações do TizenTube Cobalt",
-                    "versionSubtitle": "Versão atual: {{version}}",
-                    "options": {
-                        "checkForUpdates": "Verificar atualizações",
-                        "checkForUpdatesOnStartup": "Verificar atualizações ao iniciar"
-                    }
+                    },
+                    "sortSubscriptionsByAlphabet": "Sort Subscriptions Alphabetically"
+                }
+            },
+            "updater": {
+                "title": "Atualizador do TizenTube Cobalt",
+                "menuSubtitle": "Gerir atualizações do TizenTube Cobalt",
+                "versionSubtitle": "Versão atual: {{version}}",
+                "options": {
+                    "checkForUpdates": "Verificar atualizações",
+                    "checkForUpdatesOnStartup": "Verificar atualizações ao iniciar"
                 }
             }
         },
