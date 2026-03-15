@@ -38,6 +38,9 @@ export default {
     "pt-PT": {
         translation: PortuguesePortugalResource
     },
+    "es-419": {
+        translation: SpanishLatinAmericaResource
+    },
     es: {
         translation: SpanishResource
     },
