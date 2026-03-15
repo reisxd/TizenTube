@@ -1,3 +1,4 @@
+import DanishResource from './resources/da.json';
 import EnglishResource from './resources/en.json';
 import TurkishResource from './resources/tr.json';
 import VietnameseResource from './resources/vi.json';
@@ -9,8 +10,12 @@ import CroatianResource from './resources/hr.json';
 import SerbianLatinResource from './resources/sr-Latn.json';
 import SerbianCyrillicResource from './resources/sr.json';
 import KlingonResource from './resources/tlh.json';
+import BrazilianPortugueseResource from './resources/pt-BR.json';
 
 export default {
+    da: {
+        translation: DanishResource
+    },
     en: {
         translation: EnglishResource
     },
@@ -42,6 +47,9 @@ export default {
         translation: SerbianCyrillicResource
     },
     tlh: {
-    translation: KlingonResource
-}
+        translation: KlingonResource
+    },
+    "pt-BR": {
+        translation: BrazilianPortugueseResource
+    }
 };
