@@ -16,6 +16,7 @@ import SerbianLatinResource from './resources/sr-Latn.json';
 import SerbianCyrillicResource from './resources/sr-Cyrl.json';
 import KlingonResource from './resources/tlh.json';
 import BrazilianPortugueseResource from './resources/pt-BR.json';
+import RussianResource from './resources/ru.json';
 
 export default {
     da: {
@@ -71,5 +72,8 @@ export default {
     },
     "pt-BR": {
         translation: BrazilianPortugueseResource
+    },
+    ru: {
+        translation: RussianResource
     }
 };

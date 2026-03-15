@@ -133,7 +133,8 @@
                     "launchToOnStartup": {
                         "title": "Launch To on Startup",
                         "subtitle": "Choose the default page TizenTube opens to on startup"
-                    }
+                    },
+                    "sortSubscriptionsByAlphabet": "Sort Subscriptions Alphabetically"
                 },
                 "updater": {
                     "title": "TizenTube Cobalt Updater",

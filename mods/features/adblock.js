@@ -121,10 +121,24 @@ JSON.parse = function () {
   }
 
   if (r?.contents?.tvBrowseRenderer?.content?.tvSecondaryNavRenderer?.sections) {
-    for (const section of r.contents.tvBrowseRenderer.content.tvSecondaryNavRenderer.sections) {
-      for (const tab of section.tvSecondaryNavSectionRenderer.tabs) {
+    for (let i = 0; i < r.contents.tvBrowseRenderer.content.tvSecondaryNavRenderer.sections.length; i++) {
+      const section = r.contents.tvBrowseRenderer.content.tvSecondaryNavRenderer.sections[i].tvSecondaryNavSectionRenderer;
+
+      if (configRead('sortSubscriptionsByAlphabet')) {
+        section.tabs.sort((a, b) => {
+          if (a.tabRenderer.selected && !b.tabRenderer.selected) return -1;
+          if (!a.tabRenderer.selected && b.tabRenderer.selected) return 1;
+          return a.tabRenderer.title.localeCompare(b.tabRenderer.title);
+        });
+      }
+
+      for (let j = 0; j < section.tabs.length; j++) {
+        const tab = section.tabs[j];
         if (tab.tabRenderer.content?.tvSurfaceContentRenderer?.content?.sectionListRenderer?.contents) {
-          processShelves(tab.tabRenderer.content.tvSurfaceContentRenderer?.content?.sectionListRenderer.contents);
+          const index = section.tabs.indexOf(tab);
+          const clone = tab.tabRenderer.content.tvSurfaceContentRenderer.content.sectionListRenderer.contents;
+          processShelves(clone);
+          section.tabs[index].tabRenderer.content.tvSurfaceContentRenderer.content.sectionListRenderer.contents = clone;
         }
       }
     }

@@ -133,7 +133,8 @@
                     "launchToOnStartup": {
                         "title": "Açılışta Başlatılacak Sayfa",
                         "subtitle": "TizenTube'un açılışta varsayılan olarak açacağı sayfayı seçin"
-                    }
+                    },
+                    "sortSubscriptionsByAlphabet": "Abonelikleri Alfabetik Sırala"
                 },
                 "updater": {
                     "title": "TizenTube Cobalt Güncelleyici",
