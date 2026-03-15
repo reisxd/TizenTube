@@ -1,4 +1,4 @@
-import DanishResource from './resources/da.json';
+import DanishResource from './resources/dk.json';
 import EnglishResource from './resources/en.json';
 import TurkishResource from './resources/tr.json';
 import VietnameseResource from './resources/vi.json';
@@ -6,13 +6,14 @@ import GermanResource from './resources/de.json';
 import LatvianResource from './resources/lv.json';
 import PortuguesePortugalResource from './resources/pt-PT.json';
 import SpanishResource from './resources/es.json';
+import SpanishLatinAmericaResource from './resources/es-419.json';
 import IndonesianResource from './resources/id.json';
 import FrenchResource from './resources/fr.json'
 import RomanianResource from './resources/ro.json';
 import BosnianResource from './resources/bs.json';
 import CroatianResource from './resources/hr.json';
 import SerbianLatinResource from './resources/sr-Latn.json';
-import SerbianCyrillicResource from './resources/sr.json';
+import SerbianCyrillicResource from './resources/sr-Cyrl.json';
 import KlingonResource from './resources/tlh.json';
 import BrazilianPortugueseResource from './resources/pt-BR.json';
 
