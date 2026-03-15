@@ -1,3 +1,4 @@
+import DanishResource from './resources/da.json';
 import EnglishResource from './resources/en.json';
 import TurkishResource from './resources/tr.json';
 import VietnameseResource from './resources/vi.json';
@@ -7,6 +8,9 @@ import PortuguesePortugalResource from './resources/pt-PT.json';
 import BrazilianPortugueseResource from './resources/pt-BR.json';
 
 export default {
+    da: {
+        translation: DanishResource
+    },
     en: {
         translation: EnglishResource
     },
