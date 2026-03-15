@@ -8,6 +8,7 @@ import PortuguesePortugalResource from './resources/pt-PT.json';
 import SpanishResource from './resources/es.json';
 import SpanishLatinAmericaResource from './resources/es-419.json';
 import IndonesianResource from './resources/id.json';
+import FinnishResource from './resources/fi_FI.json';
 import FrenchResource from './resources/fr.json'
 import RomanianResource from './resources/ro.json';
 import BosnianResource from './resources/bs.json';
@@ -50,6 +51,9 @@ export default {
     },
     id: {
         translation: IndonesianResource
+    },
+    "fi-FI": {
+        translation: FinnishResource
     },
     fr: {
         translation: FrenchResource
