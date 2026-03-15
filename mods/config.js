@@ -55,7 +55,8 @@ const defaultConfig = {
   autoFrameRate: false,
   autoFrameRatePauseVideoFor: 0,
   enableSigninReminder: false,
-  force1xForMusic: false
+  force1xForMusic: false,
+  sortSubscriptionsByAlphabet: false,
 };
 
 let localConfig;

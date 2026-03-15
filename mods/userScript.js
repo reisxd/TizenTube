@@ -1,11 +1,8 @@
 import "./features/userAgentSpoofing.js";
 import "whatwg-fetch";
 import 'core-js/proposals/object-getownpropertydescriptors';
-import '@formatjs/intl-getcanonicallocales/polyfill.iife'
-import '@formatjs/intl-locale/polyfill.iife'
-import '@formatjs/intl-displaynames/polyfill.iife'
-import '@formatjs/intl-displaynames/locale-data/en';
 
+import './translations/index.js'
 import "./domrect-polyfill";
 import "./features/adblock.js";
 import "./features/sponsorblock.js";
