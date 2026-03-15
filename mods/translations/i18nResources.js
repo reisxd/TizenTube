@@ -4,6 +4,7 @@ import VietnameseResource from './resources/vi.json';
 import GermanResource from './resources/de.json';
 import LatvianResource from './resources/lv.json';
 import PortuguesePortugalResource from './resources/pt-PT.json';
+import IndonesianResource from './resources/id.json';
 
 export default {
     en: {
@@ -23,5 +24,8 @@ export default {
     },
     "pt-PT": {
         translation: PortuguesePortugalResource
+    },
+    id: {
+        translation: IndonesianResource
     }
 };
