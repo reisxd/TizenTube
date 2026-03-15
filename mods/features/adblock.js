@@ -20,6 +20,18 @@ JSON.parse = function () {
   const adBlockEnabled = configRead('enableAdBlock');
   const signinReminderEnabled = configRead('enableSigninReminder');
 
+  // Music Video Detection
+  if (r.videoDetails) {
+    const musicType = r.videoDetails.musicVideoType;
+    if (musicType) {
+      window.isMusicVideo = musicType.startsWith('MUSIC_VIDEO_TYPE_') &&
+        musicType !== 'MUSIC_VIDEO_TYPE_NONE' &&
+        musicType !== 'MUSIC_VIDEO_TYPE_OMV_NONE';
+    } else {
+      window.isMusicVideo = false;
+    }
+  }
+
   if (r.adPlacements && adBlockEnabled) {
     r.adPlacements = [];
   }
