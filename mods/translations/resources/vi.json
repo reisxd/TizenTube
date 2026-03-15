@@ -14,7 +14,7 @@
                 "options": {
                     "enableSB": "Bật SponsorBlock",
                     "manualSkip": "Bỏ qua phân đoạn SponsorBlock thủ công",
-                    "segments": "Phân đoạn",
+                    "segments": "Bỏ qua phân đoạn SponsorBlock tự động",
                     "categories": {
                         "sponsor": "Bỏ qua đoạn tài trợ",
                         "intro": "Bỏ qua đoạn mở đầu (Intro)",
@@ -43,11 +43,11 @@
                     "youThereRenderer": "Bật thông báo 'Video đã tạm dừng. Tiếp tục xem?'",
                     "paidPromoOverlay": "Bật lớp phủ 'Chứa nội dung được trả tiền để quảng cáo'",
                     "whosWatching": {
-                        "title": "Menu Ai đang xem",
+                        "title": "Menu ai đang xem",
                         "options": {
-                            "enableWW": "Bật menu Ai đang xem",
-                            "permaEnableWW": "Luôn bật menu Ai đang xem",
-                            "enableWWOnExit": "Bật menu Ai đang xem khi thoát ứng dụng"
+                            "enableWW": "Bật menu ai đang xem",
+                            "permaEnableWW": "Luôn bật menu ai đang xem",
+                            "enableWWOnExit": "Bật menu ai đang xem khi thoát ứng dụng"
                         }
                     },
                     "fixUI": "Sửa lỗi giao diện",
@@ -55,7 +55,7 @@
                     "longPress": "Bật thao tác nhấn giữ",
                     "shorts": "Bật Shorts",
                     "videoPreviews": "Bật tính năng xem trước video",
-                    "ttWelcomeMsg": "Hiển thị thông báo chào mừng TT",
+                    "ttWelcomeMsg": "Hiển thị thông báo chào mừng TizenTube",
                     "guestSignInReminder": "Hiển thị nhắc nhở đăng nhập cho chế độ khách",
                     "reloadHomeOnStartup": "Tải lại Trang chủ khi khởi động"
                 }
@@ -136,7 +136,7 @@
                         "title": "Trang khởi động",
                         "subtitle": "Chọn trang mặc định mà TizenTube sẽ mở khi khởi động"
                     },
-                    "sortSubscriptionsByAlphabet": "Sort Subscriptions Alphabetically"
+                    "sortSubscriptionsByAlphabet": "Sắp xếp các kênh đăng ký theo bảng chữ cái"
                 }
             },
             "updater": {
@@ -156,10 +156,10 @@
         },
         "supportTT": {
             "title": "Ủng hộ TizenTube",
-            "subtitle": "❤️ Thể hiện sự ủng hộ dành cho TizenTube và quá trình phát triển",
+            "subtitle": "❤️ Thể hiện sự ủng hộ dành cho TizenTube và đội ngũ phát triển!",
             "content": {
-                "1": "Nếu bạn thích sử dụng TizenTube và muốn ủng hộ quá trình phát triển dự án, hãy cân nhắc:",
-                "2": "1. Tặng sao (Star) cho kho lưu trữ trên GitHub để giúp dự án phổ biến hơn.",
+                "1": "Nếu bạn thích sử dụng TizenTube và muốn ủng hộ đội ngũ phát triển dự án này, hãy:",
+                "2": "1. Tặng sao (Star) cho dự án ở trên GitHub để giúp dự án phổ biến hơn.",
                 "3": "2. Chia sẻ TizenTube với mọi người.",
                 "4": "Nếu bạn muốn quyên góp:",
                 "5": "- Buy Me A Coffee: https://www.buymeacoffee.com/reisxd (ưu tiên)",
@@ -169,7 +169,7 @@
     },
     "welcomeMsg": {
         "title": "Chào mừng đến với TizenTube",
-        "subtitle": "Vào mục Cài đặt và nhấp vào Cài đặt TizenTube để tùy chỉnh."
+        "subtitle": "Vào mục Cài đặt và nhấp vào Cài đặt TizenTube để tùy chỉnh. "
     },
     "sponsorblock": {
         "segments": {
