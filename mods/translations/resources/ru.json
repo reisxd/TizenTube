@@ -1,0 +1,188 @@
+{
+    "__contributors": ["BlackFlux"],
+    "settings": {
+        "options": {
+            "socialMedia": {
+                "title": "Ссылки",
+                "qrCodeScanMessage": "Вы можете перейти на страницу {{name}} отсканировав QR-код ниже."
+            },
+            "adBlock": "Блокировка рекламы",
+            "sponsorblock": {
+                "title": "Настройки SponsorBlock",
+                "options": {
+                    "enableSB": "Включить SponsorBlock",
+                    "manualSkip": "Ручной пропуск сегментов",
+                    "segments": "Сегменты",
+                    "categories": {
+                        "sponsor": "Пропускать спонсорские сегменты",
+                        "intro": "Пропустить интро",
+                        "outro": "Пропустить аутро",
+                        "interaction": "Пропускать напоминание о взаимодействии",
+                        "selfpromo": "Пропускать саморекламу",
+                        "preview": "Пропускать превью/рекап",
+                        "filler": "Пропускать оффтоп/шутки",
+                        "music_offtopic": "Пропускать оффтоп-музыку",
+                        "highlights": "Включить ключевые моменты"
+                    },
+                    "showSBToasts": "Показывать уведомления SponsorBlock"
+                }
+            },
+            "dearrow": {
+                "title": "Настройки DeArrow",
+                "options": {
+                    "enableDA": "Включить DeArrow",
+                    "enableDAThumbnails": "Включить миниатюры DeArrow"
+                }
+            },
+            "misc": {
+                "title": "Разное",
+                "options": {
+                    "endScreenCards": "Скрыть карточки в конце видео",
+                    "youThereRenderer": "Включить сообщение «Вы ещё смотрите?»",
+                    "paidPromoOverlay": "Включить уведомление «Содержит рекламу»",
+                    "whosWatching": {
+                        "title": "Меню «Кто смотрит?»",
+                        "options": {
+                            "enableWW": "Включить меню «Кто смотрит»",
+                            "permaEnableWW": "Всегда включать меню «Кто смотрит»",
+                            "enableWWOnExit": "Показывать меню «Кто смотрит» при выходе"
+                        }
+                    },
+                    "fixUI": "Исправить интерфейс",
+                    "hqThumbnails": "Включить миниатюры высокого качества",
+                    "longPress": "Долгое нажатие",
+                    "shorts": "Shorts",
+                    "videoPreviews": "Предпросмотр видео",
+                    "ttWelcomeMsg": "Приветственное сообщение",
+                    "guestSignInReminder": "Показывать напоминания о гостевом входе",
+                    "reloadHomeOnStartup": "Обновлять главную страницу при запуске"
+                }
+            },
+            "subtitles": {
+                "title": "Субтитры",
+                "options": {
+                    "showLocalSubtitle": "Показывать локальные субтитры",
+                    "showHiddenSubtitles": "Показывать скрытые субтитры"
+                }
+            },
+            "videoPlayer": {
+                "title": "Настройки видеоплеера",
+                "subtitle": "Настройка функций видеоплеера",
+                "options": {
+                    "patching": {
+                        "title": "Патч интерфейса видеоплеера",
+                        "options": {
+                            "enableVPUIPatching": "Включить патч интерфейса видеоплеера",
+                            "previousNextBtns": "Кнопки «Предыдущее/Следующее»",
+                            "showSuperThxBtn": "Кнопка Super Thanks",
+                            "showSpeedCtrlBtn": "Кнопка скорости"
+                        }
+                    },
+                    "preferredVideoQuality": {
+                        "title": "Предпочтительное качество",
+                        "subtitle": "Выберите предпочтительное или следующее лучшее качество видео при запуске воспроизведения"
+                    },
+                    "speedSettings": {
+                        "title": "Шаг изменения скорости",
+                        "subtitle": "Установите шаг изменения скорости для регулировки скорости воспроизведения"
+                    },
+                    "preferredVideoCodec": {
+                        "title": "Предпочтительный кодек",
+                        "subtitle": "Выберите предпочитаемый видеокодек"
+                    },
+                    "afr": "Auto Frame Rate",
+                    "afrPauseDuration": {
+                        "title": "Длительность паузы Auto Frame Rate",
+                        "subtitle": "Установите длительность (в секундах) паузы воспроизведения при изменении частоты кадров"
+                    }
+                }
+            },
+            "uiSettings": {
+                "title": "Настройки интерфейса",
+                "subtitle": "Настройки интерфейса под себя",
+                "options": {
+                    "hideWatchedVideos": {
+                        "title": "Скрывать просмотренные видео",
+                        "options": {
+                            "enableHideWatchedVideos": "Включить скрытие просмотренных видео",
+                            "watchedVideosThreshold": {
+                                "title": "Порог скрытия видео",
+                                "subtitle": "Укажите процент, после которого видео будет скрываться"
+                            },
+                            "setPagesToHideWatchedVideos": "Где скрывать просмотренные"
+                        }
+                    },
+                    "screenDimming": {
+                        "title": "Затемнение экрана",
+                        "options": {
+                            "enableScreenDimming": "Включить затемнение экрана",
+                            "dimmingTimeout": {
+                                "title": "Задержка затемнения",
+                                "subtitle": "Установите время бездействия (в секундах), после которого экран затемняется"
+                            },
+                            "dimmingOpacity": {
+                                "title": "Прозрачность затемнения",
+                                "subtitle": "Установите уровень затемнения экрана"
+                            }
+                        }
+                    },
+                    "disableSidebarContents": {
+                        "title": "Отключить разделы бокового меню",
+                        "subtitle": "Выберите разделы бокового меню, которые нужно отключить"
+                    },
+                    "launchToOnStartup": {
+                        "title": "Открыть при запуске",
+                        "subtitle": "Выберите страницу, которая будет открываться при запуске TizenTube"
+                    }
+                },
+                "updater": {
+                    "title": "Обновление TizenTube Cobalt",
+                    "menuSubtitle": "Управление обновлениями TizenTube Cobalt",
+                    "versionSubtitle": "Текущая версия: {{version}}",
+                    "options": {
+                        "checkForUpdates": "Проверить обновления",
+                        "checkForUpdatesOnStartup": "Проверять обновления при запуске"
+                    }
+                }
+            }
+        },
+        "ttSettings": {
+            "title": "Настройки TizenTube",
+            "madeByText": "Сделано Reis Can (reisxd) с ❤️",
+            "summary": "Открыть настройки TizenTube"
+        },
+        "supportTT": {
+            "title": "Поддержать TizenTube",
+            "subtitle": "❤️ Поддержите TizenTube и его разработку",
+            "content": {
+                "1": "Если вам нравится использовать TizenTube и вы хотите поддержать его развитие, рассмотрите следующие варианты:",
+                "2": "1. Поставьте звезду репозиторию на GitHub, чтобы повысить его видимость.",
+                "3": "2. Поделитесь TizenTube с другими.",
+                "4": "Если вы хотите поддержать проект финансово, рассмотрите возможность пожертвования:",
+                "5": "- Buy Me A Coffee: https://www.buymeacoffee.com/reisxd (preferably)",
+                "6": "- GitHub Sponsors: https://github.com/sponsors/reisxd"
+            }
+        }
+    },
+    "welcomeMsg": {
+        "title": "Добро пожаловать в TizenTube",
+        "subtitle": "Перейдите в настройки и нажмите «Настройки TizenTube»."
+    },
+    "sponsorblock": {
+        "segments": {
+            "sponsor": "спонсорский сегмент",
+            "intro": "интро",
+            "outro": "аутро",
+            "interaction": "напоминание о взаимодействии",
+            "selfpromo": "самореклама",
+            "preview": "повтор или превью",
+            "filler": "отступления от темы",
+            "music_offtopic": "немузыкальная часть",
+            "poi_highlight": "ключевой момент"
+        },
+        "toasts": {
+            "skipping": "Пропуск {{segment}}",
+            "notSkipping": "Не пропускается {{segment}} (уже пропущено {{count}} раз)",
+            "skip": "Пропустить {{segment}}",
+            "skipToHighlight": "Перейти к ключевому моменту"
+        }
