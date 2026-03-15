@@ -5,6 +5,7 @@ import VietnameseResource from './resources/vi.json';
 import GermanResource from './resources/de.json';
 import LatvianResource from './resources/lv.json';
 import PortuguesePortugalResource from './resources/pt-PT.json';
+import BrazilianPortugueseResource from './resources/pt-BR.json';
 
 export default {
     da: {
@@ -27,5 +28,8 @@ export default {
     },
     "pt-PT": {
         translation: PortuguesePortugalResource
+    },
+    "pt-BR": {
+        translation: BrazilianPortugueseResource
     }
 };
