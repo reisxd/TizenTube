@@ -5,6 +5,7 @@ import VietnameseResource from './resources/vi.json';
 import GermanResource from './resources/de.json';
 import LatvianResource from './resources/lv.json';
 import PortuguesePortugalResource from './resources/pt-PT.json';
+import FrenchResource from './resources/fr.json'
 import RomanianResource from './resources/ro.json';
 import BosnianResource from './resources/bs.json';
 import CroatianResource from './resources/hr.json';
@@ -34,6 +35,9 @@ export default {
     },
     "pt-PT": {
         translation: PortuguesePortugalResource
+    },
+    fr: {
+        translation: FrenchResource
     },
     ro: {
         translation: RomanianResource
