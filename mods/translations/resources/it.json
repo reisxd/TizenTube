@@ -1,63 +1,63 @@
 {
     "__contributors": [
-        "reisxd"
+        "DaRkViVi"
     ],
     "settings": {
         "options": {
             "socialMedia": {
-                "title": "Social Media Links",
-                "qrCodeScanMessage": "You can visit the {{name}} page by scanning the QR code below."
+                "title": "Link ai Social",
+                "qrCodeScanMessage": "Puoi visitare la pagina {{name}} scansionando il QR qui sotto."
             },
             "adBlock": "Ad Block",
             "sponsorblock": {
-                "title": "SponsorBlock Settings",
+                "title": "Impostazioni SponsorBlock",
                 "options": {
-                    "enableSB": "Enable SponsorBlock",
-                    "manualSkip": "Manual SponsorBlock Segment Skip",
-                    "segments": "Segments",
+                    "enableSB": "Attiva SponsorBlock",
+                    "manualSkip": "Salto manuale segmento SponsorBlock",
+                    "segments": "Segmenti",
                     "categories": {
-                        "sponsor": "Skip Sponsor Segments",
-                        "intro": "Skip Intro Segments",
-                        "outro": "Skip Outro Segments",
-                        "interaction": "Skip Interaction Reminder Segments",
-                        "selfpromo": "Skip Self-Promotion Segments",
-                        "preview": "Skip Preview/Recap Segments",
-                        "filler": "Skip Tangents/Jokes Segments",
-                        "music_offtopic": "Skip Off-Topic Music Segments",
-                        "highlights": "Enable Highlights"
+                        "sponsor": "Salta Segmenti Sponsor",
+                        "intro": "Salta Segmenti Intro",
+                        "outro": "Salta Segmenti Outro",
+                        "interaction": "Salta Segmenti Richiesta Interazione",
+                        "selfpromo": "Salta Segmenti Auto-Promozione",
+                        "preview": "Salta Segmenti Anteprima/Riassunto",
+                        "filler": "Salta Segmenti Fuori Tema/Scherzi",
+                        "music_offtopic": "Salta Segmenti Musica Off-Topic",
+                        "highlights": "Attiva Punti Salienti"
                     },
-                    "showSBToasts": "Show SponsorBlock Toasts"
+                    "showSBToasts": "Mostra Notifiche SponsorBlock"
                 }
             },
             "dearrow": {
-                "title": "DeArrow Settings",
+                "title": "Impostazioni DeArrow",
                 "options": {
-                    "enableDA": "Enable DeArrow",
-                    "enableDAThumbnails": "Enable DeArrow Thumbnails"
+                    "enableDA": "Attiva DeArrow",
+                    "enableDAThumbnails": "Attiva Anteprime DeArrow"
                 }
             },
             "misc": {
-                "title": "Miscellaneous Settings",
+                "title": "Impostazioni varie",
                 "options": {
-                    "endScreenCards": "Hide End Screen Cards",
-                    "youThereRenderer": "Enable 'Are you still watching?' Renderer",
-                    "paidPromoOverlay": "Enable 'Includes paid promotion' Overlay",
+                    "endScreenCards": "Nascondi Schermate Finali",
+                    "youThereRenderer": "Abilita Avviso 'Stai ancora guardando?'",
+                    "paidPromoOverlay": "Attiva Overlay 'Include promozioni a pagamento'",
                     "whosWatching": {
-                        "title": "Who's Watching Menu",
+                        "title": "Menu Chi Sta Guardando",
                         "options": {
-                            "enableWW": "Enable Who's Watching Menu",
-                            "permaEnableWW": "Permanently Enable Who's Watching Menu",
-                            "enableWWOnExit": "Enable Who's Watching Menu on App Exit"
+                            "enableWW": "Attiva Menu Chi Sta Guardando",
+                            "permaEnableWW": "Attiva Sempre Menu Chi Sta Guardando",
+                            "enableWWOnExit": "Attiva Menu Chi Sta Guardando Chiudendo l'App"
                         }
                     },
-                    "fixUI": "Fix UI",
-                    "hqThumbnails": "Enable High Quality Thumbnails",
-                    "longPress": "Enable Long Press Actions",
-                    "shorts": "Enable Shorts",
-                    "videoPreviews": "Enable Video Previews",
-                    "ttWelcomeMsg": "Show TT Welcome Message",
-                    "guestSignInReminder": "Show Guest Sign In Reminder",
-                    "reloadHomeOnStartup": "Reload Home on Startup"
+                    "fixUI": "Correggi Interfaccia",
+                    "hqThumbnails": "Attiva Anteprime in Alta Qualità",
+                    "longPress": "Attiva Azioni con Pressione Prolungata",
+                    "shorts": "Attiva Shorts",
+                    "videoPreviews": "Attiva Anteprime Video",
+                    "ttWelcomeMsg": "Mostra Messaggio di Benvenuto TT",
+                    "guestSignInReminder": "Mostra Promemoria Login Ospite",
+                    "reloadHomeOnStartup": "Ricarica Home all'Avvio"
                 }
             },
             "subtitles": {
