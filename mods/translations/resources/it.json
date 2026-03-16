@@ -61,133 +61,133 @@
                 }
             },
             "subtitles": {
-                "title": "Subtitle Settings",
+                "title": "Impostazioni Sottotitoli",
                 "options": {
-                    "showLocalSubtitle": "Show Local Subtitle",
-                    "showHiddenSubtitles": "Show Hidden Subtitles"
+                    "showLocalSubtitle": "Mostra Sottotitoli Locali",
+                    "showHiddenSubtitles": "Mostra Sottotitoli Nascosti"
                 }
             },
             "videoPlayer": {
-                "title": "Video Player Settings",
-                "subtitle": "Customize video player features",
+                "title": "Impostazioni Video Player",
+                "subtitle": "Perzonalizza le funzionalità del video player",
                 "options": {
                     "patching": {
-                        "title": "Patch Video Player UI",
+                        "title": "Patcha Interfaccia Video Player",
                         "options": {
-                            "enableVPUIPatching": "Enable Video Player UI Patching",
-                            "previousNextBtns": "Enable Previous and Next Buttons",
-                            "showSuperThxBtn": "Show Super Thanks Button",
-                            "showSpeedCtrlBtn": "Show Speed Controls Button"
+                            "enableVPUIPatching": "Attiva Patching Interfaccia Video Player",
+                            "previousNextBtns": "Attiva Pulsanti Precedente e Successivo",
+                            "showSuperThxBtn": "Mostra Tasto Super Grazie",
+                            "showSpeedCtrlBtn": "Mostra Pulsante Controllo Velocità"
                         }
                     },
                     "preferredVideoQuality": {
-                        "title": "Preferred Video Quality",
-                        "subtitle": "Choose the preferred or next best video quality applied when playback starts"
+                        "title": "Qualità Video Preferita",
+                        "subtitle": "Seleziona la qualità video preferita o la più vicina che verrà applicata quando parte una riproduzione"
                     },
                     "speedSettings": {
-                        "title": "Speed Settings Increments",
-                        "subtitle": "Set the speed increments for video playback speed adjustments"
+                        "title": "Impostazione Incrementi di Velocità",
+                        "subtitle": "Imposta gli incrementi di velocità per le regolazioni di velocità di riproduzione video"
                     },
                     "preferredVideoCodec": {
-                        "title": "Preferred Video Codec",
-                        "subtitle": "Choose the preferred video codec for playback"
+                        "title": "Codec Video Preferito",
+                        "subtitle": "Seleziona il codec video preferito per la riproduzione"
                     },
-                    "afr": "Auto Frame Rate",
+                    "afr": "Frame Rate Automatico",
                     "afrPauseDuration": {
-                        "title": "Auto Frame Rate Pause Duration",
-                        "subtitle": "Set the duration (in seconds) to pause video playback when adjusting frame rate"
+                        "title": "Durata Pausa Frame Rate Automatico",
+                        "subtitle": "Imposta la durata (in secondi) della pausa viene corretto il frame rate"
                     }
                 }
             },
             "uiSettings": {
-                "title": "User Interface Settings",
-                "subtitle": "Customize the UI to your liking",
+                "title": "Impostazioni Interfaccia Utente",
+                "subtitle": "Personalizza l'interfaccia a tuo piacimento",
                 "options": {
                     "hideWatchedVideos": {
-                        "title": "Hide Watched Videos",
+                        "title": "Nascondi Video Visti",
                         "options": {
-                            "enableHideWatchedVideos": "Enable Hide Watched Videos",
+                            "enableHideWatchedVideos": "Attiva Nascondi Video Visti",
                             "watchedVideosThreshold": {
-                                "title": "Watched Videos Threshold",
-                                "subtitle": "Set the percentage threshold for hiding watched videos"
+                                "title": "Soglia Video Visti",
+                                "subtitle": "Imposta la soglia in percentuale per nascondere un video come visto"
                             },
-                            "setPagesToHideWatchedVideos": "Set Pages to Hide Watched Videos"
+                            "setPagesToHideWatchedVideos": "Imposta Pagine per Nascondere i Video Visti"
                         }
                     },
                     "screenDimming": {
-                        "title": "Screen Dimming",
+                        "title": "Oscuramento Schermo",
                         "options": {
-                            "enableScreenDimming": "Enable Screen Dimming",
+                            "enableScreenDimming": "Attiva Oscuramento Schermo",
                             "dimmingTimeout": {
-                                "title": "Dimming Timeout",
-                                "subtitle": "Set the inactivity timeout (in seconds) before the screen dims"
+                                "title": "Timeout Oscuramento",
+                                "subtitle": "Imposta il timeout di inattività (in secondi) prima che lo schermo si oscuri"
                             },
                             "dimmingOpacity": {
-                                "title": "Dimming Opacity",
-                                "subtitle": "Set the opacity level for screen dimming"
+                                "title": "Opacità Oscuramento",
+                                "subtitle": "Imposta il livello di opacità per l'oscuramento schermo"
                             }
                         }
                     },
                     "disableSidebarContents": {
-                        "title": "Disable Sidebar Contents",
-                        "subtitle": "Select sidebar contents to disable"
+                        "title": "Disabilita Contenuti Barra Laterale",
+                        "subtitle": "Seleziona i contenuti della barra laterale che vuoi disabilitare"
                     },
                     "launchToOnStartup": {
-                        "title": "Launch To on Startup",
-                        "subtitle": "Choose the default page TizenTube opens to on startup"
+                        "title": "Lancia all'Avvio",
+                        "subtitle": "Seleziona la pagina che TizenTube apre all'avvio"
                     },
-                    "sortSubscriptionsByAlphabet": "Sort Subscriptions Alphabetically"
+                    "sortSubscriptionsByAlphabet": "Iscrizioni in ordine alfabetico"
                 }
             },
             "updater": {
-                "title": "TizenTube Cobalt Updater",
-                "menuSubtitle": "Manage TizenTube Cobalt updates",
-                "versionSubtitle": "Current version: {{version}}",
+                "title": "Aggiorna TizenTube Cobalt",
+                "menuSubtitle": "Gestisci gli aggiornamenti di TizenTube Cobalt",
+                "versionSubtitle": "Versione attuale: {{version}}",
                 "options": {
-                    "checkForUpdates": "Check for updates",
-                    "checkForUpdatesOnStartup": "Check for updates on startup"
+                    "checkForUpdates": "Controlla aggiornamenti",
+                    "checkForUpdatesOnStartup": "Controlla aggiornamenti all'avvio"
                 }
             }
         },
         "ttSettings": {
-            "title": "TizenTube Settings",
-            "madeByText": "Made by Reis Can (reisxd) with ❤️",
-            "summary": "Open TizenTube Settings"
+            "title": "Impostazioni TizenTube",
+            "madeByText": "Creato da Reis Can (reisxd) con ❤️",
+            "summary": "Apri Impostazioni TizenTube"
         },
         "supportTT": {
-            "title": "Support TizenTube",
-            "subtitle": "❤️ Show support for TizenTube and its development",
+            "title": "Supporta TizenTube",
+            "subtitle": "❤️ Mostra supporto per TizenTube e il suo sviluppo",
             "content": {
-                "1": "If you enjoy using TizenTube and would like to support its development, consider the following:",
-                "2": "1. Star the GitHub repository to help increase its visibility.",
-                "3": "2. Share TizenTube with others.",
-                "4": "If you would like to contribute financially, consider donating:",
-                "5": "- Buy Me A Coffee: https://www.buymeacoffee.com/reisxd (preferably)",
+                "1": "Se ti sta piacendo TizenTube e vuoi supportare il suo sviluppo, considera di:",
+                "2": "1. Mettere una Stella alla repository GitHub per aiutare ad aumentare la sua visibilità.",
+                "3": "2. Condividi TizenTube con altri.",
+                "4": "Se vuoi contribuire finanziariamente, considera una donazione:",
+                "5": "- Buy Me A Coffee: https://www.buymeacoffee.com/reisxd (preferibilmente)",
                 "6": "- GitHub Sponsors: https://github.com/sponsors/reisxd"
             }
         }
     },
     "welcomeMsg": {
-        "title": "Welcome to TizenTube",
-        "subtitle": "Go to settings and click on TizenTube Settings for settings."
+        "title": "Benvenuto in TizenTube",
+        "subtitle": "Vai su Impostazioni e seleziona Impostazioni TizenTube per la configurazione."
     },
     "sponsorblock": {
         "segments": {
-            "sponsor": "sponsored segment",
+            "sponsor": "segmento sponsorizzato",
             "intro": "intro",
             "outro": "outro",
-            "interaction": "interaction reminder",
-            "selfpromo": "self-promotion",
-            "preview": "recap or preview",
-            "filler": "tangents",
-            "music_offtopic": "non-music part",
-            "poi_highlight": "highlight"
+            "interaction": "promemoria interazione",
+            "selfpromo": "autopromozione",
+            "preview": "riassunto o anteprima",
+            "filler": "fuori tema",
+            "music_offtopic": "parte non musicale",
+            "poi_highlight": "punti salienti"
         },
         "toasts": {
-            "skipping": "Skipping {{segment}}",
-            "notSkipping": "Not skipping {{segment}} (was skipped {{count}} times)",
-            "skip": "Skip {{segment}}",
-            "skipToHighlight": "Skip to highlight"
+            "skipping": "Sto saltando {{segment}}",
+            "notSkipping": "Non sto saltando {{segment}} (è stata saltato {{count}} volte)",
+            "skip": "Salta {{segment}}",
+            "skipToHighlight": "Salta ai punti salienti"
         }
     }
 }
