@@ -200,7 +200,7 @@ JSON.parse = function () {
       for (const segment of window.sponsorblock.segments) {
         if (manualSkippedSegments.includes(segment.category)) {
           const timelyActionData = timelyAction(
-            t('sponsorblock.toast.skip', { segment: segment.category }),
+            t('sponsorblock.toasts.skip', { segment: segment.category }),
             'SKIP_NEXT',
             {
               clickTrackingParams: null,

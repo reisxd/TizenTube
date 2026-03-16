@@ -20,6 +20,7 @@ import BrazilianPortugueseResource from './resources/pt-BR.json';
 import RussianResource from './resources/ru.json';
 import LithuanianResource from './resources/lt.json';
 import HungarianResource from './resources/hu.json';
+import ItalianResource from './resources/it.json';
 
 export default {
     da: {
@@ -84,8 +85,11 @@ export default {
     },
     lt: {
         translation: LithuanianResource
-        },
+    },
     hu: {
         translation: HungarianResource
+    },
+    it: {
+        translation: ItalianResource
     }
 };
