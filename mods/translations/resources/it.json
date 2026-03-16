@@ -13,7 +13,7 @@
                 "title": "Impostazioni SponsorBlock",
                 "options": {
                     "enableSB": "Attiva SponsorBlock",
-                    "manualSkip": "Salto manuale segmento SponsorBlock",
+                    "manualSkip": "Salto Manuale Segmento SponsorBlock",
                     "segments": "Segmenti",
                     "categories": {
                         "sponsor": "Salta Segmenti Sponsor",
@@ -22,7 +22,7 @@
                         "interaction": "Salta Segmenti Richiesta Interazione",
                         "selfpromo": "Salta Segmenti Auto-Promozione",
                         "preview": "Salta Segmenti Anteprima/Riassunto",
-                        "filler": "Salta Segmenti Fuori Tema/Scherzi",
+                        "filler": "Salta Segmenti Fuori Tema/Battute",
                         "music_offtopic": "Salta Segmenti Musica Off-Topic",
                         "highlights": "Attiva Punti Salienti"
                     },
@@ -41,20 +41,20 @@
                 "options": {
                     "endScreenCards": "Nascondi Schermate Finali",
                     "youThereRenderer": "Abilita Avviso 'Stai ancora guardando?'",
-                    "paidPromoOverlay": "Attiva Overlay 'Include promozioni a pagamento'",
+                    "paidPromoOverlay": "Abilita Overlay 'Include promozioni a pagamento'",
                     "whosWatching": {
-                        "title": "Menu Chi Sta Guardando",
+                        "title": "Menù Chi Sta Guardando",
                         "options": {
-                            "enableWW": "Attiva Menu Chi Sta Guardando",
-                            "permaEnableWW": "Attiva Sempre Menu Chi Sta Guardando",
-                            "enableWWOnExit": "Attiva Menu Chi Sta Guardando Chiudendo l'App"
+                            "enableWW": "Abilita Menù Chi Sta Guardando",
+                            "permaEnableWW": "Abilita Sempre Menù Chi Sta Guardando",
+                            "enableWWOnExit": "Abilita Menù Chi Sta Guardando Chiudendo l'App"
                         }
                     },
                     "fixUI": "Correggi Interfaccia",
-                    "hqThumbnails": "Attiva Anteprime in Alta Qualità",
-                    "longPress": "Attiva Azioni con Pressione Prolungata",
-                    "shorts": "Attiva Shorts",
-                    "videoPreviews": "Attiva Anteprime Video",
+                    "hqThumbnails": "Abilita Anteprime in Alta Qualità",
+                    "longPress": "Abilita Azioni con Pressione Prolungata",
+                    "shorts": "Abilita Shorts",
+                    "videoPreviews": "Abilita Anteprime Video",
                     "ttWelcomeMsg": "Mostra Messaggio di Benvenuto TT",
                     "guestSignInReminder": "Mostra Promemoria Login Ospite",
                     "reloadHomeOnStartup": "Ricarica Home all'Avvio"
@@ -69,14 +69,14 @@
             },
             "videoPlayer": {
                 "title": "Impostazioni Video Player",
-                "subtitle": "Perzonalizza le funzionalità del video player",
+                "subtitle": "Personalizza le funzionalità del video player",
                 "options": {
                     "patching": {
                         "title": "Patcha Interfaccia Video Player",
                         "options": {
-                            "enableVPUIPatching": "Attiva Patching Interfaccia Video Player",
-                            "previousNextBtns": "Attiva Pulsanti Precedente e Successivo",
-                            "showSuperThxBtn": "Mostra Tasto Super Grazie",
+                            "enableVPUIPatching": "Abilita Patching Interfaccia Video Player",
+                            "previousNextBtns": "Abilita Pulsanti Precedente e Successivo",
+                            "showSuperThxBtn": "Mostra Pulsante Super Grazie",
                             "showSpeedCtrlBtn": "Mostra Pulsante Controllo Velocità"
                         }
                     },
@@ -86,7 +86,7 @@
                     },
                     "speedSettings": {
                         "title": "Impostazione Incrementi di Velocità",
-                        "subtitle": "Imposta gli incrementi di velocità per le regolazioni di velocità di riproduzione video"
+                        "subtitle": "Imposta gli incrementi di velocità per le regolazioni della velocità di riproduzione video"
                     },
                     "preferredVideoCodec": {
                         "title": "Codec Video Preferito",
@@ -95,7 +95,7 @@
                     "afr": "Frame Rate Automatico",
                     "afrPauseDuration": {
                         "title": "Durata Pausa Frame Rate Automatico",
-                        "subtitle": "Imposta la durata (in secondi) della pausa viene corretto il frame rate"
+                        "subtitle": "Imposta la durata (in secondi) della pausa mentre viene corretto il frame rate"
                     }
                 }
             },
@@ -106,7 +106,7 @@
                     "hideWatchedVideos": {
                         "title": "Nascondi Video Visti",
                         "options": {
-                            "enableHideWatchedVideos": "Attiva Nascondi Video Visti",
+                            "enableHideWatchedVideos": "Abilita Nascondi Video Visti",
                             "watchedVideosThreshold": {
                                 "title": "Soglia Video Visti",
                                 "subtitle": "Imposta la soglia in percentuale per nascondere un video come visto"
@@ -117,7 +117,7 @@
                     "screenDimming": {
                         "title": "Oscuramento Schermo",
                         "options": {
-                            "enableScreenDimming": "Attiva Oscuramento Schermo",
+                            "enableScreenDimming": "Abilita Oscuramento Schermo",
                             "dimmingTimeout": {
                                 "title": "Timeout Oscuramento",
                                 "subtitle": "Imposta il timeout di inattività (in secondi) prima che lo schermo si oscuri"
@@ -134,7 +134,7 @@
                     },
                     "launchToOnStartup": {
                         "title": "Lancia all'Avvio",
-                        "subtitle": "Seleziona la pagina che TizenTube apre all'avvio"
+                        "subtitle": "Seleziona la pagina che TizenTube aprirà all'avvio"
                     },
                     "sortSubscriptionsByAlphabet": "Iscrizioni in ordine alfabetico"
                 }
