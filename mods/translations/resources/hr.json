@@ -136,7 +136,7 @@
                         "title": "Početna stranica pri pokretanju",
                         "subtitle": "Odaberite zadanu stranicu koja se otvara pri pokretanju TizenTubea"
                     },
-                    "sortSubscriptionsByAlphabet": "Sort Subscriptions Alphabetically"
+                    "sortSubscriptionsByAlphabet": "Poredaj pretplate abecedno"
                 }
             },
             "updater": {
