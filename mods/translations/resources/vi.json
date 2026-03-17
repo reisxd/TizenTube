@@ -57,7 +57,7 @@
                     "videoPreviews": "Bật tính năng xem trước video",
                     "ttWelcomeMsg": "Hiển thị thông báo chào mừng TizenTube",
                     "guestSignInReminder": "Hiển thị nhắc nhở đăng nhập cho chế độ khách",
-                    "reloadHomeOnStartup": "Tải lại Trang chủ khi khởi động"
+                    "reloadHomeOnStartup": "Tải lại trang chủ khi khởi động"
                 }
             },
             "subtitles": {
@@ -82,7 +82,7 @@
                     },
                     "preferredVideoQuality": {
                         "title": "Chất lượng video ưu tiên",
-                        "subtitle": "Chọn chất lượng video ưu tiên hoặc tốt nhất tiếp theo được áp dụng khi bắt đầu phát"
+                        "subtitle": "Chọn chất lượng video được áp dụng khi bắt đầu phát"
                     },
                     "speedSettings": {
                         "title": "Mức tăng cài đặt tốc độ",
@@ -90,7 +90,7 @@
                     },
                     "preferredVideoCodec": {
                         "title": "Bộ giải mã video ưu tiên",
-                        "subtitle": "Chọn bộ giải mã video ưu tiên để phát"
+                        "subtitle": "Chọn bộ giải mã video để phát"
                     },
                     "afr": "Tốc độ khung hình tự động (AFR)",
                     "afrPauseDuration": {
@@ -129,8 +129,8 @@
                         }
                     },
                     "disableSidebarContents": {
-                        "title": "Tắt nội dung thanh bên",
-                        "subtitle": "Chọn các nội dung trên thanh bên để tắt"
+                        "title": "Ẩn mục trên thanh điều hướng",
+                        "subtitle": "Chọn các mục dưới đây để ẩn ở trên thanh điều hướng"
                     },
                     "launchToOnStartup": {
                         "title": "Trang khởi động",
