@@ -21,6 +21,7 @@ import RussianResource from './resources/ru.json';
 import LithuanianResource from './resources/lt.json';
 import HungarianResource from './resources/hu.json';
 import ItalianResource from './resources/it.json';
+import UkrainianResource from './resources/uk.json';
 
 export default {
     da: {
@@ -91,5 +92,8 @@ export default {
     },
     it: {
         translation: ItalianResource
+    },
+    uk: {
+        translation: UkrainianResource
     }
 };
