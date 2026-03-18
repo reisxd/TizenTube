@@ -92,5 +92,8 @@ export default {
     },
     it: {
         translation: ItalianResource
+    },
+    uk: {
+        translation: UkrainianResource
     }
 };
