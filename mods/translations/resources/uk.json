@@ -136,7 +136,7 @@
                         "title": "Відкривати під час запуску",
                         "subtitle": "Виберіть сторінку, яка відкриватиметься під час запуску TizenTube"
                     },
-                    "sortSubscriptionsByAlphabet": "Сортувати підписки за абеткою"
+                    "sortSubscriptionsByAlphabet": "Сортувати підписки в алфавітному порядку"
                 }
             },
             "updater": {
