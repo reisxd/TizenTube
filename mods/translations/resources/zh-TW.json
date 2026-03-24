@@ -1,0 +1,193 @@
+{
+    "__contributors": [
+        "Kerry"
+    ],
+    "settings": {
+        "options": {
+            "socialMedia": {
+                "title": "社群連結",
+                "qrCodeScanMessage": "您可以掃描下方 QR Code 前往 {{name}} 頁面"
+            },
+            "adBlock": "廣告攔截器",
+            "sponsorblock": {
+                "title": "SponsorBlock(贊助商阻擋) 設定",
+                "options": {
+                    "enableSB": "啟用 SponsorBlock",
+                    "manualSkip": "手動略過 SponsorBlock 區段",
+                    "segments": "區段類型",
+                    "categories": {
+                        "sponsor": "略過贊助片段",
+                        "intro": "略過片頭",
+                        "outro": "略過片尾",
+                        "interaction": "略過互動提醒片段",
+                        "selfpromo": "略過自我宣傳片段",
+                        "preview": "略過預覽／回顧片段",
+                        "filler": "略過閒聊/玩笑的段落",
+                        "music_offtopic": "跳過無關的音樂片段",
+                        "highlights": "啟用精華片段"
+                    },
+                    "showSBToasts": "顯示 SponsorBlock 提示通知"
+                }
+            },
+            "dearrow": {
+                "title": "DeArrow(標題去誤導) 設定",
+                "options": {
+                    "enableDA": "啟用 DeArrow",
+                    "enableDAThumbnails": "啟用 DeArrow 縮圖"
+                }
+            },
+            "misc": {
+                "title": "其他設定",
+                "options": {
+                    "endScreenCards": "隱藏片尾小卡",
+                    "youThereRenderer": "啟用'是否繼續觀看'提醒",
+                    "paidPromoOverlay": "啟用'包含付費推廣'標示",
+                    "whosWatching": {
+                        "title": "誰在觀看選單",
+                        "options": {
+                            "enableWW": "啟用誰在觀看選單",
+                            "permaEnableWW": "永久啟用",
+                            "enableWWOnExit": "程式離開時顯示"
+                        }
+                    },
+                    "fixUI": "修復介面",
+                    "hqThumbnails": "啟用高畫質縮圖",
+                    "longPress": "啟用長按操作",
+                    "shorts": "啟用 Shorts(短影音)",
+                    "videoPreviews": "啟用影片預覽",
+                    "ttWelcomeMsg": "顯示 TT(TizenTube)歡迎訊息",
+                    "guestSignInReminder": "顯示訪客登入提醒",
+                    "reloadHomeOnStartup": "啟動時重新載入首頁"
+                }
+            },
+            "subtitles": {
+                "title": "字幕設定",
+                "options": {
+                    "showLocalSubtitle": "顯示本地字幕",
+                    "showHiddenSubtitles": "顯示隱藏字幕"
+                }
+            },
+            "videoPlayer": {
+                "title": "影片播放器設定",
+                "subtitle": "自訂播放器功能",
+                "options": {
+                    "patching": {
+                        "title": "Patch(修正)影片播放器介面",
+                        "options": {
+                            "enableVPUIPatching": "啟用影片播放器介面修正",
+                            "previousNextBtns": "啟用上一個／下一個按鈕",
+                            "showSuperThxBtn": "顯示超級感謝按鈕",
+                            "showSpeedCtrlBtn": "顯示速度控制按鈕"
+                        }
+                    },
+                    "preferredVideoQuality": {
+                        "title": "影片畫質偏好設定",
+                        "subtitle": "選擇影片開始播放時要使用的畫質，若無法套用則改用次佳畫質"
+                    },
+                    "speedSettings": {
+                        "title": "倍速間隔設定",
+                        "subtitle": "調整倍速間隔的大小"
+                    },
+                    "preferredVideoCodec": {
+                        "title": "影片編碼偏好設定",
+                        "subtitle": "選擇播放時偏好的影片編碼格式"
+                    },
+                    "afr": "自動幀率",
+                    "afrPauseDuration": {
+                        "title": "調整幀率時的暫停時間",
+                        "subtitle": "設定調整幀率時，影片暫停的秒數"
+                    }
+                }
+            },
+            "uiSettings": {
+                "title": "使用者介面設定",
+                "subtitle": "打造您喜歡的介面風格",
+                "options": {
+                    "hideWatchedVideos": {
+                        "title": "隱藏已觀看影片",
+                        "options": {
+                            "enableHideWatchedVideos": "啟用隱藏已觀看影片",
+                            "watchedVideosThreshold": {
+                                "title": "已觀看影片進度條門檻",
+                                "subtitle": "設定進度條達到百分之幾時候，將影片視為已觀看並隱藏"
+                            },
+                            "setPagesToHideWatchedVideos": "設定隱藏已觀看影片的頁面"
+                        }
+                    },
+                    "screenDimming": {
+                        "title": "螢幕調暗",
+                        "options": {
+                            "enableScreenDimming": "啟用螢幕調暗功能",
+                            "dimmingTimeout": {
+                                "title": "調暗等待時間",
+                                "subtitle": "設定在沒操作幾(秒)後，調暗螢幕"
+                            },
+                            "dimmingOpacity": {
+                                "title": "調暗透明度",
+                                "subtitle": "設定調暗螢幕時的透明"
+                            }
+                        }
+                    },
+                    "disableSidebarContents": {
+                        "title": "停用側邊欄內容",
+                        "subtitle": "選擇要停用的側邊欄項目"
+                    },
+                    "launchToOnStartup": {
+                        "title": "啟動時預設頁面",
+                        "subtitle": "選擇 TizenTube 啟動時預設開啟的頁面"
+                    },
+                    "sortSubscriptionsByAlphabet": "訂閱依字母排序"
+                }
+            },
+            "updater": {
+                "title": "TizenTube Cobalt 更新工具",
+                "menuSubtitle": "管理 TizenTube Cobalt 更新",
+                "versionSubtitle": "目前版本:{{version}}",
+                "options": {
+                    "checkForUpdates": "檢查更新",
+                    "checkForUpdatesOnStartup": "啟動時檢查更新"
+                }
+            }
+        },
+        "ttSettings": {
+            "title": "TizenTube 設定",
+            "madeByText": "由 Reis Can (reisxd) 製作❤️",
+            "summary": "開啟 TizenTube 設定"
+        },
+        "supportTT": {
+            "title": "支持TizenTube",
+            "subtitle": "❤️ 支持 TizenTube 與其開發",
+            "content": {
+                "1": "如果你喜歡使用 TizenTube，並想支持它的開發，可以參考以下方式:",
+                "2": "1. 在 GitHub 專案點星標（Star），幫助提升曝光度。",
+                "3": "2. 分享 TizenTube 給其他人。",
+                "4": "如果你想提供金錢上的支持，可以考慮斗內(捐款):",
+                "5": "- Buy Me A Coffee: https://www.buymeacoffee.com/reisxd (建議優先)",
+                "6": "- GitHub Sponsors: https://github.com/sponsors/reisxd"
+            }
+        }
+    },
+    "welcomeMsg": {
+        "title": "歡迎使用 TizenTube",
+        "subtitle": "請前往設定，點選 TizenTube 設定以進行相關設定"
+    },
+    "sponsorblock": {
+        "segments": {
+            "sponsor": "贊助片段",
+            "intro": "片頭",
+            "outro": "片尾",
+            "interaction": "互動提醒",
+            "selfpromo": "自我宣傳",
+            "preview": "預告/回顧",
+            "filler": "無關內容",
+            "music_offtopic": "無關音樂片段",
+            "poi_highlight": "精華片段"
+        },
+        "toasts": {
+            "skipping": "正在略過 {{segment}}",
+            "notSkipping": "未成功略過 {{segment}} (已略過{{count}}次)",
+            "skip": "略過{{segment}}",
+            "skipToHighlight": "跳至精華片段"
+        }
+    }
+}
