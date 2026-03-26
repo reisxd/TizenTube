@@ -357,6 +357,16 @@ export default function modernUI(update, parameters) {
                             name: t('settings.options.videoPlayer.options.patching.options.showSpeedCtrlBtn'),
                             icon: 'SLOW_MOTION_VIDEO',
                             value: 'enableSpeedControlsButton'
+                        },
+                        {
+                            name: t('settings.options.videoPlayer.options.patching.options.showPipBtn'),
+                            icon: 'CLEAR_COOKIES',
+                            value: 'enablePipButton'
+                        },
+                        {
+                            name: t('settings.options.videoPlayer.options.patching.options.showTurnOffScreenBtn'),
+                            icon: 'VISIBILITY_OFF',
+                            value: 'enableTurnOffScreenButton'
                         }
                     ]
                 },
