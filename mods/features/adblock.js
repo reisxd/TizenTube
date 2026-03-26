@@ -1032,6 +1032,14 @@ JSON.parse = function () {
       for (const section of r.contents.tvBrowseRenderer.content.tvSecondaryNavRenderer.sections) {
         if (!Array.isArray(section?.tvSecondaryNavSectionRenderer?.tabs)) continue;
 
+        if (configRead('sortSubscriptionsByAlphabet')) {
+          section.tvSecondaryNavSectionRenderer.tabs.sort((a, b) => {
+            if (a.tabRenderer.selected && !b.tabRenderer.selected) return -1;
+            if (!a.tabRenderer.selected && b.tabRenderer.selected) return 1;
+            return a.tabRenderer.title.localeCompare(b.tabRenderer.title);
+          });
+        }
+        
         if (!configRead('enableShorts')) {
           const tabs = section.tvSecondaryNavSectionRenderer.tabs;
           for (let i = tabs.length - 1; i >= 0; i--) {

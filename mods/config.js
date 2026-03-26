@@ -65,6 +65,7 @@ const defaultConfig = {
   autoFrameRate: false,
   autoFrameRatePauseVideoFor: 0,
   enableSigninReminder: false,
+  sortSubscriptionsByAlphabet: false,
   enableDebugConsole: false,
   enableDebugLogging: true,
   debugConsolePosition: 'top-left',
