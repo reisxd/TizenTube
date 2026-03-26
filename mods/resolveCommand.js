@@ -4,6 +4,7 @@ import modernUI, { optionShow } from './ui/settings.js';
 import { speedSettings } from './ui/speedUI.js';
 import { showToast, buttonItem } from './ui/ytUI.js';
 import checkForUpdates from './features/updater.js';
+import { turnOffScreen } from './features/turnOffScreen.js';
 
 export default function resolveCommand(cmd, _) {
     // resolveCommand function is pretty OP, it can do from opening modals, changing client settings and way more.
@@ -92,13 +93,25 @@ export function patchResolveCommand() {
                         }
                     }
 
-                    cmd.openPopupAction.popup.overlaySectionRenderer.overlay.overlayTwoPanelRenderer.actionPanel.overlayPanelRenderer.content.overlayPanelItemListRenderer.items.splice(2, 0,
+                    items.splice(2, 0,
                         buttonItem(
                             { title: 'Mini Player' },
                             { icon: 'CLEAR_COOKIES' }, [
                             {
                                 customAction: {
                                     action: 'ENTER_PIP'
+                                }
+                            }
+                        ])
+                    );
+
+                    items.splice(2, 0,
+                        buttonItem(
+                            { title: 'Turn off screen' },
+                            { icon: 'VISIBILITY_OFF' }, [
+                            {
+                                customAction: {
+                                    action: 'TURN_OFF_SCREEN'
                                 }
                             }
                         ])
@@ -196,6 +209,9 @@ function customAction(action, parameters) {
             break;
         case 'CHECK_FOR_UPDATES':
             checkForUpdates(true);
+            break;
+        case 'TURN_OFF_SCREEN':
+            turnOffScreen();
             break;
     }
 }
