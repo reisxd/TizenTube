@@ -2,6 +2,7 @@ const CONFIG_KEY = 'ytaf-configuration';
 const defaultConfig = {
   enableAdBlock: true,
   enableSponsorBlock: true,
+  enableSponsorBlockToasts: true,
   sponsorBlockManualSkips: ['intro', 'outro', 'filler'],
   enableSponsorBlockSponsor: true,
   enableSponsorBlockIntro: true,
@@ -11,6 +12,7 @@ const defaultConfig = {
   enableSponsorBlockPreview: true,
   enableSponsorBlockMusicOfftopic: true,
   enableSponsorBlockFiller: false,
+  enableSponsorBlockHighlight: true,
   videoSpeed: 1,
   preferredVideoQuality: 'auto',
   enableDeArrow: true,
@@ -24,11 +26,14 @@ const defaultConfig = {
   enableShorts: true,
   dontCheckUpdateUntil: 0,
   enableWhoIsWatchingMenu: false,
+  permanentlyEnableWhoIsWatchingMenu: false,
+  enableWhosWatchingMenuOnAppExit: false,
   enableShowUserLanguage: true,
   enableShowOtherLanguages: false,
   showWelcomeToast: true,
   enablePreviousNextButtons: true,
   enableSuperThanksButton: false,
+  enableSpeedControlsButton: true,
   enablePatchingVideoPlayer: true,
   enablePreviews: true,
   enableHideWatchedVideos: false,
@@ -42,7 +47,15 @@ const defaultConfig = {
   dimmingOpacity: 0.5,
   enablePaidPromotionOverlay: true,
   speedSettingsIncrement: 0.25,
-  videoPreferredCodec: 'vp9'
+  videoPreferredCodec: 'any',
+  launchToOnStartup: null,
+  reloadHomeOnStartup: true,
+  disabledSidebarContents: [],
+  enableUpdater: true,
+  autoFrameRate: false,
+  autoFrameRatePauseVideoFor: 0,
+  enableSigninReminder: false,
+  sortSubscriptionsByAlphabet: false,
 };
 
 let localConfig;
@@ -83,6 +96,10 @@ export const configChangeEmitter = {
   dispatchEvent(event) {
     const type = event.type;
     if (!this.listeners[type]) return;
-    this.listeners[type].forEach(cb => cb.call(this, event));
+    this.listeners[type].forEach(cb => {
+      try {
+        cb.call(this, event)
+      } catch (_) {};
+    });
   }
 };

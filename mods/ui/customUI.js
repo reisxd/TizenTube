@@ -2,6 +2,7 @@
 
 import { extractAssignedFunctions } from "../utils/ASTParser.js";
 import { configRead } from "../config.js";
+import { ButtonRenderer } from "./ytUI.js";
 
 function applyPatches() {
     if (!window._yttv) return setTimeout(applyPatches, 250);
@@ -94,7 +95,7 @@ function applyPatches() {
 
         const engagementActionButton = functions.find(func => func.rhs.includes('props.data.engagementActions')).left.split('.')[1];
 
-        if (engagementActionButton) {
+        if (engagementActionButton && configRead('enableSpeedControlsButton')) {
             const origEngagementActionButton = inst[engagementActionButton];
             inst[engagementActionButton] = function () {
                 const res = origEngagementActionButton.apply(this, arguments);
@@ -165,24 +166,6 @@ function applyPatches() {
         YtlrPlayerActionsContainer.prototype = origMethod.prototype;
         window._yttv[methods[0]] = YtlrPlayerActionsContainer;
     }
-}
-
-function ButtonRenderer(disabled, text, iconType, command) {
-    return {
-        isDisabled: disabled,
-        text: {
-            runs: [
-                {
-                    text: text
-                }
-            ]
-        },
-        icon: {
-            iconType
-        },
-        command: command,
-        trackingParams: null
-    };
 }
 
 

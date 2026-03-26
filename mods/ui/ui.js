@@ -7,6 +7,8 @@ import { showToast } from './ytUI.js';
 import modernUI from './settings.js';
 import resolveCommand, { patchResolveCommand } from '../resolveCommand.js';
 import { pipToFullscreen } from '../features/pictureInPicture.js';
+import getCommandExecutor from './customCommandExecution.js';
+import { t } from 'i18next';
 
 // It just works, okay?
 const interval = setInterval(() => {
@@ -190,15 +192,26 @@ function execute_once_dom_loaded() {
   document.addEventListener('keyup', eventHandler, true);
   if (configRead('showWelcomeToast')) {
     setTimeout(() => {
-      showToast('Welcome to TizenTube', 'Go to settings and click on TizenTube Settings for settings, press [RED] to open TizenTube Theme Settings.');
+      showToast(t('welcomeMsg.title'), t('welcomeMsg.subtitle'));
     }, 2000);
   }
 
-  resolveCommand({
-    signalAction: {
-      signal: 'SOFT_RELOAD_PAGE'
+  if (configRead('reloadHomeOnStartup')) {
+    if (configRead('launchToOnStartup')) {
+      resolveCommand(JSON.parse(configRead('launchToOnStartup')));
+    } else {
+      resolveCommand({
+        signalAction: {
+          signal: 'SOFT_RELOAD_PAGE'
+        }
+      });
     }
-  });
+  }
+
+  const commandExecutor = getCommandExecutor();
+  if (commandExecutor) {
+    commandExecutor.executeFunction(new commandExecutor.commandFunction('reloadGuideAction'));
+  }
 
   // Fix UI issues, again. Love, Googol.
 

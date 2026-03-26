@@ -1,48 +1,54 @@
 import sha256 from '../tiny-sha256.js';
 import { configRead } from '../config.js';
 import { showToast } from '../ui/ytUI.js';
+import { t } from 'i18next';
 
 // Copied from https://github.com/ajayyy/SponsorBlock/blob/da1a535de784540ee10166a75a3eb8537073838c/src/config.ts#L113-L134
 const barTypes = {
   sponsor: {
     color: '#00d400',
     opacity: '0.7',
-    name: 'sponsored segment'
+    name: t('sponsorblock.segments.sponsor') || 'sponsored segment'
   },
   intro: {
     color: '#00ffff',
     opacity: '0.7',
-    name: 'intro'
+    name: t('sponsorblock.segments.intro') || 'intro'
   },
   outro: {
     color: '#0202ed',
     opacity: '0.7',
-    name: 'outro'
+    name: t('sponsorblock.segments.outro') || 'outro'
   },
   interaction: {
     color: '#cc00ff',
     opacity: '0.7',
-    name: 'interaction reminder'
+    name: t('sponsorblock.segments.interaction') || 'interaction reminder'
   },
   selfpromo: {
     color: '#ffff00',
     opacity: '0.7',
-    name: 'self-promotion'
+    name: t('sponsorblock.segments.selfpromo') || 'self-promotion'
   },
   preview: {
     color: '#008fd6',
     opacity: '0.7',
-    name: 'recap or preview'
+    name: t('sponsorblock.segments.preview') || 'recap or preview'
   },
   filler: {
     color: "#7300FF",
     opacity: "0.9",
-    name: 'tangents'
+    name: t('sponsorblock.segments.filler') || 'tangents'
   },
   music_offtopic: {
     color: '#ff9900',
     opacity: '0.7',
-    name: 'non-music part'
+    name: t('sponsorblock.segments.music_offtopic') || 'non-music part'
+  },
+  poi_highlight: {
+    color: '#9b044c',
+    opacity: '0.7',
+    name: t('sponsorblock.segments.poi_highlight') || 'highlight'
   }
 };
 
@@ -78,7 +84,8 @@ class SponsorBlockHandler {
       'selfpromo',
       'preview',
       'filler',
-      'music_offtopic'
+      'music_offtopic',
+      'poi_highlight'
     ];
     const resp = await fetch(
       `${sponsorblockAPI}/skipSegments/${videoHash}?categories=${encodeURIComponent(
@@ -101,7 +108,7 @@ class SponsorBlockHandler {
 
     this.scheduleSkipHandler = () => {
       const slider = document.querySelector('div[idomkey="slider"]');
-      const sliderRect = slider.getBoundingClientRect();
+      const sliderRect = slider?.getBoundingClientRect();
       const isOldUI = !document.querySelector('div[idomkey="Metadata-Section"]');
       if (isOldUI) {
         this.segmentsoverlay.style.setProperty('top', `${sliderRect.top}px`, 'important');
@@ -205,7 +212,7 @@ class SponsorBlockHandler {
       elm.style.setProperty('background-color', barType.color, 'important');
       elm.style.setProperty('opacity', barType.opacity, 'important');
       elm.style.setProperty('height', '100%', 'important');
-      elm.style.setProperty('width', `${widthPercent}%`, 'important');
+      elm.style.setProperty('width', `${segment.category === 'poi_highlight' ? 1 : widthPercent}%`, 'important');
       elm.style.setProperty('left', `${leftPercent}%`, 'important');
       elm.style.setProperty('position', 'absolute', 'important');
       console.info('Generated element', elm, 'from', segment);
@@ -310,7 +317,9 @@ class SponsorBlockHandler {
 
           if (wasSkippedBefore.lastSkipped - wasSkippedBefore.firstSkipped < 1000) {
             if (!wasSkippedBefore.hasShownToast) {
-              showToast('SponsorBlock', `Not skipping ${skipName} (was skipped ${wasSkippedBefore.count} times)`);
+              if (configRead('enableSponsorBlockToasts')) {
+                showToast('SponsorBlock', t('sponsorblock.toasts.notSkipping', { segment: skipName, count: wasSkippedBefore.count }));
+              }
               wasSkippedBefore.hasShownToast = true;
               this.skippedCategories.set(segment.UUID, wasSkippedBefore);
             }
@@ -324,8 +333,9 @@ class SponsorBlockHandler {
             hasShownToast: false
           });
         }
-
-        showToast('SponsorBlock', `Skipping ${skipName}`);
+        if (configRead('enableSponsorBlockToasts')) {
+          showToast('SponsorBlock', t('sponsorblock.toasts.skipping', { segment: skipName }));
+        }
         if (this.video.duration - end < 1) {
           this.video.currentTime = end - 1;
         } else this.video.currentTime = end;

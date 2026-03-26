@@ -2,7 +2,7 @@
 import { configRead, configChangeEmitter } from '../config.js';
 
 configChangeEmitter.addEventListener('configChange', (event) => {
-    dnableFeatures();
+    enableFeatures();
 });
 
 

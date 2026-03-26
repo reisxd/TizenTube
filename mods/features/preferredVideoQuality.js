@@ -63,7 +63,8 @@ class PreferredQualityHandler {
             this.#hasAppliedQuality = false;
         }
 
-        if (state?.isPlaying && !this.#hasAppliedQuality) {
+        const isShorts = Object.values(this.#player.getVideoStats()).find(a => a && a === 'shortspage');
+        if (state?.isPlaying && !this.#hasAppliedQuality && !isShorts) {
             this.#applyQuality();
             this.#hasAppliedQuality = true;
         }

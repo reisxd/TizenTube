@@ -1,10 +1,8 @@
+import "./features/userAgentSpoofing.js";
 import "whatwg-fetch";
 import 'core-js/proposals/object-getownpropertydescriptors';
-import '@formatjs/intl-getcanonicallocales/polyfill.iife'
-import '@formatjs/intl-locale/polyfill.iife'
-import '@formatjs/intl-displaynames/polyfill.iife'
-import '@formatjs/intl-displaynames/locale-data/en';
 
+import './translations/index.js'
 import "./domrect-polyfill";
 import "./features/adblock.js";
 import "./features/sponsorblock.js";
@@ -20,3 +18,5 @@ import "./features/preferredVideoQuality.js";
 import "./features/videoQueuing.js";
 import "./features/enableFeatures.js";
 import "./ui/customUI.js";
+import "./ui/customGuideAction.js";
+import "./features/autoFrameRate.js";
