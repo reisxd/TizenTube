@@ -264,10 +264,27 @@ export function consolidateShelves(contents, path = 'unknown', pageName = null) 
     const newShelves = [];
 
     for (let i = 0; i + perRow <= dedupedItems.length; i += perRow) {
+      const rowItems = dedupedItems.slice(i, i + perRow);
+      // FIX: Build a fresh horizontalListRenderer with correct count fields.
+      // Spreading template's horizontalListRenderer carries over stale visibleItemCount /
+      // collapsedItemCount / totalItemCount from the original shelf (before filtering),
+      // which causes the YouTube TV renderer to pre-allocate slots for the old count
+      // and render empty black boxes for the missing ones.
+      const hlr = {
+        ...template.shelfRenderer.content.horizontalListRenderer,
+        items: rowItems,
+        visibleItemCount: rowItems.length,
+        collapsedItemCount: rowItems.length,
+        totalItemCount: rowItems.length,
+      };
+      // Clamp index fields so they don't point past the new items array
+      if (typeof hlr.selectedIndex === 'number') hlr.selectedIndex = 0;
+      if (typeof hlr.focusIndex === 'number')    hlr.focusIndex = 0;
+      if (typeof hlr.currentIndex === 'number')  hlr.currentIndex = 0;
       newShelves.push({
         shelfRenderer: {
           ...template.shelfRenderer,
-          content: { horizontalListRenderer: { ...template.shelfRenderer.content.horizontalListRenderer, items: dedupedItems.slice(i, i + perRow) } }
+          content: { horizontalListRenderer: hlr }
         }
       });
     }
@@ -277,10 +294,20 @@ export function consolidateShelves(contents, path = 'unknown', pageName = null) 
     const remainder = dedupedItems.length % perRow;
     if (remainder > 0) {
       const lastBatch = dedupedItems.slice(dedupedItems.length - remainder);
+      const hlr = {
+        ...template.shelfRenderer.content.horizontalListRenderer,
+        items: lastBatch,
+        visibleItemCount: lastBatch.length,
+        collapsedItemCount: lastBatch.length,
+        totalItemCount: lastBatch.length,
+      };
+      if (typeof hlr.selectedIndex === 'number') hlr.selectedIndex = 0;
+      if (typeof hlr.focusIndex === 'number')    hlr.focusIndex = 0;
+      if (typeof hlr.currentIndex === 'number')  hlr.currentIndex = 0;
       newShelves.push({
         shelfRenderer: {
           ...template.shelfRenderer,
-          content: { horizontalListRenderer: { ...template.shelfRenderer.content.horizontalListRenderer, items: lastBatch } }
+          content: { horizontalListRenderer: hlr }
         }
       });
     }

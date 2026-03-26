@@ -803,7 +803,7 @@ export default function modernUI(update, parameters) {
                     ]
                 },
                 {
-                    name: t('settings.options.uiSettings.options.sortSubscriptionsByAlphabet'),
+                    name: 'Sort Subscriptions Alphabetically',
                     icon: 'SUBSCRIPTIONS',
                     value: 'sortSubscriptionsByAlphabet'
                 }
