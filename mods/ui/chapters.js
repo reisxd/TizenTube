@@ -75,11 +75,7 @@ function markerEntity(videoID, markers) {
                     markerType: 'MARKER_TYPE_CHAPTERS',
                     markers: markers,
                     headerTitle: {
-                        runs: [
-                            {
-                                text: 'Chapters'
-                            }
-                        ]
+                        runs: [{ text: 'Chapters' }]
                     },
                     onTap: {
                         innertubeCommand: {
@@ -91,21 +87,9 @@ function markerEntity(videoID, markers) {
                         }
                     },
                     markersEdu: {
-                        enterNudgeText: {
-                            runs: [
-                                {
-                                    text: 'To view chapters, press the up arrow button'
-                                }
-                            ]
-                        },
+                        enterNudgeText: { runs: [{ text: 'To view chapters, press the up arrow button' }] },
                         enterNudgeA11yText: 'To view chapters, press the up arrow button',
-                        navNudgeText: {
-                            runs: [
-                                {
-                                    text: 'Navigate between chapters'
-                                }
-                            ]
-                        },
+                        navNudgeText: { runs: [{ text: 'Navigate between chapters' }] },
                         navNudgeA11yText: 'Press the left or right arrow button to navigate between chapters'
                     },
                     loggingDirectives: {
@@ -119,19 +103,69 @@ function markerEntity(videoID, markers) {
 }
 
 export default function Chapters(video) {
-    const videoID = video.contents.singleColumnWatchNextResults.results.results.contents[0].itemSectionRenderer.contents[0].videoMetadataRenderer.videoId;
-    const videoDescription = video.contents.singleColumnWatchNextResults.results.results.contents[0].itemSectionRenderer.contents[0].videoMetadataRenderer.description.runs[0].text;
-    const chapters = parseTimestamps(videoDescription);
-    const videoDuration = document.getElementsByTagName('video')[0].duration * 1000;
-    let markers = [];
+    try {
+        // FIX: The deep property chain and video element access can all throw if the
+        // response structure changes or if the video element isn't ready yet.
+        const videoMeta = video?.contents?.singleColumnWatchNextResults?.results?.results
+            ?.contents?.[0]?.itemSectionRenderer?.contents?.[0]?.videoMetadataRenderer;
 
-    for (let i = 0; i < chapters.length; i++) {
-        const chapter = chapters[i];
-        const nextChapter = chapters[i + 1];
-        const duration = nextChapter ? nextChapter.time - chapter.time : videoDuration - chapter.time;
-        markers.push(marker(chapter.name, String(chapter.time), String(duration), videoID, i));
+        if (!videoMeta) {
+            console.warn('[Chapters] Could not find videoMetadataRenderer in response');
+            return null;
+        }
+
+        const videoID = videoMeta.videoId;
+        if (!videoID) {
+            console.warn('[Chapters] videoId missing from videoMetadataRenderer');
+            return null;
+        }
+
+        const descriptionRuns = videoMeta?.description?.runs;
+        if (!Array.isArray(descriptionRuns) || descriptionRuns.length === 0) {
+            console.info('[Chapters] No description runs found for', videoID);
+            return null;
+        }
+
+        const videoDescription = descriptionRuns[0].text;
+        if (!videoDescription) {
+            console.info('[Chapters] Empty description for', videoID);
+            return null;
+        }
+
+        const chapters = parseTimestamps(videoDescription);
+        if (!chapters.length) {
+            console.info('[Chapters] No timestamps found in description for', videoID);
+            return null;
+        }
+
+        const videoEl = document.getElementsByTagName('video')[0];
+        if (!videoEl || !videoEl.duration || !Number.isFinite(videoEl.duration)) {
+            console.warn('[Chapters] Video element not ready or duration unavailable for', videoID);
+            return null;
+        }
+
+        const videoDuration = videoEl.duration * 1000;
+        const markers = [];
+
+        for (let i = 0; i < chapters.length; i++) {
+            try {
+                const chapter = chapters[i];
+                const nextChapter = chapters[i + 1];
+                const duration = nextChapter ? nextChapter.time - chapter.time : videoDuration - chapter.time;
+                markers.push(marker(chapter.name, String(chapter.time), String(duration), videoID, i));
+            } catch (markerErr) {
+                console.warn('[Chapters] Failed to build marker at index', i, markerErr);
+            }
+        }
+
+        if (!markers.length) {
+            console.warn('[Chapters] No markers built for', videoID);
+            return null;
+        }
+
+        return markerEntity(videoID, markers);
+    } catch (err) {
+        console.warn('[Chapters] Chapters() failed:', err);
+        return null;
     }
-
-    const markerEntityData = markerEntity(videoID, markers);
-    return markerEntityData;
 }
