@@ -60,21 +60,25 @@ export function getCountryLanguage(countryCode, locale = "en") {
 
 let isPatched = false;
 
-// Function to get user's country code
+// Get user's country code from YouTube's internal config.
+// FIX: yt.config_.GL is an internal YouTube property with no stability guarantee.
+// If YouTube restructures yt.config_ (as they have done in the past), this returns null
+// silently. We now explicitly warn in that case so it shows up in debug logs.
 function getUserCountryCode() {
     try {
-        // Always use window.yt.config_.GL as primary source
         if (window.yt && window.yt.config_ && window.yt.config_.GL) {
             return window.yt.config_.GL;
         }
-
+        // FIX: Promote to console.warn so this surfaces in the debug console and
+        // log downloads, making it obvious when the config key has changed.
         console.warn(
-            "TizenTube Subtitle Localization: Could not determine user country code"
+            "TizenTube Subtitle Localization: window.yt.config_.GL is unavailable — " +
+            "YouTube may have changed the config structure. User language detection will not work."
         );
         return null;
     } catch (error) {
         console.error(
-            "TizenTube Subtitle Localization: Error getting country code:",
+            "TizenTube Subtitle Localization: Error accessing yt.config_.GL:",
             error
         );
         return null;
@@ -83,40 +87,46 @@ function getUserCountryCode() {
 
 // Function to get dynamic user language option name for settings UI
 export function getUserLanguageOptionName() {
-    const userCountryCode = getUserCountryCode();
-    const userLanguage = getCountryLanguage(userCountryCode);
-    if (userLanguage) {
-        return `Show ${userLanguage.name} Subtitle`;
-    }
+    try {
+        const userCountryCode = getUserCountryCode();
+        const userLanguage = getCountryLanguage(userCountryCode);
+        if (userLanguage) {
+            return `Show ${userLanguage.name} Subtitle`;
+        }
+    } catch (_) { }
     return "Show Local Subtitle";
 }
 
 // Function to check if language already exists in the menu
 function languageExistsInMenu(items, languageCode, languageName) {
-    return items.some((item) => {
-        if (
-            item.compactLinkRenderer &&
-            item.compactLinkRenderer.serviceEndpoint
-        ) {
-            const commands =
-                item.compactLinkRenderer.serviceEndpoint.commandExecutorCommand
-                    ?.commands;
+    try {
+        return items.some((item) => {
             if (
-                commands &&
-                commands[0] &&
-                commands[0].selectSubtitlesTrackCommand
+                item.compactLinkRenderer &&
+                item.compactLinkRenderer.serviceEndpoint
             ) {
-                const translationLang =
-                    commands[0].selectSubtitlesTrackCommand.translationLanguage;
-                return (
-                    translationLang &&
-                    (translationLang.languageCode === languageCode ||
-                        translationLang.languageName === languageName)
-                );
+                const commands =
+                    item.compactLinkRenderer.serviceEndpoint.commandExecutorCommand
+                        ?.commands;
+                if (
+                    commands &&
+                    commands[0] &&
+                    commands[0].selectSubtitlesTrackCommand
+                ) {
+                    const translationLang =
+                        commands[0].selectSubtitlesTrackCommand.translationLanguage;
+                    return (
+                        translationLang &&
+                        (translationLang.languageCode === languageCode ||
+                            translationLang.languageName === languageName)
+                    );
+                }
             }
-        }
+            return false;
+        });
+    } catch (_) {
         return false;
-    });
+    }
 }
 
 // Function to create a language option
@@ -155,30 +165,30 @@ function createLanguageOption(languageCode, languageName) {
 // Function to get languages already present in menu
 function getExistingLanguages(items) {
     const existingLanguages = new Set();
-
-    items.forEach((item) => {
-        if (
-            item.compactLinkRenderer &&
-            item.compactLinkRenderer.serviceEndpoint
-        ) {
-            const commands =
-                item.compactLinkRenderer.serviceEndpoint.commandExecutorCommand
-                    ?.commands;
+    try {
+        items.forEach((item) => {
             if (
-                commands &&
-                commands[0] &&
-                commands[0].selectSubtitlesTrackCommand
+                item.compactLinkRenderer &&
+                item.compactLinkRenderer.serviceEndpoint
             ) {
-                const translationLang =
-                    commands[0].selectSubtitlesTrackCommand.translationLanguage;
-                if (translationLang) {
-                    existingLanguages.add(translationLang.languageCode);
-                    existingLanguages.add(translationLang.languageName);
+                const commands =
+                    item.compactLinkRenderer.serviceEndpoint.commandExecutorCommand
+                        ?.commands;
+                if (
+                    commands &&
+                    commands[0] &&
+                    commands[0].selectSubtitlesTrackCommand
+                ) {
+                    const translationLang =
+                        commands[0].selectSubtitlesTrackCommand.translationLanguage;
+                    if (translationLang) {
+                        existingLanguages.add(translationLang.languageCode);
+                        existingLanguages.add(translationLang.languageName);
+                    }
                 }
             }
-        }
-    });
-
+        });
+    } catch (_) { }
     return existingLanguages;
 }
 
@@ -197,160 +207,149 @@ function createSectionTitle(title) {
 function patchSubtitleMenu() {
     if (isPatched) return;
 
-    // Always patch if possible - settings will be checked dynamically
     if (!window._yttv) return setTimeout(patchSubtitleMenu, 250);
-    const yttvInstance = Object.values(window._yttv).find(
-        (obj) =>
-            obj &&
-            obj.instance &&
-            typeof obj.instance.resolveCommand === "function"
-    );
 
-    if (
-        !yttvInstance ||
-        yttvInstance.instance.resolveCommand.isPatchedBySubtitleLocalization
-    ) {
-        if (!yttvInstance) {
-            console.error(
-                "TizenTube Subtitle Localization: Could not find resolveCommand instance."
-            );
-        } else {
-            console.log("TizenTube Subtitle Localization: Already patched.");
-        }
+    let yttvInstance;
+    try {
+        yttvInstance = Object.values(window._yttv).find(
+            (obj) =>
+                obj &&
+                obj.instance &&
+                typeof obj.instance.resolveCommand === "function"
+        );
+    } catch (e) {
+        console.error("TizenTube Subtitle Localization: Error finding resolveCommand instance:", e);
+        return;
+    }
+
+    if (!yttvInstance) {
+        console.error("TizenTube Subtitle Localization: Could not find resolveCommand instance.");
+        return;
+    }
+
+    if (yttvInstance.instance.resolveCommand.isPatchedBySubtitleLocalization) {
+        console.log("TizenTube Subtitle Localization: Already patched.");
         return;
     }
 
     const originalResolveCommand = yttvInstance.instance.resolveCommand;
 
     yttvInstance.instance.resolveCommand = function (cmd, _) {
-        // Identify the correct command using its uniqueId
-        if (
-            cmd?.openPopupAction?.uniqueId ===
-            "CLIENT_OVERLAY_TYPE_CAPTIONS_AUTO_TRANSLATE"
-        ) {
-            // Check current settings dynamically each time menu opens
-            const showUserLanguage = configRead("enableShowUserLanguage");
-            const showOtherLanguages = configRead("enableShowOtherLanguages");
+        try {
+            if (
+                cmd?.openPopupAction?.uniqueId ===
+                "CLIENT_OVERLAY_TYPE_CAPTIONS_AUTO_TRANSLATE"
+            ) {
+                const showUserLanguage = configRead("enableShowUserLanguage");
+                const showOtherLanguages = configRead("enableShowOtherLanguages");
 
-            // If neither feature is enabled, don't modify the menu
-            if (!showUserLanguage && !showOtherLanguages) {
-                return originalResolveCommand.apply(this, arguments);
-            }
+                if (!showUserLanguage && !showOtherLanguages) {
+                    return originalResolveCommand.apply(this, arguments);
+                }
 
-            const items =
-                cmd.openPopupAction.popup.overlaySectionRenderer.overlay
-                    .overlayTwoPanelRenderer.actionPanel.overlayPanelRenderer
-                    .content.overlayPanelItemListRenderer.items;
+                // Guard against unexpected menu structure changes
+                const itemsPath = cmd?.openPopupAction?.popup?.overlaySectionRenderer
+                    ?.overlay?.overlayTwoPanelRenderer?.actionPanel?.overlayPanelRenderer
+                    ?.content?.overlayPanelItemListRenderer?.items;
+                if (!Array.isArray(itemsPath)) {
+                    return originalResolveCommand.apply(this, arguments);
+                }
+                const items = itemsPath;
 
-            // Get existing languages
-            const existingLanguages = getExistingLanguages(items);
+                const existingLanguages = getExistingLanguages(items);
 
-            // Add user's local language if enabled
-            if (showUserLanguage) {
-                const userCountryCode = getUserCountryCode();
-                const userLanguage = getCountryLanguage(userCountryCode);
+                if (showUserLanguage) {
+                    try {
+                        const userCountryCode = getUserCountryCode();
+                        const userLanguage = getCountryLanguage(userCountryCode);
 
-                if (userLanguage) {
-                    // Check if the user's language already exists
-                    if (
-                        !languageExistsInMenu(items, userLanguage.code, userLanguage.name)
-                    ) {
-                        console.log(
-                            `%c[TizenTube Subtitle Localization] Adding user's local language: ${userLanguage.name} (${userLanguage.code})`,
-                            "background: #2196F3; color: #ffffff; font-size: 14px; font-weight: bold;"
-                        );
-
-                        const userLanguageOption = createLanguageOption(
-                            userLanguage.code,
-                            userLanguage.name
-                        );
-
-                        // Find the "Recommended languages" section and insert after it
-                        const recommendedIndex = items.findIndex(
-                            (item) =>
-                                item.overlayMessageRenderer?.subtitle
-                                    ?.simpleText === "Recommended languages"
-                        );
-
-                        if (recommendedIndex > -1) {
-                            // Insert user's language as the first recommendation
-                            items.splice(
-                                recommendedIndex + 1,
-                                0,
-                                userLanguageOption
-                            );
-                            // Update existing languages set
-                            existingLanguages.add(userLanguage.code);
-                            existingLanguages.add(userLanguage.name);
-                        } else {
-                            // Find "Other languages" section and insert before it
-                            const otherLanguagesIndex = items.findIndex(
-                                (item) =>
-                                    item.overlayMessageRenderer?.subtitle
-                                        ?.simpleText === "Other languages"
-                            );
-
-                            if (otherLanguagesIndex > -1) {
-                                items.splice(
-                                    otherLanguagesIndex,
-                                    0,
-                                    userLanguageOption
+                        if (userLanguage) {
+                            if (!languageExistsInMenu(items, userLanguage.code, userLanguage.name)) {
+                                console.log(
+                                    `%c[TizenTube Subtitle Localization] Adding user's local language: ${userLanguage.name} (${userLanguage.code})`,
+                                    "background: #2196F3; color: #ffffff; font-size: 14px; font-weight: bold;"
                                 );
+
+                                const userLanguageOption = createLanguageOption(
+                                    userLanguage.code,
+                                    userLanguage.name
+                                );
+
+                                const recommendedIndex = items.findIndex(
+                                    (item) =>
+                                        item.overlayMessageRenderer?.subtitle
+                                            ?.simpleText === "Recommended languages"
+                                );
+
+                                if (recommendedIndex > -1) {
+                                    items.splice(recommendedIndex + 1, 0, userLanguageOption);
+                                    existingLanguages.add(userLanguage.code);
+                                    existingLanguages.add(userLanguage.name);
+                                } else {
+                                    const otherLanguagesIndex = items.findIndex(
+                                        (item) =>
+                                            item.overlayMessageRenderer?.subtitle
+                                                ?.simpleText === "Other languages"
+                                    );
+
+                                    if (otherLanguagesIndex > -1) {
+                                        items.splice(otherLanguagesIndex, 0, userLanguageOption);
+                                    } else {
+                                        items.unshift(userLanguageOption);
+                                    }
+                                    existingLanguages.add(userLanguage.code);
+                                    existingLanguages.add(userLanguage.name);
+                                }
                             } else {
-                                // As a fallback, add it at the beginning
-                                items.unshift(userLanguageOption);
+                                console.log(
+                                    `%c[TizenTube Subtitle Localization] User's language ${userLanguage.name} already exists in menu`,
+                                    "background: #4CAF50; color: #ffffff; font-size: 12px;"
+                                );
                             }
-                            // Update existing languages set
-                            existingLanguages.add(userLanguage.code);
-                            existingLanguages.add(userLanguage.name);
                         }
-                    } else {
-                        console.log(
-                            `%c[TizenTube Subtitle Localization] User's language ${userLanguage.name} already exists in menu`,
-                            "background: #4CAF50; color: #ffffff; font-size: 12px;"
-                        );
+                        // getUserCountryCode() already warns when null, no need to repeat here
+                    } catch (userLangErr) {
+                        console.warn("TizenTube Subtitle Localization: Error adding user language:", userLangErr);
                     }
-                } else {
-                    console.warn(
-                        `TizenTube Subtitle Localization: No language mapping found for country code: ${userCountryCode}`
-                    );
+                }
+
+                if (showOtherLanguages) {
+                    try {
+                        const missingLanguages = Object.entries(getComprehensiveLanguageList())
+                            .filter(([code, name]) => !existingLanguages.has(code) && !existingLanguages.has(name))
+                            .sort(([, a], [, b]) => a.localeCompare(b));
+
+                        if (missingLanguages.length > 0) {
+                            console.log(
+                                `%c[TizenTube Subtitle Localization] Adding "Tizen Languages" section with ${missingLanguages.length} additional languages`,
+                                "background: #FF9800; color: #ffffff; font-size: 12px;"
+                            );
+
+                            items.push(createSectionTitle("Other Languages"));
+
+                            missingLanguages.forEach(([code, name]) => {
+                                items.push(createLanguageOption(code, name));
+                            });
+
+                            console.log(
+                                `%c[TizenTube Subtitle Localization] Added "Tizen Languages" section`,
+                                "background: #FF9800; color: #ffffff; font-size: 12px;"
+                            );
+                        } else {
+                            console.log(
+                                `%c[TizenTube Subtitle Localization] All languages already present in menu`,
+                                "background: #4CAF50; color: #ffffff; font-size: 12px;"
+                            );
+                        }
+                    } catch (otherLangErr) {
+                        console.warn("TizenTube Subtitle Localization: Error adding other languages:", otherLangErr);
+                    }
                 }
             }
-
-            // Create "Tizen Languages" section with all missing languages if enabled
-            if (showOtherLanguages) {
-                const missingLanguages = Object.entries(getComprehensiveLanguageList())
-                    .filter(([code, name]) => !existingLanguages.has(code) && !existingLanguages.has(name))
-                    .sort(([, a], [, b]) => a.localeCompare(b));
-
-                if (missingLanguages.length > 0) {
-                    console.log(
-                        `%c[TizenTube Subtitle Localization] Adding "Tizen Languages" section with ${missingLanguages.length} additional languages`,
-                        "background: #FF9800; color: #ffffff; font-size: 12px;"
-                    );
-
-                    // Add section title
-                    items.push(createSectionTitle("Other Languages"));
-
-                    // Add all missing languages
-                    missingLanguages.forEach(([code, name]) => {
-                        items.push(createLanguageOption(code, name));
-                    });
-
-                    console.log(
-                        `%c[TizenTube Subtitle Localization] Added "Tizen Languages" section`,
-                        "background: #FF9800; color: #ffffff; font-size: 12px;"
-                    );
-                } else {
-                    console.log(
-                        `%c[TizenTube Subtitle Localization] All languages already present in menu`,
-                        "background: #4CAF50; color: #ffffff; font-size: 12px;"
-                    );
-                }
-            }
+        } catch (patchErr) {
+            console.warn("TizenTube Subtitle Localization: Patch handler error:", patchErr);
         }
 
-        // Let the original function run with our modified 'cmd' object
         return originalResolveCommand.apply(this, arguments);
     };
 

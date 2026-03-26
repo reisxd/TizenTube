@@ -102,10 +102,8 @@ function getThumbnailCandidates(renderer, item) {
   ];
 }
 
-// Comprehensive Shorts detection — ported from KrX3D/TizenTube working branch.
+// Comprehensive Shorts detection.
 // Returns { isShort, reason, title, lengthText, totalSeconds }.
-// Handles tileRenderer, videoRenderer, reelItemRenderer, lockupViewModel, and all
-// richItemRenderer variants — not just tileRenderer — so it works across all feed types.
 function getShortInfo(item, opts = {}) {
   const { pageName = null } = opts;
   if (!item) return { isShort: false, reason: 'no_item', title: 'unknown' };
@@ -138,12 +136,10 @@ function getShortInfo(item, opts = {}) {
 
   if (!renderer) return { isShort: false, reason: 'no_renderer', title };
 
-  // Explicit Shorts renderer type flag
   if (renderer.tvhtml5ShelfRendererType === 'TVHTML5_TILE_RENDERER_TYPE_SHORTS') {
     return { isShort: true, reason: 'renderer_type', title };
   }
 
-  // reelWatchEndpoint on the select command
   if (renderer.onSelectCommand?.reelWatchEndpoint) {
     return { isShort: true, reason: 'reelWatchEndpoint', title };
   }
@@ -152,7 +148,6 @@ function getShortInfo(item, opts = {}) {
     return { isShort: true, reason: 'endpoint_marker', title };
   }
 
-  // URL/browse metadata hints (covers converted Shorts rendered as normal videos)
   const allText = collectAllText(item).join(' ').toLowerCase();
   if (/\bshorts?\b/.test(allText)) {
     return { isShort: true, reason: 'shorts_text', title };
@@ -168,7 +163,6 @@ function getShortInfo(item, opts = {}) {
     return { isShort: true, reason: 'shorts_url', title };
   }
 
-  // thumbnailOverlay style flags AND duration text
   let lengthText = null;
   const thumbnailOverlays = renderer.header?.tileHeaderRenderer?.thumbnailOverlays
     || renderer.thumbnailOverlays;
@@ -180,17 +174,14 @@ function getShortInfo(item, opts = {}) {
       if (style === 'SHORTS' || style === 'SHORTS_TIME_STATUS_STYLE') {
         return { isShort: true, reason: 'overlay_style', title };
       }
-      // Capture duration text from this overlay for the seconds check below
       if (!lengthText) lengthText = tsr.text?.simpleText || null;
     }
   }
 
-  // lengthText field (some renderer variants)
   if (!lengthText) {
     lengthText = renderer.lengthText?.simpleText || renderer.lengthText?.runs?.[0]?.text || null;
   }
 
-  // metadata lines — subscription tiles store duration here across multiple line positions
   if (!lengthText) {
     const lines = renderer.metadata?.tileMetadataRenderer?.lines;
     if (Array.isArray(lines)) {
@@ -211,13 +202,10 @@ function getShortInfo(item, opts = {}) {
   const totalSeconds = parseDurationToSeconds(lengthText);
   if (totalSeconds === null) return { isShort: false, reason: 'length_format_miss', title, lengthText };
 
-  // Converted Shorts in subscriptions can arrive as plain tileRenderer entries with
-  // no Shorts/reel endpoint marker. Keep duration fallback narrowly scoped there.
   if (pageName === 'subscriptions' && totalSeconds <= 180) {
     return { isShort: true, reason: 'subscriptions_duration_fallback', title, lengthText, totalSeconds };
   }
 
-  // Do not classify Shorts by duration alone globally.
   return { isShort: false, reason: 'duration_only_not_used', title, lengthText, totalSeconds };
 }
 
@@ -487,7 +475,6 @@ function compactPlaylistVirtualRows(reason = 'playlist.row_compact') {
 }
 
 function removeRetiredHelpersFromTiles(reason = 'playlist.helper.tile_scan') {
-  // Prevent re-entrant calls triggered by our own DOM removals
   if (window.__ttRemovingHelperTiles) return { scannedTiles: 0, removed: 0, matchedIds: [] };
   const retiredIds = Array.from(getRetiredPlaylistHelperVideoIdSet());
   if (!retiredIds.length) return { scannedTiles: 0, removed: 0, matchedIds: [] };
@@ -518,7 +505,6 @@ function removeRetiredHelpersFromTiles(reason = 'playlist.helper.tile_scan') {
       }
     }
 
-    // Only compact if we actually removed something — avoids unnecessary DOM queries
     if (removed > 0) {
       compactPlaylistVirtualRows(`${reason}.tile_scan`);
       if (detectCurrentPage() === 'playlist') {
@@ -556,11 +542,11 @@ function ensurePlaylistHelperObserver() {
   };
 
   const observer = new MutationObserver(() => {
-    if (isProcessing) return; // drop mutations caused by our own DOM removals
+    if (isProcessing) return;
     if (detectCurrentPage() !== 'playlist') return;
     if (getRetiredPlaylistHelperVideoIdSet().size === 0) return;
     if (debounceTimer) clearTimeout(debounceTimer);
-    debounceTimer = setTimeout(process, 300); // batch all rapid mutations into one pass
+    debounceTimer = setTimeout(process, 300);
   });
 
   observer.observe(document.documentElement, { childList: true, subtree: true });
@@ -769,6 +755,40 @@ function processResponsePayload(payload, detectedPage) {
   processTileArraysDeep(payload, detectedPage, 'arrayPayload', 0, filterShortsFromItems);
 }
 
+// ===== DeArrow request queue =====
+// Limits concurrent DeArrow fetch requests to avoid overwhelming the network stack on
+// Tizen 5.5 and other resource-constrained devices. Replaces the old setTimeout stagger
+// which gave no backpressure and didn't handle slow or failing requests gracefully.
+const _deArrowQueue = [];
+let _deArrowInFlight = 0;
+const _DEARROW_MAX_CONCURRENT = 5;
+
+function _deArrowRunNext() {
+  if (_deArrowInFlight >= _DEARROW_MAX_CONCURRENT || _deArrowQueue.length === 0) return;
+  const task = _deArrowQueue.shift();
+  _deArrowInFlight++;
+  try {
+    const result = task();
+    if (result && typeof result.finally === 'function') {
+      result.finally(() => {
+        _deArrowInFlight--;
+        _deArrowRunNext();
+      });
+    } else {
+      _deArrowInFlight--;
+      _deArrowRunNext();
+    }
+  } catch (_) {
+    _deArrowInFlight--;
+    _deArrowRunNext();
+  }
+}
+
+function _deArrowEnqueue(taskFn) {
+  _deArrowQueue.push(taskFn);
+  _deArrowRunNext();
+}
+
 // ===== JSON.parse Patch =====
 
 const origParse = JSON.parse;
@@ -798,33 +818,33 @@ JSON.parse = function () {
     if (r?.frameworkUpdates?.entityBatchUpdate?.mutations) {
       if (!window._ttVideoProgressCache) window._ttVideoProgressCache = {};
       for (const mutation of r.frameworkUpdates.entityBatchUpdate.mutations) {
-        const key = String(mutation?.entityKey || '');
-        const payload = mutation?.payload || {};
-        const pct = payload?.videoAttributionModel?.watchProgressPercentage
-          ?? payload?.videoData?.watchProgressPercentage
-          ?? payload?.macroMarkersListEntity?.watchProgressPercentage
-          ?? null;
-        if (pct !== null) {
-          const videoId = key.includes('|') ? key.split('|')[0] : key;
-          window._ttVideoProgressCache[videoId] = Number(pct);
-          const explicitId = payload?.videoAttributionModel?.externalVideoId
-            || payload?.videoData?.videoId || null;
-          if (explicitId) window._ttVideoProgressCache[String(explicitId)] = Number(pct);
-        }
-        // Deep scan only on feed pages — on watch page these are player heartbeats
-        // and the deep scan is pure wasted CPU that competes with the video stream
-        if (detectedPage !== 'watch') {
-          for (const entry of collectWatchProgressEntries(payload)) {
-            if (window._ttVideoProgressCache[entry.id] === undefined) {
-              window._ttVideoProgressCache[entry.id] = Number(entry.percent);
+        try {
+          const key = String(mutation?.entityKey || '');
+          const payload = mutation?.payload || {};
+          const pct = payload?.videoAttributionModel?.watchProgressPercentage
+            ?? payload?.videoData?.watchProgressPercentage
+            ?? payload?.macroMarkersListEntity?.watchProgressPercentage
+            ?? null;
+          if (pct !== null) {
+            const videoId = key.includes('|') ? key.split('|')[0] : key;
+            window._ttVideoProgressCache[videoId] = Number(pct);
+            const explicitId = payload?.videoAttributionModel?.externalVideoId
+              || payload?.videoData?.videoId || null;
+            if (explicitId) window._ttVideoProgressCache[String(explicitId)] = Number(pct);
+          }
+          if (detectedPage !== 'watch') {
+            for (const entry of collectWatchProgressEntries(payload)) {
+              if (window._ttVideoProgressCache[entry.id] === undefined) {
+                window._ttVideoProgressCache[entry.id] = Number(entry.percent);
+              }
             }
           }
-        }
+        } catch (_) { }
       }
     }
 
     // =========================================================
-    // === WATCH PAGE FAST PATH                              ===
+    // === WATCH PAGE FAST PATH                               ===
     // =========================================================
     if (detectedPage === 'watch') {
       if (r.paidContentOverlay && !configRead('enablePaidPromotionOverlay')) r.paidContentOverlay = null;
@@ -835,67 +855,75 @@ JSON.parse = function () {
       if (r?.title?.runs) PatchSettings(r);
 
       if (r?.streamingData?.adaptiveFormats && configRead('videoPreferredCodec') !== 'any') {
-        const preferredCodec = configRead('videoPreferredCodec');
-        if (r.streamingData.adaptiveFormats.find(f => f.mimeType.includes(preferredCodec))) {
-          r.streamingData.adaptiveFormats = r.streamingData.adaptiveFormats.filter(f =>
-            f.mimeType.startsWith('audio/') || f.mimeType.includes(preferredCodec)
-          );
-        }
+        try {
+          const preferredCodec = configRead('videoPreferredCodec');
+          if (r.streamingData.adaptiveFormats.find(f => f.mimeType.includes(preferredCodec))) {
+            r.streamingData.adaptiveFormats = r.streamingData.adaptiveFormats.filter(f =>
+              f.mimeType.startsWith('audio/') || f.mimeType.includes(preferredCodec)
+            );
+          }
+        } catch (_) { }
       }
 
       // SponsorBlock
       if (configRead('sponsorBlockManualSkips').length > 0 && r?.playerOverlays?.playerOverlayRenderer) {
-        const manualSkippedSegments = configRead('sponsorBlockManualSkips');
-        const timelyActions = [];
-        if (window?.sponsorblock?.segments) {
-          for (const segment of window.sponsorblock.segments) {
-            if (manualSkippedSegments.includes(segment.category)) {
-              timelyActions.push(timelyAction(
-                `Skip ${segment.category}`, 'SKIP_NEXT',
-                { clickTrackingParams: null, showEngagementPanelEndpoint: { customAction: { action: 'SKIP', parameters: { time: segment.segment[1] } } } },
-                segment.segment[0] * 1000,
-                segment.segment[1] * 1000 - segment.segment[0] * 1000
-              ));
+        try {
+          const manualSkippedSegments = configRead('sponsorBlockManualSkips');
+          const timelyActions = [];
+          if (window?.sponsorblock?.segments) {
+            for (const segment of window.sponsorblock.segments) {
+              if (manualSkippedSegments.includes(segment.category)) {
+                timelyActions.push(timelyAction(
+                  `Skip ${segment.category}`, 'SKIP_NEXT',
+                  { clickTrackingParams: null, showEngagementPanelEndpoint: { customAction: { action: 'SKIP', parameters: { time: segment.segment[1] } } } },
+                  segment.segment[0] * 1000,
+                  segment.segment[1] * 1000 - segment.segment[0] * 1000
+                ));
+              }
             }
+            r.playerOverlays.playerOverlayRenderer.timelyActionRenderers = timelyActions;
           }
-          r.playerOverlays.playerOverlayRenderer.timelyActionRenderers = timelyActions;
-        }
+        } catch (_) { }
       } else if (r?.playerOverlays?.playerOverlayRenderer) {
         r.playerOverlays.playerOverlayRenderer.timelyActionRenderers = [];
       }
 
       if (r?.transportControls?.transportControlsRenderer?.promotedActions && configRead('enableSponsorBlockHighlight')) {
-        if (window?.sponsorblock?.segments) {
-          const category = window.sponsorblock.segments.find(seg => seg.category === 'poi_highlight');
-          if (category) {
-            r.transportControls.transportControlsRenderer.promotedActions.push({
-              type: 'TRANSPORT_CONTROLS_BUTTON_TYPE_SPONSORBLOCK_HIGHLIGHT',
-              button: { buttonRenderer: ButtonRenderer(false, 'Skip to highlight', 'SKIP_NEXT', { clickTrackingParams: null, customAction: { action: 'SKIP', parameters: { time: category.segment[0] } } }) }
-            });
+        try {
+          if (window?.sponsorblock?.segments) {
+            const category = window.sponsorblock.segments.find(seg => seg.category === 'poi_highlight');
+            if (category) {
+              r.transportControls.transportControlsRenderer.promotedActions.push({
+                type: 'TRANSPORT_CONTROLS_BUTTON_TYPE_SPONSORBLOCK_HIGHLIGHT',
+                button: { buttonRenderer: ButtonRenderer(false, 'Skip to highlight', 'SKIP_NEXT', { clickTrackingParams: null, customAction: { action: 'SKIP', parameters: { time: category.segment[0] } } }) }
+              });
+            }
           }
-        }
+        } catch (_) { }
       }
 
-      // watchNext initial load — no hqify/deArrowify to avoid competing with video stream
+      // watchNext initial load
       if (r?.contents?.singleColumnWatchNextResults?.pivot?.sectionListRenderer) {
-        const signinReminderEnabled = configRead('enableSigninReminder');
-        if (!signinReminderEnabled) {
-          r.contents.singleColumnWatchNextResults.pivot.sectionListRenderer.contents =
-            r.contents.singleColumnWatchNextResults.pivot.sectionListRenderer.contents.filter(elm => !elm.alertWithActionsRenderer);
-        }
-        processShelves(r.contents.singleColumnWatchNextResults.pivot.sectionListRenderer.contents, false, detectedPage);
-        consolidateShelves(r.contents.singleColumnWatchNextResults.pivot.sectionListRenderer.contents, 'watchNext', detectedPage);
-        if (window.queuedVideos.videos.length > 0) {
-          const queuedVideosClone = window.queuedVideos.videos.slice();
-          queuedVideosClone.unshift(TileRenderer('Clear Queue', { customAction: { action: 'CLEAR_QUEUE' } }));
-          r.contents.singleColumnWatchNextResults.pivot.sectionListRenderer.contents.unshift(ShelfRenderer(
-            'Queued Videos',
-            queuedVideosClone,
-            queuedVideosClone.findIndex(v => v.contentId === window.queuedVideos.lastVideoId) !== -1
-              ? queuedVideosClone.findIndex(v => v.contentId === window.queuedVideos.lastVideoId)
-              : 0
-          ));
-        }
+        try {
+          const signinReminderEnabled = configRead('enableSigninReminder');
+          if (!signinReminderEnabled) {
+            r.contents.singleColumnWatchNextResults.pivot.sectionListRenderer.contents =
+              r.contents.singleColumnWatchNextResults.pivot.sectionListRenderer.contents.filter(elm => !elm.alertWithActionsRenderer);
+          }
+          processShelves(r.contents.singleColumnWatchNextResults.pivot.sectionListRenderer.contents, false, detectedPage);
+          consolidateShelves(r.contents.singleColumnWatchNextResults.pivot.sectionListRenderer.contents, 'watchNext', detectedPage);
+          if (window.queuedVideos.videos.length > 0) {
+            const queuedVideosClone = window.queuedVideos.videos.slice();
+            queuedVideosClone.unshift(TileRenderer('Clear Queue', { customAction: { action: 'CLEAR_QUEUE' } }));
+            r.contents.singleColumnWatchNextResults.pivot.sectionListRenderer.contents.unshift(ShelfRenderer(
+              'Queued Videos',
+              queuedVideosClone,
+              queuedVideosClone.findIndex(v => v.contentId === window.queuedVideos.lastVideoId) !== -1
+                ? queuedVideosClone.findIndex(v => v.contentId === window.queuedVideos.lastVideoId)
+                : 0
+            ));
+          }
+        } catch (_) { }
       }
 
       // watchNext scroll-down continuations — filter watched/shorts, skip hqify/deArrowify
@@ -919,7 +947,7 @@ JSON.parse = function () {
       return r;
     }
     // =========================================================
-    // === END WATCH PAGE FAST PATH                          ===
+    // === END WATCH PAGE FAST PATH                           ===
     // =========================================================
 
     const signinReminderEnabled = configRead('enableSigninReminder');
@@ -927,12 +955,14 @@ JSON.parse = function () {
     if (r.paidContentOverlay && !configRead('enablePaidPromotionOverlay')) r.paidContentOverlay = null;
 
     if (r?.streamingData?.adaptiveFormats && configRead('videoPreferredCodec') !== 'any') {
-      const preferredCodec = configRead('videoPreferredCodec');
-      if (r.streamingData.adaptiveFormats.find(f => f.mimeType.includes(preferredCodec))) {
-        r.streamingData.adaptiveFormats = r.streamingData.adaptiveFormats.filter(f =>
-          f.mimeType.startsWith('audio/') || f.mimeType.includes(preferredCodec)
-        );
-      }
+      try {
+        const preferredCodec = configRead('videoPreferredCodec');
+        if (r.streamingData.adaptiveFormats.find(f => f.mimeType.includes(preferredCodec))) {
+          r.streamingData.adaptiveFormats = r.streamingData.adaptiveFormats.filter(f =>
+            f.mimeType.startsWith('audio/') || f.mimeType.includes(preferredCodec)
+          );
+        }
+      } catch (_) { }
     }
 
     // === Home screen (tvBrowse sectionList) ===
@@ -947,8 +977,10 @@ JSON.parse = function () {
           r.contents.tvBrowseRenderer.content.tvSurfaceContentRenderer.content.sectionListRenderer.contents.filter(elm => !elm.adSlotRenderer);
         for (const shelve of r.contents.tvBrowseRenderer.content.tvSurfaceContentRenderer.content.sectionListRenderer.contents) {
           if (shelve.shelfRenderer) {
-            shelve.shelfRenderer.content.horizontalListRenderer.items =
-              shelve.shelfRenderer.content.horizontalListRenderer.items.filter(item => !item.adSlotRenderer);
+            try {
+              shelve.shelfRenderer.content.horizontalListRenderer.items =
+                shelve.shelfRenderer.content.horizontalListRenderer.items.filter(item => !item.adSlotRenderer);
+            } catch (_) { }
           }
         }
       }
@@ -991,9 +1023,9 @@ JSON.parse = function () {
 
     // === sectionListContinuation ===
     if (r?.continuationContents?.sectionListContinuation?.contents) {
-        processShelves(r.continuationContents.sectionListContinuation.contents, false, detectedPage);
-        consolidateShelves(r.continuationContents.sectionListContinuation.contents, 'watchNext.continuation.sectionList', detectedPage);
-      }
+      processShelves(r.continuationContents.sectionListContinuation.contents, false, detectedPage);
+      consolidateShelves(r.continuationContents.sectionListContinuation.contents, 'continuation.sectionList', detectedPage);
+    }
 
     // === pivotContinuation ===
     if (r?.continuationContents?.pivotContinuation?.contents) {
@@ -1004,13 +1036,13 @@ JSON.parse = function () {
 
     // === horizontalListContinuation ===
     if (r?.continuationContents?.horizontalListContinuation?.items) {
-        const continuation = r.continuationContents.horizontalListContinuation;
-        deArrowify(continuation.items);
-        hqify(continuation.items);
-        addLongPress(continuation.items);
-        continuation.items = filterContinuationItems(continuation.items, detectedPage, !!continuation?.continuations, 'watchNext.continuation.horizontal');
-        normalizeHorizontalListRenderer(continuation, 'watchNext.continuation.horizontal');
-      }
+      const continuation = r.continuationContents.horizontalListContinuation;
+      deArrowify(continuation.items);
+      hqify(continuation.items);
+      addLongPress(continuation.items);
+      continuation.items = filterContinuationItems(continuation.items, detectedPage, !!continuation?.continuations, 'continuation.horizontal');
+      normalizeHorizontalListRenderer(continuation, 'continuation.horizontal');
+    }
 
     // === gridContinuation ===
     if (r?.continuationContents?.gridContinuation?.items) {
@@ -1031,7 +1063,6 @@ JSON.parse = function () {
     if (r?.contents?.tvBrowseRenderer?.content?.tvSecondaryNavRenderer?.sections) {
       for (const section of r.contents.tvBrowseRenderer.content.tvSecondaryNavRenderer.sections) {
         if (!Array.isArray(section?.tvSecondaryNavSectionRenderer?.tabs)) continue;
-
         if (configRead('sortSubscriptionsByAlphabet')) {
           section.tvSecondaryNavSectionRenderer.tabs.sort((a, b) => {
             if (a.tabRenderer.selected && !b.tabRenderer.selected) return -1;
@@ -1039,7 +1070,6 @@ JSON.parse = function () {
             return a.tabRenderer.title.localeCompare(b.tabRenderer.title);
           });
         }
-        
         if (!configRead('enableShorts')) {
           const tabs = section.tvSecondaryNavSectionRenderer.tabs;
           for (let i = tabs.length - 1; i >= 0; i--) {
@@ -1056,32 +1086,36 @@ JSON.parse = function () {
         }
 
         for (const tab of section.tvSecondaryNavSectionRenderer.tabs) {
-          const tabBrowseId = String(extractNavTabBrowseId(tab)).toLowerCase();
-          let tabPage = detectedPage;
-          if (tabBrowseId.includes('fesubscription')) tabPage = 'subscriptions';
-          else if (tabBrowseId.startsWith('uc')) tabPage = 'channel';
-          else if (tabBrowseId === 'fehistory') tabPage = 'history';
-          else if (tabBrowseId === 'felibrary') tabPage = 'library';
-          else if (tabBrowseId === 'feplaylist_aggregation') tabPage = 'playlists';
-          else if (tabBrowseId === 'femy_youtube' || tabBrowseId === 'vlwl' || tabBrowseId === 'vlll' || tabBrowseId.startsWith('vlpl')) tabPage = 'playlist';
+          try {
+            const tabBrowseId = String(extractNavTabBrowseId(tab)).toLowerCase();
+            let tabPage = detectedPage;
+            if (tabBrowseId.includes('fesubscription')) tabPage = 'subscriptions';
+            else if (tabBrowseId.startsWith('uc')) tabPage = 'channel';
+            else if (tabBrowseId === 'fehistory') tabPage = 'history';
+            else if (tabBrowseId === 'felibrary') tabPage = 'library';
+            else if (tabBrowseId === 'feplaylist_aggregation') tabPage = 'playlists';
+            else if (tabBrowseId === 'femy_youtube' || tabBrowseId === 'vlwl' || tabBrowseId === 'vlll' || tabBrowseId.startsWith('vlpl')) tabPage = 'playlist';
 
-          const tabSectionList = tab?.tabRenderer?.content?.tvSurfaceContentRenderer?.content?.sectionListRenderer?.contents;
-          if (Array.isArray(tabSectionList)) {
-            processShelves(tabSectionList, true, tabPage);
-            consolidateShelves(tabSectionList, `tab.${tabBrowseId || 'unknown'}`, tabPage);
-          }
+            const tabSectionList = tab?.tabRenderer?.content?.tvSurfaceContentRenderer?.content?.sectionListRenderer?.contents;
+            if (Array.isArray(tabSectionList)) {
+              processShelves(tabSectionList, true, tabPage);
+              consolidateShelves(tabSectionList, `tab.${tabBrowseId || 'unknown'}`, tabPage);
+            }
 
-          const tabGridItems = tab?.tabRenderer?.content?.tvSurfaceContentRenderer?.content?.gridRenderer?.items;
-          if (Array.isArray(tabGridItems)) {
-            let filteredTabGrid = hideVideo(tabGridItems, tabPage);
-            filteredTabGrid = filterShortsFromItems(filteredTabGrid, tabPage);
-            tab.tabRenderer.content.tvSurfaceContentRenderer.content.gridRenderer.items = filteredTabGrid;
-            normalizeGridRenderer(tab.tabRenderer.content.tvSurfaceContentRenderer.content.gridRenderer, 'tab.grid');
-          }
+            const tabGridItems = tab?.tabRenderer?.content?.tvSurfaceContentRenderer?.content?.gridRenderer?.items;
+            if (Array.isArray(tabGridItems)) {
+              let filteredTabGrid = hideVideo(tabGridItems, tabPage);
+              filteredTabGrid = filterShortsFromItems(filteredTabGrid, tabPage);
+              tab.tabRenderer.content.tvSurfaceContentRenderer.content.gridRenderer.items = filteredTabGrid;
+              normalizeGridRenderer(tab.tabRenderer.content.tvSurfaceContentRenderer.content.gridRenderer, 'tab.grid');
+            }
 
-          const tabPlaylistRenderer = tab?.tabRenderer?.content?.tvSurfaceContentRenderer?.content?.playlistVideoListRenderer;
-          if (tabPlaylistRenderer?.contents) {
-            filterPlaylistRendererContents(tabPlaylistRenderer, tabPage, 'tab.playlist.renderer');
+            const tabPlaylistRenderer = tab?.tabRenderer?.content?.tvSurfaceContentRenderer?.content?.playlistVideoListRenderer;
+            if (tabPlaylistRenderer?.contents) {
+              filterPlaylistRendererContents(tabPlaylistRenderer, tabPage, 'tab.playlist.renderer');
+            }
+          } catch (tabErr) {
+            appendFileOnlyLog('tab.process.error', { msg: String(tabErr?.message || tabErr) });
           }
         }
       }
@@ -1096,56 +1130,62 @@ JSON.parse = function () {
     }
 
     if (r?.contents?.singleColumnWatchNextResults?.pivot?.sectionListRenderer) {
-      if (!signinReminderEnabled) {
-        r.contents.singleColumnWatchNextResults.pivot.sectionListRenderer.contents =
-          r.contents.singleColumnWatchNextResults.pivot.sectionListRenderer.contents.filter(elm => !elm.alertWithActionsRenderer);
-      }
-      processShelves(r.contents.singleColumnWatchNextResults.pivot.sectionListRenderer.contents, false, detectedPage);
-      consolidateShelves(r.contents.singleColumnWatchNextResults.pivot.sectionListRenderer.contents, 'watchNext', detectedPage);
-      if (window.queuedVideos.videos.length > 0) {
-        const queuedVideosClone = window.queuedVideos.videos.slice();
-        queuedVideosClone.unshift(TileRenderer('Clear Queue', { customAction: { action: 'CLEAR_QUEUE' } }));
-        r.contents.singleColumnWatchNextResults.pivot.sectionListRenderer.contents.unshift(ShelfRenderer(
-          'Queued Videos',
-          queuedVideosClone,
-          queuedVideosClone.findIndex(v => v.contentId === window.queuedVideos.lastVideoId) !== -1
-            ? queuedVideosClone.findIndex(v => v.contentId === window.queuedVideos.lastVideoId)
-            : 0
-        ));
-      }
+      try {
+        if (!signinReminderEnabled) {
+          r.contents.singleColumnWatchNextResults.pivot.sectionListRenderer.contents =
+            r.contents.singleColumnWatchNextResults.pivot.sectionListRenderer.contents.filter(elm => !elm.alertWithActionsRenderer);
+        }
+        processShelves(r.contents.singleColumnWatchNextResults.pivot.sectionListRenderer.contents, false, detectedPage);
+        consolidateShelves(r.contents.singleColumnWatchNextResults.pivot.sectionListRenderer.contents, 'watchNext', detectedPage);
+        if (window.queuedVideos.videos.length > 0) {
+          const queuedVideosClone = window.queuedVideos.videos.slice();
+          queuedVideosClone.unshift(TileRenderer('Clear Queue', { customAction: { action: 'CLEAR_QUEUE' } }));
+          r.contents.singleColumnWatchNextResults.pivot.sectionListRenderer.contents.unshift(ShelfRenderer(
+            'Queued Videos',
+            queuedVideosClone,
+            queuedVideosClone.findIndex(v => v.contentId === window.queuedVideos.lastVideoId) !== -1
+              ? queuedVideosClone.findIndex(v => v.contentId === window.queuedVideos.lastVideoId)
+              : 0
+          ));
+        }
+      } catch (_) { }
     }
 
     // === SponsorBlock ===
     if (configRead('sponsorBlockManualSkips').length > 0 && r?.playerOverlays?.playerOverlayRenderer) {
-      const manualSkippedSegments = configRead('sponsorBlockManualSkips');
-      const timelyActions = [];
-      if (window?.sponsorblock?.segments) {
-        for (const segment of window.sponsorblock.segments) {
-          if (manualSkippedSegments.includes(segment.category)) {
-            timelyActions.push(timelyAction(
-              `Skip ${segment.category}`, 'SKIP_NEXT',
-              { clickTrackingParams: null, showEngagementPanelEndpoint: { customAction: { action: 'SKIP', parameters: { time: segment.segment[1] } } } },
-              segment.segment[0] * 1000,
-              segment.segment[1] * 1000 - segment.segment[0] * 1000
-            ));
+      try {
+        const manualSkippedSegments = configRead('sponsorBlockManualSkips');
+        const timelyActions = [];
+        if (window?.sponsorblock?.segments) {
+          for (const segment of window.sponsorblock.segments) {
+            if (manualSkippedSegments.includes(segment.category)) {
+              timelyActions.push(timelyAction(
+                `Skip ${segment.category}`, 'SKIP_NEXT',
+                { clickTrackingParams: null, showEngagementPanelEndpoint: { customAction: { action: 'SKIP', parameters: { time: segment.segment[1] } } } },
+                segment.segment[0] * 1000,
+                segment.segment[1] * 1000 - segment.segment[0] * 1000
+              ));
+            }
           }
+          r.playerOverlays.playerOverlayRenderer.timelyActionRenderers = timelyActions;
         }
-        r.playerOverlays.playerOverlayRenderer.timelyActionRenderers = timelyActions;
-      }
+      } catch (_) { }
     } else if (r?.playerOverlays?.playerOverlayRenderer) {
       r.playerOverlays.playerOverlayRenderer.timelyActionRenderers = [];
     }
 
     if (r?.transportControls?.transportControlsRenderer?.promotedActions && configRead('enableSponsorBlockHighlight')) {
-      if (window?.sponsorblock?.segments) {
-        const category = window.sponsorblock.segments.find(seg => seg.category === 'poi_highlight');
-        if (category) {
-          r.transportControls.transportControlsRenderer.promotedActions.push({
-            type: 'TRANSPORT_CONTROLS_BUTTON_TYPE_SPONSORBLOCK_HIGHLIGHT',
-            button: { buttonRenderer: ButtonRenderer(false, 'Skip to highlight', 'SKIP_NEXT', { clickTrackingParams: null, customAction: { action: 'SKIP', parameters: { time: category.segment[0] } } }) }
-          });
+      try {
+        if (window?.sponsorblock?.segments) {
+          const category = window.sponsorblock.segments.find(seg => seg.category === 'poi_highlight');
+          if (category) {
+            r.transportControls.transportControlsRenderer.promotedActions.push({
+              type: 'TRANSPORT_CONTROLS_BUTTON_TYPE_SPONSORBLOCK_HIGHLIGHT',
+              button: { buttonRenderer: ButtonRenderer(false, 'Skip to highlight', 'SKIP_NEXT', { clickTrackingParams: null, customAction: { action: 'SKIP', parameters: { time: category.segment[0] } } }) }
+            });
+          }
         }
-      }
+      } catch (_) { }
     }
 
     // === Safety net deep scan (non-watch pages only) ===
@@ -1163,11 +1203,35 @@ JSON.parse = function () {
 };
 
 window.JSON.parse = JSON.parse;
-for (const key in window._yttv) {
-  if (window._yttv[key] && window._yttv[key].JSON && window._yttv[key].JSON.parse) {
-    window._yttv[key].JSON.parse = JSON.parse;
-  }
+
+// Patch all _yttv sandbox JSON instances.
+// FIX: Run immediately and also retry with an interval, because on slower devices
+// (Tizen 5.5) _yttv may not be fully populated at module evaluation time.
+// Without this, some sandbox instances get unfiltered ad/shorts data.
+function _patchYttvJsonParse() {
+  let patched = 0;
+  try {
+    for (const key in window._yttv) {
+      if (window._yttv[key] && window._yttv[key].JSON && window._yttv[key].JSON.parse) {
+        window._yttv[key].JSON.parse = JSON.parse;
+        patched++;
+      }
+    }
+  } catch (_) { }
+  return patched;
 }
+
+_patchYttvJsonParse();
+
+// Keep retrying until we either patch something or time out at 15 seconds.
+const _yttvPatchInterval = setInterval(() => {
+  try {
+    if (!window._yttv || !Object.keys(window._yttv).length) return;
+    const patched = _patchYttvJsonParse();
+    if (patched > 0) clearInterval(_yttvPatchInterval);
+  } catch (_) { }
+}, 300);
+setTimeout(() => clearInterval(_yttvPatchInterval), 15000);
 
 // ===== processShelves =====
 
@@ -1176,115 +1240,94 @@ function processShelves(shelves, shouldAddPreviews = true, pageHint = null) {
   const activePage = pageHint || window.__ttLastDetectedPage || detectCurrentPage();
 
   for (let i = shelves.length - 1; i >= 0; i--) {
-    const shelve = shelves[i];
+    try {
+      const shelve = shelves[i];
 
-    if (!configRead('enableShorts') && isShortsShelf(shelve)) {
-      shelves.splice(i, 1);
-      continue;
-    }
-
-    if (!configRead('enableShorts') && !shelve?.shelfRenderer) {
-      const allText = collectAllText(shelve).join(' ').toLowerCase();
-      if (/\bshorts?\b/i.test(allText)) {
+      if (!configRead('enableShorts') && isShortsShelf(shelve)) {
         shelves.splice(i, 1);
         continue;
       }
-    }
 
-    if (!shelve.shelfRenderer) continue;
-
-    const shelfItems = shelve?.shelfRenderer?.content?.horizontalListRenderer?.items;
-    if (!Array.isArray(shelfItems)) continue;
-
-    deArrowify(shelfItems);
-    hqify(shelfItems);
-    addLongPress(shelfItems);
-    if (shouldAddPreviews) addPreviews(shelfItems);
-
-    shelve.shelfRenderer.content.horizontalListRenderer._originalRowSize = shelfItems.length;
-    shelve.shelfRenderer.content.horizontalListRenderer.items = hideVideo(shelfItems, activePage);
-    normalizeHorizontalListRenderer(shelve.shelfRenderer.content.horizontalListRenderer, `shelf:${activePage}:${i}`);
-
-    if (!configRead('enableShorts')) {
-      if (isShortsShelf(shelve)) { shelves.splice(i, 1); continue; }
-      // Filter Shorts from ALL list types — ported from KrX3D working branch.
-      // getShortInfo handles every renderer type (tileRenderer, videoRenderer, reelItemRenderer,
-      // lockupViewModel, etc.) and reads duration from overlays, lengthText, and metadata lines.
-      const filterShortItems = (items) => {
-        if (!Array.isArray(items)) return items;
-        const before = items.length;
-        const filtered = items.filter(item => {
-          const info = getShortInfo(item, { pageName: activePage });
-          if (!info.isShort) {
-            // Diagnostic: dump renderer shape to understand what we're missing
-            const r = item?.tileRenderer || item?.videoRenderer || item?.richItemRenderer?.content?.videoRenderer || null;
-            const rendererType = item ? Object.keys(item)[0] : 'none';
-            const overlays = r?.header?.tileHeaderRenderer?.thumbnailOverlays || r?.thumbnailOverlays || [];
-            const overlayStyles = Array.isArray(overlays)
-              ? overlays.map(o => o?.thumbnailOverlayTimeStatusRenderer?.style).filter(Boolean)
-              : [];
-            const thumbnails = getThumbnailCandidates(r, item);
-            const thumbnailRatios = thumbnails
-              .map((t) => {
-                const w = Number(t?.width);
-                const h = Number(t?.height);
-                return (Number.isFinite(w) && Number.isFinite(h) && w > 0) ? Number((h / w).toFixed(3)) : null;
-              })
-              .filter((v) => v !== null)
-              .slice(0, 6);
-            const shelfType = r?.tvhtml5ShelfRendererType || null;
-            const lines = r?.metadata?.tileMetadataRenderer?.lines;
-            const lineTexts = Array.isArray(lines)
-              ? lines.flatMap(l => (l?.lineRenderer?.items || []).map(li => li?.lineItemRenderer?.text?.simpleText).filter(Boolean))
-              : [];
-            appendFileOnlyLog('shorts.miss', {
-              reason: info.reason,
-              title: info.title,
-              rendererType,
-              shelfType,
-              overlayStyles,
-              lengthText: info.lengthText || null,
-              lineTexts,
-              thumbnailRatios,
-              hasReelCmd: !!(r?.onSelectCommand?.reelWatchEndpoint),
-            });
-          }
-          return !info.isShort;
-        });
-        if (before !== filtered.length) {
-          appendFileOnlyLog('shorts.tiles.filter', { page: activePage, shelf: i, before, after: filtered.length });
+      if (!configRead('enableShorts') && !shelve?.shelfRenderer) {
+        const allText = collectAllText(shelve).join(' ').toLowerCase();
+        if (/\bshorts?\b/i.test(allText)) {
+          shelves.splice(i, 1);
+          continue;
         }
-        return filtered;
-      };
-      const base = shelve?.richSectionRenderer?.content || shelve;
-      if (Array.isArray(base?.shelfRenderer?.content?.horizontalListRenderer?.items)) {
-        base.shelfRenderer.content.horizontalListRenderer.items =
-          filterShortItems(base.shelfRenderer.content.horizontalListRenderer.items);
-        normalizeHorizontalListRenderer(base.shelfRenderer.content.horizontalListRenderer, `shelf:${activePage}:${i}:shorts`);
       }
-      if (Array.isArray(base?.shelfRenderer?.content?.verticalListRenderer?.items)) {
-        base.shelfRenderer.content.verticalListRenderer.items =
-          filterShortItems(base.shelfRenderer.content.verticalListRenderer.items);
-      }
-      if (Array.isArray(base?.shelfRenderer?.content?.gridRenderer?.items)) {
-        base.shelfRenderer.content.gridRenderer.items =
-          filterShortItems(base.shelfRenderer.content.gridRenderer.items);
-      }
-      if (Array.isArray(base?.shelfRenderer?.content?.expandedShelfContentsRenderer?.items)) {
-        base.shelfRenderer.content.expandedShelfContentsRenderer.items =
-          filterShortItems(base.shelfRenderer.content.expandedShelfContentsRenderer.items);
-      }
-      if (Array.isArray(base?.richShelfRenderer?.content?.richGridRenderer?.contents)) {
-        base.richShelfRenderer.content.richGridRenderer.contents =
-          filterShortItems(base.richShelfRenderer.content.richGridRenderer.contents);
-      }
-      if (Array.isArray(base?.reelShelfRenderer?.items)) {
-        base.reelShelfRenderer.items = filterShortItems(base.reelShelfRenderer.items);
-      }
-    }
 
-    if (shelve.shelfRenderer.content.horizontalListRenderer.items.length === 0) {
-      shelves.splice(i, 1);
+      if (!shelve.shelfRenderer) continue;
+
+      const shelfItems = shelve?.shelfRenderer?.content?.horizontalListRenderer?.items;
+      if (!Array.isArray(shelfItems)) continue;
+
+      deArrowify(shelfItems);
+      hqify(shelfItems);
+      addLongPress(shelfItems);
+      if (shouldAddPreviews) addPreviews(shelfItems);
+
+      shelve.shelfRenderer.content.horizontalListRenderer._originalRowSize = shelfItems.length;
+      shelve.shelfRenderer.content.horizontalListRenderer.items = hideVideo(shelfItems, activePage);
+      normalizeHorizontalListRenderer(shelve.shelfRenderer.content.horizontalListRenderer, `shelf:${activePage}:${i}`);
+
+      if (!configRead('enableShorts')) {
+        if (isShortsShelf(shelve)) { shelves.splice(i, 1); continue; }
+
+        // Filter Shorts from ALL content list types within this shelf.
+        // FIX: Uses the module-level filterShortsFromItems instead of a per-call closure,
+        // eliminating duplicate logic and the shorts.miss log spam that fired for every
+        // non-Short item in every shelf on every parse.
+        const base = shelve?.richSectionRenderer?.content || shelve;
+
+        if (Array.isArray(base?.shelfRenderer?.content?.horizontalListRenderer?.items)) {
+          base.shelfRenderer.content.horizontalListRenderer.items =
+            filterShortsFromItems(base.shelfRenderer.content.horizontalListRenderer.items, activePage);
+          normalizeHorizontalListRenderer(base.shelfRenderer.content.horizontalListRenderer, `shelf:${activePage}:${i}:shorts`);
+        }
+        if (Array.isArray(base?.shelfRenderer?.content?.verticalListRenderer?.items)) {
+          base.shelfRenderer.content.verticalListRenderer.items =
+            filterShortsFromItems(base.shelfRenderer.content.verticalListRenderer.items, activePage);
+        }
+        if (Array.isArray(base?.shelfRenderer?.content?.gridRenderer?.items)) {
+          base.shelfRenderer.content.gridRenderer.items =
+            filterShortsFromItems(base.shelfRenderer.content.gridRenderer.items, activePage);
+        }
+        if (Array.isArray(base?.shelfRenderer?.content?.expandedShelfContentsRenderer?.items)) {
+          base.shelfRenderer.content.expandedShelfContentsRenderer.items =
+            filterShortsFromItems(base.shelfRenderer.content.expandedShelfContentsRenderer.items, activePage);
+        }
+        if (Array.isArray(base?.richShelfRenderer?.content?.richGridRenderer?.contents)) {
+          base.richShelfRenderer.content.richGridRenderer.contents =
+            filterShortsFromItems(base.richShelfRenderer.content.richGridRenderer.contents, activePage);
+        }
+        if (Array.isArray(base?.reelShelfRenderer?.items)) {
+          base.reelShelfRenderer.items = filterShortsFromItems(base.reelShelfRenderer.items, activePage);
+        }
+
+        // FIX: Check ALL content containers for emptiness, not only horizontalListRenderer.
+        // Previously only the horizontal list was checked, leaving empty shelf wrappers
+        // when verticalListRenderer / gridRenderer / etc. were the actual content.
+        const contentArrays = [
+          base?.shelfRenderer?.content?.horizontalListRenderer?.items,
+          base?.shelfRenderer?.content?.verticalListRenderer?.items,
+          base?.shelfRenderer?.content?.gridRenderer?.items,
+          base?.shelfRenderer?.content?.expandedShelfContentsRenderer?.items,
+          base?.richShelfRenderer?.content?.richGridRenderer?.contents,
+          base?.reelShelfRenderer?.items,
+        ].filter(arr => Array.isArray(arr));
+
+        if (contentArrays.length > 0 && contentArrays.every(arr => arr.length === 0)) {
+          shelves.splice(i, 1);
+          continue;
+        }
+      }
+
+      // Standard empty-shelf check (when Shorts filtering is disabled).
+      if (shelve.shelfRenderer.content.horizontalListRenderer.items.length === 0) {
+        shelves.splice(i, 1);
+      }
+    } catch (shelfErr) {
+      appendFileOnlyLog('processShelves.shelf.error', { index: i, msg: String(shelfErr?.message || shelfErr) });
     }
   }
 }
@@ -1294,22 +1337,29 @@ function processShelves(shelves, shouldAddPreviews = true, pageHint = null) {
 function addPreviews(items) {
   if (!configRead('enablePreviews')) return;
   for (const item of items) {
-    if (item.tileRenderer) {
-      const watchEndpoint = item.tileRenderer.onSelectCommand;
-      if (item.tileRenderer?.onFocusCommand?.playbackEndpoint) continue;
-      if (item.tileRenderer?.onFocusCommand?.commandExecutorCommand) continue;
-      item.tileRenderer.onFocusCommand = {
-        startInlinePlaybackCommand: {
-          blockAdoption: true, caption: false, delayMs: 3000, durationMs: 40000,
-          muted: false, restartPlaybackBeforeSeconds: 10, resumeVideo: true,
-          playbackEndpoint: watchEndpoint
-        }
-      };
-    }
+    try {
+      if (item.tileRenderer) {
+        const watchEndpoint = item.tileRenderer.onSelectCommand;
+        if (item.tileRenderer?.onFocusCommand?.playbackEndpoint) continue;
+        if (item.tileRenderer?.onFocusCommand?.commandExecutorCommand) continue;
+        item.tileRenderer.onFocusCommand = {
+          startInlinePlaybackCommand: {
+            blockAdoption: true, caption: false, delayMs: 3000, durationMs: 40000,
+            muted: false, restartPlaybackBeforeSeconds: 10, resumeVideo: true,
+            playbackEndpoint: watchEndpoint
+          }
+        };
+      }
+    } catch (_) { }
   }
 }
 
 // ===== deArrowify =====
+// FIX: Uses a concurrent request queue instead of a setTimeout stagger.
+// FIX: Falls back to onSelectCommand.watchEndpoint.videoId when contentId is missing or
+//      not an 11-character video ID — this fixes DeArrow not working on subscription
+//      page tiles where contentId may differ from the raw video ID (hqify already used
+//      this fallback, which is why HQ thumbnails worked on subscriptions but DeArrow did not).
 
 function deArrowify(items) {
   if (!Array.isArray(items)) return;
@@ -1318,37 +1368,50 @@ function deArrowify(items) {
     if (!item || typeof item !== 'object') continue;
     if (item.adSlotRenderer) { items.splice(i, 1); continue; }
     if (!item?.tileRenderer) continue;
-    if (configRead('enableDeArrow')) {
-      const capturedItem = item;
-      const videoID = capturedItem.tileRenderer.contentId;
-      // Skip playlists, channels — only real video IDs are 11 chars
-      if (!videoID || videoID.length !== 11) continue;
-      const delay = i * 80;
-      setTimeout(() => {
-        fetch(`https://sponsor.ajay.app/api/branding?videoID=${videoID}`)
-          .then(res => {
-            if (!res.ok) return null; // 404 = no DeArrow data, skip silently
-            return res.json();
-          })
-          .then(data => {
-            if (!data) return;
-            if (data.titles.length > 0) {
+    if (!configRead('enableDeArrow')) continue;
+
+    const capturedItem = item;
+    // FIX: use watchEndpoint videoId as fallback when contentId is absent or non-standard.
+    const videoID = String(
+      capturedItem.tileRenderer.contentId ||
+      capturedItem.tileRenderer.onSelectCommand?.watchEndpoint?.videoId ||
+      ''
+    );
+    if (!videoID || videoID.length !== 11) {
+      appendFileOnlyLog('dearrow.skip', { reason: 'no_video_id', contentId: capturedItem.tileRenderer.contentId || null });
+      continue;
+    }
+
+    _deArrowEnqueue(() =>
+      fetch(`https://sponsor.ajay.app/api/branding?videoID=${videoID}`)
+        .then(res => {
+          if (!res.ok) return null; // 404 = no DeArrow data, skip silently
+          return res.json();
+        })
+        .then(data => {
+          if (!data) return;
+          if (Array.isArray(data.titles) && data.titles.length > 0) {
+            try {
               const mostVoted = data.titles.reduce((max, title) => max.votes > title.votes ? max : title);
               capturedItem.tileRenderer.metadata.tileMetadataRenderer.title.simpleText = mostVoted.title;
-            }
-            if (data.thumbnails.length > 0 && configRead('enableDeArrowThumbnails')) {
+            } catch (_) { }
+          }
+          if (Array.isArray(data.thumbnails) && data.thumbnails.length > 0 && configRead('enableDeArrowThumbnails')) {
+            try {
               const mostVotedThumbnail = data.thumbnails.reduce((max, thumbnail) => max.votes > thumbnail.votes ? max : thumbnail);
-              if (mostVotedThumbnail.timestamp) {
+              if (mostVotedThumbnail.timestamp !== null && mostVotedThumbnail.timestamp !== undefined) {
                 capturedItem.tileRenderer.header.tileHeaderRenderer.thumbnail.thumbnails = [{
                   url: `https://dearrow-thumb.ajay.app/api/v1/getThumbnail?videoID=${videoID}&time=${mostVotedThumbnail.timestamp}`,
                   width: 1280, height: 640
                 }];
               }
-            }
-          })
-          .catch(() => { });
-      }, delay);
-    }
+            } catch (_) { }
+          }
+        })
+        .catch(err => {
+          appendFileOnlyLog('dearrow.fetch.error', { videoID, msg: String(err?.message || err) });
+        })
+    );
   }
 }
 
@@ -1356,20 +1419,22 @@ function deArrowify(items) {
 
 function hqify(items) {
   items.forEach((item, index) => {
-    if (!item.tileRenderer) return;
-    if (item.tileRenderer.style !== 'TILE_STYLE_YTLR_DEFAULT') return;
-    if (!configRead('enableHqThumbnails')) return;
-    const videoID = item.tileRenderer.onSelectCommand?.watchEndpoint?.videoId;
-    if (!videoID) return;
-    const existingUrl = item.tileRenderer.header?.tileHeaderRenderer?.thumbnail?.thumbnails?.[0]?.url;
-    if (!existingUrl) return;
-    const thumbs = item.tileRenderer.header.tileHeaderRenderer.thumbnail.thumbnails;
-    thumbs[0] = { url: `https://i.ytimg.com/vi/${videoID}/hqdefault.jpg`, width: 480, height: 360 };
-    setTimeout(() => {
-      fetch(`https://i.ytimg.com/vi/${videoID}/sddefault.jpg`, { method: 'HEAD' })
-        .then(res => { if (res.ok) thumbs[0] = { url: `https://i.ytimg.com/vi/${videoID}/sddefault.jpg`, width: 640, height: 480 }; })
-        .catch(() => {});
-    }, index * 50);
+    try {
+      if (!item.tileRenderer) return;
+      if (item.tileRenderer.style !== 'TILE_STYLE_YTLR_DEFAULT') return;
+      if (!configRead('enableHqThumbnails')) return;
+      const videoID = item.tileRenderer.onSelectCommand?.watchEndpoint?.videoId;
+      if (!videoID) return;
+      const existingUrl = item.tileRenderer.header?.tileHeaderRenderer?.thumbnail?.thumbnails?.[0]?.url;
+      if (!existingUrl) return;
+      const thumbs = item.tileRenderer.header.tileHeaderRenderer.thumbnail.thumbnails;
+      thumbs[0] = { url: `https://i.ytimg.com/vi/${videoID}/hqdefault.jpg`, width: 480, height: 360 };
+      setTimeout(() => {
+        fetch(`https://i.ytimg.com/vi/${videoID}/sddefault.jpg`, { method: 'HEAD' })
+          .then(res => { if (res.ok) thumbs[0] = { url: `https://i.ytimg.com/vi/${videoID}/sddefault.jpg`, width: 640, height: 480 }; })
+          .catch(() => {});
+      }, index * 50);
+    } catch (_) { }
   });
 }
 
@@ -1409,15 +1474,23 @@ function addLongPress(items) {
   }
 }
 
+// ===== filterShortsFromItems =====
+// FIX: The shorts.miss diagnostic log previously fired for EVERY non-Short video on
+// every shelf on every parse, causing massive log spam. It now only fires when an item
+// has characteristics that suggest it might be a misclassified Short (suspicious overlay
+// styles, portrait thumbnail ratio, or sub-3-minute duration). This preserves the
+// diagnostic value while eliminating noise.
+
 function filterShortsFromItems(items, pageName) {
   if (!Array.isArray(items) || configRead('enableShorts')) return items;
   const before = items.length;
   const filtered = items.filter(item => {
     const info = getShortInfo(item, { pageName });
     if (info.isShort) return false;
-    // keep existing shorts.miss diagnostic log
+
+    // Only emit a diagnostic log when the item has characteristics that suggest
+    // our Shorts detection might have missed it. Logging every kept item is pure noise.
     const r = item?.tileRenderer || item?.videoRenderer || item?.richItemRenderer?.content?.videoRenderer || null;
-    const rendererType = item ? Object.keys(item)[0] : 'none';
     const overlays = r?.header?.tileHeaderRenderer?.thumbnailOverlays || r?.thumbnailOverlays || [];
     const overlayStyles = Array.isArray(overlays)
       ? overlays.map(o => o?.thumbnailOverlayTimeStatusRenderer?.style).filter(Boolean)
@@ -1426,11 +1499,29 @@ function filterShortsFromItems(items, pageName) {
     const thumbnailRatios = thumbnails
       .map(t => { const w = Number(t?.width), h = Number(t?.height); return (w > 0 && Number.isFinite(w) && Number.isFinite(h)) ? Number((h/w).toFixed(3)) : null; })
       .filter(v => v !== null).slice(0, 6);
-    const lines = r?.metadata?.tileMetadataRenderer?.lines;
-    const lineTexts = Array.isArray(lines)
-      ? lines.flatMap(l => (l?.lineRenderer?.items||[]).map(li => li?.lineItemRenderer?.text?.simpleText).filter(Boolean))
-      : [];
-    appendFileOnlyLog('shorts.miss', { reason: info.reason, title: info.title, rendererType, shelfType: r?.tvhtml5ShelfRendererType||null, overlayStyles, lengthText: info.lengthText||null, lineTexts, thumbnailRatios, hasReelCmd: !!(r?.onSelectCommand?.reelWatchEndpoint) });
+
+    const hasSuspiciousOverlay = overlayStyles.length > 0;
+    const hasSuspiciousRatio = thumbnailRatios.some(r => r > 1.4); // portrait
+    const hasSuspiciousDuration = typeof info.totalSeconds === 'number' && info.totalSeconds <= 180;
+
+    if (hasSuspiciousOverlay || hasSuspiciousRatio || hasSuspiciousDuration) {
+      const rendererType = item ? Object.keys(item)[0] : 'none';
+      const lines = r?.metadata?.tileMetadataRenderer?.lines;
+      const lineTexts = Array.isArray(lines)
+        ? lines.flatMap(l => (l?.lineRenderer?.items||[]).map(li => li?.lineItemRenderer?.text?.simpleText).filter(Boolean))
+        : [];
+      appendFileOnlyLog('shorts.miss', {
+        reason: info.reason,
+        title: info.title,
+        rendererType,
+        shelfType: r?.tvhtml5ShelfRendererType || null,
+        overlayStyles,
+        lengthText: info.lengthText || null,
+        lineTexts,
+        thumbnailRatios,
+        hasReelCmd: !!(r?.onSelectCommand?.reelWatchEndpoint),
+      });
+    }
     return true;
   });
   if (before !== filtered.length)
