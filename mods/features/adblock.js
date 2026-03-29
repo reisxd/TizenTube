@@ -13,7 +13,7 @@ import {
   consolidateShelves,
 } from './hideWatched.js';
 
-// ===== Local utilities (not exported from hideWatched.js) =====
+// ===== Local utilities =====
 
 function collectAllText(node, out = [], seen = new WeakSet(), depth = 0) {
   if (depth > 12) return out;
@@ -48,7 +48,6 @@ function getItemVideoId(item) {
   );
 }
 
-// Shared duration parser — handles "M:SS" and "H:MM:SS".
 function parseDurationToSeconds(lengthText) {
   const parts = String(lengthText).trim().split(':').map((p) => Number(p));
   if (parts.some((p) => Number.isNaN(p))) return null;
@@ -102,8 +101,6 @@ function getThumbnailCandidates(renderer, item) {
   ];
 }
 
-// Comprehensive Shorts detection.
-// Returns { isShort, reason, title, lengthText, totalSeconds }.
 function getShortInfo(item, opts = {}) {
   const { pageName = null } = opts;
   if (!item) return { isShort: false, reason: 'no_item', title: 'unknown' };
@@ -114,12 +111,10 @@ function getShortInfo(item, opts = {}) {
     || item?.richItemRenderer?.content?.videoRenderer?.title?.runs?.[0]?.text
     || 'unknown';
 
-  // reel items are always Shorts
   if (item.reelItemRenderer || item.richItemRenderer?.content?.reelItemRenderer) {
     return { isShort: true, reason: 'reel', title };
   }
 
-  // Resolve the concrete renderer from all known shapes
   const renderer = item.tileRenderer
     || item.videoRenderer
     || item.playlistVideoRenderer
@@ -208,7 +203,6 @@ function getShortInfo(item, opts = {}) {
 
   return { isShort: false, reason: 'duration_only_not_used', title, lengthText, totalSeconds };
 }
-
 
 function collectWatchProgressEntries(node, out = [], depth = 0, seen = new WeakSet()) {
   if (!node || depth > 10) return out;
@@ -700,7 +694,7 @@ function filterPlaylistRendererContents(playlistRenderer, pageName, label = 'pla
   appendFileOnlyLog(`${label}.result`, { pageName, hasContinuation, before, after: playlistRenderer.contents.length });
 }
 
-// ===== processResponsePayload (for array-root responses) =====
+// ===== processResponsePayload (array-root responses) =====
 
 function processResponsePayload(payload, detectedPage) {
   if (!payload || typeof payload !== 'object') return;
@@ -708,14 +702,13 @@ function processResponsePayload(payload, detectedPage) {
   if (payload?.contents?.sectionListRenderer?.contents) {
     const slr = payload.contents.sectionListRenderer;
     processShelves(slr.contents, true, detectedPage);
-    consolidateShelves(slr.contents, 'arrayPayload.sectionList', detectedPage, !!slr.continuations);
+    consolidateShelves(slr.contents, 'arrayPayload.sectionList', detectedPage, !!slr.continuations, filterShortsFromItems);
   }
 
   if (payload?.contents?.tvBrowseRenderer?.content?.tvSurfaceContentRenderer?.content?.sectionListRenderer?.contents) {
-    // FIX: Extract the sectionListRenderer object so we can read .continuations for hasContinuation.
     const tvBrowseSlr = payload.contents.tvBrowseRenderer.content.tvSurfaceContentRenderer.content.sectionListRenderer;
     processShelves(tvBrowseSlr.contents, true, detectedPage);
-    consolidateShelves(tvBrowseSlr.contents, 'arrayPayload.tvBrowse.sectionList', detectedPage, !!tvBrowseSlr.continuations);
+    consolidateShelves(tvBrowseSlr.contents, 'arrayPayload.tvBrowse.sectionList', detectedPage, !!tvBrowseSlr.continuations, filterShortsFromItems);
   }
 
   if (payload?.contents?.tvBrowseRenderer?.content?.tvSurfaceContentRenderer?.content?.gridRenderer?.items) {
@@ -727,7 +720,7 @@ function processResponsePayload(payload, detectedPage) {
   if (payload?.continuationContents?.sectionListContinuation?.contents) {
     const slc = payload.continuationContents.sectionListContinuation;
     processShelves(slc.contents, true, detectedPage);
-    consolidateShelves(slc.contents, 'arrayPayload.continuation.sectionList', detectedPage, !!slc.continuations);
+    consolidateShelves(slc.contents, 'arrayPayload.continuation.sectionList', detectedPage, !!slc.continuations, filterShortsFromItems);
   }
 
   if (payload?.continuationContents?.horizontalListContinuation?.items) {
@@ -759,9 +752,7 @@ function processResponsePayload(payload, detectedPage) {
 }
 
 // ===== DeArrow request queue =====
-// Limits concurrent DeArrow fetch requests to avoid overwhelming the network stack on
-// Tizen 5.5 and other resource-constrained devices. Replaces the old setTimeout stagger
-// which gave no backpressure and didn't handle slow or failing requests gracefully.
+
 const _deArrowQueue = [];
 let _deArrowInFlight = 0;
 const _DEARROW_MAX_CONCURRENT = 5;
@@ -773,10 +764,7 @@ function _deArrowRunNext() {
   try {
     const result = task();
     if (result && typeof result.finally === 'function') {
-      result.finally(() => {
-        _deArrowInFlight--;
-        _deArrowRunNext();
-      });
+      result.finally(() => { _deArrowInFlight--; _deArrowRunNext(); });
     } else {
       _deArrowInFlight--;
       _deArrowRunNext();
@@ -804,7 +792,6 @@ JSON.parse = function () {
 
     appendFileOnlyLog('parse.begin', { detectedPage, hash: location.hash || '' });
 
-    // Array-root responses
     if (Array.isArray(r)) {
       for (let i = 0; i < r.length; i++) processResponsePayload(r[i], detectedPage);
       return r;
@@ -812,12 +799,10 @@ JSON.parse = function () {
 
     const adBlockEnabled = configRead('enableAdBlock');
 
-    // === Ads (needed on all pages) ===
     if (r.adPlacements && adBlockEnabled) r.adPlacements = [];
     if (r.playerAds && adBlockEnabled) r.playerAds = false;
     if (r.adSlots && adBlockEnabled) r.adSlots = [];
 
-    // === Watch progress entity cache ===
     if (r?.frameworkUpdates?.entityBatchUpdate?.mutations) {
       if (!window._ttVideoProgressCache) window._ttVideoProgressCache = {};
       for (const mutation of r.frameworkUpdates.entityBatchUpdate.mutations) {
@@ -868,7 +853,6 @@ JSON.parse = function () {
         } catch (_) { }
       }
 
-      // SponsorBlock
       if (configRead('sponsorBlockManualSkips').length > 0 && r?.playerOverlays?.playerOverlayRenderer) {
         try {
           const manualSkippedSegments = configRead('sponsorBlockManualSkips');
@@ -905,17 +889,15 @@ JSON.parse = function () {
         } catch (_) { }
       }
 
-      // watchNext initial load
       if (r?.contents?.singleColumnWatchNextResults?.pivot?.sectionListRenderer) {
         try {
           const signinReminderEnabled = configRead('enableSigninReminder');
-          // FIX: Extract sectionListRenderer to read .continuations for hasContinuation.
           const watchNextSlr = r.contents.singleColumnWatchNextResults.pivot.sectionListRenderer;
           if (!signinReminderEnabled) {
             watchNextSlr.contents = watchNextSlr.contents.filter(elm => !elm.alertWithActionsRenderer);
           }
           processShelves(watchNextSlr.contents, false, detectedPage);
-          consolidateShelves(watchNextSlr.contents, 'watchNext', detectedPage, !!watchNextSlr.continuations);
+          consolidateShelves(watchNextSlr.contents, 'watchNext', detectedPage, !!watchNextSlr.continuations, filterShortsFromItems);
           if (window.queuedVideos.videos.length > 0) {
             const queuedVideosClone = window.queuedVideos.videos.slice();
             queuedVideosClone.unshift(TileRenderer('Clear Queue', { customAction: { action: 'CLEAR_QUEUE' } }));
@@ -930,11 +912,10 @@ JSON.parse = function () {
         } catch (_) { }
       }
 
-      // watchNext scroll-down continuations — filter watched/shorts, skip hqify/deArrowify
       if (r?.continuationContents?.sectionListContinuation?.contents) {
         const wNextSlc = r.continuationContents.sectionListContinuation;
         processShelves(wNextSlc.contents, false, detectedPage);
-        consolidateShelves(wNextSlc.contents, 'watchNext.continuation.sectionList', detectedPage, !!wNextSlc.continuations);
+        consolidateShelves(wNextSlc.contents, 'watchNext.continuation.sectionList', detectedPage, !!wNextSlc.continuations, filterShortsFromItems);
       }
 
       if (r?.continuationContents?.horizontalListContinuation?.items) {
@@ -947,7 +928,7 @@ JSON.parse = function () {
       if (r?.continuationContents?.pivotContinuation?.contents) {
         const wNextPivot = r.continuationContents.pivotContinuation;
         processShelves(wNextPivot.contents, false, detectedPage);
-        consolidateShelves(wNextPivot.contents, 'watchNext.continuation.pivot', detectedPage, !!wNextPivot.continuations);
+        consolidateShelves(wNextPivot.contents, 'watchNext.continuation.pivot', detectedPage, !!wNextPivot.continuations, filterShortsFromItems);
       }
 
       return r;
@@ -971,9 +952,7 @@ JSON.parse = function () {
       } catch (_) { }
     }
 
-    // === Home screen (tvBrowse sectionList) ===
     if (r?.contents?.tvBrowseRenderer?.content?.tvSurfaceContentRenderer?.content?.sectionListRenderer?.contents) {
-      // FIX: Extract the sectionListRenderer to read .continuations for hasContinuation.
       const tvBrowseMainSlr = r.contents.tvBrowseRenderer.content.tvSurfaceContentRenderer.content.sectionListRenderer;
       if (!signinReminderEnabled) {
         tvBrowseMainSlr.contents = tvBrowseMainSlr.contents.filter(elm => !elm.feedNudgeRenderer);
@@ -990,7 +969,7 @@ JSON.parse = function () {
         }
       }
       processShelves(tvBrowseMainSlr.contents, true, detectedPage);
-      consolidateShelves(tvBrowseMainSlr.contents, 'tvBrowse.sectionList', detectedPage, !!tvBrowseMainSlr.continuations);
+      consolidateShelves(tvBrowseMainSlr.contents, 'tvBrowse.sectionList', detectedPage, !!tvBrowseMainSlr.continuations, filterShortsFromItems);
     }
 
     if (r.endscreen && configRead('enableHideEndScreenCards')) r.endscreen = null;
@@ -1005,13 +984,11 @@ JSON.parse = function () {
 
     if (r?.title?.runs) PatchSettings(r);
 
-    // === sectionListRenderer ===
     if (r?.contents?.sectionListRenderer?.contents) {
       processShelves(r.contents.sectionListRenderer.contents, true, detectedPage);
-      consolidateShelves(r.contents.sectionListRenderer.contents, 'sectionList', detectedPage, !!r.contents.sectionListRenderer.continuations);
+      consolidateShelves(r.contents.sectionListRenderer.contents, 'sectionList', detectedPage, !!r.contents.sectionListRenderer.continuations, filterShortsFromItems);
     }
 
-    // tvBrowse top-level gridRenderer
     if (r?.contents?.tvBrowseRenderer?.content?.tvSurfaceContentRenderer?.content?.gridRenderer?.items) {
       const grid = r.contents.tvBrowseRenderer.content.tvSurfaceContentRenderer.content.gridRenderer;
       let gridItems = hideVideo(grid.items, detectedPage);
@@ -1020,28 +997,24 @@ JSON.parse = function () {
       normalizeGridRenderer(grid, 'contents.tvBrowseRenderer.grid');
     }
 
-    // === Playlist renderer (top-level) ===
     const topPlaylistRenderer = r?.contents?.tvBrowseRenderer?.content?.tvSurfaceContentRenderer?.content?.twoColumnRenderer?.rightColumn?.playlistVideoListRenderer;
     if (topPlaylistRenderer?.contents) {
       filterPlaylistRendererContents(topPlaylistRenderer, detectedPage, 'playlist.renderer');
     }
 
-    // === sectionListContinuation ===
     if (r?.continuationContents?.sectionListContinuation?.contents) {
       const contSlc = r.continuationContents.sectionListContinuation;
       processShelves(contSlc.contents, false, detectedPage);
-      consolidateShelves(contSlc.contents, 'continuation.sectionList', detectedPage, !!contSlc.continuations);
+      consolidateShelves(contSlc.contents, 'continuation.sectionList', detectedPage, !!contSlc.continuations, filterShortsFromItems);
     }
 
-    // === pivotContinuation ===
     if (r?.continuationContents?.pivotContinuation?.contents) {
       const contPivot = r.continuationContents.pivotContinuation;
       appendFileOnlyLog('pivot.continuation.hit', { count: contPivot.contents.length });
       processShelves(contPivot.contents, false, detectedPage);
-      consolidateShelves(contPivot.contents, 'continuation.pivot', detectedPage, !!contPivot.continuations);
+      consolidateShelves(contPivot.contents, 'continuation.pivot', detectedPage, !!contPivot.continuations, filterShortsFromItems);
     }
 
-    // === horizontalListContinuation ===
     if (r?.continuationContents?.horizontalListContinuation?.items) {
       const continuation = r.continuationContents.horizontalListContinuation;
       deArrowify(continuation.items);
@@ -1051,14 +1024,12 @@ JSON.parse = function () {
       normalizeHorizontalListRenderer(continuation, 'continuation.horizontal');
     }
 
-    // === gridContinuation ===
     if (r?.continuationContents?.gridContinuation?.items) {
       const gc = r.continuationContents.gridContinuation;
       gc.items = filterContinuationItems(gc.items, detectedPage, !!gc?.continuations, 'gridContinuation');
       normalizeGridRenderer(gc, 'continuation.grid');
     }
 
-    // === playlistVideoListContinuation ===
     if (r?.continuationContents?.playlistVideoListContinuation?.contents) {
       const plc = r.continuationContents.playlistVideoListContinuation;
       const hasContinuation = !!plc?.continuations;
@@ -1066,7 +1037,6 @@ JSON.parse = function () {
       plc.contents = filterContinuationItems(plc.contents, detectedPage, hasContinuation, 'playlist.continuation');
     }
 
-    // === Tab sections ===
     if (r?.contents?.tvBrowseRenderer?.content?.tvSecondaryNavRenderer?.sections) {
       for (const section of r.contents.tvBrowseRenderer.content.tvSecondaryNavRenderer.sections) {
         if (!Array.isArray(section?.tvSecondaryNavSectionRenderer?.tabs)) continue;
@@ -1109,11 +1079,16 @@ JSON.parse = function () {
             else if (tabBrowseId === 'feplaylist_aggregation') tabPage = 'playlists';
             else if (tabBrowseId === 'femy_youtube' || tabBrowseId === 'vlwl' || tabBrowseId === 'vlll' || tabBrowseId.startsWith('vlpl')) tabPage = 'playlist';
 
-            // FIX: Extract the sectionListRenderer so we can read .continuations for hasContinuation.
+            // The tab path includes the browseId so each channel tab gets a distinct
+            // carryover key. Continuation batches for this tab will come through
+            // 'continuation.sectionList' (not a 'tab.' path), which still correctly
+            // applies the stored carryover as long as the user hasn't switched tabs.
+            const tabPath = `tab.${tabBrowseId || 'unknown'}`;
+
             const tabSlr = tab?.tabRenderer?.content?.tvSurfaceContentRenderer?.content?.sectionListRenderer;
             if (tabSlr && Array.isArray(tabSlr.contents)) {
               processShelves(tabSlr.contents, true, tabPage);
-              consolidateShelves(tabSlr.contents, `tab.${tabBrowseId || 'unknown'}`, tabPage, !!tabSlr.continuations);
+              consolidateShelves(tabSlr.contents, tabPath, tabPage, !!tabSlr.continuations, filterShortsFromItems);
             }
 
             const tabGridItems = tab?.tabRenderer?.content?.tvSurfaceContentRenderer?.content?.gridRenderer?.items;
@@ -1135,7 +1110,6 @@ JSON.parse = function () {
       }
     }
 
-    // === Watch Next (non-watch page, e.g. mini-player) ===
     if (r?.contents?.singleColumnWatchNextResults) {
       appendFileOnlyLog('watchNext.shape', {
         hasPivot: !!r.contents.singleColumnWatchNextResults.pivot,
@@ -1145,13 +1119,12 @@ JSON.parse = function () {
 
     if (r?.contents?.singleColumnWatchNextResults?.pivot?.sectionListRenderer) {
       try {
-        // FIX: Extract sectionListRenderer to read .continuations for hasContinuation.
         const nonWatchWnSlr = r.contents.singleColumnWatchNextResults.pivot.sectionListRenderer;
         if (!signinReminderEnabled) {
           nonWatchWnSlr.contents = nonWatchWnSlr.contents.filter(elm => !elm.alertWithActionsRenderer);
         }
         processShelves(nonWatchWnSlr.contents, false, detectedPage);
-        consolidateShelves(nonWatchWnSlr.contents, 'watchNext', detectedPage, !!nonWatchWnSlr.continuations);
+        consolidateShelves(nonWatchWnSlr.contents, 'watchNext', detectedPage, !!nonWatchWnSlr.continuations, filterShortsFromItems);
         if (window.queuedVideos.videos.length > 0) {
           const queuedVideosClone = window.queuedVideos.videos.slice();
           queuedVideosClone.unshift(TileRenderer('Clear Queue', { customAction: { action: 'CLEAR_QUEUE' } }));
@@ -1166,7 +1139,6 @@ JSON.parse = function () {
       } catch (_) { }
     }
 
-    // === SponsorBlock ===
     if (configRead('sponsorBlockManualSkips').length > 0 && r?.playerOverlays?.playerOverlayRenderer) {
       try {
         const manualSkippedSegments = configRead('sponsorBlockManualSkips');
@@ -1203,7 +1175,6 @@ JSON.parse = function () {
       } catch (_) { }
     }
 
-    // === Safety net deep scan (non-watch pages only) ===
     processTileArraysDeep(r, detectedPage, 'response', 0, filterShortsFromItems);
 
     return r;
@@ -1219,10 +1190,6 @@ JSON.parse = function () {
 
 window.JSON.parse = JSON.parse;
 
-// Patch all _yttv sandbox JSON instances.
-// FIX: Run immediately and also retry with an interval, because on slower devices
-// (Tizen 5.5) _yttv may not be fully populated at module evaluation time.
-// Without this, some sandbox instances get unfiltered ad/shorts data.
 function _patchYttvJsonParse() {
   let patched = 0;
   try {
@@ -1238,7 +1205,6 @@ function _patchYttvJsonParse() {
 
 _patchYttvJsonParse();
 
-// Keep retrying until we either patch something or time out at 15 seconds.
 const _yttvPatchInterval = setInterval(() => {
   try {
     if (!window._yttv || !Object.keys(window._yttv).length) return;
@@ -1288,10 +1254,6 @@ function processShelves(shelves, shouldAddPreviews = true, pageHint = null) {
       if (!configRead('enableShorts')) {
         if (isShortsShelf(shelve)) { shelves.splice(i, 1); continue; }
 
-        // Filter Shorts from ALL content list types within this shelf.
-        // FIX: Uses the module-level filterShortsFromItems instead of a per-call closure,
-        // eliminating duplicate logic and the shorts.miss log spam that fired for every
-        // non-Short item in every shelf on every parse.
         const base = shelve?.richSectionRenderer?.content || shelve;
 
         if (Array.isArray(base?.shelfRenderer?.content?.horizontalListRenderer?.items)) {
@@ -1319,9 +1281,6 @@ function processShelves(shelves, shouldAddPreviews = true, pageHint = null) {
           base.reelShelfRenderer.items = filterShortsFromItems(base.reelShelfRenderer.items, activePage);
         }
 
-        // FIX: Check ALL content containers for emptiness, not only horizontalListRenderer.
-        // Previously only the horizontal list was checked, leaving empty shelf wrappers
-        // when verticalListRenderer / gridRenderer / etc. were the actual content.
         const contentArrays = [
           base?.shelfRenderer?.content?.horizontalListRenderer?.items,
           base?.shelfRenderer?.content?.verticalListRenderer?.items,
@@ -1337,7 +1296,6 @@ function processShelves(shelves, shouldAddPreviews = true, pageHint = null) {
         }
       }
 
-      // Standard empty-shelf check (when Shorts filtering is disabled).
       if (shelve.shelfRenderer.content.horizontalListRenderer.items.length === 0) {
         shelves.splice(i, 1);
       }
@@ -1370,11 +1328,6 @@ function addPreviews(items) {
 }
 
 // ===== deArrowify =====
-// FIX: Uses a concurrent request queue instead of a setTimeout stagger.
-// FIX: Falls back to onSelectCommand.watchEndpoint.videoId when contentId is missing or
-//      not an 11-character video ID — this fixes DeArrow not working on subscription
-//      page tiles where contentId may differ from the raw video ID (hqify already used
-//      this fallback, which is why HQ thumbnails worked on subscriptions but DeArrow did not).
 
 function deArrowify(items) {
   if (!Array.isArray(items)) return;
@@ -1386,7 +1339,6 @@ function deArrowify(items) {
     if (!configRead('enableDeArrow')) continue;
 
     const capturedItem = item;
-    // FIX: use watchEndpoint videoId as fallback when contentId is absent or non-standard.
     const videoID = String(
       capturedItem.tileRenderer.contentId ||
       capturedItem.tileRenderer.onSelectCommand?.watchEndpoint?.videoId ||
@@ -1400,7 +1352,7 @@ function deArrowify(items) {
     _deArrowEnqueue(() =>
       fetch(`https://sponsor.ajay.app/api/branding?videoID=${videoID}`)
         .then(res => {
-          if (!res.ok) return null; // 404 = no DeArrow data, skip silently
+          if (!res.ok) return null;
           return res.json();
         })
         .then(data => {
@@ -1490,11 +1442,6 @@ function addLongPress(items) {
 }
 
 // ===== filterShortsFromItems =====
-// FIX: The shorts.miss diagnostic log previously fired for EVERY non-Short video on
-// every shelf on every parse, causing massive log spam. It now only fires when an item
-// has characteristics that suggest it might be a misclassified Short (suspicious overlay
-// styles, portrait thumbnail ratio, or sub-3-minute duration). This preserves the
-// diagnostic value while eliminating noise.
 
 function filterShortsFromItems(items, pageName) {
   if (!Array.isArray(items) || configRead('enableShorts')) return items;
@@ -1503,8 +1450,6 @@ function filterShortsFromItems(items, pageName) {
     const info = getShortInfo(item, { pageName });
     if (info.isShort) return false;
 
-    // Only emit a diagnostic log when the item has characteristics that suggest
-    // our Shorts detection might have missed it. Logging every kept item is pure noise.
     const r = item?.tileRenderer || item?.videoRenderer || item?.richItemRenderer?.content?.videoRenderer || null;
     const overlays = r?.header?.tileHeaderRenderer?.thumbnailOverlays || r?.thumbnailOverlays || [];
     const overlayStyles = Array.isArray(overlays)
@@ -1516,7 +1461,7 @@ function filterShortsFromItems(items, pageName) {
       .filter(v => v !== null).slice(0, 6);
 
     const hasSuspiciousOverlay = overlayStyles.length > 0;
-    const hasSuspiciousRatio = thumbnailRatios.some(r => r > 1.4); // portrait
+    const hasSuspiciousRatio = thumbnailRatios.some(r => r > 1.4);
     const hasSuspiciousDuration = typeof info.totalSeconds === 'number' && info.totalSeconds <= 180;
 
     if (hasSuspiciousOverlay || hasSuspiciousRatio || hasSuspiciousDuration) {
