@@ -706,14 +706,16 @@ function processResponsePayload(payload, detectedPage) {
   if (!payload || typeof payload !== 'object') return;
 
   if (payload?.contents?.sectionListRenderer?.contents) {
-    processShelves(payload.contents.sectionListRenderer.contents, true, detectedPage);
-    consolidateShelves(payload.contents.sectionListRenderer.contents, 'arrayPayload.sectionList', detectedPage);
+    const slr = payload.contents.sectionListRenderer;
+    processShelves(slr.contents, true, detectedPage);
+    consolidateShelves(slr.contents, 'arrayPayload.sectionList', detectedPage, !!slr.continuations);
   }
 
   if (payload?.contents?.tvBrowseRenderer?.content?.tvSurfaceContentRenderer?.content?.sectionListRenderer?.contents) {
-    const contents = payload.contents.tvBrowseRenderer.content.tvSurfaceContentRenderer.content.sectionListRenderer.contents;
-    processShelves(contents, true, detectedPage);
-    consolidateShelves(contents, 'arrayPayload.tvBrowse.sectionList', detectedPage);
+    // FIX: Extract the sectionListRenderer object so we can read .continuations for hasContinuation.
+    const tvBrowseSlr = payload.contents.tvBrowseRenderer.content.tvSurfaceContentRenderer.content.sectionListRenderer;
+    processShelves(tvBrowseSlr.contents, true, detectedPage);
+    consolidateShelves(tvBrowseSlr.contents, 'arrayPayload.tvBrowse.sectionList', detectedPage, !!tvBrowseSlr.continuations);
   }
 
   if (payload?.contents?.tvBrowseRenderer?.content?.tvSurfaceContentRenderer?.content?.gridRenderer?.items) {
@@ -723,8 +725,9 @@ function processResponsePayload(payload, detectedPage) {
   }
 
   if (payload?.continuationContents?.sectionListContinuation?.contents) {
-    processShelves(payload.continuationContents.sectionListContinuation.contents, true, detectedPage);
-    consolidateShelves(payload.continuationContents.sectionListContinuation.contents, 'arrayPayload.continuation.sectionList', detectedPage);
+    const slc = payload.continuationContents.sectionListContinuation;
+    processShelves(slc.contents, true, detectedPage);
+    consolidateShelves(slc.contents, 'arrayPayload.continuation.sectionList', detectedPage, !!slc.continuations);
   }
 
   if (payload?.continuationContents?.horizontalListContinuation?.items) {
@@ -906,16 +909,17 @@ JSON.parse = function () {
       if (r?.contents?.singleColumnWatchNextResults?.pivot?.sectionListRenderer) {
         try {
           const signinReminderEnabled = configRead('enableSigninReminder');
+          // FIX: Extract sectionListRenderer to read .continuations for hasContinuation.
+          const watchNextSlr = r.contents.singleColumnWatchNextResults.pivot.sectionListRenderer;
           if (!signinReminderEnabled) {
-            r.contents.singleColumnWatchNextResults.pivot.sectionListRenderer.contents =
-              r.contents.singleColumnWatchNextResults.pivot.sectionListRenderer.contents.filter(elm => !elm.alertWithActionsRenderer);
+            watchNextSlr.contents = watchNextSlr.contents.filter(elm => !elm.alertWithActionsRenderer);
           }
-          processShelves(r.contents.singleColumnWatchNextResults.pivot.sectionListRenderer.contents, false, detectedPage);
-          consolidateShelves(r.contents.singleColumnWatchNextResults.pivot.sectionListRenderer.contents, 'watchNext', detectedPage);
+          processShelves(watchNextSlr.contents, false, detectedPage);
+          consolidateShelves(watchNextSlr.contents, 'watchNext', detectedPage, !!watchNextSlr.continuations);
           if (window.queuedVideos.videos.length > 0) {
             const queuedVideosClone = window.queuedVideos.videos.slice();
             queuedVideosClone.unshift(TileRenderer('Clear Queue', { customAction: { action: 'CLEAR_QUEUE' } }));
-            r.contents.singleColumnWatchNextResults.pivot.sectionListRenderer.contents.unshift(ShelfRenderer(
+            watchNextSlr.contents.unshift(ShelfRenderer(
               'Queued Videos',
               queuedVideosClone,
               queuedVideosClone.findIndex(v => v.contentId === window.queuedVideos.lastVideoId) !== -1
@@ -928,8 +932,9 @@ JSON.parse = function () {
 
       // watchNext scroll-down continuations — filter watched/shorts, skip hqify/deArrowify
       if (r?.continuationContents?.sectionListContinuation?.contents) {
-        processShelves(r.continuationContents.sectionListContinuation.contents, false, detectedPage);
-        consolidateShelves(r.continuationContents.sectionListContinuation.contents, 'watchNext.continuation.sectionList', detectedPage);
+        const wNextSlc = r.continuationContents.sectionListContinuation;
+        processShelves(wNextSlc.contents, false, detectedPage);
+        consolidateShelves(wNextSlc.contents, 'watchNext.continuation.sectionList', detectedPage, !!wNextSlc.continuations);
       }
 
       if (r?.continuationContents?.horizontalListContinuation?.items) {
@@ -940,8 +945,9 @@ JSON.parse = function () {
       }
 
       if (r?.continuationContents?.pivotContinuation?.contents) {
-        processShelves(r.continuationContents.pivotContinuation.contents, false, detectedPage);
-        consolidateShelves(r.continuationContents.pivotContinuation.contents, 'watchNext.continuation.pivot', detectedPage);
+        const wNextPivot = r.continuationContents.pivotContinuation;
+        processShelves(wNextPivot.contents, false, detectedPage);
+        consolidateShelves(wNextPivot.contents, 'watchNext.continuation.pivot', detectedPage, !!wNextPivot.continuations);
       }
 
       return r;
@@ -967,15 +973,14 @@ JSON.parse = function () {
 
     // === Home screen (tvBrowse sectionList) ===
     if (r?.contents?.tvBrowseRenderer?.content?.tvSurfaceContentRenderer?.content?.sectionListRenderer?.contents) {
-      const contents = r.contents.tvBrowseRenderer.content.tvSurfaceContentRenderer.content.sectionListRenderer.contents;
+      // FIX: Extract the sectionListRenderer to read .continuations for hasContinuation.
+      const tvBrowseMainSlr = r.contents.tvBrowseRenderer.content.tvSurfaceContentRenderer.content.sectionListRenderer;
       if (!signinReminderEnabled) {
-        r.contents.tvBrowseRenderer.content.tvSurfaceContentRenderer.content.sectionListRenderer.contents =
-          contents.filter(elm => !elm.feedNudgeRenderer);
+        tvBrowseMainSlr.contents = tvBrowseMainSlr.contents.filter(elm => !elm.feedNudgeRenderer);
       }
       if (adBlockEnabled) {
-        r.contents.tvBrowseRenderer.content.tvSurfaceContentRenderer.content.sectionListRenderer.contents =
-          r.contents.tvBrowseRenderer.content.tvSurfaceContentRenderer.content.sectionListRenderer.contents.filter(elm => !elm.adSlotRenderer);
-        for (const shelve of r.contents.tvBrowseRenderer.content.tvSurfaceContentRenderer.content.sectionListRenderer.contents) {
+        tvBrowseMainSlr.contents = tvBrowseMainSlr.contents.filter(elm => !elm.adSlotRenderer);
+        for (const shelve of tvBrowseMainSlr.contents) {
           if (shelve.shelfRenderer) {
             try {
               shelve.shelfRenderer.content.horizontalListRenderer.items =
@@ -984,8 +989,8 @@ JSON.parse = function () {
           }
         }
       }
-      processShelves(r.contents.tvBrowseRenderer.content.tvSurfaceContentRenderer.content.sectionListRenderer.contents, true, detectedPage);
-      consolidateShelves(r.contents.tvBrowseRenderer.content.tvSurfaceContentRenderer.content.sectionListRenderer.contents, 'tvBrowse.sectionList', detectedPage);
+      processShelves(tvBrowseMainSlr.contents, true, detectedPage);
+      consolidateShelves(tvBrowseMainSlr.contents, 'tvBrowse.sectionList', detectedPage, !!tvBrowseMainSlr.continuations);
     }
 
     if (r.endscreen && configRead('enableHideEndScreenCards')) r.endscreen = null;
@@ -1003,7 +1008,7 @@ JSON.parse = function () {
     // === sectionListRenderer ===
     if (r?.contents?.sectionListRenderer?.contents) {
       processShelves(r.contents.sectionListRenderer.contents, true, detectedPage);
-      consolidateShelves(r.contents.sectionListRenderer.contents, 'sectionList', detectedPage);
+      consolidateShelves(r.contents.sectionListRenderer.contents, 'sectionList', detectedPage, !!r.contents.sectionListRenderer.continuations);
     }
 
     // tvBrowse top-level gridRenderer
@@ -1023,15 +1028,17 @@ JSON.parse = function () {
 
     // === sectionListContinuation ===
     if (r?.continuationContents?.sectionListContinuation?.contents) {
-      processShelves(r.continuationContents.sectionListContinuation.contents, false, detectedPage);
-      consolidateShelves(r.continuationContents.sectionListContinuation.contents, 'continuation.sectionList', detectedPage);
+      const contSlc = r.continuationContents.sectionListContinuation;
+      processShelves(contSlc.contents, false, detectedPage);
+      consolidateShelves(contSlc.contents, 'continuation.sectionList', detectedPage, !!contSlc.continuations);
     }
 
     // === pivotContinuation ===
     if (r?.continuationContents?.pivotContinuation?.contents) {
-      appendFileOnlyLog('pivot.continuation.hit', { count: r.continuationContents.pivotContinuation.contents.length });
-      processShelves(r.continuationContents.pivotContinuation.contents, false, detectedPage);
-      consolidateShelves(r.continuationContents.pivotContinuation.contents, 'continuation.pivot', detectedPage);
+      const contPivot = r.continuationContents.pivotContinuation;
+      appendFileOnlyLog('pivot.continuation.hit', { count: contPivot.contents.length });
+      processShelves(contPivot.contents, false, detectedPage);
+      consolidateShelves(contPivot.contents, 'continuation.pivot', detectedPage, !!contPivot.continuations);
     }
 
     // === horizontalListContinuation ===
@@ -1102,10 +1109,11 @@ JSON.parse = function () {
             else if (tabBrowseId === 'feplaylist_aggregation') tabPage = 'playlists';
             else if (tabBrowseId === 'femy_youtube' || tabBrowseId === 'vlwl' || tabBrowseId === 'vlll' || tabBrowseId.startsWith('vlpl')) tabPage = 'playlist';
 
-            const tabSectionList = tab?.tabRenderer?.content?.tvSurfaceContentRenderer?.content?.sectionListRenderer?.contents;
-            if (Array.isArray(tabSectionList)) {
-              processShelves(tabSectionList, true, tabPage);
-              consolidateShelves(tabSectionList, `tab.${tabBrowseId || 'unknown'}`, tabPage);
+            // FIX: Extract the sectionListRenderer so we can read .continuations for hasContinuation.
+            const tabSlr = tab?.tabRenderer?.content?.tvSurfaceContentRenderer?.content?.sectionListRenderer;
+            if (tabSlr && Array.isArray(tabSlr.contents)) {
+              processShelves(tabSlr.contents, true, tabPage);
+              consolidateShelves(tabSlr.contents, `tab.${tabBrowseId || 'unknown'}`, tabPage, !!tabSlr.continuations);
             }
 
             const tabGridItems = tab?.tabRenderer?.content?.tvSurfaceContentRenderer?.content?.gridRenderer?.items;
@@ -1137,16 +1145,17 @@ JSON.parse = function () {
 
     if (r?.contents?.singleColumnWatchNextResults?.pivot?.sectionListRenderer) {
       try {
+        // FIX: Extract sectionListRenderer to read .continuations for hasContinuation.
+        const nonWatchWnSlr = r.contents.singleColumnWatchNextResults.pivot.sectionListRenderer;
         if (!signinReminderEnabled) {
-          r.contents.singleColumnWatchNextResults.pivot.sectionListRenderer.contents =
-            r.contents.singleColumnWatchNextResults.pivot.sectionListRenderer.contents.filter(elm => !elm.alertWithActionsRenderer);
+          nonWatchWnSlr.contents = nonWatchWnSlr.contents.filter(elm => !elm.alertWithActionsRenderer);
         }
-        processShelves(r.contents.singleColumnWatchNextResults.pivot.sectionListRenderer.contents, false, detectedPage);
-        consolidateShelves(r.contents.singleColumnWatchNextResults.pivot.sectionListRenderer.contents, 'watchNext', detectedPage);
+        processShelves(nonWatchWnSlr.contents, false, detectedPage);
+        consolidateShelves(nonWatchWnSlr.contents, 'watchNext', detectedPage, !!nonWatchWnSlr.continuations);
         if (window.queuedVideos.videos.length > 0) {
           const queuedVideosClone = window.queuedVideos.videos.slice();
           queuedVideosClone.unshift(TileRenderer('Clear Queue', { customAction: { action: 'CLEAR_QUEUE' } }));
-          r.contents.singleColumnWatchNextResults.pivot.sectionListRenderer.contents.unshift(ShelfRenderer(
+          nonWatchWnSlr.contents.unshift(ShelfRenderer(
             'Queued Videos',
             queuedVideosClone,
             queuedVideosClone.findIndex(v => v.contentId === window.queuedVideos.lastVideoId) !== -1

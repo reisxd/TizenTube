@@ -91,6 +91,14 @@ if (!window.__ttHideWatchedLocationTrackingInit) {
     try {
       const p = detectCurrentPage();
       if (p && p !== 'home' && p !== 'search') detectAndStorePage(p, 'nav');
+      // FIX: Clear any pending carryover rows when the user navigates away from a page.
+      // Without this, stale partial rows from page A would be prepended into page B's
+      // first batch, producing duplicated or misplaced tiles.
+      const keys = Object.keys(_carryover);
+      if (keys.length) {
+        appendFileOnlyLog('consolidate.carryover.navClear', { cleared: keys, page: p });
+        keys.forEach(k => delete _carryover[k]);
+      }
     } catch (_) { }
   };
   try { sync(); window.addEventListener('hashchange', sync); window.addEventListener('popstate', sync); } catch (_) {}
@@ -220,10 +228,19 @@ export function processTileArraysDeep(node, pageHint = null, path = 'root', dept
 // (i.e. after the YouTube TV renderer releases its reference), so between page
 // navigations / fresh responses this resets naturally without any manual clearing.
 const _seen = new WeakSet();
-const CONSOLIDATE_PAGES = new Set(['subscriptions', 'watch']);
 
-export function consolidateShelves(contents, path = 'unknown', pageName = null) {
-  appendFileOnlyLog('consolidate.check', { path, contentsLength: contents?.length, pageName });
+// FIX: Module-level carryover store keyed by pageName.
+// When a filtered batch has a partial last row and hasContinuation=true, the leftover
+// items are stored here rather than rendered with empty slots. The next batch for the
+// same page prepends them before packing rows. Cleared on every navigation event above.
+const _carryover = {};
+
+// FIX: 'channel' added — channel pages were never consolidated, leaving empty slots
+// after watched-video filtering because CONSOLIDATE_PAGES did not include 'channel'.
+const CONSOLIDATE_PAGES = new Set(['subscriptions', 'channel', 'watch']);
+
+export function consolidateShelves(contents, path = 'unknown', pageName = null, hasContinuation = false) {
+  appendFileOnlyLog('consolidate.check', { path, contentsLength: contents?.length, pageName, hasContinuation });
   if (!configRead('enableHideWatchedVideos')) return;
   if (pageName && !CONSOLIDATE_PAGES.has(pageName)) return;
   if (!Array.isArray(contents)) return;
@@ -234,17 +251,44 @@ export function consolidateShelves(contents, path = 'unknown', pageName = null) 
     const shelves = contents.filter(c => c.shelfRenderer);
     if (!shelves.length) return;
 
+    // FIX: Collect all items from shelves, then filter to actual video tiles only.
+    // Non-video items (channel cards, nav buttons, etc.) have no contentId/videoId.
+    // Previously the flatMap kept everything including these, so they ended up packed
+    // into video rows and rendered as black boxes. Filtering to video-only items here
+    // ensures only real video tiles are merged and packed into consolidated rows.
     const allItems = shelves.flatMap(s => s.shelfRenderer.content.horizontalListRenderer.items || []);
-    if (!allItems.length) return;
+    const freshItems = allItems.filter(item => {
+      const id = item?.tileRenderer?.contentId
+        || item?.tileRenderer?.onSelectCommand?.watchEndpoint?.videoId;
+      return !!id;
+    });
 
-    // Deduplicate by contentId — continuations sometimes re-send items from the
-    // previous batch as context, causing the same video to appear twice in allItems.
+    // FIX: Prepend carryover items from the previous batch for this page.
+    // When the prior batch had a partial last row and hasContinuation was true, those
+    // leftover items were stored in _carryover[pageName]. Prepending them here ensures
+    // they are packed into full rows together with this batch's fresh items.
+    const carried = (pageName && _carryover[pageName]) ? [..._carryover[pageName]] : [];
+    if (carried.length) {
+      delete _carryover[pageName];
+      appendFileOnlyLog('consolidate.carryover.apply', { path, pageName, carried: carried.length });
+    }
+
+    if (!freshItems.length && !carried.length) return;
+
+    // Deduplicate by contentId — continuations sometimes re-send items from the previous
+    // batch as context, causing the same video to appear twice in the merged set.
+    // Seed seenIds with carried IDs first so they are not duplicated by freshItems.
     const seenIds = new Set();
-    const dedupedItems = allItems.filter(item => {
+    for (const item of carried) {
+      const id = item?.tileRenderer?.contentId
+        || item?.tileRenderer?.onSelectCommand?.watchEndpoint?.videoId || null;
+      if (id) seenIds.add(id);
+    }
+    const dedupedFresh = freshItems.filter(item => {
       const id = item?.tileRenderer?.contentId
         || item?.tileRenderer?.onSelectCommand?.watchEndpoint?.videoId
         || null;
-      if (!id) return true; // non-video items (buttons etc) — always keep
+      if (!id) return true;
       if (seenIds.has(id)) {
         appendFileOnlyLog('consolidate.dedup', { path, videoId: id });
         return false;
@@ -253,6 +297,7 @@ export function consolidateShelves(contents, path = 'unknown', pageName = null) 
       return true;
     });
 
+    const dedupedItems = [...carried, ...dedupedFresh];
     if (!dedupedItems.length) return;
 
     const insertAt = contents.findIndex(c => c.shelfRenderer);
@@ -289,31 +334,49 @@ export function consolidateShelves(contents, path = 'unknown', pageName = null) 
       });
     }
 
-    // If the last batch doesn't fill a complete row, add it as a partial row
-    // rather than silently dropping those videos.
+    // FIX: Handle the partial remainder (items that don't fill a complete row).
+    // When hasContinuation=true (more batches are coming), store the partial items in
+    // _carryover[pageName] so the next batch prepends them and packs full rows.
+    // Previously the partial row was always rendered immediately, leaving 1-2 empty
+    // black slots that the next batch's items would never fill because they appended
+    // after the already-rendered partial row instead of being merged into it.
+    // When hasContinuation=false (this is the last batch), render partial row as-is.
     const remainder = dedupedItems.length % perRow;
     if (remainder > 0) {
       const lastBatch = dedupedItems.slice(dedupedItems.length - remainder);
-      const hlr = {
-        ...template.shelfRenderer.content.horizontalListRenderer,
-        items: lastBatch,
-        visibleItemCount: lastBatch.length,
-        collapsedItemCount: lastBatch.length,
-        totalItemCount: lastBatch.length,
-      };
-      if (typeof hlr.selectedIndex === 'number') hlr.selectedIndex = 0;
-      if (typeof hlr.focusIndex === 'number')    hlr.focusIndex = 0;
-      if (typeof hlr.currentIndex === 'number')  hlr.currentIndex = 0;
-      newShelves.push({
-        shelfRenderer: {
-          ...template.shelfRenderer,
-          content: { horizontalListRenderer: hlr }
-        }
-      });
+      if (hasContinuation && pageName) {
+        _carryover[pageName] = lastBatch;
+        appendFileOnlyLog('consolidate.carryover.store', { path, pageName, stored: lastBatch.length });
+      } else {
+        const hlr = {
+          ...template.shelfRenderer.content.horizontalListRenderer,
+          items: lastBatch,
+          visibleItemCount: lastBatch.length,
+          collapsedItemCount: lastBatch.length,
+          totalItemCount: lastBatch.length,
+        };
+        if (typeof hlr.selectedIndex === 'number') hlr.selectedIndex = 0;
+        if (typeof hlr.focusIndex === 'number')    hlr.focusIndex = 0;
+        if (typeof hlr.currentIndex === 'number')  hlr.currentIndex = 0;
+        newShelves.push({
+          shelfRenderer: {
+            ...template.shelfRenderer,
+            content: { horizontalListRenderer: hlr }
+          }
+        });
+      }
     }
 
     contents.splice(insertAt, 0, ...newShelves);
-    appendFileOnlyLog('consolidate.done', { path, totalItems: allItems.length, deduped: allItems.length - dedupedItems.length, newRows: newShelves.length });
+    appendFileOnlyLog('consolidate.done', {
+      path,
+      totalItems: allItems.length,
+      freshItems: freshItems.length,
+      carried: carried.length,
+      deduped: (freshItems.length + carried.length) - dedupedItems.length,
+      newRows: newShelves.length,
+      carryoverStored: (hasContinuation && remainder > 0) ? remainder : 0,
+    });
   } catch (err) {
     appendFileOnlyLog('consolidate.error', { path, msg: String(err?.message || err) });
   }
