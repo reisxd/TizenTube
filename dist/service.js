@@ -38819,6 +38819,7 @@ function pathToRegexp(path, keys, options) {
     }
     pos = offset + match.length;
     if (match === '*') {
+      backtrack = '';
       extraOffset += 3;
       return '(.*)';
     }
@@ -38839,6 +38840,7 @@ function pathToRegexp(path, keys, options) {
       offset: offset + extraOffset
     });
     var result = '(?:' + format + slash + capture + (star ? '((?:[/' + format + '].+?)?)' : '') + ')' + optional;
+    backtrack = '';
     extraOffset += result.length - match.length;
     return result;
   });
