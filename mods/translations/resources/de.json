@@ -52,7 +52,7 @@
                     },
                     "fixUI": "UI korrigieren",
                     "hqThumbnails": "Hochqualitative Thumbnails aktivieren",
-                    "longPress": "Gedrückthalten-Aktionen aktivieren",
+                    "longPress": "Aktionen bei langem Drücken aktivieren",
                     "shorts": "Shorts aktivieren",
                     "videoPreviews": "Videovorschauen aktivieren",
                     "ttWelcomeMsg": "TT-Begrüßungsnachricht anzeigen",
@@ -136,7 +136,7 @@
                         "title": "Startseite beim Start",
                         "subtitle": "Wähle die Standardseite, die TizenTube beim Start öffnet"
                     },
-                    "sortSubscriptionsByAlphabet": "Sort Subscriptions Alphabetically"
+                    "sortSubscriptionsByAlphabet": "Abonnements alphabetisch sortieren"
                 }
             },
             "updater": {
