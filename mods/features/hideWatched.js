@@ -33,7 +33,6 @@ export function detectCurrentPage() {
       hash.match(/(?:^|[?&])c=([^&]+)/i)?.[1] ||
       location.search.match(/(?:^|[?&])c=([^&]+)/i)?.[1] || ''
     ).toLowerCase();
-
     if (hash.startsWith('/watch')) return 'watch';
     if (hash.startsWith('/channel/') || hash.startsWith('/c/') || hash.startsWith('/@')) return 'channel';
     const fromC = browseIdToPage(cParam);
@@ -49,7 +48,6 @@ export function detectCurrentPage() {
 export function detectPageFromResponse(response) {
   try {
     if (response?.contents?.singleColumnWatchNextResults) return 'watch';
-
     for (const entry of response?.responseContext?.serviceTrackingParams || []) {
       for (const param of entry?.params || []) {
         if (param?.key === 'browse_id') {
@@ -58,13 +56,11 @@ export function detectPageFromResponse(response) {
         }
       }
     }
-
     const targetId = String(response?.contents?.tvBrowseRenderer?.targetId || '').toLowerCase();
     if (targetId.startsWith('browse-feed')) {
       const page = browseIdToPage(targetId.replace('browse-feed', ''));
       if (page) return page;
     }
-
     return browseIdToPage(response?.currentVideoEndpoint?.watchEndpoint?.browseEndpoint?.browseId);
   } catch {
     return null;
@@ -86,8 +82,6 @@ if (!window.__ttHideWatchedLocationTrackingInit) {
     try {
       const p = detectCurrentPage();
       if (p && p !== 'home' && p !== 'search') detectAndStorePage(p, 'nav');
-      // Clear ALL carryover on every navigation. Stale carryover from a previous tab/page
-      // must never bleed into a fresh page load regardless of keying.
       const keys = Object.keys(_carryover);
       if (keys.length) {
         appendFileOnlyLog('consolidate.carryover.navClear', { cleared: keys, page: p });
@@ -104,31 +98,25 @@ function getWatchPercent(item) {
   try {
     const overlays = item?.tileRenderer?.header?.tileHeaderRenderer?.thumbnailOverlays
       || item?.tileRenderer?.thumbnailOverlays || [];
-
     const resume = overlays.find(o => o.thumbnailOverlayResumePlaybackRenderer)?.thumbnailOverlayResumePlaybackRenderer;
     if (resume) {
       const pct = resume.percentDurationWatched;
       return (pct !== null && pct !== undefined) ? Number(pct) : 100;
     }
-
     if (overlays.some(o => o.thumbnailOverlayPlaybackStatusRenderer || o.thumbnailOverlayPlayedRenderer)) return 100;
-
     const badges = item?.tileRenderer?.badges || [];
     if (badges.some(b => {
       const s = String(b?.metadataBadgeRenderer?.style || '') + String(b?.metadataBadgeRenderer?.label || '');
       return s.toLowerCase().includes('watched');
     })) return 100;
-
     const raw = item?.watchProgressPercentage ?? item?.percentDurationWatched
       ?? item?.lockupViewModel?.progressPercentage ?? null;
     if (raw !== null) return Number(raw);
-
     const videoId = item?.tileRenderer?.contentId
       || item?.tileRenderer?.onSelectCommand?.watchEndpoint?.videoId;
     if (videoId && window._ttVideoProgressCache?.[videoId] !== undefined) {
       return window._ttVideoProgressCache[videoId];
     }
-
     return null;
   } catch {
     return null;
@@ -139,22 +127,17 @@ function getWatchPercent(item) {
 
 export function hideVideo(items, pageHint = null) {
   if (!Array.isArray(items) || !configRead('enableHideWatchedVideos')) return items;
-
   const pages = configRead('hideWatchedVideosPages');
   const threshold = configRead('hideWatchedVideosThreshold');
   const hashPage = detectCurrentPage();
   const pageName = (pageHint && pageHint !== 'home' && pageHint !== 'search') ? pageHint
     : (hashPage !== 'home' && hashPage !== 'search') ? hashPage
     : (window.__ttLastDetectedPage || hashPage);
-
   appendFileOnlyLog('hideVideo.context', { pageHint, hashPage, pageName, lastDetected: window.__ttLastDetectedPage || null });
-
   if (!pages.includes(pageName)) return items;
-
   return items.filter(item => {
     try {
       if (!item?.tileRenderer?.contentId) return true;
-
       if (item.__ttKeepOneForContinuation) {
         const currentSeq = Number(window.__ttParseSeq || 0);
         const itemSeq = Number(item.__ttKeepOneForContinuationParseSeq || 0);
@@ -166,13 +149,11 @@ export function hideVideo(items, pageHint = null) {
         delete item.__ttKeepOneForContinuationLabel;
         delete item.__ttKeepOneForContinuationParseSeq;
       }
-
       const pct = getWatchPercent(item);
       if (pct === null) {
         appendFileOnlyLog('hideVideo.noProgress', { pageName, videoId: item?.tileRenderer?.contentId });
         return true;
       }
-
       const keep = pct <= threshold;
       if (!keep) appendFileOnlyLog('hideVideo.removed', { pageName, pct, videoId: item?.tileRenderer?.contentId });
       return keep;
@@ -211,40 +192,16 @@ export function processTileArraysDeep(node, pageHint = null, path = 'root', dept
 
 const _seen = new WeakSet();
 
-// Carryover store: keyed by pageName.
-// Each entry: { items: TileRenderer[], sourcePath: string }
-//
-// sourcePath tracks WHICH path last stored the carryover. This is critical for
-// subscription channel tabs: all channel tabs share pageName='channel' (or
-// 'subscriptions'), but each tab has a distinct path like 'tab.UCxxxx'. Without
-// sourcePath tracking, switching from tab A to tab B would incorrectly prepend
-// tab A's leftover videos into tab B's first batch.
-//
-// Apply rules:
-//   - If current path starts with 'tab.' and stored sourcePath != current path
-//     → different tab; discard stale carryover (tab switch).
-//   - All other paths (continuation paths, watchNext, etc.)
-//     → apply normally; they are continuations of whatever tab stored the carryover.
-//
-// Cleared on every hashchange/popstate regardless.
+// Carryover store: { items, sourcePath } keyed by pageName.
+// sourcePath is the path string of the call that stored the carryover.
+// When a new 'tab.*' path comes in and its sourcePath doesn't match, the
+// carryover is from a different tab and is discarded. Cleared on navigation.
 const _carryover = {};
 
-// Pages where shelf consolidation is active.
-// 'subscriptions' covers both the "Alle" tab and the per-channel tabs (those
-// resolve to pageName='channel' but are children of the subscription page).
+// Only subscriptions and watch benefit from consolidation.
+// Channel page is intentionally excluded — it breaks the channel page layout.
 const CONSOLIDATE_PAGES = new Set(['subscriptions', 'watch']);
 
-/**
- * Merges items from all shelfRenderer rows in `contents` into evenly-packed rows,
- * carrying over partial remainder rows when more continuation batches are expected.
- *
- * @param {Array}    contents        The sectionList / continuationContents array.
- * @param {string}   path            Caller label used for logging and carryover key disambiguation.
- * @param {string|null} pageName     Detected page name; must be in CONSOLIDATE_PAGES to run.
- * @param {boolean}  hasContinuation True when the response has a continuation token (more batches coming).
- * @param {Function|null} itemFilter Optional post-filter applied to freshItems before packing.
- *                                   Called as itemFilter(items, pageName). Use to strip Shorts.
- */
 export function consolidateShelves(contents, path = 'unknown', pageName = null, hasContinuation = false, itemFilter = null) {
   appendFileOnlyLog('consolidate.check', { path, contentsLength: contents?.length, pageName, hasContinuation });
   if (!configRead('enableHideWatchedVideos')) return;
@@ -257,14 +214,8 @@ export function consolidateShelves(contents, path = 'unknown', pageName = null, 
     const shelves = contents.filter(c => c.shelfRenderer);
     if (!shelves.length) return;
 
-    // ── Collect video-only items from all shelves ─────────────────────────────
-    // FIX 1 (black videos): The old filter kept any item with a non-empty contentId,
-    // which includes channel-card tiles whose contentId is a browseId ("UCxxxx…", 24+
-    // chars). Those render as black boxes when packed into a video row. We now require
-    // either:
-    //   (a) watchEndpoint.videoId  — always an 11-char video ID, never set on channel tiles
-    //   (b) contentId that is exactly 11 chars — standard YouTube video ID length
-    // Channel tiles use browseEndpoint, not watchEndpoint, so (a) excludes them cleanly.
+    // Collect only real video tiles: require watchEndpoint.videoId OR exactly 11-char contentId.
+    // Channel cards use browseEndpoint only and have a 24-char browseId as contentId — excluded.
     const allItems = shelves.flatMap(s => s.shelfRenderer.content.horizontalListRenderer.items || []);
     let freshItems = allItems.filter(item => {
       const watchVideoId = item?.tileRenderer?.onSelectCommand?.watchEndpoint?.videoId;
@@ -273,32 +224,18 @@ export function consolidateShelves(contents, path = 'unknown', pageName = null, 
       return contentId && String(contentId).length === 11;
     });
 
-    // FIX 2 (shorts shelf): Apply caller-provided item filter (e.g. filterShortsFromItems)
-    // so that any shorts items that slipped through processShelves' isShortsShelf check
-    // are stripped before being packed into consolidated rows.
     if (itemFilter) freshItems = itemFilter(freshItems, pageName);
 
-    // ── Apply carryover from previous batch ───────────────────────────────────
-    // FIX 3 (tab bleed): Subscription channel tabs all share pageName='channel' but
-    // each has a distinct path like 'tab.UCxxxx'. When the user switches tabs, the
-    // incoming path is a new 'tab.*' that doesn't match the stored sourcePath → we
-    // discard the stale carryover instead of prepending it into the new tab's rows.
+    // Apply or discard carryover based on sourcePath.
+    // A 'tab.*' path that doesn't match the stored sourcePath means a tab switch — discard.
     const isTabPath = path.startsWith('tab.');
     let carried = [];
-
     if (pageName && _carryover[pageName]) {
       const stored = _carryover[pageName];
       if (isTabPath && stored.sourcePath !== path) {
-        // Different tab — stale carryover from a previous channel tab. Discard.
         delete _carryover[pageName];
-        appendFileOnlyLog('consolidate.carryover.tabSwitch', {
-          path, pageName,
-          discarded: stored.items.length,
-          oldPath: stored.sourcePath,
-        });
+        appendFileOnlyLog('consolidate.carryover.tabSwitch', { path, pageName, discarded: stored.items.length, oldPath: stored.sourcePath });
       } else {
-        // Same tab continuation, or a non-tab path (e.g. 'continuation.sectionList')
-        // which is always a continuation of whatever tab last stored the carryover.
         carried = [...stored.items];
         delete _carryover[pageName];
         appendFileOnlyLog('consolidate.carryover.apply', { path, pageName, carried: carried.length });
@@ -307,18 +244,14 @@ export function consolidateShelves(contents, path = 'unknown', pageName = null, 
 
     if (!freshItems.length && !carried.length) return;
 
-    // ── Deduplicate ───────────────────────────────────────────────────────────
-    // Continuations sometimes re-send items from the tail of the previous batch.
-    // Seed seenIds with carried IDs first so they are never duplicated by freshItems.
+    // Deduplicate — seed with carried IDs first.
     const seenIds = new Set();
     for (const item of carried) {
-      const id = item?.tileRenderer?.onSelectCommand?.watchEndpoint?.videoId
-        || item?.tileRenderer?.contentId || null;
+      const id = item?.tileRenderer?.onSelectCommand?.watchEndpoint?.videoId || item?.tileRenderer?.contentId || null;
       if (id) seenIds.add(id);
     }
     const dedupedFresh = freshItems.filter(item => {
-      const id = item?.tileRenderer?.onSelectCommand?.watchEndpoint?.videoId
-        || item?.tileRenderer?.contentId || null;
+      const id = item?.tileRenderer?.onSelectCommand?.watchEndpoint?.videoId || item?.tileRenderer?.contentId || null;
       if (!id) return true;
       if (seenIds.has(id)) { appendFileOnlyLog('consolidate.dedup', { path, videoId: id }); return false; }
       seenIds.add(id);
@@ -328,26 +261,26 @@ export function consolidateShelves(contents, path = 'unknown', pageName = null, 
     const dedupedItems = [...carried, ...dedupedFresh];
     if (!dedupedItems.length) return;
 
-    // ── Determine row size ────────────────────────────────────────────────────
-    // FIX 4 (wrong perRow): Taking only shelves[0]._originalRowSize is fragile —
-    // if the first shelf happened to have 1 item originally (e.g. a near-empty
-    // continuation batch), perRow becomes 1 and every video gets its own row.
-    // Take the MAX across all shelves' _originalRowSize values, then fall back
-    // to the max of current item counts, with a hard minimum of 3.
+    // perRow: max across all shelves' recorded original row size and current item counts.
     const perRow = Math.max(
       ...shelves.map(s => s.shelfRenderer.content.horizontalListRenderer._originalRowSize || 0),
       ...shelves.map(s => s.shelfRenderer.content.horizontalListRenderer.items?.length || 0),
       3
     );
 
-    // ── Remove existing shelves and rebuild ───────────────────────────────────
     const insertAt = contents.findIndex(c => c.shelfRenderer);
     for (let i = contents.length - 1; i >= 0; i--) if (contents[i].shelfRenderer) contents.splice(i, 1);
 
-    const template = shelves[0];
+    // Pick the template from the first shelf that has a non-empty title or no suspicious header.
+    // Avoids using a Shorts shelf (which survived processShelves) as template, which would
+    // copy the "Shorts" heading into all consolidated rows.
+    const template = shelves.find(s => {
+      const firstItem = s.shelfRenderer.content.horizontalListRenderer.items?.[0];
+      return !firstItem?.tileRenderer?.onSelectCommand?.reelWatchEndpoint && !firstItem?.reelItemRenderer;
+    }) || shelves[0];
+
     const newShelves = [];
 
-    // Pack full rows.
     for (let i = 0; i + perRow <= dedupedItems.length; i += perRow) {
       const rowItems = dedupedItems.slice(i, i + perRow);
       const hlr = {
@@ -360,30 +293,17 @@ export function consolidateShelves(contents, path = 'unknown', pageName = null, 
       if (typeof hlr.selectedIndex === 'number') hlr.selectedIndex = 0;
       if (typeof hlr.focusIndex === 'number')    hlr.focusIndex = 0;
       if (typeof hlr.currentIndex === 'number')  hlr.currentIndex = 0;
-      newShelves.push({
-        shelfRenderer: { ...template.shelfRenderer, content: { horizontalListRenderer: hlr } }
-      });
+      newShelves.push({ shelfRenderer: { ...template.shelfRenderer, content: { horizontalListRenderer: hlr } } });
     }
 
-    // Handle the partial remainder (items that don't fill a complete row).
-    //
-    // hasContinuation=true → more batches are coming. Store the remainder in
-    //   _carryover[pageName] tagged with the current path (sourcePath). The next
-    //   batch will prepend them before packing — filling the gap correctly.
-    //   This is the core fix for "1 video left with 2 empty slots".
-    //
-    // hasContinuation=false → last batch (or no pageName). Render partial row as-is.
-    //   The user will see a short row at the end, but that's correct since there
-    //   are no more videos to fill it.
+    // Partial remainder: store as carryover when more batches are coming, else render as-is.
     const remainder = dedupedItems.length % perRow;
     if (remainder > 0) {
       const lastBatch = dedupedItems.slice(dedupedItems.length - remainder);
       if (hasContinuation && pageName) {
-        // Store with sourcePath so the next consolidateShelves call can detect tab switches.
         _carryover[pageName] = { items: lastBatch, sourcePath: path };
         appendFileOnlyLog('consolidate.carryover.store', { path, pageName, stored: lastBatch.length, perRow });
       } else {
-        // Last batch — render partial row.
         const hlr = {
           ...template.shelfRenderer.content.horizontalListRenderer,
           items: lastBatch,
@@ -394,18 +314,14 @@ export function consolidateShelves(contents, path = 'unknown', pageName = null, 
         if (typeof hlr.selectedIndex === 'number') hlr.selectedIndex = 0;
         if (typeof hlr.focusIndex === 'number')    hlr.focusIndex = 0;
         if (typeof hlr.currentIndex === 'number')  hlr.currentIndex = 0;
-        newShelves.push({
-          shelfRenderer: { ...template.shelfRenderer, content: { horizontalListRenderer: hlr } }
-        });
+        newShelves.push({ shelfRenderer: { ...template.shelfRenderer, content: { horizontalListRenderer: hlr } } });
       }
     }
 
     contents.splice(insertAt, 0, ...newShelves);
     appendFileOnlyLog('consolidate.done', {
       path, pageName, perRow,
-      totalItems: allItems.length,
-      freshItems: freshItems.length,
-      carried: carried.length,
+      totalItems: allItems.length, freshItems: freshItems.length, carried: carried.length,
       deduped: (freshItems.length + carried.length) - dedupedItems.length,
       newRows: newShelves.length,
       carryoverStored: (hasContinuation && remainder > 0) ? remainder : 0,
@@ -439,4 +355,4 @@ export function updateProgressCache(r) {
   }
 }
 
-export function startEmptyTileObserver() {} // no-op, kept for import compatibility
+export function startEmptyTileObserver() {}
