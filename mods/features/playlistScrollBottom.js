@@ -123,8 +123,13 @@ export function playlistScrollBottom(showToastFn) {
             } else {
               target.scrollTop = max;
             }
+            try { target.dispatchEvent(new Event('scroll', { bubbles: true })); } catch (_) { }
             metrics.push(`${target.scrollTop}:${target.scrollHeight}:${target.clientHeight}`);
           }
+          try {
+            const keyEvent = new KeyboardEvent('keydown', { key: 'ArrowDown', code: 'ArrowDown', keyCode: 40, which: 40, bubbles: true });
+            document.dispatchEvent(keyEvent);
+          } catch (_) { }
           const key = metrics.join('|');
           unchangedCount = key === lastKey ? unchangedCount + 1 : 0;
           lastKey = key;

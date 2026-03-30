@@ -1,5 +1,4 @@
-import { configRead } from '../config.js';
-import { appendFileOnlyLog, getWatchPercent } from './hideWatched.js';
+import { appendFileOnlyLog } from './hideWatched.js';
 
 // Walks an object up to maxDepth and logs every path that contains the word 'button'
 // or 'playlist' in its key — used once to find the real playlistHeaderRenderer path.
@@ -234,17 +233,13 @@ export function playlistContinue(resolveCommandFn, showToastFn) {
       return;
     }
 
-    const threshold = Number(configRead('hideWatchedVideosThreshold'));
     let firstEligible = null;
     for (const item of items) {
       const cmd = item?.tileRenderer?.onSelectCommand;
       const videoId = item?.tileRenderer?.contentId || cmd?.watchEndpoint?.videoId;
       if (!videoId || !cmd) continue;
       if (helperIds?.has?.(videoId) || item?.__ttKeepOneForContinuation) continue;
-
-      const pct = getWatchPercent(item);
-      if (pct !== null && Number.isFinite(pct) && pct > threshold) continue;
-      firstEligible = { cmd, videoId, pct };
+      firstEligible = { cmd, videoId };
       break;
     }
     if (firstEligible) {
