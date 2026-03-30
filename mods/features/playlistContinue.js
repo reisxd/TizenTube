@@ -1,5 +1,5 @@
 import { configRead } from '../config.js';
-import { appendFileOnlyLog, hideVideo } from './hideWatched.js';
+import { appendFileOnlyLog } from './hideWatched.js';
 
 // Walks an object up to maxDepth and logs every path that contains the word 'button'
 // or 'playlist' in its key — used once to find the real playlistHeaderRenderer path.
@@ -151,6 +151,9 @@ function tryInjectButton(r) {
 
 export function playlistContinue(resolveCommandFn, showToastFn) {
   try {
+    // __ttCurrentPlaylistItems is populated by storePlItems() AFTER adblock.js has already
+    // run filterContinuationItems on the playlist contents. So these are already the
+    // filtered (non-watched) items — we just need the first one that isn't a keep-one helper.
     const items = window.__ttCurrentPlaylistItems || [];
 
     if (!items.length) {
@@ -159,18 +162,17 @@ export function playlistContinue(resolveCommandFn, showToastFn) {
     }
 
     for (const item of items) {
-      const videoId = item?.tileRenderer?.contentId
-        || item?.tileRenderer?.onSelectCommand?.watchEndpoint?.videoId;
-      if (!videoId) continue;
+      // Skip keep-one helper items (watched videos kept temporarily to trigger next batch load)
+      if (item?.__ttKeepOneForContinuation) continue;
 
-      // Use hideVideo with the 'playlist' page hint — this is the same logic that hides
-      // videos in the list, so Continue finds exactly the first video that would be visible.
-      const kept = hideVideo([item], 'playlist');
-      if (kept.length > 0) {
-        _log('playlist.continue.play', { videoId });
-        resolveCommandFn(item.tileRenderer.onSelectCommand);
-        return;
-      }
+      const cmd = item?.tileRenderer?.onSelectCommand;
+      const videoId = item?.tileRenderer?.contentId
+        || cmd?.watchEndpoint?.videoId;
+      if (!videoId || !cmd) continue;
+
+      _log('playlist.continue.play', { videoId });
+      resolveCommandFn(cmd);
+      return;
     }
 
     showToastFn('TizenTube', 'No unwatched videos found in this playlist.');
