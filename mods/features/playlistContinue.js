@@ -1,5 +1,5 @@
 import { configRead } from '../config.js';
-import { appendFileOnlyLog } from './hideWatched.js';
+import { appendFileOnlyLog, getWatchPercent } from './hideWatched.js';
 
 // Walks an object up to maxDepth and logs every path that contains the word 'button'
 // or 'playlist' in its key — used once to find the real playlistHeaderRenderer path.
@@ -151,9 +151,6 @@ function tryInjectButton(r) {
 
 export function playlistContinue(resolveCommandFn, showToastFn) {
   try {
-    // __ttCurrentPlaylistItems is populated by storePlItems() AFTER adblock.js has already
-    // run filterContinuationItems on the playlist contents. So these are already the
-    // filtered (non-watched) items — we just need the first one that isn't a keep-one helper.
     const items = window.__ttCurrentPlaylistItems || [];
 
     if (!items.length) {
@@ -161,22 +158,27 @@ export function playlistContinue(resolveCommandFn, showToastFn) {
       return;
     }
 
+    const threshold = Number(configRead('hideWatchedVideosThreshold'));
+
     for (const item of items) {
       // Skip keep-one helper items (watched videos kept temporarily to trigger next batch load)
       if (item?.__ttKeepOneForContinuation) continue;
 
       const cmd = item?.tileRenderer?.onSelectCommand;
-      const videoId = item?.tileRenderer?.contentId
-        || cmd?.watchEndpoint?.videoId;
+      const videoId = item?.tileRenderer?.contentId || cmd?.watchEndpoint?.videoId;
       if (!videoId || !cmd) continue;
 
-      _log('playlist.continue.play', { videoId });
+      const watchPercent = getWatchPercent(item);
+      const isWatched = watchPercent !== null && Number.isFinite(watchPercent) && watchPercent > threshold;
+      if (isWatched) continue;
+
+      _log('playlist.continue.play', { videoId, watchPercent, threshold });
       resolveCommandFn(cmd);
       return;
     }
 
     showToastFn('TizenTube', 'No unwatched videos found in this playlist.');
-    _log('playlist.continue.all_watched', { checked: items.length });
+    _log('playlist.continue.all_watched', { checked: items.length, threshold });
   } catch (err) {
     _log('playlist.continue.action.error', { msg: String(err?.message || err) });
   }
