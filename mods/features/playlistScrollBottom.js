@@ -108,14 +108,28 @@ export function playlistScrollBottom(showToastFn) {
 
     if (targets.length) {
       const max = Number.MAX_SAFE_INTEGER;
+      let sentDowns = 0;
+      const targetDowns = 15;
+      const maxAttempts = 120;
       let attempt = 0;
-      let unchangedCount = 0;
-      let lastKey = '';
-      const maxAttempts = 12;
+      const baseItemCount = Array.isArray(window.__ttCurrentPlaylistItems) ? window.__ttCurrentPlaylistItems.length : 0;
 
       const stepScroll = () => {
         try {
-          const metrics = [];
+          if (attempt >= maxAttempts) {
+            _log('playlist.scroll.bottom.done', { reason: 'max_attempts', attempts: attempt, sentDowns, targets: targets.length });
+            return;
+          }
+          const currentItemCount = Array.isArray(window.__ttCurrentPlaylistItems) ? window.__ttCurrentPlaylistItems.length : 0;
+          if (currentItemCount > baseItemCount) {
+            _log('playlist.scroll.bottom.done', { reason: 'batch_loaded', attempts: attempt, sentDowns, baseItemCount, currentItemCount });
+            return;
+          }
+          if (sentDowns >= targetDowns) {
+            _log('playlist.scroll.bottom.done', { reason: 'batch_step_complete', attempts: attempt, sentDowns, targets: targets.length });
+            return;
+          }
+
           for (const target of targets) {
             if (!target) continue;
             if (typeof target.scrollTo === 'function') {
@@ -124,24 +138,18 @@ export function playlistScrollBottom(showToastFn) {
               target.scrollTop = max;
             }
             try { target.dispatchEvent(new Event('scroll', { bubbles: true })); } catch (_) { }
-            metrics.push(`${target.scrollTop}:${target.scrollHeight}:${target.clientHeight}`);
           }
           try {
             const keyEvent = new KeyboardEvent('keydown', { key: 'ArrowDown', code: 'ArrowDown', keyCode: 40, which: 40, bubbles: true });
             document.dispatchEvent(keyEvent);
+            const keyUpEvent = new KeyboardEvent('keyup', { key: 'ArrowDown', code: 'ArrowDown', keyCode: 40, which: 40, bubbles: true });
+            document.dispatchEvent(keyUpEvent);
+            sentDowns++;
           } catch (_) { }
-          const key = metrics.join('|');
-          unchangedCount = key === lastKey ? unchangedCount + 1 : 0;
-          lastKey = key;
           attempt++;
-
-          if (attempt >= maxAttempts || unchangedCount >= 2) {
-            _log('playlist.scroll.bottom.done', { attempts: attempt, targets: targets.length });
-            return;
-          }
-          setTimeout(stepScroll, 150);
+          setTimeout(stepScroll, 10);
         } catch (err) {
-          _log('playlist.scroll.bottom.step_error', { msg: String(err?.message || err), attempt });
+          _log('playlist.scroll.bottom.step_error', { msg: String(err?.message || err), attempt, sentDowns });
         }
       };
 
