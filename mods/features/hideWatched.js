@@ -230,13 +230,21 @@ export function consolidateShelves(contents, path = 'unknown', pageName = null, 
     let carried = [];
     if (pageName && _carryover[pageName]) {
       const stored = _carryover[pageName];
-      const lastTab = window.__ttLastTabPath || null;
+      // Stale carryover detection without relying on __ttLastTabPath (which only fires once
+      // at initial page load and never updates on tab switch):
+      //
+      // "Alle" tab stores carryover via path 'tab.fesubscriptions'. Its scroll continuations
+      // arrive as sectionListContinuation → path 'continuation.sectionList'. Channel tab
+      // content (when URL stays #/browse?c=FEsubscriptions) arrives via
+      // tvSurfaceContentContinuation → path 'continuation.tvSurface.*'. These two paths
+      // are structurally different. If a stored tab carryover is being claimed by a
+      // tvSurface continuation, it belongs to a different tab — discard it.
       const isStale = isTabPath
         ? stored.sourcePath !== path
-        : (lastTab && stored.sourcePath && lastTab !== stored.sourcePath);
+        : (stored.sourcePath && stored.sourcePath.startsWith('tab.') && path.startsWith('continuation.tvSurface'));
       if (isStale) {
         delete _carryover[pageName];
-        appendFileOnlyLog('consolidate.carryover.tabSwitch', { path, pageName, discarded: stored.items.length, oldPath: stored.sourcePath, lastTab });
+        appendFileOnlyLog('consolidate.carryover.tabSwitch', { path, pageName, discarded: stored.items.length, oldPath: stored.sourcePath });
       } else {
         carried = [...stored.items];
         delete _carryover[pageName];

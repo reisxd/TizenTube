@@ -902,10 +902,6 @@ JSON.parse = function () {
             else if (tabBrowseId === 'femy_youtube' || tabBrowseId === 'vlwl' || tabBrowseId === 'vlll' || tabBrowseId.startsWith('vlpl')) tabPage = 'playlist';
 
             const tabPath = `tab.${tabBrowseId || 'unknown'}`;
-            if (window.__ttLastTabPath !== tabPath) {
-              appendFileOnlyLog('tab.active', { prev: window.__ttLastTabPath || null, next: tabPath });
-            }
-            window.__ttLastTabPath = tabPath;
             const tabSlr = tab?.tabRenderer?.content?.tvSurfaceContentRenderer?.content?.sectionListRenderer;
             if (tabSlr && Array.isArray(tabSlr.contents)) {
               processShelves(tabSlr.contents, true, tabPage);
