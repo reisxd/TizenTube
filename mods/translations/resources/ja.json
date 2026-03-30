@@ -1,0 +1,193 @@
+{
+    "__contributors": [
+        "Re*Index.(ot_inc)"
+    ],
+    "settings": {
+        "options": {
+            "socialMedia": {
+                "title": "ソーシャルメディアのリンク",
+                "qrCodeScanMessage": "以下の QR コードをスキャンすると {{name}} のページにアクセスできます。"
+            },
+            "adBlock": "広告のブロック",
+            "sponsorblock": {
+                "title": "SponsorBlock の設定",
+                "options": {
+                    "enableSB": "SponsorBlock を有効化する",
+                    "manualSkip": "SponsorBlock のセグメントスキップを手動にする",
+                    "segments": "セグメント",
+                    "categories": {
+                        "sponsor": "スポンサーをスキップ",
+                        "intro": "イントロをスキップ",
+                        "outro": "アウトロをスキップ",
+                        "interaction": "チャンネル登録などのリマインダーをスキップ",
+                        "selfpromo": "セルフプロモーションをスキップ",
+                        "preview": "プレビュー/ダイジェストをスキップ",
+                        "filler": "本筋に関係ない話/ジョークをスキップ",
+                        "music_offtopic": "音楽以外をスキップ",
+                        "highlights": "ハイライトを有効化する"
+                    },
+                    "showSBToasts": "SponsorBlock のトーストを表示"
+                }
+            },
+            "dearrow": {
+                "title": "DeArrow の設定",
+                "options": {
+                    "enableDA": "DeArrow を有効化する",
+                    "enableDAThumbnails": "DeArrow のサムネイルを有効化する"
+                }
+            },
+            "misc": {
+                "title": "その他の設定",
+                "options": {
+                    "endScreenCards": "動画終了時のカードを非表示にする",
+                    "youThereRenderer": "「続きを視聴しますか？」のリマインダーを有効化する",
+                    "paidPromoOverlay": "「プロモーションを含みます」のオーバーレイを有効化する",
+                    "whosWatching": {
+                        "title": "ユーザー選択メニュー",
+                        "options": {
+                            "enableWW": "ユーザー選択メニューを有効化する",
+                            "permaEnableWW": "ユーザー選択メニューを常に有効化する",
+                            "enableWWOnExit": "アプリ終了時にユーザー選択メニューの表示を有効化する"
+                        }
+                    },
+                    "fixUI": "UI の修正",
+                    "hqThumbnails": "高画質なサムネイルを有効化する",
+                    "longPress": "長押し時のアクションを有効化する",
+                    "shorts": "ショートを有効化する",
+                    "videoPreviews": "動画のプレビューを有効化する",
+                    "ttWelcomeMsg": "TT のようこそメッセージを表示する",
+                    "guestSignInReminder": "ゲストログインのリマインダーを表示する",
+                    "reloadHomeOnStartup": "起動時にホームを再読み込みする"
+                }
+            },
+            "subtitles": {
+                "title": "字幕の設定",
+                "options": {
+                    "showLocalSubtitle": "ローカルの字幕を表示する",
+                    "showHiddenSubtitles": "非表示されている字幕を表示する"
+                }
+            },
+            "videoPlayer": {
+                "title": "動画プレーヤーの設定",
+                "subtitle": "動画プレーヤーの機能をカスタマイズします",
+                "options": {
+                    "patching": {
+                        "title": "動画プレーヤー UI のパッチ",
+                        "options": {
+                            "enableVPUIPatching": "動画プレーヤー UI のパッチを有効化します",
+                            "previousNextBtns": "「前へ」と「次へ」のボタンを有効化する",
+                            "showSuperThxBtn": "Super Thanks ボタンを表示する",
+                            "showSpeedCtrlBtn": "速度制御ボタンを表示する"
+                        }
+                    },
+                    "preferredVideoQuality": {
+                        "title": "優先する動画の画質",
+                        "subtitle": "動画再生で優先する画質または、次に最適な画質を選択してください"
+                    },
+                    "speedSettings": {
+                        "title": "速度の増分幅の設定",
+                        "subtitle": "動画再生の速度調整の増分幅を設定します"
+                    },
+                    "preferredVideoCodec": {
+                        "title": "優先する動画のコーデック",
+                        "subtitle": "動画再生で優先するコーデックを選択してください"
+                    },
+                    "afr": "自動フレームレート",
+                    "afrPauseDuration": {
+                        "title": "自動フレームレート時の一時停止の長さ",
+                        "subtitle": "フレームレートの調整時で動画再生を一時停止する時間 (秒単位) を設定します"
+                    }
+                }
+            },
+            "uiSettings": {
+                "title": "ユーザーインターフェースの設定",
+                "subtitle": "好みの UI にカスタマイズします",
+                "options": {
+                    "hideWatchedVideos": {
+                        "title": "視聴した動画を非表示にする",
+                        "options": {
+                            "enableHideWatchedVideos": "視聴した動画の非表示を有効化します",
+                            "watchedVideosThreshold": {
+                                "title": "視聴した動画と判定するしきい値",
+                                "subtitle": "視聴した動画を非表示にする割合のしきい値を設定します"
+                            },
+                            "setPagesToHideWatchedVideos": "視聴した動画を非表示にするページを設定する"
+                        }
+                    },
+                    "screenDimming": {
+                        "title": "画面の減光",
+                        "options": {
+                            "enableScreenDimming": "画面の減光を有効化する",
+                            "dimmingTimeout": {
+                                "title": "減光までのタイムアウト",
+                                "subtitle": "画面を減光するまでの無操作時間 (秒単位) を設定します"
+                            },
+                            "dimmingOpacity": {
+                                "title": "減光の不透明度",
+                                "subtitle": "画面を減光する際の不透明度を設定します"
+                            }
+                        }
+                    },
+                    "disableSidebarContents": {
+                        "title": "サイドバーの項目を無効化する",
+                        "subtitle": "無効化するサイドバーの項目を選択してください"
+                    },
+                    "launchToOnStartup": {
+                        "title": "起動時に開くページ",
+                        "subtitle": "TizenTube の起動時にデフォルトで表示するページを選択してください"
+                    },
+                    "sortSubscriptionsByAlphabet": "登録しているチャンネルをアルファベット順に並べ替える"
+                }
+            },
+            "updater": {
+                "title": "TizenTube Cobalt の更新",
+                "menuSubtitle": "TizenTube Cobalt の更新を管理します",
+                "versionSubtitle": "現在のバージョン: {{version}}",
+                "options": {
+                    "checkForUpdates": "更新を確認する",
+                    "checkForUpdatesOnStartup": "起動時に更新を確認します"
+                }
+            }
+        },
+        "ttSettings": {
+            "title": "TizenTube の設定",
+            "madeByText": "Made by Reis Can (reisxd) with ❤️",
+            "summary": "TizenTube の設定を開きます"
+        },
+        "supportTT": {
+            "title": "TizenTube をサポート",
+            "subtitle": "❤️ TizenTube と開発をサポートしましょう",
+            "content": {
+                "1": "TizenTube を使用して気に入ったならば、以下をご検討ください:",
+                "2": "1. GitHub のリポジトリに Star を付けて、認知度の向上にご協力ください。",
+                "3": "2. TizenTube を他の人へ共有しましょう。",
+                "4": "金銭的なサポートをご希望の方は、寄付をご検討ください:",
+                "5": "- Buy Me A Coffee: https://www.buymeacoffee.com/reisxd (可能であれば)",
+                "6": "- GitHub Sponsors: https://github.com/sponsors/reisxd"
+            }
+        }
+    },
+    "welcomeMsg": {
+        "title": "TizenTube へようこそ",
+        "subtitle": "設定画面から「TizenTube の設定」を選択して設定を行ってください。"
+    },
+    "sponsorblock": {
+        "segments": {
+            "sponsor": "スポンサーのセグメント",
+            "intro": "イントロ",
+            "outro": "アウトロ",
+            "interaction": "チャンネル登録のリマインダー",
+            "selfpromo": "セルフプロモーション",
+            "preview": "プレビューまたはダイジェスト",
+            "filler": "本筋に関係ない話",
+            "music_offtopic": "音楽以外のパート",
+            "poi_highlight": "ハイライト"
+        },
+        "toasts": {
+            "skipping": "{{segment}}をスキップします",
+            "notSkipping": "{{segment}}をスキップしません ({{count}} 回スキップ済み)",
+            "skip": "{{segment}}をスキップ",
+            "skipToHighlight": "ハイライトへスキップ"
+        }
+    }
+}
