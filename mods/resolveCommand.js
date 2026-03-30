@@ -4,6 +4,7 @@ import modernUI, { optionShow } from './ui/settings.js';
 import { speedSettings } from './ui/speedUI.js';
 import { showToast, buttonItem } from './ui/ytUI.js';
 import checkForUpdates from './features/updater.js';
+import { playlistContinue } from './features/playlistContinue.js';
 
 export default function resolveCommand(cmd, _) {
     // resolveCommand function is pretty OP, it can do from opening modals, changing client settings and way more.
@@ -197,22 +198,8 @@ function customAction(action, parameters) {
         case 'CHECK_FOR_UPDATES':
             checkForUpdates(true);
             break;
-        case 'PLAYLIST_CONTINUE': {
-            const threshold = configRead('hideWatchedVideosThreshold');
-            const cache = window._ttVideoProgressCache || {};
-            const items = window.__ttCurrentPlaylistItems || [];
-            for (const item of items) {
-                const videoId = item?.tileRenderer?.contentId
-                || item?.tileRenderer?.onSelectCommand?.watchEndpoint?.videoId;
-                if (!videoId) continue;
-                const pct = cache[videoId] ?? null;
-                if (pct === null || pct <= threshold) {
-                resolveCommand(item.tileRenderer.onSelectCommand);
-                return;
-                }
-            }
-            showToast('TizenTube', 'No unwatched videos in this playlist.');
+        case 'PLAYLIST_CONTINUE':
+            playlistContinue(resolveCommand, showToast);
             break;
-            }
     }
 }

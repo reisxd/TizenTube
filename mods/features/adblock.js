@@ -826,7 +826,6 @@ JSON.parse = function () {
 
     const topPlaylistRenderer = r?.contents?.tvBrowseRenderer?.content?.tvSurfaceContentRenderer?.content?.twoColumnRenderer?.rightColumn?.playlistVideoListRenderer;
     if (topPlaylistRenderer?.contents) filterPlaylistRendererContents(topPlaylistRenderer, detectedPage, 'playlist.renderer');
-    if (detectedPage === 'playlist') injectPlaylistContinueButton(r);
 
     if (r?.continuationContents?.sectionListContinuation?.contents) {
       const contSlc = r.continuationContents.sectionListContinuation;
@@ -1005,53 +1004,6 @@ const _yttvPatchInterval = setInterval(() => {
 }, 300);
 setTimeout(() => clearInterval(_yttvPatchInterval), 15000);
 
-
-// ===== injectPlaylistContinueButton =====
-
-function injectPlaylistContinueButton(r) {
-  try {
-    // Store all playlist items (unfiltered) so PLAYLIST_CONTINUE can find the first unwatched.
-    const playlistRenderer = r?.contents?.tvBrowseRenderer?.content?.tvSurfaceContentRenderer
-      ?.content?.twoColumnRenderer?.rightColumn?.playlistVideoListRenderer;
-    if (Array.isArray(playlistRenderer?.contents)) {
-      window.__ttCurrentPlaylistItems = playlistRenderer.contents.slice();
-    }
-
-    // Find the playlistHeaderRenderer — it lives in the leftColumn of the twoColumnRenderer.
-    const header = r?.contents?.tvBrowseRenderer?.content?.tvSurfaceContentRenderer
-      ?.content?.twoColumnRenderer?.leftColumn?.playlistHeaderRenderer;
-    if (!header) return;
-
-    if (!Array.isArray(header.buttons)) return;
-
-    // Don't inject twice (e.g. on continuation responses).
-    if (header.buttons.some(b => b?.buttonRenderer?.command?.commandExecutorCommand
-        ?.commands?.[0]?.customAction?.action === 'PLAYLIST_CONTINUE')) return;
-
-    // Build a Continue button that matches the style of the existing playlist action buttons.
-    const continueButton = {
-      buttonRenderer: {
-        style: 'STYLE_DEFAULT',
-        size: 'SIZE_DEFAULT',
-        isDisabled: false,
-        text: { runs: [{ text: 'Continue' }] },
-        icon: { iconType: 'QUEUE_PLAY_NEXT' },
-        trackingParams: null,
-        command: {
-          clickTrackingParams: null,
-          commandExecutorCommand: {
-            commands: [{ customAction: { action: 'PLAYLIST_CONTINUE' } }]
-          }
-        }
-      }
-    };
-
-    header.buttons.push(continueButton);
-    appendFileOnlyLog('playlist.continue.injected', { totalButtons: header.buttons.length });
-  } catch (err) {
-    appendFileOnlyLog('playlist.continue.inject.error', { msg: String(err?.message || err) });
-  }
-}
 
 // ===== processShelves =====
 
