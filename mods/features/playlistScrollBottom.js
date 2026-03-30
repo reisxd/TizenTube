@@ -4,6 +4,35 @@ function _log(label, payload) {
   appendFileOnlyLog(label, payload);
 }
 
+function getPlaylistScrollTargets() {
+  const targets = [];
+  const seen = new Set();
+  const push = (node) => {
+    if (!node || seen.has(node)) return;
+    seen.add(node);
+    targets.push(node);
+  };
+
+  const playlistRoot = document.querySelector('ytlr-playlist-video-list-renderer');
+  const browseRoot = document.querySelector('ytlr-browse-response');
+  push(playlistRoot);
+  push(playlistRoot?.querySelector?.('[role="list"]'));
+  push(playlistRoot?.querySelector?.('yt-focus-container'));
+  push(browseRoot?.querySelector?.('[role="list"]'));
+
+  const scrollables = document.querySelectorAll('ytlr-playlist-video-list-renderer *, ytlr-browse-response *');
+  for (const node of scrollables) {
+    if (!(node instanceof HTMLElement)) continue;
+    const style = window.getComputedStyle ? window.getComputedStyle(node) : null;
+    const canScroll = node.scrollHeight > node.clientHeight + 8;
+    const overflowScrollable = style && (style.overflowY === 'auto' || style.overflowY === 'scroll');
+    if (canScroll && overflowScrollable) push(node);
+  }
+
+  push(document.scrollingElement || document.documentElement || document.body);
+  return targets;
+}
+
 function buildScrollBottomCommand() {
   return {
     clickTrackingParams: null,
@@ -75,33 +104,34 @@ function tryInjectButton(r) {
 
 export function playlistScrollBottom(showToastFn) {
   try {
-    const playlistNode = document.querySelector('ytlr-playlist-video-list-renderer')
-      || document.querySelector('ytlr-guide-response-panel-renderer [role="list"]')
-      || document.querySelector('ytlr-browse-response yt-focus-container[role="list"]')
-      || document.querySelector('[data-content-type="playlist"] [role="list"]');
+    const targets = getPlaylistScrollTargets();
 
-    if (playlistNode) {
+    if (targets.length) {
       const max = Number.MAX_SAFE_INTEGER;
       let attempt = 0;
       let unchangedCount = 0;
-      let lastHeight = -1;
+      let lastKey = '';
       const maxAttempts = 12;
 
       const stepScroll = () => {
         try {
-          if (typeof playlistNode.scrollTo === 'function') {
-            playlistNode.scrollTo({ top: max, behavior: 'auto' });
-          } else {
-            playlistNode.scrollTop = max;
+          const metrics = [];
+          for (const target of targets) {
+            if (!target) continue;
+            if (typeof target.scrollTo === 'function') {
+              target.scrollTo({ top: max, behavior: 'auto' });
+            } else {
+              target.scrollTop = max;
+            }
+            metrics.push(`${target.scrollTop}:${target.scrollHeight}:${target.clientHeight}`);
           }
-
-          const currentHeight = Number(playlistNode.scrollHeight || 0);
-          unchangedCount = currentHeight === lastHeight ? unchangedCount + 1 : 0;
-          lastHeight = currentHeight;
+          const key = metrics.join('|');
+          unchangedCount = key === lastKey ? unchangedCount + 1 : 0;
+          lastKey = key;
           attempt++;
 
           if (attempt >= maxAttempts || unchangedCount >= 2) {
-            _log('playlist.scroll.bottom.done', { selector: playlistNode.tagName || 'unknown', attempts: attempt, scrollHeight: currentHeight });
+            _log('playlist.scroll.bottom.done', { attempts: attempt, targets: targets.length });
             return;
           }
           setTimeout(stepScroll, 150);

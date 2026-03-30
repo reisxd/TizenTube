@@ -1,4 +1,5 @@
-import { appendFileOnlyLog } from './hideWatched.js';
+import { configRead } from '../config.js';
+import { appendFileOnlyLog, getWatchPercent } from './hideWatched.js';
 
 // Walks an object up to maxDepth and logs every path that contains the word 'button'
 // or 'playlist' in its key — used once to find the real playlistHeaderRenderer path.
@@ -25,33 +26,52 @@ function _log(label, payload) {
 function getPlaylistDomVideoIds() {
   const ids = [];
   const seen = new Set();
-  const selectors = [
-    'ytlr-playlist-video-list-renderer [data-video-id]',
-    'ytlr-playlist-video-list-renderer [video-id]',
-    'ytlr-playlist-video-list-renderer [data-content-id]',
-    'ytlr-playlist-video-list-renderer [content-id]',
-  ];
-  for (const selector of selectors) {
-    const nodes = document.querySelectorAll(selector);
-    for (const node of nodes) {
-      const id = String(
-        node.getAttribute('data-video-id')
-        || node.getAttribute('video-id')
-        || node.getAttribute('data-content-id')
-        || node.getAttribute('content-id')
-        || ''
-      ).trim();
-      if (!id || seen.has(id)) continue;
-      const hidden = node.closest?.('[hidden],[aria-hidden="true"]');
-      if (hidden) continue;
-      if (typeof window.getComputedStyle === 'function') {
-        const style = window.getComputedStyle(node);
-        if (style?.display === 'none' || style?.visibility === 'hidden' || style?.opacity === '0') continue;
+  const roots = [
+    document.querySelector('ytlr-playlist-video-list-renderer'),
+    document.querySelector('ytlr-browse-response'),
+    document,
+  ].filter(Boolean);
+  const selectors = ['[data-video-id]', '[video-id]', '[data-content-id]', '[content-id]', '[data-context-item-id]', 'a[href*="watch"]'];
+
+  const getId = (node) => {
+    const attrs = [
+      node.getAttribute?.('data-video-id'),
+      node.getAttribute?.('video-id'),
+      node.getAttribute?.('data-content-id'),
+      node.getAttribute?.('content-id'),
+      node.getAttribute?.('data-context-item-id'),
+    ];
+    for (const attr of attrs) {
+      const value = String(attr || '').trim();
+      if (value) return value;
+    }
+    const href = node.getAttribute?.('href') || '';
+    const match = String(href).match(/[?&]v=([a-zA-Z0-9_-]{11})/);
+    return match ? match[1] : '';
+  };
+
+  const isVisibleNode = (node) => {
+    const row = node.closest?.('ytlr-tile-renderer, ytlr-grid-tile, ytlr-rich-item-renderer, [role="listitem"]') || node;
+    const hidden = row.closest?.('[hidden],[aria-hidden="true"]');
+    if (hidden) return false;
+    if (typeof window.getComputedStyle === 'function') {
+      const style = window.getComputedStyle(row);
+      if (style?.display === 'none' || style?.visibility === 'hidden' || style?.opacity === '0') return false;
+    }
+    const rects = row.getClientRects ? row.getClientRects() : null;
+    return !(rects && rects.length === 0);
+  };
+
+  for (const root of roots) {
+    for (const selector of selectors) {
+      const nodes = root.querySelectorAll(selector);
+      for (const node of nodes) {
+        const id = getId(node);
+        if (!id || seen.has(id)) continue;
+        if (!isVisibleNode(node)) continue;
+        seen.add(id);
+        ids.push(id);
       }
-      const rects = node.getClientRects ? node.getClientRects() : null;
-      if (rects && rects.length === 0) continue;
-      seen.add(id);
-      ids.push(id);
     }
   }
   return ids;
@@ -214,8 +234,27 @@ export function playlistContinue(resolveCommandFn, showToastFn) {
       return;
     }
 
+    const threshold = Number(configRead('hideWatchedVideosThreshold'));
+    let firstEligible = null;
+    for (const item of items) {
+      const cmd = item?.tileRenderer?.onSelectCommand;
+      const videoId = item?.tileRenderer?.contentId || cmd?.watchEndpoint?.videoId;
+      if (!videoId || !cmd) continue;
+      if (helperIds?.has?.(videoId) || item?.__ttKeepOneForContinuation) continue;
+
+      const pct = getWatchPercent(item);
+      if (pct !== null && Number.isFinite(pct) && pct > threshold) continue;
+      firstEligible = { cmd, videoId, pct };
+      break;
+    }
+    if (firstEligible) {
+      _log('playlist.continue.play.fallback', firstEligible);
+      resolveCommandFn(firstEligible.cmd);
+      return;
+    }
+
     showToastFn('TizenTube', 'No visible unwatched videos found. Scroll playlist to load more.');
-    _log('playlist.continue.none_from_dom', { checkedDom: domVideoIds.length, items: items.length });
+    _log('playlist.continue.none_found', { checkedDom: domVideoIds.length, items: items.length });
   } catch (err) {
     _log('playlist.continue.action.error', { msg: String(err?.message || err) });
   }
