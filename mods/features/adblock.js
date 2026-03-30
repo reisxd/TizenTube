@@ -11,6 +11,7 @@ import {
   hideVideo,
   processTileArraysDeep,
   consolidateShelves,
+  clearCarryover,
 } from './hideWatched.js';
 
 // ===== Local utilities =====
@@ -611,6 +612,7 @@ function processResponsePayload(payload, detectedPage) {
   }
   if (payload?.continuationContents?.tvSurfaceContentContinuation?.content?.sectionListRenderer?.contents) {
     const tvSlc = payload.continuationContents.tvSurfaceContentContinuation.content.sectionListRenderer;
+    clearCarryover();
     processShelves(tvSlc.contents, true, detectedPage);
     consolidateShelves(tvSlc.contents, 'arrayPayload.continuation.tvSurface.sectionList', detectedPage, !!tvSlc.continuations, filterShortsFromItems);
   }
@@ -827,41 +829,13 @@ JSON.parse = function () {
 
     if (r?.continuationContents?.sectionListContinuation?.contents) {
       const contSlc = r.continuationContents.sectionListContinuation;
-      if (detectedPage === 'subscriptions') {
-        if (!Array.isArray(window.__ttDebugSubsResponses)) window.__ttDebugSubsResponses = [];
-        window.__ttDebugSubsResponses.push({ type: 'sectionListContinuation', ts: new Date().toISOString(), raw: r });
-        if (window.__ttDebugSubsResponses.length > 10) window.__ttDebugSubsResponses.shift();
-        appendFileOnlyLog('debug.subs.stored', {
-          type: 'sectionListContinuation',
-          topLevelKeys: Object.keys(r),
-          continuationContentsKeys: Object.keys(r.continuationContents || {}),
-          sectionListKeys: Object.keys(contSlc),
-          trackingParams: r?.responseContext?.serviceTrackingParams?.map(e => e?.service + ':' + (e?.params || []).map(p => p.key + '=' + p.value).join(',')) || [],
-          hasContinuation: !!contSlc.continuations,
-          hint: 'inspect window.__ttDebugSubsResponses in console',
-        });
-      }
       processShelves(contSlc.contents, false, detectedPage);
       consolidateShelves(contSlc.contents, 'continuation.sectionList', detectedPage, !!contSlc.continuations, filterShortsFromItems);
     }
 
     if (r?.continuationContents?.tvSurfaceContentContinuation?.content?.sectionListRenderer?.contents) {
       const tvSlc = r.continuationContents.tvSurfaceContentContinuation.content.sectionListRenderer;
-      if (detectedPage === 'subscriptions') {
-        if (!Array.isArray(window.__ttDebugSubsResponses)) window.__ttDebugSubsResponses = [];
-        window.__ttDebugSubsResponses.push({ type: 'tvSurfaceContentContinuation', ts: new Date().toISOString(), raw: r });
-        if (window.__ttDebugSubsResponses.length > 10) window.__ttDebugSubsResponses.shift();
-        appendFileOnlyLog('debug.subs.stored', {
-          type: 'tvSurfaceContentContinuation',
-          topLevelKeys: Object.keys(r),
-          continuationContentsKeys: Object.keys(r.continuationContents || {}),
-          tvSurfaceKeys: Object.keys(r.continuationContents.tvSurfaceContentContinuation || {}),
-          tvSurfaceContentKeys: Object.keys(r.continuationContents.tvSurfaceContentContinuation?.content || {}),
-          trackingParams: r?.responseContext?.serviceTrackingParams?.map(e => e?.service + ':' + (e?.params || []).map(p => p.key + '=' + p.value).join(',')) || [],
-          hasContinuation: !!tvSlc.continuations,
-          hint: 'inspect window.__ttDebugSubsResponses in console',
-        });
-      }
+      clearCarryover();
       processShelves(tvSlc.contents, false, detectedPage);
       consolidateShelves(tvSlc.contents, 'continuation.tvSurface.sectionList', detectedPage, !!tvSlc.continuations, filterShortsFromItems);
     }

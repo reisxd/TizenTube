@@ -192,11 +192,13 @@ export function processTileArraysDeep(node, pageHint = null, path = 'root', dept
 
 const _seen = new WeakSet();
 
-// Carryover store: { items, sourcePath } keyed by pageName.
-// sourcePath is the path string of the call that stored the carryover.
-// When a new 'tab.*' path comes in and its sourcePath doesn't match, the
-// carryover is from a different tab and is discarded. Cleared on navigation.
 const _carryover = {};
+
+export function clearCarryover() {
+  const keys = Object.keys(_carryover);
+  if (keys.length) appendFileOnlyLog('consolidate.carryover.cleared', { cleared: keys });
+  keys.forEach(k => delete _carryover[k]);
+}
 
 // Only subscriptions and watch benefit from consolidation.
 // Channel page is intentionally excluded — it breaks the channel page layout.
@@ -226,28 +228,15 @@ export function consolidateShelves(contents, path = 'unknown', pageName = null, 
 
     if (itemFilter) freshItems = itemFilter(freshItems, pageName);
 
+    // Apply carryover from previous batch for this pageName.
+    // Only discard if current path is a tab.* path and sourcePath differs (initial tab load
+    // after a tab switch). Tab-switch clears are handled by clearCarryover() in adblock.js
+    // which is called whenever tvSurfaceContentContinuation fires (channel tab initial load).
     const isTabPath = path.startsWith('tab.');
     let carried = [];
     if (pageName && _carryover[pageName]) {
       const stored = _carryover[pageName];
-      // Stale carryover detection without relying on __ttLastTabPath (which only fires once
-      // at initial page load and never updates on tab switch):
-      //
-      // "Alle" tab stores carryover via path 'tab.fesubscriptions'. Its scroll continuations
-      // arrive as sectionListContinuation → path 'continuation.sectionList'. Channel tab
-      // content (when URL stays #/browse?c=FEsubscriptions) arrives via
-      // tvSurfaceContentContinuation → path 'continuation.tvSurface.*'. These two paths
-      // are structurally different. If a stored tab carryover is being claimed by a
-      // tvSurface continuation, it belongs to a different tab — discard it.
-      // Carryover is only valid within the same continuation family:
-      //   tvSurface paths  → channel tab continuations (continuation.tvSurface.*)
-      //   non-tvSurface    → "Alle" tab continuations  (continuation.sectionList, tab.fesubscriptions)
-      // Cross-family application is always wrong regardless of direction.
-      const currentIsTvSurface = path.includes('tvSurface');
-      const storedIsTvSurface  = stored.sourcePath ? stored.sourcePath.includes('tvSurface') : currentIsTvSurface;
-      const isStale = isTabPath
-        ? stored.sourcePath !== path
-        : currentIsTvSurface !== storedIsTvSurface;
+      const isStale = isTabPath && stored.sourcePath !== path;
       if (isStale) {
         delete _carryover[pageName];
         appendFileOnlyLog('consolidate.carryover.tabSwitch', { path, pageName, discarded: stored.items.length, oldPath: stored.sourcePath });
@@ -260,7 +249,7 @@ export function consolidateShelves(contents, path = 'unknown', pageName = null, 
 
     if (!freshItems.length && !carried.length) return;
 
-    // Deduplicate — seed with carried IDs first.
+    // Deduplicate — seed seenIds with carried IDs so fresh items can't duplicate them.
     const seenIds = new Set();
     for (const item of carried) {
       const id = item?.tileRenderer?.onSelectCommand?.watchEndpoint?.videoId || item?.tileRenderer?.contentId || null;
@@ -273,7 +262,6 @@ export function consolidateShelves(contents, path = 'unknown', pageName = null, 
       seenIds.add(id);
       return true;
     });
-
     const dedupedItems = [...carried, ...dedupedFresh];
     if (!dedupedItems.length) return;
 
@@ -312,7 +300,9 @@ export function consolidateShelves(contents, path = 'unknown', pageName = null, 
       newShelves.push({ shelfRenderer: { ...template.shelfRenderer, content: { horizontalListRenderer: hlr } } });
     }
 
-    // Partial remainder: store as carryover when more batches are coming, else render as-is.
+    // Partial remainder handling:
+    // hasContinuation=true  → store as carryover; next batch prepends them before packing rows.
+    // hasContinuation=false → last batch; render partial row as-is.
     const remainder = dedupedItems.length % perRow;
     if (remainder > 0) {
       const lastBatch = dedupedItems.slice(dedupedItems.length - remainder);
@@ -337,7 +327,8 @@ export function consolidateShelves(contents, path = 'unknown', pageName = null, 
     contents.splice(insertAt, 0, ...newShelves);
     appendFileOnlyLog('consolidate.done', {
       path, pageName, perRow,
-      totalItems: allItems.length, freshItems: freshItems.length, carried: carried.length,
+      totalItems: allItems.length, freshItems: freshItems.length,
+      carried: carried.length,
       deduped: (freshItems.length + carried.length) - dedupedItems.length,
       newRows: newShelves.length,
       carryoverStored: (hasContinuation && remainder > 0) ? remainder : 0,
