@@ -13,7 +13,7 @@
                 "title": "SponsorBlock の設定",
                 "options": {
                     "enableSB": "SponsorBlock を有効化する",
-                    "manualSkip": "SponsorBlock のセグメントのスキップを手動にする",
+                    "manualSkip": "SponsorBlock のセグメントスキップを手動にする",
                     "segments": "セグメント",
                     "categories": {
                         "sponsor": "スポンサーをスキップ",
