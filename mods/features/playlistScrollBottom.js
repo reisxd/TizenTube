@@ -4,6 +4,15 @@ function _log(label, payload) {
   appendFileOnlyLog(label, payload);
 }
 
+function buildScrollBottomCommand() {
+  return {
+    clickTrackingParams: null,
+    commandExecutorCommand: {
+      commands: [{ customAction: { action: 'PLAYLIST_SCROLL_BOTTOM' } }],
+    },
+  };
+}
+
 function getButtons(r) {
   const twoCol = r?.contents?.tvBrowseRenderer?.content?.tvSurfaceContentRenderer?.content?.twoColumnRenderer;
   if (!twoCol) return null;
@@ -48,10 +57,12 @@ function tryInjectButton(r) {
 
     if (br.icon) br.icon.iconType = 'ARROW_DOWNWARD';
 
-    const cmd = { clickTrackingParams: null, commandExecutorCommand: { commands: [{ customAction: { action: 'PLAYLIST_SCROLL_BOTTOM' } }] } };
-    if (br.serviceEndpoint !== undefined) br.serviceEndpoint = cmd;
-    else if (br.command !== undefined) br.command = cmd;
-    else br.serviceEndpoint = cmd;
+    const cmd = buildScrollBottomCommand();
+    br.command = cmd;
+    br.serviceEndpoint = cmd;
+    if (br.navigationEndpoint) delete br.navigationEndpoint;
+    if (br.onLongPressCommand) delete br.onLongPressCommand;
+    if (br.longPressCommand) delete br.longPressCommand;
 
     if (br.accessibilityData) br.accessibilityData = { accessibilityData: { label: 'Scroll to bottom' } };
 
@@ -71,12 +82,35 @@ export function playlistScrollBottom(showToastFn) {
 
     if (playlistNode) {
       const max = Number.MAX_SAFE_INTEGER;
-      if (typeof playlistNode.scrollTo === 'function') {
-        playlistNode.scrollTo({ top: max, behavior: 'smooth' });
-      } else {
-        playlistNode.scrollTop = max;
-      }
-      _log('playlist.scroll.bottom', { selector: playlistNode.tagName || 'unknown' });
+      let attempt = 0;
+      let unchangedCount = 0;
+      let lastHeight = -1;
+      const maxAttempts = 12;
+
+      const stepScroll = () => {
+        try {
+          if (typeof playlistNode.scrollTo === 'function') {
+            playlistNode.scrollTo({ top: max, behavior: 'auto' });
+          } else {
+            playlistNode.scrollTop = max;
+          }
+
+          const currentHeight = Number(playlistNode.scrollHeight || 0);
+          unchangedCount = currentHeight === lastHeight ? unchangedCount + 1 : 0;
+          lastHeight = currentHeight;
+          attempt++;
+
+          if (attempt >= maxAttempts || unchangedCount >= 2) {
+            _log('playlist.scroll.bottom.done', { selector: playlistNode.tagName || 'unknown', attempts: attempt, scrollHeight: currentHeight });
+            return;
+          }
+          setTimeout(stepScroll, 150);
+        } catch (err) {
+          _log('playlist.scroll.bottom.step_error', { msg: String(err?.message || err), attempt });
+        }
+      };
+
+      stepScroll();
       return;
     }
 
