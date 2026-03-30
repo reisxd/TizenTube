@@ -226,15 +226,17 @@ export function consolidateShelves(contents, path = 'unknown', pageName = null, 
 
     if (itemFilter) freshItems = itemFilter(freshItems, pageName);
 
-    // Apply or discard carryover based on sourcePath.
-    // A 'tab.*' path that doesn't match the stored sourcePath means a tab switch — discard.
     const isTabPath = path.startsWith('tab.');
     let carried = [];
     if (pageName && _carryover[pageName]) {
       const stored = _carryover[pageName];
-      if (isTabPath && stored.sourcePath !== path) {
+      const lastTab = window.__ttLastTabPath || null;
+      const isStale = isTabPath
+        ? stored.sourcePath !== path
+        : (lastTab && stored.sourcePath && lastTab !== stored.sourcePath);
+      if (isStale) {
         delete _carryover[pageName];
-        appendFileOnlyLog('consolidate.carryover.tabSwitch', { path, pageName, discarded: stored.items.length, oldPath: stored.sourcePath });
+        appendFileOnlyLog('consolidate.carryover.tabSwitch', { path, pageName, discarded: stored.items.length, oldPath: stored.sourcePath, lastTab });
       } else {
         carried = [...stored.items];
         delete _carryover[pageName];
