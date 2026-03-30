@@ -197,5 +197,22 @@ function customAction(action, parameters) {
         case 'CHECK_FOR_UPDATES':
             checkForUpdates(true);
             break;
+        case 'PLAYLIST_CONTINUE': {
+            const threshold = configRead('hideWatchedVideosThreshold');
+            const cache = window._ttVideoProgressCache || {};
+            const items = window.__ttCurrentPlaylistItems || [];
+            for (const item of items) {
+                const videoId = item?.tileRenderer?.contentId
+                || item?.tileRenderer?.onSelectCommand?.watchEndpoint?.videoId;
+                if (!videoId) continue;
+                const pct = cache[videoId] ?? null;
+                if (pct === null || pct <= threshold) {
+                resolveCommand(item.tileRenderer.onSelectCommand);
+                return;
+                }
+            }
+            showToast('TizenTube', 'No unwatched videos in this playlist.');
+            break;
+            }
     }
 }
