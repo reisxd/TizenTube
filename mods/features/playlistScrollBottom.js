@@ -113,8 +113,10 @@ export function playlistScrollBottom(showToastFn) {
       const maxAttempts = 120;
       const stepDelayMs = 70;
       let attempt = 0;
-      const baseItemCount = Array.isArray(window.__ttCurrentPlaylistItems) ? window.__ttCurrentPlaylistItems.length : 0;
-      _log('playlist.scroll.bottom.start', { targets: targets.length, baseItemCount, targetDowns, maxAttempts, stepDelayMs });
+      let baseItemCount = Array.isArray(window.__ttCurrentPlaylistItems) ? window.__ttCurrentPlaylistItems.length : 0;
+      let batchLoads = 0;
+      const maxBatchLoads = 4;
+      _log('playlist.scroll.bottom.start', { targets: targets.length, baseItemCount, targetDowns, maxAttempts, stepDelayMs, maxBatchLoads });
 
       const stepScroll = () => {
         try {
@@ -124,8 +126,14 @@ export function playlistScrollBottom(showToastFn) {
           }
           const currentItemCount = Array.isArray(window.__ttCurrentPlaylistItems) ? window.__ttCurrentPlaylistItems.length : 0;
           if (currentItemCount > baseItemCount) {
-            _log('playlist.scroll.bottom.done', { reason: 'batch_loaded', attempts: attempt, sentDowns, baseItemCount, currentItemCount });
-            return;
+            batchLoads++;
+            _log('playlist.scroll.bottom.batch_loaded', { attempts: attempt, sentDowns, baseItemCount, currentItemCount, batchLoads });
+            baseItemCount = currentItemCount;
+            sentDowns = 0;
+            if (batchLoads >= maxBatchLoads) {
+              _log('playlist.scroll.bottom.done', { reason: 'max_batch_loads', attempts: attempt, sentDowns, batchLoads, baseItemCount });
+              return;
+            }
           }
           if (sentDowns >= targetDowns) {
             _log('playlist.scroll.bottom.done', { reason: 'batch_step_complete', attempts: attempt, sentDowns, targets: targets.length });

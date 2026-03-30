@@ -84,8 +84,6 @@ function getPlaylistDomVideoIds() {
 function storePlItems(r) {
   try {
     const twoCol = r?.contents?.tvBrowseRenderer?.content?.tvSurfaceContentRenderer?.content?.twoColumnRenderer;
-    if (!twoCol) return;
-
     const plr = twoCol?.rightColumn?.playlistVideoListRenderer;
     if (Array.isArray(plr?.contents)) {
       window.__ttCurrentPlaylistItems = plr.contents.slice();
