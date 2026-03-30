@@ -109,10 +109,11 @@ export function playlistScrollBottom(showToastFn) {
     if (targets.length) {
       const max = Number.MAX_SAFE_INTEGER;
       let sentDowns = 0;
-      const targetDowns = 15;
+      const targetDowns = 60;
       const maxAttempts = 120;
       let attempt = 0;
       const baseItemCount = Array.isArray(window.__ttCurrentPlaylistItems) ? window.__ttCurrentPlaylistItems.length : 0;
+      _log('playlist.scroll.bottom.start', { targets: targets.length, baseItemCount, targetDowns, maxAttempts });
 
       const stepScroll = () => {
         try {
@@ -139,6 +140,15 @@ export function playlistScrollBottom(showToastFn) {
             }
             try { target.dispatchEvent(new Event('scroll', { bubbles: true })); } catch (_) { }
           }
+          if (sentDowns % 5 === 0) {
+            _log('playlist.scroll.bottom.progress', {
+              attempt,
+              sentDowns,
+              itemCount: Array.isArray(window.__ttCurrentPlaylistItems) ? window.__ttCurrentPlaylistItems.length : 0,
+              top0: Number(targets[0]?.scrollTop || 0),
+              top1: Number(targets[1]?.scrollTop || 0),
+            });
+          }
           try {
             const keyEvent = new KeyboardEvent('keydown', { key: 'ArrowDown', code: 'ArrowDown', keyCode: 40, which: 40, bubbles: true });
             document.dispatchEvent(keyEvent);
@@ -147,7 +157,7 @@ export function playlistScrollBottom(showToastFn) {
             sentDowns++;
           } catch (_) { }
           attempt++;
-          setTimeout(stepScroll, 10);
+          setTimeout(stepScroll, 0);
         } catch (err) {
           _log('playlist.scroll.bottom.step_error', { msg: String(err?.message || err), attempt, sentDowns });
         }

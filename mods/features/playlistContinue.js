@@ -218,6 +218,7 @@ export function playlistContinue(resolveCommandFn, showToastFn) {
 
     const helperIds = window.__ttPlaylistHelperVideoIds;
     const domVideoIds = getPlaylistDomVideoIds();
+    _log('playlist.continue.dom_ids', { count: domVideoIds.length, ids: domVideoIds.slice(0, 20) });
     const cmdByVideoId = new Map();
     for (const item of items) {
       const cmd = item?.tileRenderer?.onSelectCommand;
@@ -237,12 +238,18 @@ export function playlistContinue(resolveCommandFn, showToastFn) {
     const threshold = Number(configRead('hideWatchedVideosThreshold'));
     let firstEligible = null;
     let firstUnknown = null;
+    let firstAny = null;
+    const debugCandidates = [];
     for (const item of items) {
       const cmd = item?.tileRenderer?.onSelectCommand;
       const videoId = item?.tileRenderer?.contentId || cmd?.watchEndpoint?.videoId;
       if (!videoId || !cmd) continue;
-      if (helperIds?.has?.(videoId) || item?.__ttKeepOneForContinuation) continue;
+      const isHelper = !!helperIds?.has?.(videoId);
+      const isKeepOne = !!item?.__ttKeepOneForContinuation;
       const pct = getWatchPercent(item);
+      if (debugCandidates.length < 25) debugCandidates.push({ videoId, pct, isHelper, isKeepOne });
+      if (isHelper || isKeepOne) continue;
+      if (!firstAny) firstAny = { cmd, videoId, pct };
       if (pct !== null && Number.isFinite(pct)) {
         if (pct <= threshold) {
           firstEligible = { cmd, videoId, pct };
@@ -252,7 +259,9 @@ export function playlistContinue(resolveCommandFn, showToastFn) {
       }
       if (!firstUnknown) firstUnknown = { cmd, videoId, pct: null };
     }
+    _log('playlist.continue.fallback.scan', { threshold, candidates: debugCandidates });
     if (!firstEligible && firstUnknown) firstEligible = firstUnknown;
+    if (!firstEligible && firstAny) firstEligible = firstAny;
     if (firstEligible) {
       _log('playlist.continue.play.fallback', firstEligible);
       resolveCommandFn(firstEligible.cmd);
