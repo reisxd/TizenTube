@@ -139,6 +139,8 @@ function tryInjectButton(r) {
 
     // Don't inject twice
     if (buttons.some(b =>
+      b?.buttonRenderer?.command?.customAction?.action === 'PLAYLIST_CONTINUE' ||
+      b?.buttonRenderer?.serviceEndpoint?.customAction?.action === 'PLAYLIST_CONTINUE' ||
       b?.buttonRenderer?.command?.commandExecutorCommand?.commands?.[0]?.customAction?.action === 'PLAYLIST_CONTINUE' ||
       b?.buttonRenderer?.serviceEndpoint?.commandExecutorCommand?.commands?.[0]?.customAction?.action === 'PLAYLIST_CONTINUE'
     )) {
@@ -154,7 +156,7 @@ function tryInjectButton(r) {
       return;
     }
 
-    const continueButton = JSON.parse(JSON.stringify(existingButton));
+    const continueButton = { buttonRenderer: JSON.parse(JSON.stringify(existingButton.buttonRenderer)) };
     const br = continueButton.buttonRenderer;
 
     // Set text
@@ -165,10 +167,12 @@ function tryInjectButton(r) {
     if (br.icon) br.icon.iconType = 'PLAY_ARROW';
 
     // Set command — try both serviceEndpoint and command shapes
-    const cmd = { clickTrackingParams: null, commandExecutorCommand: { commands: [{ customAction: { action: 'PLAYLIST_CONTINUE' } }] } };
-    if (br.serviceEndpoint !== undefined) br.serviceEndpoint = cmd;
-    else if (br.command !== undefined) br.command = cmd;
-    else br.serviceEndpoint = cmd;
+    const cmd = { clickTrackingParams: null, customAction: { action: 'PLAYLIST_CONTINUE' } };
+    br.command = cmd;
+    br.serviceEndpoint = cmd;
+    if (br.navigationEndpoint) delete br.navigationEndpoint;
+    if (br.onLongPressCommand) delete br.onLongPressCommand;
+    if (br.longPressCommand) delete br.longPressCommand;
 
     // Clear any accessibility label so it doesn't say the wrong thing
     if (br.accessibilityData) br.accessibilityData = { accessibilityData: { label: 'Continue' } };

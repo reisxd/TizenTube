@@ -7,9 +7,7 @@ function _log(label, payload) {
 function buildScrollBottomCommand() {
   return {
     clickTrackingParams: null,
-    commandExecutorCommand: {
-      commands: [{ customAction: { action: 'PLAYLIST_SCROLL_BOTTOM' } }],
-    },
+    customAction: { action: 'PLAYLIST_SCROLL_BOTTOM' },
   };
 }
 
@@ -41,6 +39,8 @@ function tryInjectButton(r) {
     if (!Array.isArray(buttons) || !buttons.length) return;
 
     const already = buttons.some(b =>
+      b?.buttonRenderer?.command?.customAction?.action === 'PLAYLIST_SCROLL_BOTTOM' ||
+      b?.buttonRenderer?.serviceEndpoint?.customAction?.action === 'PLAYLIST_SCROLL_BOTTOM' ||
       b?.buttonRenderer?.command?.commandExecutorCommand?.commands?.[0]?.customAction?.action === 'PLAYLIST_SCROLL_BOTTOM' ||
       b?.buttonRenderer?.serviceEndpoint?.commandExecutorCommand?.commands?.[0]?.customAction?.action === 'PLAYLIST_SCROLL_BOTTOM'
     );
