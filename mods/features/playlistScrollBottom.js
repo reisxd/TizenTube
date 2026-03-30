@@ -109,7 +109,7 @@ export function playlistScrollBottom(showToastFn) {
     if (targets.length) {
       const max = Number.MAX_SAFE_INTEGER;
       let sentDowns = 0;
-      const targetDowns = 15;
+      const targetDowns = 30;
       const maxAttempts = 120;
       const stepDelayMs = 70;
       let attempt = 0;

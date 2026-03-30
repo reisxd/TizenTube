@@ -236,8 +236,10 @@ export function playlistContinue(resolveCommandFn, showToastFn) {
     }
 
     const threshold = Number(configRead('hideWatchedVideosThreshold'));
-    let bestByPct = null;
+    const effectiveThreshold = Math.max(20, threshold);
+    let firstByOrder = null;
     let firstUnknown = null;
+    let firstNonHelper = null;
     const debugCandidates = [];
     for (const item of items) {
       const cmd = item?.tileRenderer?.onSelectCommand;
@@ -248,19 +250,21 @@ export function playlistContinue(resolveCommandFn, showToastFn) {
       const pct = getWatchPercent(item);
       if (debugCandidates.length < 25) debugCandidates.push({ videoId, pct, isHelper, isKeepOne });
       if (isHelper || isKeepOne) continue;
+      if (!firstNonHelper) firstNonHelper = { cmd, videoId, pct };
       if (pct !== null && Number.isFinite(pct)) {
-        if (!bestByPct || pct < bestByPct.pct) {
-          bestByPct = { cmd, videoId, pct };
+        if (pct <= effectiveThreshold) {
+          firstByOrder = { cmd, videoId, pct };
+          break;
         }
         continue;
       }
       if (!firstUnknown) firstUnknown = { cmd, videoId, pct: null };
     }
     let pick = null;
-    if (bestByPct && bestByPct.pct <= threshold) pick = bestByPct;
-    else if (bestByPct) pick = bestByPct;
+    if (firstByOrder) pick = firstByOrder;
     else if (firstUnknown) pick = firstUnknown;
-    _log('playlist.continue.fallback.scan', { threshold, pick, candidates: debugCandidates });
+    else if (firstNonHelper) pick = firstNonHelper;
+    _log('playlist.continue.fallback.scan', { threshold, effectiveThreshold, pick, candidates: debugCandidates });
     if (pick) {
       _log('playlist.continue.play.fallback', pick);
       resolveCommandFn(pick.cmd);
