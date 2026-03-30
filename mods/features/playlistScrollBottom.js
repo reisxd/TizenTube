@@ -109,11 +109,12 @@ export function playlistScrollBottom(showToastFn) {
     if (targets.length) {
       const max = Number.MAX_SAFE_INTEGER;
       let sentDowns = 0;
-      const targetDowns = 60;
+      const targetDowns = 15;
       const maxAttempts = 120;
+      const stepDelayMs = 70;
       let attempt = 0;
       const baseItemCount = Array.isArray(window.__ttCurrentPlaylistItems) ? window.__ttCurrentPlaylistItems.length : 0;
-      _log('playlist.scroll.bottom.start', { targets: targets.length, baseItemCount, targetDowns, maxAttempts });
+      _log('playlist.scroll.bottom.start', { targets: targets.length, baseItemCount, targetDowns, maxAttempts, stepDelayMs });
 
       const stepScroll = () => {
         try {
@@ -157,7 +158,7 @@ export function playlistScrollBottom(showToastFn) {
             sentDowns++;
           } catch (_) { }
           attempt++;
-          setTimeout(stepScroll, 0);
+          setTimeout(stepScroll, stepDelayMs);
         } catch (err) {
           _log('playlist.scroll.bottom.step_error', { msg: String(err?.message || err), attempt, sentDowns });
         }
