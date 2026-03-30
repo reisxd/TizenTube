@@ -49,7 +49,7 @@ function tryInjectButton(r) {
     const existingButton = buttons.find(b => b?.buttonRenderer);
     if (!existingButton) return;
 
-    const scrollButton = JSON.parse(JSON.stringify(existingButton));
+    const scrollButton = { buttonRenderer: JSON.parse(JSON.stringify(existingButton.buttonRenderer)) };
     const br = scrollButton.buttonRenderer;
 
     if (br.text?.runs) br.text.runs[0].text = 'Bottom';

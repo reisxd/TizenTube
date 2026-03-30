@@ -1,5 +1,4 @@
-import { configRead } from '../config.js';
-import { appendFileOnlyLog, getWatchPercent } from './hideWatched.js';
+import { appendFileOnlyLog } from './hideWatched.js';
 
 // Walks an object up to maxDepth and logs every path that contains the word 'button'
 // or 'playlist' in its key — used once to find the real playlistHeaderRenderer path.
@@ -45,6 +44,12 @@ function getPlaylistDomVideoIds() {
       if (!id || seen.has(id)) continue;
       const hidden = node.closest?.('[hidden],[aria-hidden="true"]');
       if (hidden) continue;
+      if (typeof window.getComputedStyle === 'function') {
+        const style = window.getComputedStyle(node);
+        if (style?.display === 'none' || style?.visibility === 'hidden' || style?.opacity === '0') continue;
+      }
+      const rects = node.getClientRects ? node.getClientRects() : null;
+      if (rects && rects.length === 0) continue;
       seen.add(id);
       ids.push(id);
     }
@@ -205,28 +210,8 @@ export function playlistContinue(resolveCommandFn, showToastFn) {
       return;
     }
 
-    const threshold = Number(configRead('hideWatchedVideosThreshold'));
-
-    for (const item of items) {
-      // Skip keep-one helper items (watched videos kept temporarily to trigger next batch load)
-      if (item?.__ttKeepOneForContinuation) continue;
-
-      const cmd = item?.tileRenderer?.onSelectCommand;
-      const videoId = item?.tileRenderer?.contentId || cmd?.watchEndpoint?.videoId;
-      if (!videoId || !cmd) continue;
-      if (helperIds?.has?.(videoId)) continue;
-
-      const watchPercent = getWatchPercent(item);
-      const isWatched = watchPercent !== null && Number.isFinite(watchPercent) && watchPercent > threshold;
-      if (isWatched) continue;
-
-      _log('playlist.continue.play.fallback', { videoId, watchPercent, threshold });
-      resolveCommandFn(cmd);
-      return;
-    }
-
-    showToastFn('TizenTube', 'No unwatched videos found in this playlist.');
-    _log('playlist.continue.all_watched', { checked: items.length, threshold });
+    showToastFn('TizenTube', 'No visible unwatched videos found. Scroll playlist to load more.');
+    _log('playlist.continue.none_from_dom', { checkedDom: domVideoIds.length, items: items.length });
   } catch (err) {
     _log('playlist.continue.action.error', { msg: String(err?.message || err) });
   }
