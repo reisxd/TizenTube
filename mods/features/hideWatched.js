@@ -239,9 +239,15 @@ export function consolidateShelves(contents, path = 'unknown', pageName = null, 
       // tvSurfaceContentContinuation → path 'continuation.tvSurface.*'. These two paths
       // are structurally different. If a stored tab carryover is being claimed by a
       // tvSurface continuation, it belongs to a different tab — discard it.
+      // Carryover is only valid within the same continuation family:
+      //   tvSurface paths  → channel tab continuations (continuation.tvSurface.*)
+      //   non-tvSurface    → "Alle" tab continuations  (continuation.sectionList, tab.fesubscriptions)
+      // Cross-family application is always wrong regardless of direction.
+      const currentIsTvSurface = path.includes('tvSurface');
+      const storedIsTvSurface  = stored.sourcePath ? stored.sourcePath.includes('tvSurface') : currentIsTvSurface;
       const isStale = isTabPath
         ? stored.sourcePath !== path
-        : (stored.sourcePath && stored.sourcePath.startsWith('tab.') && path.startsWith('continuation.tvSurface'));
+        : currentIsTvSurface !== storedIsTvSurface;
       if (isStale) {
         delete _carryover[pageName];
         appendFileOnlyLog('consolidate.carryover.tabSwitch', { path, pageName, discarded: stored.items.length, oldPath: stored.sourcePath });
