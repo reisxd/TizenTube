@@ -609,6 +609,11 @@ function processResponsePayload(payload, detectedPage) {
     processShelves(slc.contents, true, detectedPage);
     consolidateShelves(slc.contents, 'arrayPayload.continuation.sectionList', detectedPage, !!slc.continuations, filterShortsFromItems);
   }
+  if (payload?.continuationContents?.tvSurfaceContentContinuation?.content?.sectionListRenderer?.contents) {
+    const tvSlc = payload.continuationContents.tvSurfaceContentContinuation.content.sectionListRenderer;
+    processShelves(tvSlc.contents, true, detectedPage);
+    consolidateShelves(tvSlc.contents, 'arrayPayload.continuation.tvSurface.sectionList', detectedPage, !!tvSlc.continuations, filterShortsFromItems);
+  }
   if (payload?.continuationContents?.horizontalListContinuation?.items) {
     const continuation = payload.continuationContents.horizontalListContinuation;
     deArrowify(continuation.items);
@@ -824,6 +829,12 @@ JSON.parse = function () {
       const contSlc = r.continuationContents.sectionListContinuation;
       processShelves(contSlc.contents, false, detectedPage);
       consolidateShelves(contSlc.contents, 'continuation.sectionList', detectedPage, !!contSlc.continuations, filterShortsFromItems);
+    }
+
+    if (r?.continuationContents?.tvSurfaceContentContinuation?.content?.sectionListRenderer?.contents) {
+      const tvSlc = r.continuationContents.tvSurfaceContentContinuation.content.sectionListRenderer;
+      processShelves(tvSlc.contents, false, detectedPage);
+      consolidateShelves(tvSlc.contents, 'continuation.tvSurface.sectionList', detectedPage, !!tvSlc.continuations, filterShortsFromItems);
     }
 
     if (r?.continuationContents?.pivotContinuation?.contents) {
