@@ -1,5 +1,5 @@
 import { configRead } from '../config.js';
-import { appendFileOnlyLog } from './hideWatched.js';
+import { appendFileOnlyLog, hideVideo } from './hideWatched.js';
 
 // Walks an object up to maxDepth and logs every path that contains the word 'button'
 // or 'playlist' in its key — used once to find the real playlistHeaderRenderer path.
@@ -128,7 +128,7 @@ function tryInjectButton(r) {
     else if (br.text?.simpleText) br.text.simpleText = 'Continue';
 
     // Set icon
-    if (br.icon) br.icon.iconType = 'QUEUE_PLAY_NEXT';
+    if (br.icon) br.icon.iconType = 'PLAY_ARROW';
 
     // Set command — try both serviceEndpoint and command shapes
     const cmd = { clickTrackingParams: null, commandExecutorCommand: { commands: [{ customAction: { action: 'PLAYLIST_CONTINUE' } }] } };
@@ -151,8 +151,6 @@ function tryInjectButton(r) {
 
 export function playlistContinue(resolveCommandFn, showToastFn) {
   try {
-    const threshold = Number(configRead('hideWatchedVideosThreshold') ?? 5);
-    const cache = window._ttVideoProgressCache || {};
     const items = window.__ttCurrentPlaylistItems || [];
 
     if (!items.length) {
@@ -165,9 +163,11 @@ export function playlistContinue(resolveCommandFn, showToastFn) {
         || item?.tileRenderer?.onSelectCommand?.watchEndpoint?.videoId;
       if (!videoId) continue;
 
-      const pct = cache[videoId] ?? null;
-      if (pct === null || pct <= threshold) {
-        _log('playlist.continue.play', { videoId, pct });
+      // Use hideVideo with the 'playlist' page hint — this is the same logic that hides
+      // videos in the list, so Continue finds exactly the first video that would be visible.
+      const kept = hideVideo([item], 'playlist');
+      if (kept.length > 0) {
+        _log('playlist.continue.play', { videoId });
         resolveCommandFn(item.tileRenderer.onSelectCommand);
         return;
       }
