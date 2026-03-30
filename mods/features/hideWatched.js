@@ -94,7 +94,7 @@ if (!window.__ttHideWatchedLocationTrackingInit) {
 
 // ── Watch progress extraction ─────────────────────────────────────────────────
 
-function getWatchPercent(item) {
+export function getWatchPercent(item) {
   try {
     const overlays = item?.tileRenderer?.header?.tileHeaderRenderer?.thumbnailOverlays
       || item?.tileRenderer?.thumbnailOverlays || [];
