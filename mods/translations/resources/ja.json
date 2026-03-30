@@ -24,7 +24,7 @@
                         "preview": "プレビュー/ダイジェストをスキップ",
                         "filler": "本筋に関係ない話/ジョークをスキップ",
                         "music_offtopic": "音楽以外をスキップ",
-                        "highlights": "ハイライトを有効化"
+                        "highlights": "ハイライトを有効化する"
                     },
                     "showSBToasts": "SponsorBlock のトーストを表示"
                 }
