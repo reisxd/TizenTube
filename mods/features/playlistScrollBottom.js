@@ -55,13 +55,16 @@ function injectButton(buttons, actionName, label, iconType) {
 // We do NOT need focus to be inside the list; setting scrollTop directly works regardless.
 
 function findScrollContainers() {
-  // Mirrors attemptPlaylistAutoLoad in adblock.js exactly:
-  // Primary: ytlr-playlist-video-list-renderer scrolled by 900px — this is what triggers
-  //          YouTube TV to render more virtual rows and fire continuation requests.
-  // Secondary: yt-virtual-list scrolled by 1400px — used for empty_batch recovery.
-  const primary = document.querySelector('ytlr-playlist-video-list-renderer, ytlr-surface-page, body')
-    || document.body;
-  const vlist = document.querySelector('ytlr-playlist-video-list-renderer yt-virtual-list, yt-virtual-list.rN5BTd');
+  // Try each selector individually — a comma-separated querySelector returns elements
+  // in DOM order, so 'body' would always win as the ancestor. Try specific first.
+  const primary =
+    document.querySelector('ytlr-playlist-video-list-renderer') ||
+    document.querySelector('ytlr-surface-page') ||
+    document.body;
+  const vlist =
+    document.querySelector('ytlr-playlist-video-list-renderer yt-virtual-list') ||
+    document.querySelector('yt-virtual-list.rN5BTd') ||
+    document.querySelector('yt-virtual-list');
   return { primary, vlist };
 }
 

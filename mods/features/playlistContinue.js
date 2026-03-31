@@ -73,11 +73,11 @@ function storePlItems(r) {
   }
 }
 
-export function playlistContinue(resolveCommandFn, showToastFn) {
+export function playlistContinue(resolveCommandFn, showToastFn) { // showToastFn kept for signature compat
   try {
     const raw = window.__ttCurrentPlaylistItems || [];
     if (!raw.length) {
-      showToastFn('TizenTube', 'No playlist data. Open a playlist first.');
+      _log('playlist.continue.no_data', {});
       return;
     }
 
@@ -104,7 +104,7 @@ export function playlistContinue(resolveCommandFn, showToastFn) {
       return;
     }
 
-    showToastFn('TizenTube', 'No unwatched videos found. Use Load All to load more first.');
+    _log('playlist.continue.all_watched.silent', { rawItems: raw.length, filteredItems: items.length, skipped: skipped.length });
     _log('playlist.continue.none_found', { rawItems: raw.length, filteredItems: items.length, skipped: skipped.length });
   } catch (err) {
     _log('playlist.continue.error', { msg: String(err?.message || err) });
