@@ -30,13 +30,24 @@ function injectButton(buttons, actionName, label, iconType) {
     b?.buttonRenderer?.command?.customAction?.action === actionName ||
     b?.buttonRenderer?.serviceEndpoint?.customAction?.action === actionName
   )) return false;
-  const existing = buttons.find(b => b?.buttonRenderer);
+  // Prefer a button that already has a text label — cloning an icon-only (round) button
+  // would produce a round clone with no visible text. Fall back to first buttonRenderer.
+  const existing =
+    buttons.find(b => b?.buttonRenderer?.text?.runs || b?.buttonRenderer?.text?.simpleText) ||
+    buttons.find(b => b?.buttonRenderer);
   if (!existing) return false;
   const btn = { buttonRenderer: JSON.parse(JSON.stringify(existing.buttonRenderer)) };
   const br = btn.buttonRenderer;
-  if (br.text?.runs) br.text.runs[0].text = label;
-  else if (br.text?.simpleText) br.text.simpleText = label;
+  // Always ensure text is set, even if the source button had none
+  if (br.text?.runs) {
+    br.text.runs[0].text = label;
+  } else if (br.text?.simpleText) {
+    br.text.simpleText = label;
+  } else {
+    br.text = { runs: [{ text: label }] };
+  }
   if (br.icon) br.icon.iconType = iconType;
+  else br.icon = { iconType };
   const cmd = { clickTrackingParams: null, customAction: { action: actionName } };
   br.command = cmd;
   br.serviceEndpoint = cmd;

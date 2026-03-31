@@ -31,13 +31,24 @@ function injectButton(buttons, actionName, label, iconType) {
     b?.buttonRenderer?.command?.customAction?.action === actionName ||
     b?.buttonRenderer?.serviceEndpoint?.customAction?.action === actionName
   )) return false;
-  const existing = buttons.find(b => b?.buttonRenderer);
+  // Prefer a button that already has a text label — cloning an icon-only (round) button
+  // would produce a round clone with no visible text. Fall back to first buttonRenderer.
+  const existing =
+    buttons.find(b => b?.buttonRenderer?.text?.runs || b?.buttonRenderer?.text?.simpleText) ||
+    buttons.find(b => b?.buttonRenderer);
   if (!existing) return false;
   const btn = { buttonRenderer: JSON.parse(JSON.stringify(existing.buttonRenderer)) };
   const br = btn.buttonRenderer;
-  if (br.text?.runs) br.text.runs[0].text = label;
-  else if (br.text?.simpleText) br.text.simpleText = label;
+  // Always ensure text is set, even if the source button had none
+  if (br.text?.runs) {
+    br.text.runs[0].text = label;
+  } else if (br.text?.simpleText) {
+    br.text.simpleText = label;
+  } else {
+    br.text = { runs: [{ text: label }] };
+  }
   if (br.icon) br.icon.iconType = iconType;
+  else br.icon = { iconType };
   const cmd = { clickTrackingParams: null, customAction: { action: actionName } };
   br.command = cmd;
   br.serviceEndpoint = cmd;
@@ -79,10 +90,10 @@ export function playlistScrollBottom(showToastFn) {
     ? window.__ttCurrentPlaylistItems.length : 0;
 
   // Tuning — adjust if the TV is too slow to render tiles between bursts
-  const BURST_COUNT   = 30;   // ArrowDowns per burst (covers a full batch of ~20 tiles)
-  const BURST_MS      = 80;   // ms between each ArrowDown in the burst
-  const BATCH_WAIT_MS = 5000; // max ms to wait for a new batch after a burst
-  const POLL_MS       = 200;  // how often to check if a new batch arrived
+  const BURST_COUNT   = 40;   // ArrowDowns per burst (covers a full batch of ~20 tiles, with room)
+  const BURST_MS      = 50;   // ms between each ArrowDown in the burst (~2s total per burst)
+  const BATCH_WAIT_MS = 6000; // max ms to wait for a new batch after a burst (TV is slow)
+  const POLL_MS       = 150;  // how often to check if a new batch arrived
 
   _log('playlist.loadall.start', { startItemCount, startFetchCount });
   showToastFn('TizenTube', 'Loading all batches…');
@@ -102,10 +113,14 @@ export function playlistScrollBottom(showToastFn) {
     return tiles.length ? tiles[tiles.length - 1] : null;
   }
 
-  function fireArrowDown(target) {
+  function fireArrowDown() {
+    // Dispatch on document — this is how the physical remote works on YouTube TV.
+    // The TV's focus management system listens on document and routes to the focused element.
+    // Dispatching on a specific tile only works if that tile is already focused; dispatching
+    // on document works regardless of where focus currently is (e.g. on a header button).
     const opts = { key: 'ArrowDown', code: 'ArrowDown', keyCode: 40, which: 40, bubbles: true, cancelable: true };
-    try { target.dispatchEvent(new KeyboardEvent('keydown', opts)); } catch (_) {}
-    try { target.dispatchEvent(new KeyboardEvent('keyup',   opts)); } catch (_) {}
+    try { document.dispatchEvent(new KeyboardEvent('keydown', opts)); } catch (_) {}
+    try { document.dispatchEvent(new KeyboardEvent('keyup',   opts)); } catch (_) {}
   }
 
   // ── Core loop ────────────────────────────────────────────────────────────────
@@ -119,23 +134,22 @@ export function playlistScrollBottom(showToastFn) {
     }
 
     const lastTile = getLastTile();
-    const target = lastTile
-      || document.querySelector('ytlr-playlist-video-list-renderer')
-      || document.body;
+    _log('playlist.loadall.burst', { burst: burstCount, hasLastTile: !!lastTile, lastFetchCount });
+    burstCount++;
 
-    // Focus the last rendered tile so the virtual list knows position
+    // Focus the last tile so the virtual list's focus manager knows position.
+    // Even if focus() doesn't move the TV cursor visually, it updates the internal
+    // focus pointer used by the virtual list to decide when to load next batch.
     try {
       if (lastTile && typeof lastTile.focus === 'function') lastTile.focus({ preventScroll: true });
     } catch (_) {}
 
-    _log('playlist.loadall.burst', { burst: burstCount, tag: target.tagName, lastFetchCount });
-    burstCount++;
-
-    // Fire BURST_COUNT ArrowDowns spaced BURST_MS apart
+    // Fire BURST_COUNT ArrowDowns on document spaced BURST_MS apart.
+    // document dispatch matches how the physical remote fires events.
     let i = 0;
     const burstInterval = setInterval(() => {
       if (!window.__ttLoadAllRunning) { clearInterval(burstInterval); return; }
-      fireArrowDown(target);
+      fireArrowDown();
       i++;
       if (i >= BURST_COUNT) {
         clearInterval(burstInterval);
