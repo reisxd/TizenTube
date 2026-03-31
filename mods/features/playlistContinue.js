@@ -1,5 +1,5 @@
 import { configRead } from '../config.js';
-import { appendFileOnlyLog } from './hideWatched.js';
+import { appendFileOnlyLog, getWatchPercent } from './hideWatched.js';
 
 // Walks an object up to maxDepth and logs every path that contains the word 'button'
 // or 'playlist' in its key — used once to find the real playlistHeaderRenderer path.
@@ -23,6 +23,60 @@ function _log(label, payload) {
   appendFileOnlyLog(label, payload);
 }
 
+function getPlaylistDomVideoIds() {
+  const ids = [];
+  const seen = new Set();
+  const roots = [
+    document.querySelector('ytlr-playlist-video-list-renderer'),
+    document.querySelector('ytlr-browse-response'),
+    document,
+  ].filter(Boolean);
+  const selectors = ['[data-video-id]', '[video-id]', '[data-content-id]', '[content-id]', '[data-context-item-id]', 'a[href*="watch"]'];
+
+  const getId = (node) => {
+    const attrs = [
+      node.getAttribute?.('data-video-id'),
+      node.getAttribute?.('video-id'),
+      node.getAttribute?.('data-content-id'),
+      node.getAttribute?.('content-id'),
+      node.getAttribute?.('data-context-item-id'),
+    ];
+    for (const attr of attrs) {
+      const value = String(attr || '').trim();
+      if (value) return value;
+    }
+    const href = node.getAttribute?.('href') || '';
+    const match = String(href).match(/[?&]v=([a-zA-Z0-9_-]{11})/);
+    return match ? match[1] : '';
+  };
+
+  const isVisibleNode = (node) => {
+    const row = node.closest?.('ytlr-tile-renderer, ytlr-grid-tile, ytlr-rich-item-renderer, [role="listitem"]') || node;
+    const hidden = row.closest?.('[hidden],[aria-hidden="true"]');
+    if (hidden) return false;
+    if (typeof window.getComputedStyle === 'function') {
+      const style = window.getComputedStyle(row);
+      if (style?.display === 'none' || style?.visibility === 'hidden' || style?.opacity === '0') return false;
+    }
+    const rects = row.getClientRects ? row.getClientRects() : null;
+    return !(rects && rects.length === 0);
+  };
+
+  for (const root of roots) {
+    for (const selector of selectors) {
+      const nodes = root.querySelectorAll(selector);
+      for (const node of nodes) {
+        const id = getId(node);
+        if (!id || seen.has(id)) continue;
+        if (!isVisibleNode(node)) continue;
+        seen.add(id);
+        ids.push(id);
+      }
+    }
+  }
+  return ids;
+}
+
 // ── Store current playlist items ─────────────────────────────────────────────
 // Called from patchJsonParse whenever a playlist page response arrives.
 // Stores the UNFILTERED items so PLAYLIST_CONTINUE can scan watched state.
@@ -30,8 +84,6 @@ function _log(label, payload) {
 function storePlItems(r) {
   try {
     const twoCol = r?.contents?.tvBrowseRenderer?.content?.tvSurfaceContentRenderer?.content?.twoColumnRenderer;
-    if (!twoCol) return;
-
     const plr = twoCol?.rightColumn?.playlistVideoListRenderer;
     if (Array.isArray(plr?.contents)) {
       window.__ttCurrentPlaylistItems = plr.contents.slice();
@@ -43,6 +95,7 @@ function storePlItems(r) {
     if (Array.isArray(plc?.contents)) {
       if (!Array.isArray(window.__ttCurrentPlaylistItems)) window.__ttCurrentPlaylistItems = [];
       window.__ttCurrentPlaylistItems = window.__ttCurrentPlaylistItems.concat(plc.contents);
+      window.__ttLastPlaylistContinuationBatch = plc.contents.slice();
       _log('playlist.continue.items.continuation', { total: window.__ttCurrentPlaylistItems.length, added: plc.contents.length });
     }
   } catch (err) {
@@ -105,6 +158,8 @@ function tryInjectButton(r) {
 
     // Don't inject twice
     if (buttons.some(b =>
+      b?.buttonRenderer?.command?.customAction?.action === 'PLAYLIST_CONTINUE' ||
+      b?.buttonRenderer?.serviceEndpoint?.customAction?.action === 'PLAYLIST_CONTINUE' ||
       b?.buttonRenderer?.command?.commandExecutorCommand?.commands?.[0]?.customAction?.action === 'PLAYLIST_CONTINUE' ||
       b?.buttonRenderer?.serviceEndpoint?.commandExecutorCommand?.commands?.[0]?.customAction?.action === 'PLAYLIST_CONTINUE'
     )) {
@@ -120,7 +175,7 @@ function tryInjectButton(r) {
       return;
     }
 
-    const continueButton = JSON.parse(JSON.stringify(existingButton));
+    const continueButton = { buttonRenderer: JSON.parse(JSON.stringify(existingButton.buttonRenderer)) };
     const br = continueButton.buttonRenderer;
 
     // Set text
@@ -131,10 +186,12 @@ function tryInjectButton(r) {
     if (br.icon) br.icon.iconType = 'PLAY_ARROW';
 
     // Set command — try both serviceEndpoint and command shapes
-    const cmd = { clickTrackingParams: null, commandExecutorCommand: { commands: [{ customAction: { action: 'PLAYLIST_CONTINUE' } }] } };
-    if (br.serviceEndpoint !== undefined) br.serviceEndpoint = cmd;
-    else if (br.command !== undefined) br.command = cmd;
-    else br.serviceEndpoint = cmd;
+    const cmd = { clickTrackingParams: null, customAction: { action: 'PLAYLIST_CONTINUE' } };
+    br.command = cmd;
+    br.serviceEndpoint = cmd;
+    if (br.navigationEndpoint) delete br.navigationEndpoint;
+    if (br.onLongPressCommand) delete br.onLongPressCommand;
+    if (br.longPressCommand) delete br.longPressCommand;
 
     // Clear any accessibility label so it doesn't say the wrong thing
     if (br.accessibilityData) br.accessibilityData = { accessibilityData: { label: 'Continue' } };
@@ -151,9 +208,6 @@ function tryInjectButton(r) {
 
 export function playlistContinue(resolveCommandFn, showToastFn) {
   try {
-    // __ttCurrentPlaylistItems is populated by storePlItems() AFTER adblock.js has already
-    // run filterContinuationItems on the playlist contents. So these are already the
-    // filtered (non-watched) items — we just need the first one that isn't a keep-one helper.
     const items = window.__ttCurrentPlaylistItems || [];
 
     if (!items.length) {
@@ -161,22 +215,65 @@ export function playlistContinue(resolveCommandFn, showToastFn) {
       return;
     }
 
+    const helperIds = window.__ttPlaylistHelperVideoIds;
+    const domVideoIds = getPlaylistDomVideoIds();
+    _log('playlist.continue.dom_ids', { count: domVideoIds.length, ids: domVideoIds.slice(0, 20) });
+    const cmdByVideoId = new Map();
     for (const item of items) {
-      // Skip keep-one helper items (watched videos kept temporarily to trigger next batch load)
-      if (item?.__ttKeepOneForContinuation) continue;
-
       const cmd = item?.tileRenderer?.onSelectCommand;
-      const videoId = item?.tileRenderer?.contentId
-        || cmd?.watchEndpoint?.videoId;
-      if (!videoId || !cmd) continue;
+      const videoId = item?.tileRenderer?.contentId || cmd?.watchEndpoint?.videoId;
+      if (videoId && cmd && !cmdByVideoId.has(videoId)) cmdByVideoId.set(videoId, cmd);
+    }
 
-      _log('playlist.continue.play', { videoId });
+    for (const videoId of domVideoIds) {
+      if (helperIds?.has?.(videoId)) continue;
+      const cmd = cmdByVideoId.get(videoId);
+      if (!cmd) continue;
+      _log('playlist.continue.play.dom', { videoId });
       resolveCommandFn(cmd);
       return;
     }
 
-    showToastFn('TizenTube', 'No unwatched videos found in this playlist.');
-    _log('playlist.continue.all_watched', { checked: items.length });
+    const threshold = Number(configRead('hideWatchedVideosThreshold'));
+    const effectiveThreshold = Math.max(20, threshold);
+    let firstByOrder = null;
+    let firstUnknown = null;
+    let firstNonHelper = null;
+    const debugCandidates = [];
+    const batchItems = Array.isArray(window.__ttLastPlaylistContinuationBatch) ? window.__ttLastPlaylistContinuationBatch : [];
+    const sourceItems = batchItems.length ? batchItems.concat(items) : items;
+    for (const item of sourceItems) {
+      const cmd = item?.tileRenderer?.onSelectCommand;
+      const videoId = item?.tileRenderer?.contentId || cmd?.watchEndpoint?.videoId;
+      if (!videoId || !cmd) continue;
+      const isHelper = !!helperIds?.has?.(videoId);
+      const isKeepOne = !!item?.__ttKeepOneForContinuation;
+      const pct = getWatchPercent(item);
+      if (debugCandidates.length < 25) debugCandidates.push({ videoId, pct, isHelper, isKeepOne });
+      if (isHelper || isKeepOne) continue;
+      if (!firstNonHelper) firstNonHelper = { cmd, videoId, pct };
+      if (pct !== null && Number.isFinite(pct)) {
+        if (pct <= effectiveThreshold) {
+          firstByOrder = { cmd, videoId, pct };
+          break;
+        }
+        continue;
+      }
+      if (!firstUnknown) firstUnknown = { cmd, videoId, pct: null };
+    }
+    let pick = null;
+    if (firstByOrder) pick = firstByOrder;
+    else if (firstUnknown) pick = firstUnknown;
+    else if (firstNonHelper) pick = firstNonHelper;
+    _log('playlist.continue.fallback.scan', { threshold, effectiveThreshold, source: batchItems.length ? 'continuation+all' : 'all', pick, candidates: debugCandidates });
+    if (pick) {
+      _log('playlist.continue.play.fallback', pick);
+      resolveCommandFn(pick.cmd);
+      return;
+    }
+
+    showToastFn('TizenTube', 'No visible unwatched videos found. Scroll playlist to load more.');
+    _log('playlist.continue.none_found', { checkedDom: domVideoIds.length, items: items.length });
   } catch (err) {
     _log('playlist.continue.action.error', { msg: String(err?.message || err) });
   }
