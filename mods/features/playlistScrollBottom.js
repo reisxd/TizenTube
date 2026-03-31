@@ -89,10 +89,13 @@ export function playlistScrollBottom(showToastFn) {
   const startItemCount = Array.isArray(window.__ttCurrentPlaylistItems)
     ? window.__ttCurrentPlaylistItems.length : 0;
 
-  // Tuning — adjust if the TV is too slow to render tiles between bursts
-  const BURST_COUNT   = 40;   // ArrowDowns per burst (covers a full batch of ~20 tiles, with room)
-  const BURST_MS      = 50;   // ms between each ArrowDown in the burst (~2s total per burst)
-  const BATCH_WAIT_MS = 6000; // max ms to wait for a new batch after a burst (TV is slow)
+  // Tuning
+  // After each batch the virtual list re-renders with focus already near the bottom.
+  // We only need a few events to nudge focus to the boundary — NOT a full traversal.
+  // Too many events triggers TV key-repeat rate limiting (input gets dropped/slowed).
+  const BURST_COUNT   = 6;    // just enough to reach the last rendered tile from near-bottom
+  const BURST_MS      = 80;   // comfortable spacing, avoids TV rate limiter
+  const BATCH_WAIT_MS = 6000; // max ms to wait for a new batch after a burst (TV fetch is slow)
   const POLL_MS       = 150;  // how often to check if a new batch arrived
 
   _log('playlist.loadall.start', { startItemCount, startFetchCount });
@@ -177,6 +180,13 @@ export function playlistScrollBottom(showToastFn) {
     window.__ttLoadAllRunning = false;
     window.removeEventListener('hashchange', onNavigate);
     window.removeEventListener('popstate',   onNavigate);
+    // Blur whatever element the burst left focus on, so the grey CSS focus ring doesn't
+    // persist when the user navigates back to the playlists page.
+    try {
+      if (document.activeElement && typeof document.activeElement.blur === 'function') {
+        document.activeElement.blur();
+      }
+    } catch (_) {}
     const finalItemCount = Array.isArray(window.__ttCurrentPlaylistItems)
       ? window.__ttCurrentPlaylistItems.length : 0;
     const totalFetched = (window.__ttPlaylistRawFetchCount || 0) - startFetchCount;
