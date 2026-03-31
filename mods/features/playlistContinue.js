@@ -1,5 +1,5 @@
 import { configRead } from '../config.js';
-import { appendFileOnlyLog } from './hideWatched.js';
+import { appendFileOnlyLog, hideVideo } from './hideWatched.js';
 
 function _log(label, payload) {
   appendFileOnlyLog(label, payload);
@@ -75,12 +75,17 @@ function storePlItems(r) {
 
 export function playlistContinue(resolveCommandFn, showToastFn) {
   try {
-    const items = window.__ttCurrentPlaylistItems || [];
-    if (!items.length) {
+    const raw = window.__ttCurrentPlaylistItems || [];
+    if (!raw.length) {
       showToastFn('TizenTube', 'No playlist data. Open a playlist first.');
       return;
     }
 
+    // Re-filter NOW using current _ttVideoProgressCache.
+    // __ttCurrentPlaylistItems was stored when the response arrived; watch progress data
+    // often arrives later via frameworkUpdates mutations. Re-filtering at press time
+    // ensures videos that became "watched" after initial load are excluded.
+    const items = hideVideo(raw, 'playlist');
     const helperIds = window.__ttPlaylistHelperVideoIds || new Set();
     const skipped = [];
 
@@ -90,20 +95,17 @@ export function playlistContinue(resolveCommandFn, showToastFn) {
       if (!videoId || !cmd) continue;
 
       if (item?.__ttKeepOneForContinuation || helperIds.has?.(videoId)) {
-        skipped.push({ videoId, reason: 'helper' });
+        skipped.push(videoId);
         continue;
       }
 
-      // This is the first non-helper item in the already-filtered list — play it.
-      // __ttCurrentPlaylistItems only contains items that passed hideVideo (non-watched)
-      // because adblock.js filters the list before our patch stores it.
-      _log('playlist.continue.play', { videoId, totalItems: items.length, skipped: skipped.length, skippedIds: skipped.map(s => s.videoId) });
+      _log('playlist.continue.play', { videoId, rawItems: raw.length, filteredItems: items.length, skipped: skipped.length });
       resolveCommandFn(cmd);
       return;
     }
 
     showToastFn('TizenTube', 'No unwatched videos found. Use Load All to load more first.');
-    _log('playlist.continue.none_found', { items: items.length, skipped: skipped.length });
+    _log('playlist.continue.none_found', { rawItems: raw.length, filteredItems: items.length, skipped: skipped.length });
   } catch (err) {
     _log('playlist.continue.error', { msg: String(err?.message || err) });
   }

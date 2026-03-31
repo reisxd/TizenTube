@@ -55,19 +55,14 @@ function injectButton(buttons, actionName, label, iconType) {
 // We do NOT need focus to be inside the list; setting scrollTop directly works regardless.
 
 function findScrollContainers() {
-  const containers = [];
-  const seen = new Set();
-  const push = (el) => { if (el && !seen.has(el)) { seen.add(el); containers.push(el); } };
-
-  // Mirror what attemptPlaylistAutoLoad in adblock.js uses — those are the containers
-  // YouTube TV actually responds to for batch loading.
-  const plRoot = document.querySelector('ytlr-playlist-video-list-renderer');
-  push(plRoot);
-  // yt-virtual-list is the primary scroll target (used by attemptPlaylistAutoLoad)
-  push(document.querySelector('ytlr-playlist-video-list-renderer yt-virtual-list, yt-virtual-list.rN5BTd'));
-  push(document.querySelector('ytlr-surface-page'));
-  push(document.body);
-  return containers.filter(Boolean);
+  // Mirrors attemptPlaylistAutoLoad in adblock.js exactly:
+  // Primary: ytlr-playlist-video-list-renderer scrolled by 900px — this is what triggers
+  //          YouTube TV to render more virtual rows and fire continuation requests.
+  // Secondary: yt-virtual-list scrolled by 1400px — used for empty_batch recovery.
+  const primary = document.querySelector('ytlr-playlist-video-list-renderer, ytlr-surface-page, body')
+    || document.body;
+  const vlist = document.querySelector('ytlr-playlist-video-list-renderer yt-virtual-list, yt-virtual-list.rN5BTd');
+  return { primary, vlist };
 }
 
 // ── PLAYLIST_LOAD_ALL action ──────────────────────────────────────────────────
@@ -83,58 +78,61 @@ export function playlistScrollBottom(showToastFn) {
   }
 
   window.__ttLoadAllRunning = true;
-  const startCount = Array.isArray(window.__ttCurrentPlaylistItems) ? window.__ttCurrentPlaylistItems.length : 0;
-  let lastCount = startCount;
+  // Track raw fetch count (incremented per continuation response, regardless of filtering)
+  const startFetchCount = window.__ttPlaylistRawFetchCount || 0;
+  let lastFetchCount = startFetchCount;
   let noGrowthTicks = 0;
   let totalScrolls = 0;
-  const MAX_NO_GROWTH = 30;  // give up after 30 ticks (~15 s) with no new items — Tizen is slow
-  const MAX_SCROLLS = 400;   // absolute safety limit
-  const TICK_MS = 500;
+  const startItemCount = Array.isArray(window.__ttCurrentPlaylistItems) ? window.__ttCurrentPlaylistItems.length : 0;
 
-  _log('playlist.loadall.start', { startCount });
+  // 2 seconds between scroll attempts — Tizen needs time for network responses
+  // Use same 1400px increment as attemptPlaylistAutoLoad in adblock.js (proven to work)
+  const MAX_NO_GROWTH = 15;  // 15 × 2s = 30s max wait for a new batch
+  const MAX_SCROLLS = 100;
+  const TICK_MS = 2000;
+
+  _log('playlist.loadall.start', { startItemCount, startFetchCount });
   showToastFn('TizenTube', 'Loading all batches…');
 
   const containers = findScrollContainers();
-  _log('playlist.loadall.containers', { count: containers.length, tags: containers.map(c => c.tagName + '.' + (c.className || '').split(' ')[0]) });
+  _log('playlist.loadall.containers', { primary: containers.primary?.tagName || 'none', vlist: containers.vlist?.tagName || 'none' });
 
   function scrollAll() {
-    for (const container of containers) {
-      try {
-        // Use scrollBy — this is what adblock.js's attemptPlaylistAutoLoad uses and
-        // what YouTube TV's virtual list actually responds to for batch loading.
-        if (typeof container.scrollBy === 'function') {
-          container.scrollBy({ top: 9000, left: 0, behavior: 'auto' });
-        } else {
-          container.scrollTop += 9000;
-        }
-        container.dispatchEvent(new Event('scroll', { bubbles: true, cancelable: false }));
-      } catch (_) {}
-    }
+    // Replicate attemptPlaylistAutoLoad exactly — 900px on the playlist container,
+    // plus 1400px on the virtual list (empty_batch mode), plus PageDown dispatch.
+    try {
+      if (typeof containers.primary.scrollBy === 'function') {
+        containers.primary.scrollBy({ top: 900, left: 0, behavior: 'auto' });
+      }
+    } catch (_) {}
+    try {
+      if (containers.vlist && typeof containers.vlist.scrollBy === 'function') {
+        containers.vlist.scrollBy({ top: 1400, left: 0, behavior: 'auto' });
+      }
+    } catch (_) {}
+    try {
+      document.dispatchEvent(new KeyboardEvent('keydown', { key: 'PageDown', code: 'PageDown', bubbles: true }));
+      document.dispatchEvent(new KeyboardEvent('keyup',  { key: 'PageDown', code: 'PageDown', bubbles: true }));
+    } catch (_) {}
     totalScrolls++;
   }
 
   const tick = () => {
     if (!window.__ttLoadAllRunning) return;
-    if (totalScrolls >= MAX_SCROLLS) {
-      stop('max_scrolls');
-      return;
-    }
+    if (totalScrolls >= MAX_SCROLLS) { stop('max_scrolls'); return; }
 
-    const currentCount = Array.isArray(window.__ttCurrentPlaylistItems) ? window.__ttCurrentPlaylistItems.length : 0;
-    if (currentCount > lastCount) {
+    const currentFetchCount = window.__ttPlaylistRawFetchCount || 0;
+    if (currentFetchCount > lastFetchCount) {
+      // A new batch arrived (even if all its items were filtered as watched)
       noGrowthTicks = 0;
-      lastCount = currentCount;
-      _log('playlist.loadall.batch', { currentCount, totalScrolls });
-      // Scroll immediately on batch arrival to trigger the next one faster
-      scrollAll();
+      lastFetchCount = currentFetchCount;
+      const currentItemCount = Array.isArray(window.__ttCurrentPlaylistItems) ? window.__ttCurrentPlaylistItems.length : 0;
+      _log('playlist.loadall.batch', { currentFetchCount, currentItemCount, totalScrolls });
     } else {
       noGrowthTicks++;
     }
 
-    if (noGrowthTicks >= MAX_NO_GROWTH) {
-      stop('no_growth');
-      return;
-    }
+    if (noGrowthTicks >= MAX_NO_GROWTH) { stop('no_growth'); return; }
 
     scrollAll();
     setTimeout(tick, TICK_MS);
@@ -142,12 +140,12 @@ export function playlistScrollBottom(showToastFn) {
 
   function stop(reason) {
     window.__ttLoadAllRunning = false;
-    const finalCount = Array.isArray(window.__ttCurrentPlaylistItems) ? window.__ttCurrentPlaylistItems.length : 0;
-    _log('playlist.loadall.done', { reason, startCount, finalCount, totalScrolls });
-    showToastFn('TizenTube', `Loaded ${finalCount} videos. Press Continue to play first unwatched.`);
+    const finalItemCount = Array.isArray(window.__ttCurrentPlaylistItems) ? window.__ttCurrentPlaylistItems.length : 0;
+    const totalFetched = (window.__ttPlaylistRawFetchCount || 0) - startFetchCount;
+    _log('playlist.loadall.done', { reason, startItemCount, finalItemCount, startFetchCount, totalBatchesFetched: totalFetched, totalScrolls });
+    showToastFn('TizenTube', `Done. ${finalItemCount} unwatched videos found (${totalFetched} batches loaded).`);
   }
 
-  // Kick off first scroll immediately, then start polling
   scrollAll();
   setTimeout(tick, TICK_MS);
 }
@@ -165,6 +163,12 @@ JSON.parse = function () {
         const injected = injectButton(buttons, 'PLAYLIST_SCROLL_BOTTOM', 'Load All', 'ARROW_DOWNWARD');
         if (injected) _log('playlist.loadall.injected', { totalButtons: buttons.length });
       }
+    }
+    // Count raw continuation items (pre-filter) so Load All can detect batch arrivals
+    // regardless of how many items survived adblock filtering.
+    const plc = r?.continuationContents?.playlistVideoListContinuation;
+    if (plc) {
+      window.__ttPlaylistRawFetchCount = (window.__ttPlaylistRawFetchCount || 0) + 1;
     }
   } catch (_) {}
   return r;
