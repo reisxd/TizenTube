@@ -1,62 +1,85 @@
 import { configRead } from '../config.js';
-import { appendFileOnlyLog, hideVideo } from './hideWatched.js';
+import { appendFileOnlyLog, getWatchPercent } from './hideWatched.js';
+
+// Walks an object up to maxDepth and logs every path that contains the word 'button'
+// or 'playlist' in its key — used once to find the real playlistHeaderRenderer path.
+function findInterestingPaths(obj, prefix = 'r', depth = 0, maxDepth = 6, out = []) {
+  if (!obj || depth > maxDepth) return out;
+  if (typeof obj !== 'object') return out;
+  for (const key of Object.keys(obj)) {
+    const path = `${prefix}.${key}`;
+    const lk = key.toLowerCase();
+    if (lk.includes('playlist') || lk.includes('button') || lk.includes('header') || lk.includes('action')) {
+      out.push({ path, type: typeof obj[key], isArray: Array.isArray(obj[key]), keys: obj[key] && typeof obj[key] === 'object' ? Object.keys(obj[key]).slice(0, 12) : [] });
+    }
+    if (obj[key] && typeof obj[key] === 'object' && !Array.isArray(obj[key])) {
+      findInterestingPaths(obj[key], path, depth + 1, maxDepth, out);
+    }
+  }
+  return out;
+}
 
 function _log(label, payload) {
   appendFileOnlyLog(label, payload);
 }
 
-function getButtons(r) {
-  const twoCol = r?.contents?.tvBrowseRenderer?.content?.tvSurfaceContentRenderer?.content?.twoColumnRenderer;
-  if (!twoCol) return null;
-  const leftCol = twoCol?.leftColumn;
-  const headerA = leftCol?.playlistHeaderRenderer;
-  const headerB = leftCol?.entityMetadataRenderer;
-  let headerC = null;
-  const slrContents = leftCol?.sectionListRenderer?.contents;
-  if (Array.isArray(slrContents)) {
-    for (const item of slrContents) {
-      if (item?.playlistHeaderRenderer) { headerC = item.playlistHeaderRenderer; break; }
-      if (item?.entityMetadataRenderer) { headerC = item.entityMetadataRenderer; break; }
+function getPlaylistDomVideoIds() {
+  const ids = [];
+  const seen = new Set();
+  const roots = [
+    document.querySelector('ytlr-playlist-video-list-renderer'),
+    document.querySelector('ytlr-browse-response'),
+    document,
+  ].filter(Boolean);
+  const selectors = ['[data-video-id]', '[video-id]', '[data-content-id]', '[content-id]', '[data-context-item-id]', 'a[href*="watch"]'];
+
+  const getId = (node) => {
+    const attrs = [
+      node.getAttribute?.('data-video-id'),
+      node.getAttribute?.('video-id'),
+      node.getAttribute?.('data-content-id'),
+      node.getAttribute?.('content-id'),
+      node.getAttribute?.('data-context-item-id'),
+    ];
+    for (const attr of attrs) {
+      const value = String(attr || '').trim();
+      if (value) return value;
+    }
+    const href = node.getAttribute?.('href') || '';
+    const match = String(href).match(/[?&]v=([a-zA-Z0-9_-]{11})/);
+    return match ? match[1] : '';
+  };
+
+  const isVisibleNode = (node) => {
+    const row = node.closest?.('ytlr-tile-renderer, ytlr-grid-tile, ytlr-rich-item-renderer, [role="listitem"]') || node;
+    const hidden = row.closest?.('[hidden],[aria-hidden="true"]');
+    if (hidden) return false;
+    if (typeof window.getComputedStyle === 'function') {
+      const style = window.getComputedStyle(row);
+      if (style?.display === 'none' || style?.visibility === 'hidden' || style?.opacity === '0') return false;
+    }
+    const rects = row.getClientRects ? row.getClientRects() : null;
+    return !(rects && rects.length === 0);
+  };
+
+  for (const root of roots) {
+    for (const selector of selectors) {
+      const nodes = root.querySelectorAll(selector);
+      for (const node of nodes) {
+        const id = getId(node);
+        if (!id || seen.has(id)) continue;
+        if (!isVisibleNode(node)) continue;
+        seen.add(id);
+        ids.push(id);
+      }
     }
   }
-  const header = headerA || headerB || headerC;
-  if (!header) return null;
-  return header.buttons || header.actionButtons || (Array.isArray(header.actions) ? header.actions : null);
+  return ids;
 }
 
-function injectButton(buttons, actionName, label, iconType) {
-  if (!Array.isArray(buttons) || !buttons.length) return false;
-  if (buttons.some(b =>
-    b?.buttonRenderer?.command?.customAction?.action === actionName ||
-    b?.buttonRenderer?.serviceEndpoint?.customAction?.action === actionName
-  )) return false;
-  // Prefer a button that already has a text label — cloning an icon-only (round) button
-  // would produce a round clone with no visible text. Fall back to first buttonRenderer.
-  const existing =
-    buttons.find(b => b?.buttonRenderer?.text?.runs || b?.buttonRenderer?.text?.simpleText) ||
-    buttons.find(b => b?.buttonRenderer);
-  if (!existing) return false;
-  const btn = { buttonRenderer: JSON.parse(JSON.stringify(existing.buttonRenderer)) };
-  const br = btn.buttonRenderer;
-  // Always ensure text is set, even if the source button had none
-  if (br.text?.runs) {
-    br.text.runs[0].text = label;
-  } else if (br.text?.simpleText) {
-    br.text.simpleText = label;
-  } else {
-    br.text = { runs: [{ text: label }] };
-  }
-  if (br.icon) br.icon.iconType = iconType;
-  else br.icon = { iconType };
-  const cmd = { clickTrackingParams: null, customAction: { action: actionName } };
-  br.command = cmd;
-  br.serviceEndpoint = cmd;
-  if (br.navigationEndpoint) delete br.navigationEndpoint;
-  if (br.onLongPressCommand) delete br.onLongPressCommand;
-  if (br.accessibilityData) br.accessibilityData = { accessibilityData: { label } };
-  buttons.push(btn);
-  return true;
-}
+// ── Store current playlist items ─────────────────────────────────────────────
+// Called from patchJsonParse whenever a playlist page response arrives.
+// Stores the UNFILTERED items so PLAYLIST_CONTINUE can scan watched state.
 
 function storePlItems(r) {
   try {
@@ -66,77 +89,216 @@ function storePlItems(r) {
       window.__ttCurrentPlaylistItems = plr.contents.slice();
       _log('playlist.continue.items.stored', { count: window.__ttCurrentPlaylistItems.length });
     }
+
+    // Also pick up items from continuation batches
     const plc = r?.continuationContents?.playlistVideoListContinuation;
     if (Array.isArray(plc?.contents)) {
       if (!Array.isArray(window.__ttCurrentPlaylistItems)) window.__ttCurrentPlaylistItems = [];
-      const existingIds = new Set(window.__ttCurrentPlaylistItems.map(i =>
-        i?.tileRenderer?.contentId || i?.tileRenderer?.onSelectCommand?.watchEndpoint?.videoId
-      ).filter(Boolean));
-      const newItems = plc.contents.filter(i => {
-        const id = i?.tileRenderer?.contentId || i?.tileRenderer?.onSelectCommand?.watchEndpoint?.videoId;
-        return !id || !existingIds.has(id);
-      });
-      window.__ttCurrentPlaylistItems = window.__ttCurrentPlaylistItems.concat(newItems);
-      _log('playlist.continue.items.continuation', { total: window.__ttCurrentPlaylistItems.length, added: newItems.length });
+      window.__ttCurrentPlaylistItems = window.__ttCurrentPlaylistItems.concat(plc.contents);
+      window.__ttLastPlaylistContinuationBatch = plc.contents.slice();
+      _log('playlist.continue.items.continuation', { total: window.__ttCurrentPlaylistItems.length, added: plc.contents.length });
     }
   } catch (err) {
     _log('playlist.continue.items.error', { msg: String(err?.message || err) });
   }
 }
 
-export function playlistContinue(resolveCommandFn, showToastFn) { // showToastFn kept for signature compat
+// ── Find and inject the Continue button ──────────────────────────────────────
+
+function tryInjectButton(r) {
   try {
-    const raw = window.__ttCurrentPlaylistItems || [];
-    if (!raw.length) {
-      _log('playlist.continue.no_data', {});
+    const twoCol = r?.contents?.tvBrowseRenderer?.content?.tvSurfaceContentRenderer?.content?.twoColumnRenderer;
+    if (!twoCol) {
+      // Dump interesting paths so we can find the real structure
+      const interesting = findInterestingPaths(r?.contents, 'r.contents');
+      _log('playlist.continue.debug.no_twoCol', { interesting: interesting.slice(0, 30) });
       return;
     }
 
-    // Re-filter NOW using current _ttVideoProgressCache.
-    // __ttCurrentPlaylistItems was stored when the response arrived; watch progress data
-    // often arrives later via frameworkUpdates mutations. Re-filtering at press time
-    // ensures videos that became "watched" after initial load are excluded.
-    const items = hideVideo(raw, 'playlist');
-    const helperIds = window.__ttPlaylistHelperVideoIds || new Set();
-    const skipped = [];
+    // Try all known locations for the playlist header
+    const leftCol = twoCol?.leftColumn;
+    _log('playlist.continue.debug.leftColKeys', { keys: leftCol ? Object.keys(leftCol) : null });
 
+    // Path A: direct playlistHeaderRenderer in leftColumn
+    const headerA = leftCol?.playlistHeaderRenderer;
+    // Path B: entityMetadataRenderer (newer layout — matches the DOM you shared)
+    const headerB = leftCol?.entityMetadataRenderer;
+    // Path C: inside a sectionListRenderer
+    const slrContents = leftCol?.sectionListRenderer?.contents;
+    let headerC = null;
+    if (Array.isArray(slrContents)) {
+      for (const item of slrContents) {
+        if (item?.playlistHeaderRenderer) { headerC = item.playlistHeaderRenderer; break; }
+        if (item?.entityMetadataRenderer) { headerC = item.entityMetadataRenderer; break; }
+      }
+    }
+
+    const header = headerA || headerB || headerC;
+    if (!header) {
+      const interesting = findInterestingPaths(twoCol.leftColumn, 'leftColumn');
+      _log('playlist.continue.debug.no_header', {
+        leftColKeys: leftCol ? Object.keys(leftCol) : null,
+        interesting: interesting.slice(0, 20),
+      });
+      return;
+    }
+
+    _log('playlist.continue.debug.header_found', {
+      path: headerA ? 'leftColumn.playlistHeaderRenderer' : headerB ? 'leftColumn.entityMetadataRenderer' : 'leftColumn.sectionListRenderer.contents[*]',
+      headerKeys: Object.keys(header),
+    });
+
+    // Find the buttons array — it may be directly on header or nested
+    let buttons = header.buttons || header.actionButtons || null;
+    if (!buttons && Array.isArray(header.actions)) buttons = header.actions;
+    if (!buttons) {
+      _log('playlist.continue.debug.no_buttons', { headerKeys: Object.keys(header) });
+      return;
+    }
+
+    // Don't inject twice
+    if (buttons.some(b =>
+      b?.buttonRenderer?.command?.customAction?.action === 'PLAYLIST_CONTINUE' ||
+      b?.buttonRenderer?.serviceEndpoint?.customAction?.action === 'PLAYLIST_CONTINUE' ||
+      b?.buttonRenderer?.command?.commandExecutorCommand?.commands?.[0]?.customAction?.action === 'PLAYLIST_CONTINUE' ||
+      b?.buttonRenderer?.serviceEndpoint?.commandExecutorCommand?.commands?.[0]?.customAction?.action === 'PLAYLIST_CONTINUE'
+    )) {
+      _log('playlist.continue.debug.already_injected', {});
+      return;
+    }
+
+    // Clone an existing button to match exact structure YouTube TV expects,
+    // then swap text/icon/command. This is more reliable than building from scratch.
+    const existingButton = buttons.find(b => b?.buttonRenderer);
+    if (!existingButton) {
+      _log('playlist.continue.debug.no_existing_button', { buttonCount: buttons.length, sample: JSON.stringify(buttons[0])?.slice(0, 200) });
+      return;
+    }
+
+    const continueButton = { buttonRenderer: JSON.parse(JSON.stringify(existingButton.buttonRenderer)) };
+    const br = continueButton.buttonRenderer;
+
+    // Set text
+    if (br.text?.runs) br.text.runs[0].text = 'Continue';
+    else if (br.text?.simpleText) br.text.simpleText = 'Continue';
+
+    // Set icon
+    if (br.icon) br.icon.iconType = 'PLAY_ARROW';
+
+    // Set command — try both serviceEndpoint and command shapes
+    const cmd = { clickTrackingParams: null, customAction: { action: 'PLAYLIST_CONTINUE' } };
+    br.command = cmd;
+    br.serviceEndpoint = cmd;
+    if (br.navigationEndpoint) delete br.navigationEndpoint;
+    if (br.onLongPressCommand) delete br.onLongPressCommand;
+    if (br.longPressCommand) delete br.longPressCommand;
+
+    // Clear any accessibility label so it doesn't say the wrong thing
+    if (br.accessibilityData) br.accessibilityData = { accessibilityData: { label: 'Continue' } };
+
+    buttons.push(continueButton);
+    _log('playlist.continue.injected', { totalButtons: buttons.length });
+  } catch (err) {
+    _log('playlist.continue.inject.error', { msg: String(err?.message || err) });
+  }
+}
+
+// ── PLAYLIST_CONTINUE action ─────────────────────────────────────────────────
+// Called from resolveCommand.js when the user presses the Continue button.
+
+export function playlistContinue(resolveCommandFn, showToastFn) {
+  try {
+    const items = window.__ttCurrentPlaylistItems || [];
+
+    if (!items.length) {
+      showToastFn('TizenTube', 'No playlist data available. Scroll the playlist first.');
+      return;
+    }
+
+    const helperIds = window.__ttPlaylistHelperVideoIds;
+    const domVideoIds = getPlaylistDomVideoIds();
+    _log('playlist.continue.dom_ids', { count: domVideoIds.length, ids: domVideoIds.slice(0, 20) });
+    const cmdByVideoId = new Map();
     for (const item of items) {
       const cmd = item?.tileRenderer?.onSelectCommand;
       const videoId = item?.tileRenderer?.contentId || cmd?.watchEndpoint?.videoId;
-      if (!videoId || !cmd) continue;
+      if (videoId && cmd && !cmdByVideoId.has(videoId)) cmdByVideoId.set(videoId, cmd);
+    }
 
-      if (item?.__ttKeepOneForContinuation || helperIds.has?.(videoId)) {
-        skipped.push(videoId);
-        continue;
-      }
-
-      _log('playlist.continue.play', { videoId, rawItems: raw.length, filteredItems: items.length, skipped: skipped.length });
+    for (const videoId of domVideoIds) {
+      if (helperIds?.has?.(videoId)) continue;
+      const cmd = cmdByVideoId.get(videoId);
+      if (!cmd) continue;
+      _log('playlist.continue.play.dom', { videoId });
       resolveCommandFn(cmd);
       return;
     }
 
-    _log('playlist.continue.all_watched.silent', { rawItems: raw.length, filteredItems: items.length, skipped: skipped.length });
-    _log('playlist.continue.none_found', { rawItems: raw.length, filteredItems: items.length, skipped: skipped.length });
+    const threshold = Number(configRead('hideWatchedVideosThreshold'));
+    const effectiveThreshold = Math.max(20, threshold);
+    let firstByOrder = null;
+    let firstUnknown = null;
+    let firstNonHelper = null;
+    const debugCandidates = [];
+    const batchItems = Array.isArray(window.__ttLastPlaylistContinuationBatch) ? window.__ttLastPlaylistContinuationBatch : [];
+    const sourceItems = batchItems.length ? batchItems.concat(items) : items;
+    for (const item of sourceItems) {
+      const cmd = item?.tileRenderer?.onSelectCommand;
+      const videoId = item?.tileRenderer?.contentId || cmd?.watchEndpoint?.videoId;
+      if (!videoId || !cmd) continue;
+      const isHelper = !!helperIds?.has?.(videoId);
+      const isKeepOne = !!item?.__ttKeepOneForContinuation;
+      const pct = getWatchPercent(item);
+      if (debugCandidates.length < 25) debugCandidates.push({ videoId, pct, isHelper, isKeepOne });
+      if (isHelper || isKeepOne) continue;
+      if (!firstNonHelper) firstNonHelper = { cmd, videoId, pct };
+      if (pct !== null && Number.isFinite(pct)) {
+        if (pct <= effectiveThreshold) {
+          firstByOrder = { cmd, videoId, pct };
+          break;
+        }
+        continue;
+      }
+      if (!firstUnknown) firstUnknown = { cmd, videoId, pct: null };
+    }
+    let pick = null;
+    if (firstByOrder) pick = firstByOrder;
+    else if (firstUnknown) pick = firstUnknown;
+    else if (firstNonHelper) pick = firstNonHelper;
+    _log('playlist.continue.fallback.scan', { threshold, effectiveThreshold, source: batchItems.length ? 'continuation+all' : 'all', pick, candidates: debugCandidates });
+    if (pick) {
+      _log('playlist.continue.play.fallback', pick);
+      resolveCommandFn(pick.cmd);
+      return;
+    }
+
+    showToastFn('TizenTube', 'No visible unwatched videos found. Scroll playlist to load more.');
+    _log('playlist.continue.none_found', { checkedDom: domVideoIds.length, items: items.length });
   } catch (err) {
-    _log('playlist.continue.error', { msg: String(err?.message || err) });
+    _log('playlist.continue.action.error', { msg: String(err?.message || err) });
   }
 }
+
+// ── JSON.parse patch ─────────────────────────────────────────────────────────
+// Intercepts playlist page responses to store items and inject the button.
 
 const _origParse = JSON.parse;
 JSON.parse = function () {
   const r = _origParse.apply(this, arguments);
   try {
-    const hasPlaylist = !!(r?.contents?.tvBrowseRenderer?.content?.tvSurfaceContentRenderer?.content?.twoColumnRenderer?.rightColumn?.playlistVideoListRenderer);
-    const hasContinuation = !!(r?.continuationContents?.playlistVideoListContinuation);
-    if (hasPlaylist || hasContinuation) {
+    const isPlaylist = (() => {
+      try {
+        const hash = String(location.hash || '').toLowerCase();
+        if (!hash.includes('browse') && !hash.includes('playlist')) return false;
+        // Must have a twoColumnRenderer with a rightColumn playlistVideoListRenderer
+        return !!(r?.contents?.tvBrowseRenderer?.content?.tvSurfaceContentRenderer?.content?.twoColumnRenderer?.rightColumn?.playlistVideoListRenderer) ||
+               !!(r?.continuationContents?.playlistVideoListContinuation);
+      } catch { return false; }
+    })();
+
+    if (isPlaylist) {
       storePlItems(r);
-      if (hasPlaylist) {
-        const buttons = getButtons(r);
-        if (buttons) {
-          const injected = injectButton(buttons, 'PLAYLIST_CONTINUE', 'Continue', 'PLAY_ARROW');
-          if (injected) _log('playlist.continue.injected', { totalButtons: buttons.length });
-        }
-      }
+      if (r?.contents?.tvBrowseRenderer) tryInjectButton(r);
     }
   } catch (_) {}
   return r;
