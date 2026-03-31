@@ -203,7 +203,7 @@ function customAction(action, parameters) {
             playlistContinue(resolveCommand, showToast);
             break;
         case 'PLAYLIST_SCROLL_BOTTOM':
-            playlistScrollBottom(resolveCommand, showToast);
+            playlistScrollBottom(showToast);
             break;
     }
 }
