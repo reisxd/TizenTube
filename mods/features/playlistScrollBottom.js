@@ -106,13 +106,6 @@ export function playlistScrollBottom(showToastFn) {
   window.addEventListener('popstate',   onNavigate, { once: true });
 
   // ── Helpers ──────────────────────────────────────────────────────────────────
-  function getLastTile() {
-    const plRoot = document.querySelector('ytlr-playlist-video-list-renderer');
-    if (!plRoot) return null;
-    const tiles = plRoot.querySelectorAll('ytlr-tile-renderer, ytlr-grid-tile, ytlr-rich-item-renderer');
-    return tiles.length ? tiles[tiles.length - 1] : null;
-  }
-
   function fireArrowDown() {
     // Dispatch on document — this is how the physical remote works on YouTube TV.
     // The TV's focus management system listens on document and routes to the focused element.
@@ -133,16 +126,15 @@ export function playlistScrollBottom(showToastFn) {
       return;
     }
 
-    const lastTile = getLastTile();
-    _log('playlist.loadall.burst', { burst: burstCount, hasLastTile: !!lastTile, lastFetchCount });
+    _log('playlist.loadall.burst', { burst: burstCount, lastFetchCount });
     burstCount++;
 
-    // Focus the last tile so the virtual list's focus manager knows position.
-    // Even if focus() doesn't move the TV cursor visually, it updates the internal
-    // focus pointer used by the virtual list to decide when to load next batch.
-    try {
-      if (lastTile && typeof lastTile.focus === 'function') lastTile.focus({ preventScroll: true });
-    } catch (_) {}
+    // DO NOT call lastTile.focus() — doing so moves DOM focus to the tile but bypasses
+    // the virtual list's internal focus manager. The virtual list then loses track of
+    // its item index and never triggers the next batch load (hang before last batch).
+    // The grey focus border visible on other pages is also caused by this stray focus call.
+    // Dispatching ArrowDown on document is sufficient — the TV's focus system routes it
+    // through the virtual list's own manager which correctly advances the item pointer.
 
     // Fire BURST_COUNT ArrowDowns on document spaced BURST_MS apart.
     // document dispatch matches how the physical remote fires events.
