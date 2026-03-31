@@ -54,19 +54,7 @@ function injectButton(buttons, actionName, label, iconType) {
 // which virtual rows are in view, and the virtual list responds to scroll events on itself.
 // We do NOT need focus to be inside the list; setting scrollTop directly works regardless.
 
-function findScrollContainers() {
-  // Try each selector individually — a comma-separated querySelector returns elements
-  // in DOM order, so 'body' would always win as the ancestor. Try specific first.
-  const primary =
-    document.querySelector('ytlr-playlist-video-list-renderer') ||
-    document.querySelector('ytlr-surface-page') ||
-    document.body;
-  const vlist =
-    document.querySelector('ytlr-playlist-video-list-renderer yt-virtual-list') ||
-    document.querySelector('yt-virtual-list.rN5BTd') ||
-    document.querySelector('yt-virtual-list');
-  return { primary, vlist };
-}
+
 
 // ── PLAYLIST_LOAD_ALL action ──────────────────────────────────────────────────
 // Repeatedly scrolls the playlist virtual list to its bottom.
@@ -81,63 +69,75 @@ export function playlistScrollBottom(showToastFn) {
   }
 
   window.__ttLoadAllRunning = true;
-  // Track raw fetch count (incremented per continuation response, regardless of filtering)
   const startFetchCount = window.__ttPlaylistRawFetchCount || 0;
   let lastFetchCount = startFetchCount;
   let noGrowthTicks = 0;
-  let totalScrolls = 0;
+  let totalTicks = 0;
   const startItemCount = Array.isArray(window.__ttCurrentPlaylistItems) ? window.__ttCurrentPlaylistItems.length : 0;
 
-  // 2 seconds between scroll attempts — Tizen needs time for network responses
-  // Use same 1400px increment as attemptPlaylistAutoLoad in adblock.js (proven to work)
-  const MAX_NO_GROWTH = 15;  // 15 × 2s = 30s max wait for a new batch
-  const MAX_SCROLLS = 100;
+  // On YouTube TV the batch load trigger is the virtual list detecting that the last
+  // rendered tile has focus, NOT a scroll event. scrollBy/scrollTo on the container
+  // does nothing because ytlr-playlist-video-list-renderer has no CSS overflow scroll.
+  // The only reliable approach: find the last rendered playlist tile, focus it,
+  // then send ArrowDown to it so the virtual list advances focus and loads more.
+  const MAX_NO_GROWTH = 15; // × TICK_MS before giving up
+  const MAX_TICKS = 120;
   const TICK_MS = 2000;
 
   _log('playlist.loadall.start', { startItemCount, startFetchCount });
   showToastFn('TizenTube', 'Loading all batches…');
 
-  const containers = findScrollContainers();
-  _log('playlist.loadall.containers', { primary: containers.primary?.tagName || 'none', vlist: containers.vlist?.tagName || 'none' });
+  function getLastTile() {
+    const plRoot = document.querySelector('ytlr-playlist-video-list-renderer');
+    if (!plRoot) return null;
+    const tiles = plRoot.querySelectorAll('ytlr-tile-renderer, ytlr-grid-tile, ytlr-rich-item-renderer');
+    return tiles.length ? tiles[tiles.length - 1] : null;
+  }
 
-  function scrollAll() {
-    // Replicate attemptPlaylistAutoLoad exactly — 900px on the playlist container,
-    // plus 1400px on the virtual list (empty_batch mode), plus PageDown dispatch.
+  function nudgeDown() {
+    const lastTile = getLastTile();
+    const target = lastTile || document.querySelector('ytlr-playlist-video-list-renderer') || document.body;
+    _log('playlist.loadall.nudge', { tag: target.tagName, tick: totalTicks });
+
+    // Focus the last tile so the virtual list knows where we are
     try {
-      if (typeof containers.primary.scrollBy === 'function') {
-        containers.primary.scrollBy({ top: 900, left: 0, behavior: 'auto' });
+      if (lastTile && typeof lastTile.focus === 'function') lastTile.focus({ preventScroll: true });
+    } catch (_) {}
+
+    // Dispatch ArrowDown on the focused target — this is what the remote does
+    try {
+      target.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', code: 'ArrowDown', keyCode: 40, which: 40, bubbles: true, cancelable: true }));
+      target.dispatchEvent(new KeyboardEvent('keyup',   { key: 'ArrowDown', code: 'ArrowDown', keyCode: 40, which: 40, bubbles: true, cancelable: true }));
+    } catch (_) {}
+
+    // Also try on the playlist renderer and document as fallback
+    try {
+      const pl = document.querySelector('ytlr-playlist-video-list-renderer');
+      if (pl && pl !== target) {
+        pl.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', code: 'ArrowDown', keyCode: 40, which: 40, bubbles: true }));
       }
     } catch (_) {}
-    try {
-      if (containers.vlist && typeof containers.vlist.scrollBy === 'function') {
-        containers.vlist.scrollBy({ top: 1400, left: 0, behavior: 'auto' });
-      }
-    } catch (_) {}
-    try {
-      document.dispatchEvent(new KeyboardEvent('keydown', { key: 'PageDown', code: 'PageDown', bubbles: true }));
-      document.dispatchEvent(new KeyboardEvent('keyup',  { key: 'PageDown', code: 'PageDown', bubbles: true }));
-    } catch (_) {}
-    totalScrolls++;
+
+    totalTicks++;
   }
 
   const tick = () => {
     if (!window.__ttLoadAllRunning) return;
-    if (totalScrolls >= MAX_SCROLLS) { stop('max_scrolls'); return; }
+    if (totalTicks >= MAX_TICKS) { stop('max_ticks'); return; }
 
     const currentFetchCount = window.__ttPlaylistRawFetchCount || 0;
     if (currentFetchCount > lastFetchCount) {
-      // A new batch arrived (even if all its items were filtered as watched)
       noGrowthTicks = 0;
       lastFetchCount = currentFetchCount;
       const currentItemCount = Array.isArray(window.__ttCurrentPlaylistItems) ? window.__ttCurrentPlaylistItems.length : 0;
-      _log('playlist.loadall.batch', { currentFetchCount, currentItemCount, totalScrolls });
+      _log('playlist.loadall.batch', { currentFetchCount, currentItemCount, totalTicks });
     } else {
       noGrowthTicks++;
     }
 
     if (noGrowthTicks >= MAX_NO_GROWTH) { stop('no_growth'); return; }
 
-    scrollAll();
+    nudgeDown();
     setTimeout(tick, TICK_MS);
   };
 
@@ -145,11 +145,11 @@ export function playlistScrollBottom(showToastFn) {
     window.__ttLoadAllRunning = false;
     const finalItemCount = Array.isArray(window.__ttCurrentPlaylistItems) ? window.__ttCurrentPlaylistItems.length : 0;
     const totalFetched = (window.__ttPlaylistRawFetchCount || 0) - startFetchCount;
-    _log('playlist.loadall.done', { reason, startItemCount, finalItemCount, startFetchCount, totalBatchesFetched: totalFetched, totalScrolls });
-    showToastFn('TizenTube', `Done. ${finalItemCount} unwatched videos found (${totalFetched} batches loaded).`);
+    _log('playlist.loadall.done', { reason, startItemCount, finalItemCount, totalBatchesFetched: totalFetched, totalTicks });
+    showToastFn('TizenTube', `Done. ${finalItemCount} unwatched, ${totalFetched} batch(es) loaded.`);
   }
 
-  scrollAll();
+  nudgeDown();
   setTimeout(tick, TICK_MS);
 }
 
