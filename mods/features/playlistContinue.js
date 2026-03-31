@@ -82,22 +82,28 @@ export function playlistContinue(resolveCommandFn, showToastFn) {
     }
 
     const helperIds = window.__ttPlaylistHelperVideoIds || new Set();
+    const skipped = [];
 
     for (const item of items) {
-      // Skip keep-one helpers (watched videos kept temporarily to trigger continuation loads)
-      if (item?.__ttKeepOneForContinuation) continue;
       const cmd = item?.tileRenderer?.onSelectCommand;
       const videoId = item?.tileRenderer?.contentId || cmd?.watchEndpoint?.videoId;
       if (!videoId || !cmd) continue;
-      // Skip helper video IDs tracked by adblock.js
-      if (helperIds.has?.(videoId)) continue;
-      _log('playlist.continue.play', { videoId, totalItems: items.length });
+
+      if (item?.__ttKeepOneForContinuation || helperIds.has?.(videoId)) {
+        skipped.push({ videoId, reason: 'helper' });
+        continue;
+      }
+
+      // This is the first non-helper item in the already-filtered list — play it.
+      // __ttCurrentPlaylistItems only contains items that passed hideVideo (non-watched)
+      // because adblock.js filters the list before our patch stores it.
+      _log('playlist.continue.play', { videoId, totalItems: items.length, skipped: skipped.length, skippedIds: skipped.map(s => s.videoId) });
       resolveCommandFn(cmd);
       return;
     }
 
-    showToastFn('TizenTube', 'No unwatched videos found. Use Load All to load more batches first.');
-    _log('playlist.continue.none_found', { items: items.length });
+    showToastFn('TizenTube', 'No unwatched videos found. Use Load All to load more first.');
+    _log('playlist.continue.none_found', { items: items.length, skipped: skipped.length });
   } catch (err) {
     _log('playlist.continue.error', { msg: String(err?.message || err) });
   }

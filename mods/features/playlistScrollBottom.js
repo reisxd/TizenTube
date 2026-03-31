@@ -59,26 +59,15 @@ function findScrollContainers() {
   const seen = new Set();
   const push = (el) => { if (el && !seen.has(el)) { seen.add(el); containers.push(el); } };
 
+  // Mirror what attemptPlaylistAutoLoad in adblock.js uses — those are the containers
+  // YouTube TV actually responds to for batch loading.
   const plRoot = document.querySelector('ytlr-playlist-video-list-renderer');
-  if (plRoot) {
-    // Primary: the yt-virtual-list inside the playlist renderer
-    push(plRoot.querySelector('yt-virtual-list'));
-    // Fallback: any element with overflow:auto/scroll inside playlist renderer
-    for (const el of plRoot.querySelectorAll('*')) {
-      if (!(el instanceof HTMLElement)) continue;
-      try {
-        const style = window.getComputedStyle(el);
-        if ((style.overflowY === 'auto' || style.overflowY === 'scroll') && el.scrollHeight > el.clientHeight + 4) {
-          push(el);
-        }
-      } catch (_) {}
-    }
-    push(plRoot);
-  }
-
-  // Last resort: the main scrolling element
-  push(document.scrollingElement || document.documentElement);
-  return containers;
+  push(plRoot);
+  // yt-virtual-list is the primary scroll target (used by attemptPlaylistAutoLoad)
+  push(document.querySelector('ytlr-playlist-video-list-renderer yt-virtual-list, yt-virtual-list.rN5BTd'));
+  push(document.querySelector('ytlr-surface-page'));
+  push(document.body);
+  return containers.filter(Boolean);
 }
 
 // ── PLAYLIST_LOAD_ALL action ──────────────────────────────────────────────────
@@ -98,8 +87,8 @@ export function playlistScrollBottom(showToastFn) {
   let lastCount = startCount;
   let noGrowthTicks = 0;
   let totalScrolls = 0;
-  const MAX_NO_GROWTH = 8;   // give up after 8 ticks (~4 s) with no new items
-  const MAX_SCROLLS = 200;   // absolute safety limit
+  const MAX_NO_GROWTH = 30;  // give up after 30 ticks (~15 s) with no new items — Tizen is slow
+  const MAX_SCROLLS = 400;   // absolute safety limit
   const TICK_MS = 500;
 
   _log('playlist.loadall.start', { startCount });
@@ -111,9 +100,13 @@ export function playlistScrollBottom(showToastFn) {
   function scrollAll() {
     for (const container of containers) {
       try {
-        // Set scrollTop to a very large value — the element clamps it to max
-        container.scrollTop = 9999999;
-        // Also dispatch a scroll event in case the virtual list uses event listeners
+        // Use scrollBy — this is what adblock.js's attemptPlaylistAutoLoad uses and
+        // what YouTube TV's virtual list actually responds to for batch loading.
+        if (typeof container.scrollBy === 'function') {
+          container.scrollBy({ top: 9000, left: 0, behavior: 'auto' });
+        } else {
+          container.scrollTop += 9000;
+        }
         container.dispatchEvent(new Event('scroll', { bubbles: true, cancelable: false }));
       } catch (_) {}
     }
@@ -132,6 +125,8 @@ export function playlistScrollBottom(showToastFn) {
       noGrowthTicks = 0;
       lastCount = currentCount;
       _log('playlist.loadall.batch', { currentCount, totalScrolls });
+      // Scroll immediately on batch arrival to trigger the next one faster
+      scrollAll();
     } else {
       noGrowthTicks++;
     }
