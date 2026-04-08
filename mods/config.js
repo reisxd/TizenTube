@@ -49,6 +49,7 @@ const defaultConfig = {
       'more',
       'watch'
   ],
+  hiddenLibraryTabIds: [],
   enableHideEndScreenCards: false,
   enableYouThereRenderer: false,
   lastAnnouncementCheck: 0,

@@ -25,6 +25,7 @@ import {
   isShortsShelf,
   filterShortsFromItems,
 } from './shorts.js';
+import { applyLibraryTabHiding } from './libraryTabHider.js';
 
 // ===== Local utilities =====
 
@@ -40,19 +41,71 @@ function getRetiredPlaylistHelperVideoIdSet() {
   return window.__ttRetiredPlaylistHelperVideoIds;
 }
 
+function storePlaylistContinuationToken(continuations, label = '') {
+  try {
+    const token = continuations?.[0]?.nextContinuationData?.continuation
+      || continuations?.[0]?.reloadContinuationData?.continuation;
+    if (token && typeof token === 'string') {
+      window.__ttPlaylistContinuationToken = token;
+      appendFileOnlyLog('playlist.continuation.token.stored', { label, tokenLen: token.length });
+    }
+  } catch (_) {}
+}
+
+function hideCurrentHelperTilesInDom() {
+  const helperIds = Array.from(getPlaylistHelperVideoIdSet());
+  if (!helperIds.length) return;
+  const tiles = getPlaylistTileNodes();
+  for (const tile of tiles) {
+    const html = String(tile?.outerHTML || '');
+    if (!html) continue;
+    for (const id of helperIds) {
+      if (!id || !html.includes(id)) continue;
+      try {
+        // Use opacity:0 (not visibility:hidden) so the virtual list's focus system
+        // can still navigate to this tile and trigger the next batch load.
+        const rowNode = tile.closest?.('.TXB27d') || tile;
+        rowNode.style.opacity = '0';
+        rowNode.style.pointerEvents = 'none';
+      } catch (_) {}
+      break;
+    }
+  }
+}
+
 function attemptPlaylistAutoLoad(reason = 'playlist.auto_load', attempt = 0) {
   if ((window.__ttLastDetectedPage || detectCurrentPage()) !== 'playlist') return;
+
+  // Primary: use YouTube TV's own resolveCommand with the stored continuation token.
+  // This is the most reliable trigger since it goes through the same code path as
+  // the TV's internal "load more" mechanism.
+  const token = window.__ttPlaylistContinuationToken;
+  if (token) {
+    try {
+      resolveCommand({
+        clickTrackingParams: '',
+        continuationCommand: {
+          token,
+          request: 'CONTINUATION_REQUEST_TYPE_BROWSE',
+        },
+      });
+      appendFileOnlyLog('playlist.auto_load.trigger', { reason, attempt, method: 'resolveCommand', tokenLen: token.length });
+      return;
+    } catch (_) {}
+  }
+
+  // Fallback: scroll-based triggers (works when resolveCommand is unavailable).
   const container = document.querySelector('ytlr-playlist-video-list-renderer, ytlr-surface-page, body') || document.body;
-  try { if (container && typeof container.scrollBy === 'function') container.scrollBy({ top: 900, left: 0, behavior: 'auto' }); } catch (_) { }
+  try { if (container && typeof container.scrollBy === 'function') container.scrollBy({ top: 900, left: 0, behavior: 'auto' }); } catch (_) {}
   if (String(reason || '').includes('empty_batch')) {
     const vlist = document.querySelector('ytlr-playlist-video-list-renderer yt-virtual-list, yt-virtual-list.rN5BTd');
-    try { if (vlist && typeof vlist.scrollBy === 'function') vlist.scrollBy({ top: 1400, left: 0, behavior: 'auto' }); } catch (_) { }
+    try { if (vlist && typeof vlist.scrollBy === 'function') vlist.scrollBy({ top: 1400, left: 0, behavior: 'auto' }); } catch (_) {}
     try {
       document.dispatchEvent(new KeyboardEvent('keydown', { key: 'PageDown', code: 'PageDown', bubbles: true }));
       document.dispatchEvent(new KeyboardEvent('keyup', { key: 'PageDown', code: 'PageDown', bubbles: true }));
-    } catch (_) { }
+    } catch (_) {}
   }
-  appendFileOnlyLog('playlist.auto_load.trigger', { reason, attempt });
+  appendFileOnlyLog('playlist.auto_load.trigger', { reason, attempt, method: 'scroll_fallback' });
 }
 
 function schedulePlaylistAutoLoad(reason = 'playlist.auto_load') {
@@ -227,17 +280,21 @@ function ensurePlaylistHelperObserver() {
   const process = () => {
     if (isProcessing) return;
     if (detectCurrentPage() !== 'playlist') return;
-    if (getRetiredPlaylistHelperVideoIdSet().size === 0) return;
     isProcessing = true;
     try {
-      const result = removeRetiredHelpersFromTiles('observer.mutation');
-      if (result.removed > 0) appendFileOnlyLog('playlist.helper.observer.tick', { removed: result.removed, matchedTiles: result.matchedTiles || 0 });
+      // Hide current helper tiles (opacity:0 so they stay focusable for batch-load trigger).
+      if (getPlaylistHelperVideoIdSet().size > 0) hideCurrentHelperTilesInDom();
+      // Remove retired helper tiles from DOM.
+      if (getRetiredPlaylistHelperVideoIdSet().size > 0) {
+        const result = removeRetiredHelpersFromTiles('observer.mutation');
+        if (result.removed > 0) appendFileOnlyLog('playlist.helper.observer.tick', { removed: result.removed, matchedTiles: result.matchedTiles || 0 });
+      }
     } finally { isProcessing = false; }
   };
   const observer = new MutationObserver(() => {
     if (isProcessing) return;
     if (detectCurrentPage() !== 'playlist') return;
-    if (getRetiredPlaylistHelperVideoIdSet().size === 0) return;
+    if (getRetiredPlaylistHelperVideoIdSet().size === 0 && getPlaylistHelperVideoIdSet().size === 0) return;
     if (debounceTimer) clearTimeout(debounceTimer);
     debounceTimer = setTimeout(process, 300);
   });
@@ -267,6 +324,9 @@ function registerPlaylistHelperVideoId(videoId, label = 'playlist.helper') {
   if (retired.delete(id)) appendFileOnlyLog(`${label}.register.unretire`, { videoId: id });
   appendFileOnlyLog(`${label}.register`, { videoId: id, total: set.size });
   updateHelperHideStyle(set);
+  // Also apply inline opacity:0 directly to already-rendered tiles (CSS selector may not match).
+  setTimeout(() => hideCurrentHelperTilesInDom(), 0);
+  setTimeout(() => hideCurrentHelperTilesInDom(), 300);
 }
 
 function unregisterPlaylistHelperVideoId(videoId, label = 'playlist.helper') {
@@ -472,6 +532,11 @@ JSON.parse = function () {
     if (r.playerAds && adBlockEnabled) r.playerAds = false;
     if (r.adSlots && adBlockEnabled) r.adSlots = [];
 
+    const hiddenLibraryTabIds = configRead('hiddenLibraryTabIds');
+    if (Array.isArray(hiddenLibraryTabIds) && hiddenLibraryTabIds.length > 0) {
+      applyLibraryTabHiding(r, hiddenLibraryTabIds);
+    }
+
     updateProgressCache(r);
     if (detectedPage !== 'watch' && r?.frameworkUpdates?.entityBatchUpdate?.mutations) {
       if (!window._ttVideoProgressCache) window._ttVideoProgressCache = {};
@@ -607,7 +672,10 @@ JSON.parse = function () {
     }
 
     const topPlaylistRenderer = r?.contents?.tvBrowseRenderer?.content?.tvSurfaceContentRenderer?.content?.twoColumnRenderer?.rightColumn?.playlistVideoListRenderer;
-    if (topPlaylistRenderer?.contents) filterPlaylistRendererContents(topPlaylistRenderer, detectedPage, 'playlist.renderer');
+    if (topPlaylistRenderer?.contents) {
+      storePlaylistContinuationToken(topPlaylistRenderer.continuations, 'topPlaylist');
+      filterPlaylistRendererContents(topPlaylistRenderer, detectedPage, 'playlist.renderer');
+    }
 
     if (r?.continuationContents?.sectionListContinuation?.contents) {
       const contSlc = r.continuationContents.sectionListContinuation;
@@ -647,6 +715,7 @@ JSON.parse = function () {
     if (r?.continuationContents?.playlistVideoListContinuation?.contents) {
       const plc = r.continuationContents.playlistVideoListContinuation;
       const hasContinuation = !!plc?.continuations;
+      storePlaylistContinuationToken(plc.continuations, 'plc');
       appendFileOnlyLog('playlist.continuation.detected', { detectedPage, itemCount: Array.isArray(plc.contents) ? plc.contents.length : 0, hasContinuation });
       plc.contents = filterContinuationItems(plc.contents, detectedPage, hasContinuation, 'playlist.continuation');
     }
