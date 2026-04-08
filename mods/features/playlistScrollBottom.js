@@ -159,7 +159,7 @@ JSON.parse = function () {
     if (hasPlaylist) {
       const buttons = getPlaylistButtons(r);
       if (buttons) {
-        const injected = injectPlaylistButton(buttons, 'PLAYLIST_SCROLL_BOTTOM', 'Load All', 'ARROW_DOWNWARD');
+        const injected = injectPlaylistButton(buttons, 'PLAYLIST_SCROLL_BOTTOM', 'Load All', 'SKIP_NEXT');
         if (injected) _log('playlist.loadall.injected', { totalButtons: buttons.length });
       }
     }
