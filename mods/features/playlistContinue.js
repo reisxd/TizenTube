@@ -1,62 +1,10 @@
 import { configRead } from '../config.js';
-import { appendFileOnlyLog, hideVideo } from './hideWatched.js';
+import { appendFileOnlyLog, hideVideo, getPlaylistButtons, injectPlaylistButton } from './hideWatched.js';
 
 function _log(label, payload) {
   appendFileOnlyLog(label, payload);
 }
 
-function getButtons(r) {
-  const twoCol = r?.contents?.tvBrowseRenderer?.content?.tvSurfaceContentRenderer?.content?.twoColumnRenderer;
-  if (!twoCol) return null;
-  const leftCol = twoCol?.leftColumn;
-  const headerA = leftCol?.playlistHeaderRenderer;
-  const headerB = leftCol?.entityMetadataRenderer;
-  let headerC = null;
-  const slrContents = leftCol?.sectionListRenderer?.contents;
-  if (Array.isArray(slrContents)) {
-    for (const item of slrContents) {
-      if (item?.playlistHeaderRenderer) { headerC = item.playlistHeaderRenderer; break; }
-      if (item?.entityMetadataRenderer) { headerC = item.entityMetadataRenderer; break; }
-    }
-  }
-  const header = headerA || headerB || headerC;
-  if (!header) return null;
-  return header.buttons || header.actionButtons || (Array.isArray(header.actions) ? header.actions : null);
-}
-
-function injectButton(buttons, actionName, label, iconType) {
-  if (!Array.isArray(buttons) || !buttons.length) return false;
-  if (buttons.some(b =>
-    b?.buttonRenderer?.command?.customAction?.action === actionName ||
-    b?.buttonRenderer?.serviceEndpoint?.customAction?.action === actionName
-  )) return false;
-  // Prefer a button that already has a text label — cloning an icon-only (round) button
-  // would produce a round clone with no visible text. Fall back to first buttonRenderer.
-  const existing =
-    buttons.find(b => b?.buttonRenderer?.text?.runs || b?.buttonRenderer?.text?.simpleText) ||
-    buttons.find(b => b?.buttonRenderer);
-  if (!existing) return false;
-  const btn = { buttonRenderer: JSON.parse(JSON.stringify(existing.buttonRenderer)) };
-  const br = btn.buttonRenderer;
-  // Always ensure text is set, even if the source button had none
-  if (br.text?.runs) {
-    br.text.runs[0].text = label;
-  } else if (br.text?.simpleText) {
-    br.text.simpleText = label;
-  } else {
-    br.text = { runs: [{ text: label }] };
-  }
-  if (br.icon) br.icon.iconType = iconType;
-  else br.icon = { iconType };
-  const cmd = { clickTrackingParams: null, customAction: { action: actionName } };
-  br.command = cmd;
-  br.serviceEndpoint = cmd;
-  if (br.navigationEndpoint) delete br.navigationEndpoint;
-  if (br.onLongPressCommand) delete br.onLongPressCommand;
-  if (br.accessibilityData) br.accessibilityData = { accessibilityData: { label } };
-  buttons.push(btn);
-  return true;
-}
 
 function storePlItems(r) {
   try {
@@ -131,9 +79,9 @@ JSON.parse = function () {
     if (hasPlaylist || hasContinuation) {
       storePlItems(r);
       if (hasPlaylist) {
-        const buttons = getButtons(r);
+        const buttons = getPlaylistButtons(r);
         if (buttons) {
-          const injected = injectButton(buttons, 'PLAYLIST_CONTINUE', 'Continue', 'PLAY_ARROW');
+          const injected = injectPlaylistButton(buttons, 'PLAYLIST_CONTINUE', 'Continue', 'PLAY_ARROW');
           if (injected) _log('playlist.continue.injected', { totalButtons: buttons.length });
         }
       }

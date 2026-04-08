@@ -1,62 +1,7 @@
-import { appendFileOnlyLog } from './hideWatched.js';
+import { appendFileOnlyLog, getPlaylistButtons, injectPlaylistButton } from './hideWatched.js';
 
 function _log(label, payload) {
   appendFileOnlyLog(label, payload);
-}
-
-// ── Button injection helpers (shared shape with playlistContinue.js) ──────────
-
-function getButtons(r) {
-  const twoCol = r?.contents?.tvBrowseRenderer?.content?.tvSurfaceContentRenderer?.content?.twoColumnRenderer;
-  if (!twoCol) return null;
-  const leftCol = twoCol?.leftColumn;
-  const headerA = leftCol?.playlistHeaderRenderer;
-  const headerB = leftCol?.entityMetadataRenderer;
-  let headerC = null;
-  const slrContents = leftCol?.sectionListRenderer?.contents;
-  if (Array.isArray(slrContents)) {
-    for (const item of slrContents) {
-      if (item?.playlistHeaderRenderer) { headerC = item.playlistHeaderRenderer; break; }
-      if (item?.entityMetadataRenderer) { headerC = item.entityMetadataRenderer; break; }
-    }
-  }
-  const header = headerA || headerB || headerC;
-  if (!header) return null;
-  return header.buttons || header.actionButtons || (Array.isArray(header.actions) ? header.actions : null);
-}
-
-function injectButton(buttons, actionName, label, iconType) {
-  if (!Array.isArray(buttons) || !buttons.length) return false;
-  if (buttons.some(b =>
-    b?.buttonRenderer?.command?.customAction?.action === actionName ||
-    b?.buttonRenderer?.serviceEndpoint?.customAction?.action === actionName
-  )) return false;
-  // Prefer a button that already has a text label — cloning an icon-only (round) button
-  // would produce a round clone with no visible text. Fall back to first buttonRenderer.
-  const existing =
-    buttons.find(b => b?.buttonRenderer?.text?.runs || b?.buttonRenderer?.text?.simpleText) ||
-    buttons.find(b => b?.buttonRenderer);
-  if (!existing) return false;
-  const btn = { buttonRenderer: JSON.parse(JSON.stringify(existing.buttonRenderer)) };
-  const br = btn.buttonRenderer;
-  // Always ensure text is set, even if the source button had none
-  if (br.text?.runs) {
-    br.text.runs[0].text = label;
-  } else if (br.text?.simpleText) {
-    br.text.simpleText = label;
-  } else {
-    br.text = { runs: [{ text: label }] };
-  }
-  if (br.icon) br.icon.iconType = iconType;
-  else br.icon = { iconType };
-  const cmd = { clickTrackingParams: null, customAction: { action: actionName } };
-  br.command = cmd;
-  br.serviceEndpoint = cmd;
-  if (br.navigationEndpoint) delete br.navigationEndpoint;
-  if (br.onLongPressCommand) delete br.onLongPressCommand;
-  if (br.accessibilityData) br.accessibilityData = { accessibilityData: { label } };
-  buttons.push(btn);
-  return true;
 }
 
 // ── PLAYLIST_LOAD_ALL action ──────────────────────────────────────────────────
@@ -66,10 +11,12 @@ function injectButton(buttons, actionName, label, iconType) {
 // of ~20, taking ~40s per batch, and leaks focus outside the playlist on navigation.
 //
 // Instead we use a BURST approach:
-//   1. Focus the last rendered tile.
-//   2. Fire BURST_COUNT ArrowDown events BURST_MS apart (blasts through all rendered tiles).
+//   1. Fire FIRST_BURST_COUNT ArrowDown events on the first burst (focus starts at the
+//      header button on TV — needs enough events to traverse header + all tiles).
+//   2. Fire BURST_COUNT ArrowDown events BURST_MS apart on subsequent bursts
+//      (focus is already near the bottom after each batch load).
 //   3. After the burst, poll every POLL_MS for a new batch fetch (max BATCH_WAIT_MS).
-//   4. If a batch arrived → repeat from step 1.
+//   4. If a batch arrived → repeat from step 2.
 //   5. If no batch after timeout → all loaded, stop.
 //
 // Navigation guard: hashchange/popstate stop the runner immediately so the user can
@@ -90,13 +37,15 @@ export function playlistScrollBottom(showToastFn) {
     ? window.__ttCurrentPlaylistItems.length : 0;
 
   // Tuning
-  // After each batch the virtual list re-renders with focus already near the bottom.
-  // We only need a few events to nudge focus to the boundary — NOT a full traversal.
-  // Too many events triggers TV key-repeat rate limiting (input gets dropped/slowed).
-  const BURST_COUNT   = 6;    // just enough to reach the last rendered tile from near-bottom
-  const BURST_MS      = 80;   // comfortable spacing, avoids TV rate limiter
-  const BATCH_WAIT_MS = 6000; // max ms to wait for a new batch after a burst (TV fetch is slow)
-  const POLL_MS       = 150;  // how often to check if a new batch arrived
+  // FIRST_BURST_COUNT: on TV the button lives in the playlist header, so the first burst
+  // must traverse the entire header area PLUS all rendered tiles (~15) to reach the boundary.
+  // 30 events is a safe upper bound: header area (~5) + up to 25 tiles.
+  // BURST_COUNT: after each batch load, focus is already near the bottom — 8 events suffice.
+  const FIRST_BURST_COUNT = 30;  // first burst: header → bottom of first batch
+  const BURST_COUNT        = 8;  // subsequent bursts: already near bottom
+  const BURST_MS           = 80; // comfortable spacing, avoids TV rate limiter
+  const BATCH_WAIT_MS      = 6000; // max ms to wait for a new batch after a burst (TV fetch is slow)
+  const POLL_MS            = 150;  // how often to check if a new batch arrived
 
   _log('playlist.loadall.start', { startItemCount, startFetchCount });
   showToastFn('TizenTube', 'Loading all batches…');
@@ -129,7 +78,8 @@ export function playlistScrollBottom(showToastFn) {
       return;
     }
 
-    _log('playlist.loadall.burst', { burst: burstCount, lastFetchCount });
+    const count = burstCount === 0 ? FIRST_BURST_COUNT : BURST_COUNT;
+    _log('playlist.loadall.burst', { burst: burstCount, count, lastFetchCount });
     burstCount++;
 
     // DO NOT call lastTile.focus() — doing so moves DOM focus to the tile but bypasses
@@ -139,14 +89,14 @@ export function playlistScrollBottom(showToastFn) {
     // Dispatching ArrowDown on document is sufficient — the TV's focus system routes it
     // through the virtual list's own manager which correctly advances the item pointer.
 
-    // Fire BURST_COUNT ArrowDowns on document spaced BURST_MS apart.
+    // Fire `count` ArrowDowns on document spaced BURST_MS apart.
     // document dispatch matches how the physical remote fires events.
     let i = 0;
     const burstInterval = setInterval(() => {
       if (!window.__ttLoadAllRunning) { clearInterval(burstInterval); return; }
       fireArrowDown();
       i++;
-      if (i >= BURST_COUNT) {
+      if (i >= count) {
         clearInterval(burstInterval);
         // After the burst, poll for a new batch
         waitForBatch();
@@ -207,9 +157,9 @@ JSON.parse = function () {
   try {
     const hasPlaylist = !!(r?.contents?.tvBrowseRenderer?.content?.tvSurfaceContentRenderer?.content?.twoColumnRenderer?.rightColumn?.playlistVideoListRenderer);
     if (hasPlaylist) {
-      const buttons = getButtons(r);
+      const buttons = getPlaylistButtons(r);
       if (buttons) {
-        const injected = injectButton(buttons, 'PLAYLIST_SCROLL_BOTTOM', 'Load All', 'ARROW_DOWNWARD');
+        const injected = injectPlaylistButton(buttons, 'PLAYLIST_SCROLL_BOTTOM', 'Load All', 'ARROW_DOWNWARD');
         if (injected) _log('playlist.loadall.injected', { totalButtons: buttons.length });
       }
     }
