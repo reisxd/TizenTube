@@ -53,76 +53,6 @@ function storePlaylistContinuationToken(continuations, label = '') {
   } catch (_) {}
 }
 
-// Attempts to remove stale helpers from the virtual list's Polymer data model.
-// The virtual list recycles DOM nodes and re-renders from its internal items array,
-// so DOM-only removal causes helpers to pop back up when the user scrolls.
-// We try every known Polymer 2/3 API to splice the items out and trigger a re-render.
-function clearStaleHelpersFromVListData(staleIds) {
-  if (!Array.isArray(staleIds) || !staleIds.length) return;
-  try {
-    const vlist = document.querySelector('ytlr-playlist-video-list-renderer yt-virtual-list');
-    if (!vlist) return;
-
-    // Diagnostic: log available APIs (helps understand what works on each Tizen version).
-    appendFileOnlyLog('playlist.vlist.debug', {
-      typeItems: typeof vlist.items,
-      isArrayItems: Array.isArray(vlist.items),
-      itemsLen: Array.isArray(vlist.items) ? vlist.items.length : null,
-      hasData: !!vlist.__data,
-      isArrayDataItems: Array.isArray(vlist.__data?.items),
-      hasSetFn: typeof vlist.set === 'function',
-      hasSpliceFn: typeof vlist.splice === 'function',
-      hasNotifyFn: typeof vlist.notifyPath === 'function',
-      hasRenderFn: typeof vlist.render === 'function',
-    });
-
-    const dataItems =
-      (Array.isArray(vlist.__data?.items) ? vlist.__data.items : null) ||
-      (Array.isArray(vlist.items) ? vlist.items : null) ||
-      (Array.isArray(vlist._data?.items) ? vlist._data.items : null);
-    if (!dataItems) { appendFileOnlyLog('playlist.vlist.no_items', { staleIds }); return; }
-
-    const staleSet = new Set(staleIds);
-    const filtered = dataItems.filter(item => !staleSet.has(getItemVideoId(item) || ''));
-    if (filtered.length === dataItems.length) { appendFileOnlyLog('playlist.vlist.no_match', { staleIds }); return; }
-
-    const removed = dataItems.length - filtered.length;
-    let method = 'none';
-
-    // Method 1: Polymer splice() — preferred, triggers dirty-check and re-render
-    if (method === 'none' && typeof vlist.splice === 'function') {
-      try {
-        for (let i = dataItems.length - 1; i >= 0; i--) {
-          const id = getItemVideoId(dataItems[i]);
-          if (id && staleSet.has(id)) vlist.splice('items', i, 1);
-        }
-        method = 'splice';
-      } catch (_) {}
-    }
-    // Method 2: Polymer set()
-    if (method === 'none' && typeof vlist.set === 'function') {
-      try { vlist.set('items', filtered); method = 'set'; } catch (_) {}
-    }
-    // Method 3: Direct public property assignment
-    if (method === 'none') {
-      try { vlist.items = filtered; method = 'direct_items'; } catch (_) {}
-    }
-    // Method 4: __data mutation + notifyPath
-    if (method === 'none' && Array.isArray(vlist.__data?.items)) {
-      try {
-        vlist.__data.items = filtered;
-        if (typeof vlist.notifyPath === 'function') vlist.notifyPath('items', filtered);
-        method = 'data_notifyPath';
-      } catch (_) {}
-    }
-    // Force re-render via any available method
-    try { if (typeof vlist.render === 'function') vlist.render(); } catch (_) {}
-    try { if (typeof vlist._update === 'function') vlist._update(); } catch (_) {}
-    try { if (typeof vlist.notifyResize === 'function') vlist.notifyResize(); } catch (_) {}
-
-    appendFileOnlyLog('playlist.helper.vlist.data.cleaned', { staleIds, removed, method });
-  } catch (_) {}
-}
 
 function attemptPlaylistAutoLoad(reason = 'playlist.auto_load', attempt = 0) {
   if ((window.__ttLastDetectedPage || detectCurrentPage()) !== 'playlist') return;
@@ -332,21 +262,15 @@ function removeRetiredHelpersFromTiles(reason = 'playlist.helper.tile_scan') {
           const isFocused = rowClass.includes('lxpVI') || rowClass.includes('zylon-focus') || tile.classList?.contains('zylon-focus');
           if (isFocused) {
             focusRedirected++;
-            try {
-              const vlist = document.querySelector('ytlr-playlist-video-list-renderer yt-virtual-list') || document.querySelector('yt-virtual-list');
-              if (vlist && typeof vlist.focus === 'function') vlist.focus();
-              else if (vlist) vlist.dispatchEvent(new Event('focus'));
-            } catch (_) {}
+            // Redirect focus away from the removed tile.
+            // Do NOT call vlist.focus() — on Tizen 5.0 that triggers a full playlist
+            // page restart (YouTube TV re-fetches the initial response), which causes
+            // all retired IDs to be re-rendered and breaks the helper cleanup cycle.
+            try { document.body?.focus?.(); } catch (_) {}
           }
           if (!removedTiles.has(tile)) {
             removedTiles.add(tile);
-            // Remove the tile AND its entire .TXB27d row. Removing only the tile leaves
-            // an empty row that the virtual list re-populates with the helper item on the
-            // next render cycle (when the user scrolls). Removing the whole row breaks
-            // the virtual list's row-item association for this slot.
-            const rowToRemove = tile.closest('.TXB27d');
             try { tile.remove(); } catch (_) {}
-            try { if (rowToRemove && rowToRemove !== tile) rowToRemove.remove(); } catch (_) {}
             removed++;
           }
         } catch (_) { }
@@ -407,9 +331,6 @@ function registerPlaylistHelperVideoId(videoId, label = 'playlist.helper') {
   const set = getPlaylistHelperVideoIdSet();
   const staleIds = Array.from(set).filter(knownId => knownId !== id);
   if (staleIds.length > 0) {
-    // Try to remove stale helpers from the virtual list's Polymer data model first
-    // (prevents re-render of retired tiles), then schedule DOM cleanup as a fallback.
-    clearStaleHelpersFromVListData(staleIds);
     schedulePlaylistHelperDomCleanup(staleIds, `${label}.register.stale`);
     for (const staleId of staleIds) unregisterPlaylistHelperVideoId(staleId, `${label}.register.stale`);
   }
@@ -434,7 +355,6 @@ function clearPlaylistHelperVideoIdSet(label = 'playlist.helper') {
   const set = getPlaylistHelperVideoIdSet();
   const helperIds = Array.from(set);
   if (helperIds.length > 0) {
-    clearStaleHelpersFromVListData(helperIds);
     schedulePlaylistHelperDomCleanup(helperIds, `${label}.registry.cleared`);
     for (const helperId of helperIds) retirePlaylistHelperVideoId(helperId, `${label}.registry`);
     set.clear();
@@ -500,7 +420,19 @@ function clearKeepOneMarkers(items, label = 'continuation') {
 }
 
 function filterContinuationItems(items, pageName, hasContinuation = false, label = 'continuation') {
-  if (pageName === 'playlist' && !hasContinuation) clearPlaylistHelperVideoIdSet(label);
+  if (pageName === 'playlist' && !hasContinuation) {
+    clearPlaylistHelperVideoIdSet(label);
+    // Also wipe the retired set. On Tizen 5.0 YouTube TV can "restart" a playlist page
+    // (re-fetch the initial response without a browser reload) when e.g. vlist.focus()
+    // was called. window state survives that restart, so stale retired IDs remain in the
+    // set and cause the MutationObserver to remove freshly-rendered tiles immediately,
+    // creating a deadlock where the only visible tile is perpetually deferred.
+    const retiredSet = getRetiredPlaylistHelperVideoIdSet();
+    if (retiredSet.size > 0) {
+      appendFileOnlyLog('playlist.retired.cleared_on_fresh', { count: retiredSet.size, ids: Array.from(retiredSet) });
+      retiredSet.clear();
+    }
+  }
   clearKeepOneMarkers(items, label);
   let filteredItems = hideVideo(items, pageName);
   filteredItems = filterShortsFromItems(filteredItems, pageName);
