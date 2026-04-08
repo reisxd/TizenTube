@@ -6,7 +6,7 @@
  *
  * Configuration (Settings → Debug → Remote Log Server):
  *   logServerEnabled  bool    default false
- *   logServerIp       string  default '192.168.1.10'   (set via debug console, see below)
+ *   logServerIp       string  default '192.168.50.98'   (set via debug console, see below)
  *   logServerPort     number  default 3030
  *
  * To change the IP (no text input on TV remote — use the debug console):
@@ -34,7 +34,7 @@ function isEnabled() {
 function getUrl() {
   if (!isEnabled()) return '';
   try {
-    const ip = String(configRead('logServerIp') || '192.168.1.10').trim();
+    const ip = String(configRead('logServerIp') || '192.168.50.98').trim();
     const port = Number(configRead('logServerPort') || 3030);
     if (!ip) return '';
     return `http://${ip}:${port}/tv-log`;
