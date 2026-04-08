@@ -1,24 +1,22 @@
 /**
  * logServer.js — Remote log forwarding for TizenTube
  *
- * When `logServerUrl` is configured, every appendFileOnlyLog entry is also
- * POSTed to that URL as a JSON body: { label, payload, ts }
- * Any HTTP server that accepts POST requests can receive the logs.
+ * Compatible with https://github.com/KrX3D/TizenYouTube/blob/main/scripts_log_receiver.ps1
+ * Run the PS1 script on your Windows PC; it listens on port 3030 at /tv-log by default.
  *
- * Example — simple Node.js receiver (run on your PC):
- *   node -e "
- *     const h=require('http');
- *     h.createServer((q,s)=>{
- *       let b='';
- *       q.on('data',d=>b+=d);
- *       q.on('end',()=>{ try{const e=JSON.parse(b); console.log(e.ts,e.label,JSON.stringify(e.payload));}catch{console.log(b);} s.end(); });
- *     }).listen(8765, ()=>console.log('Listening on :8765'));
- *   "
+ * Configuration (Settings → Debug → Remote Log Server):
+ *   logServerEnabled  bool    default false
+ *   logServerIp       string  default '192.168.50.98'   (set via debug console, see below)
+ *   logServerPort     number  default 3030
  *
- * Set logServerUrl in TizenTube settings to e.g. "http://192.168.1.50:8765/log"
+ * To change the IP (no text input on TV remote — use the debug console):
+ *   const c = JSON.parse(localStorage['ytaf-configuration']);
+ *   c.logServerIp = '192.168.1.X';
+ *   localStorage['ytaf-configuration'] = JSON.stringify(c);
  *
- * This module patches window.__ttFileOnlyLogs.push so ALL modules benefit
- * automatically without circular import issues.
+ * Each log entry is POSTed as JSON to http://{ip}:{port}/tv-log:
+ *   { ts, label, payload, _formatted, context, message, data }
+ * The _formatted field is used by the PS1 receiver for clean display.
  */
 
 import { configRead } from '../config.js';
@@ -27,10 +25,20 @@ let _queue = [];
 let _draining = false;
 let _failCount = 0;
 const MAX_QUEUE = 300;
-const MAX_FAILS = 10; // stop trying after 10 consecutive failures
+const MAX_FAILS = 10;
+
+function isEnabled() {
+  try { return !!configRead('logServerEnabled'); } catch { return false; }
+}
 
 function getUrl() {
-  try { return String(configRead('logServerUrl') || '').trim(); } catch { return ''; }
+  if (!isEnabled()) return '';
+  try {
+    const ip = String(configRead('logServerIp') || '192.168.50.98').trim();
+    const port = Number(configRead('logServerPort') || 3030);
+    if (!ip) return '';
+    return `http://${ip}:${port}/tv-log`;
+  } catch { return ''; }
 }
 
 function drain() {
@@ -48,7 +56,7 @@ function drain() {
     _queue.shift();
   }).catch(() => {
     _failCount++;
-    _queue.shift(); // drop on error to avoid retrying the same entry indefinitely
+    _queue.shift();
   }).finally(() => {
     _draining = false;
     if (_queue.length > 0) setTimeout(drain, 50);
@@ -56,15 +64,36 @@ function drain() {
 }
 
 function enqueue(rawLine) {
-  const url = getUrl();
-  if (!url || _failCount >= MAX_FAILS) return;
-  // Parse the line written by appendFileOnlyLog:
-  // "[<iso>] [TT_ADBLOCK_FILE] <label> <jsonPayload>"
+  if (!isEnabled() || _failCount >= MAX_FAILS) return;
   try {
     const m = rawLine.match(/^\[([^\]]+)\] \[TT_ADBLOCK_FILE\] (\S+) ([\s\S]*)$/);
-    const entry = m
-      ? { ts: m[1], label: m[2], payload: (() => { try { return JSON.parse(m[3]); } catch { return m[3]; } })() }
-      : { ts: new Date().toISOString(), label: 'raw', payload: rawLine };
+    let entry;
+    if (m) {
+      const ts = m[1];
+      const label = m[2];
+      const payload = (() => { try { return JSON.parse(m[3]); } catch { return m[3]; } })();
+      const payloadStr = typeof payload === 'object' ? JSON.stringify(payload) : String(payload);
+      entry = {
+        ts,
+        label,
+        payload,
+        // PS1-compatible fields (scripts_log_receiver.ps1 uses _formatted for display):
+        _formatted: `[${ts}] [INFO] [TizenTube] ${label} ${payloadStr}`,
+        context: 'TizenTube',
+        message: `${label} ${payloadStr}`,
+        data: payload,
+      };
+    } else {
+      const ts = new Date().toISOString();
+      entry = {
+        ts,
+        label: 'raw',
+        payload: rawLine,
+        _formatted: `[${ts}] [INFO] [TizenTube] ${rawLine}`,
+        context: 'TizenTube',
+        message: rawLine,
+      };
+    }
     if (_queue.length >= MAX_QUEUE) _queue.shift();
     _queue.push(entry);
     setTimeout(drain, 0);
@@ -72,15 +101,12 @@ function enqueue(rawLine) {
 }
 
 /**
- * Install a proxy on window.__ttFileOnlyLogs so every appendFileOnlyLog
- * call (from any module) is automatically forwarded to the log server.
- * Called once at module load time.
+ * Patches window.__ttFileOnlyLogs.push so every appendFileOnlyLog call
+ * from any module is automatically forwarded. No circular imports needed.
  */
 function install() {
   if (window.__ttLogServerInstalled) return;
   window.__ttLogServerInstalled = true;
-
-  // Ensure the array exists and wrap its push method.
   if (!Array.isArray(window.__ttFileOnlyLogs)) window.__ttFileOnlyLogs = [];
   const origPush = Array.prototype.push;
   const arr = window.__ttFileOnlyLogs;

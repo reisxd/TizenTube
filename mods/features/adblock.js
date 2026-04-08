@@ -54,34 +54,73 @@ function storePlaylistContinuationToken(continuations, label = '') {
 }
 
 // Attempts to remove stale helpers from the virtual list's Polymer data model.
-// The virtual list recycles DOM nodes and re-renders from internal data, so DOM removal
-// alone is insufficient. If we can splice the item out of the Polymer items array and
-// notify the element, it will stop re-rendering the retired helper tile.
+// The virtual list recycles DOM nodes and re-renders from its internal items array,
+// so DOM-only removal causes helpers to pop back up when the user scrolls.
+// We try every known Polymer 2/3 API to splice the items out and trigger a re-render.
 function clearStaleHelpersFromVListData(staleIds) {
   if (!Array.isArray(staleIds) || !staleIds.length) return;
   try {
     const vlist = document.querySelector('ytlr-playlist-video-list-renderer yt-virtual-list');
     if (!vlist) return;
-    // Polymer 2/3 stores data in __data.items; try both the public and private path.
-    const dataItems = (vlist.__data && Array.isArray(vlist.__data.items))
-      ? vlist.__data.items
-      : Array.isArray(vlist.items) ? vlist.items : null;
-    if (!dataItems) return;
-    const staleSet = new Set(staleIds);
-    const filtered = dataItems.filter(item => {
-      const id = getItemVideoId(item);
-      return !id || !staleSet.has(id);
+
+    // Diagnostic: log available APIs (helps understand what works on each Tizen version).
+    appendFileOnlyLog('playlist.vlist.debug', {
+      typeItems: typeof vlist.items,
+      isArrayItems: Array.isArray(vlist.items),
+      itemsLen: Array.isArray(vlist.items) ? vlist.items.length : null,
+      hasData: !!vlist.__data,
+      isArrayDataItems: Array.isArray(vlist.__data?.items),
+      hasSetFn: typeof vlist.set === 'function',
+      hasSpliceFn: typeof vlist.splice === 'function',
+      hasNotifyFn: typeof vlist.notifyPath === 'function',
+      hasRenderFn: typeof vlist.render === 'function',
     });
-    if (filtered.length === dataItems.length) return; // nothing matched
-    // Use Polymer's set() to update and trigger re-render; fall back to direct assignment.
-    if (typeof vlist.set === 'function') {
-      vlist.set('items', filtered);
-    } else if (vlist.__data) {
-      vlist.__data.items = filtered;
-    } else {
-      vlist.items = filtered;
+
+    const dataItems =
+      (Array.isArray(vlist.__data?.items) ? vlist.__data.items : null) ||
+      (Array.isArray(vlist.items) ? vlist.items : null) ||
+      (Array.isArray(vlist._data?.items) ? vlist._data.items : null);
+    if (!dataItems) { appendFileOnlyLog('playlist.vlist.no_items', { staleIds }); return; }
+
+    const staleSet = new Set(staleIds);
+    const filtered = dataItems.filter(item => !staleSet.has(getItemVideoId(item) || ''));
+    if (filtered.length === dataItems.length) { appendFileOnlyLog('playlist.vlist.no_match', { staleIds }); return; }
+
+    const removed = dataItems.length - filtered.length;
+    let method = 'none';
+
+    // Method 1: Polymer splice() — preferred, triggers dirty-check and re-render
+    if (method === 'none' && typeof vlist.splice === 'function') {
+      try {
+        for (let i = dataItems.length - 1; i >= 0; i--) {
+          const id = getItemVideoId(dataItems[i]);
+          if (id && staleSet.has(id)) vlist.splice('items', i, 1);
+        }
+        method = 'splice';
+      } catch (_) {}
     }
-    appendFileOnlyLog('playlist.helper.vlist.data.cleaned', { staleIds, removed: dataItems.length - filtered.length });
+    // Method 2: Polymer set()
+    if (method === 'none' && typeof vlist.set === 'function') {
+      try { vlist.set('items', filtered); method = 'set'; } catch (_) {}
+    }
+    // Method 3: Direct public property assignment
+    if (method === 'none') {
+      try { vlist.items = filtered; method = 'direct_items'; } catch (_) {}
+    }
+    // Method 4: __data mutation + notifyPath
+    if (method === 'none' && Array.isArray(vlist.__data?.items)) {
+      try {
+        vlist.__data.items = filtered;
+        if (typeof vlist.notifyPath === 'function') vlist.notifyPath('items', filtered);
+        method = 'data_notifyPath';
+      } catch (_) {}
+    }
+    // Force re-render via any available method
+    try { if (typeof vlist.render === 'function') vlist.render(); } catch (_) {}
+    try { if (typeof vlist._update === 'function') vlist._update(); } catch (_) {}
+    try { if (typeof vlist.notifyResize === 'function') vlist.notifyResize(); } catch (_) {}
+
+    appendFileOnlyLog('playlist.helper.vlist.data.cleaned', { staleIds, removed, method });
   } catch (_) {}
 }
 
@@ -299,17 +338,24 @@ function removeRetiredHelpersFromTiles(reason = 'playlist.helper.tile_scan') {
               else if (vlist) vlist.dispatchEvent(new Event('focus'));
             } catch (_) {}
           }
-          if (!removedTiles.has(tile)) { removedTiles.add(tile); tile.remove(); removed++; }
+          if (!removedTiles.has(tile)) {
+            removedTiles.add(tile);
+            // Remove the tile AND its entire .TXB27d row. Removing only the tile leaves
+            // an empty row that the virtual list re-populates with the helper item on the
+            // next render cycle (when the user scrolls). Removing the whole row breaks
+            // the virtual list's row-item association for this slot.
+            const rowToRemove = tile.closest('.TXB27d');
+            try { tile.remove(); } catch (_) {}
+            try { if (rowToRemove && rowToRemove !== tile) rowToRemove.remove(); } catch (_) {}
+            removed++;
+          }
         } catch (_) { }
         break;
       }
     }
-    // Do NOT call compactPlaylistVirtualRows or schedulePlaylistAutoLoad here.
-    // compactPlaylistVirtualRows removes the now-empty row, leaving the virtual list
-    // completely empty. schedulePlaylistAutoLoad then fires yt-continuation on an empty
-    // list, which causes YouTube TV to reload the whole page instead of fetching more items.
-    // The virtual list handles the empty row naturally by recycling it for the next batch,
-    // and YouTube TV's own continuation mechanism loads more without our help.
+    // Do NOT call compactPlaylistVirtualRows or schedulePlaylistAutoLoad after removal.
+    // schedulePlaylistAutoLoad on an empty virtual list causes YouTube TV to reload the
+    // whole page. YouTube TV's own continuation mechanism handles loading more content.
   } finally {
     window.__ttRemovingHelperTiles = false;
   }
@@ -336,7 +382,9 @@ function ensurePlaylistHelperObserver() {
     if (detectCurrentPage() !== 'playlist') return;
     if (getRetiredPlaylistHelperVideoIdSet().size === 0) return;
     if (debounceTimer) clearTimeout(debounceTimer);
-    debounceTimer = setTimeout(process, 300);
+    // 50ms debounce: fast enough that helpers are invisible when re-rendered by the
+    // virtual list during scroll, but not so tight that we thrash on every mutation.
+    debounceTimer = setTimeout(process, 50);
   });
   observer.observe(document.documentElement, { childList: true, subtree: true });
   window.__ttPlaylistHelperObserverInstalled = true;
@@ -347,7 +395,10 @@ function retirePlaylistHelperVideoId(videoId, label = 'playlist.helper') {
   if (!id) return;
   getRetiredPlaylistHelperVideoIdSet().add(id);
   ensurePlaylistHelperObserver();
-  removeRetiredHelpersFromTiles(`${label}.retire`);
+  // Do NOT call removeRetiredHelpersFromTiles immediately. At retirement time the new
+  // batch content has not yet been rendered, so the helper is the only tile in DOM.
+  // Removing it immediately empties the virtual list and causes a page restart.
+  // The scheduled cleanup (300ms+) and MutationObserver handle removal once new content exists.
 }
 
 function registerPlaylistHelperVideoId(videoId, label = 'playlist.helper') {
@@ -426,7 +477,9 @@ function cleanupPlaylistHelpersFromDom(helperIds, reason = 'playlist.helper.clea
 
 function schedulePlaylistHelperDomCleanup(helperIds, reason = 'playlist.helper.cleanup') {
   if (!Array.isArray(helperIds) || helperIds.length === 0) return;
-  [0, 200, 800, 2000].forEach((delay, index) => setTimeout(() => cleanupPlaylistHelpersFromDom(helperIds, reason, index), delay));
+  // Start at 300ms: YouTube TV renders new batch content within ~100ms of JSON parse.
+  // 300ms ensures replacement content is in DOM before we attempt removal.
+  [300, 700, 1500].forEach((delay, index) => setTimeout(() => cleanupPlaylistHelpersFromDom(helperIds, reason, index), delay));
 }
 
 function clearKeepOneMarkers(items, label = 'continuation') {
