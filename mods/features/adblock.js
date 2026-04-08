@@ -52,25 +52,36 @@ function storePlaylistContinuationToken(continuations, label = '') {
   } catch (_) {}
 }
 
-function hideCurrentHelperTilesInDom() {
-  const helperIds = Array.from(getPlaylistHelperVideoIdSet());
-  if (!helperIds.length) return;
-  const tiles = getPlaylistTileNodes();
-  for (const tile of tiles) {
-    const html = String(tile?.outerHTML || '');
-    if (!html) continue;
-    for (const id of helperIds) {
-      if (!id || !html.includes(id)) continue;
-      try {
-        // Use opacity:0 (not visibility:hidden) so the virtual list's focus system
-        // can still navigate to this tile and trigger the next batch load.
-        const rowNode = tile.closest?.('.TXB27d') || tile;
-        rowNode.style.opacity = '0';
-        rowNode.style.pointerEvents = 'none';
-      } catch (_) {}
-      break;
+// Attempts to remove stale helpers from the virtual list's Polymer data model.
+// The virtual list recycles DOM nodes and re-renders from internal data, so DOM removal
+// alone is insufficient. If we can splice the item out of the Polymer items array and
+// notify the element, it will stop re-rendering the retired helper tile.
+function clearStaleHelpersFromVListData(staleIds) {
+  if (!Array.isArray(staleIds) || !staleIds.length) return;
+  try {
+    const vlist = document.querySelector('ytlr-playlist-video-list-renderer yt-virtual-list');
+    if (!vlist) return;
+    // Polymer 2/3 stores data in __data.items; try both the public and private path.
+    const dataItems = (vlist.__data && Array.isArray(vlist.__data.items))
+      ? vlist.__data.items
+      : Array.isArray(vlist.items) ? vlist.items : null;
+    if (!dataItems) return;
+    const staleSet = new Set(staleIds);
+    const filtered = dataItems.filter(item => {
+      const id = getItemVideoId(item);
+      return !id || !staleSet.has(id);
+    });
+    if (filtered.length === dataItems.length) return; // nothing matched
+    // Use Polymer's set() to update and trigger re-render; fall back to direct assignment.
+    if (typeof vlist.set === 'function') {
+      vlist.set('items', filtered);
+    } else if (vlist.__data) {
+      vlist.__data.items = filtered;
+    } else {
+      vlist.items = filtered;
     }
-  }
+    appendFileOnlyLog('playlist.helper.vlist.data.cleaned', { staleIds, removed: dataItems.length - filtered.length });
+  } catch (_) {}
 }
 
 function attemptPlaylistAutoLoad(reason = 'playlist.auto_load', attempt = 0) {
@@ -94,18 +105,30 @@ function attemptPlaylistAutoLoad(reason = 'playlist.auto_load', attempt = 0) {
     } catch (_) {}
   }
 
-  // Fallback: scroll-based triggers (works when resolveCommand is unavailable).
-  const container = document.querySelector('ytlr-playlist-video-list-renderer, ytlr-surface-page, body') || document.body;
-  try { if (container && typeof container.scrollBy === 'function') container.scrollBy({ top: 900, left: 0, behavior: 'auto' }); } catch (_) {}
-  if (String(reason || '').includes('empty_batch')) {
-    const vlist = document.querySelector('ytlr-playlist-video-list-renderer yt-virtual-list, yt-virtual-list.rN5BTd');
-    try { if (vlist && typeof vlist.scrollBy === 'function') vlist.scrollBy({ top: 1400, left: 0, behavior: 'auto' }); } catch (_) {}
-    try {
-      document.dispatchEvent(new KeyboardEvent('keydown', { key: 'PageDown', code: 'PageDown', bubbles: true }));
-      document.dispatchEvent(new KeyboardEvent('keyup', { key: 'PageDown', code: 'PageDown', bubbles: true }));
-    } catch (_) {}
+  // Fallback 1: activate the <yt-continuation> sentinel element directly.
+  // YouTube TV uses this element to detect when the user has scrolled to the bottom;
+  // clicking/activating it triggers the same continuation fetch as reaching the end.
+  try {
+    const cont = document.querySelector('ytlr-playlist-video-list-renderer yt-continuation');
+    if (cont) {
+      if (typeof cont.activate === 'function') cont.activate();
+      else if (typeof cont.click === 'function') cont.click();
+      else cont.dispatchEvent(new Event('activate', { bubbles: true }));
+      appendFileOnlyLog('playlist.auto_load.trigger', { reason, attempt, method: 'yt-continuation' });
+      return;
+    }
+  } catch (_) {}
+
+  // Fallback 2: ArrowDown events on document. The virtual list's focus manager routes
+  // these through its own item-index system; reaching the last item triggers the fetch.
+  const arrowOpts = { key: 'ArrowDown', code: 'ArrowDown', keyCode: 40, which: 40, bubbles: true, cancelable: true };
+  for (let i = 0; i < 4; i++) {
+    setTimeout(() => {
+      try { document.dispatchEvent(new KeyboardEvent('keydown', arrowOpts)); } catch (_) {}
+      try { document.dispatchEvent(new KeyboardEvent('keyup', arrowOpts)); } catch (_) {}
+    }, i * 120);
   }
-  appendFileOnlyLog('playlist.auto_load.trigger', { reason, attempt, method: 'scroll_fallback' });
+  appendFileOnlyLog('playlist.auto_load.trigger', { reason, attempt, method: 'arrowdown_fallback' });
 }
 
 function schedulePlaylistAutoLoad(reason = 'playlist.auto_load') {
@@ -280,21 +303,17 @@ function ensurePlaylistHelperObserver() {
   const process = () => {
     if (isProcessing) return;
     if (detectCurrentPage() !== 'playlist') return;
+    if (getRetiredPlaylistHelperVideoIdSet().size === 0) return;
     isProcessing = true;
     try {
-      // Hide current helper tiles (opacity:0 so they stay focusable for batch-load trigger).
-      if (getPlaylistHelperVideoIdSet().size > 0) hideCurrentHelperTilesInDom();
-      // Remove retired helper tiles from DOM.
-      if (getRetiredPlaylistHelperVideoIdSet().size > 0) {
-        const result = removeRetiredHelpersFromTiles('observer.mutation');
-        if (result.removed > 0) appendFileOnlyLog('playlist.helper.observer.tick', { removed: result.removed, matchedTiles: result.matchedTiles || 0 });
-      }
+      const result = removeRetiredHelpersFromTiles('observer.mutation');
+      if (result.removed > 0) appendFileOnlyLog('playlist.helper.observer.tick', { removed: result.removed, matchedTiles: result.matchedTiles || 0 });
     } finally { isProcessing = false; }
   };
   const observer = new MutationObserver(() => {
     if (isProcessing) return;
     if (detectCurrentPage() !== 'playlist') return;
-    if (getRetiredPlaylistHelperVideoIdSet().size === 0 && getPlaylistHelperVideoIdSet().size === 0) return;
+    if (getRetiredPlaylistHelperVideoIdSet().size === 0) return;
     if (debounceTimer) clearTimeout(debounceTimer);
     debounceTimer = setTimeout(process, 300);
   });
@@ -316,6 +335,9 @@ function registerPlaylistHelperVideoId(videoId, label = 'playlist.helper') {
   const set = getPlaylistHelperVideoIdSet();
   const staleIds = Array.from(set).filter(knownId => knownId !== id);
   if (staleIds.length > 0) {
+    // Try to remove stale helpers from the virtual list's Polymer data model first
+    // (prevents re-render of retired tiles), then schedule DOM cleanup as a fallback.
+    clearStaleHelpersFromVListData(staleIds);
     schedulePlaylistHelperDomCleanup(staleIds, `${label}.register.stale`);
     for (const staleId of staleIds) unregisterPlaylistHelperVideoId(staleId, `${label}.register.stale`);
   }
@@ -324,9 +346,6 @@ function registerPlaylistHelperVideoId(videoId, label = 'playlist.helper') {
   if (retired.delete(id)) appendFileOnlyLog(`${label}.register.unretire`, { videoId: id });
   appendFileOnlyLog(`${label}.register`, { videoId: id, total: set.size });
   updateHelperHideStyle(set);
-  // Also apply inline opacity:0 directly to already-rendered tiles (CSS selector may not match).
-  setTimeout(() => hideCurrentHelperTilesInDom(), 0);
-  setTimeout(() => hideCurrentHelperTilesInDom(), 300);
 }
 
 function unregisterPlaylistHelperVideoId(videoId, label = 'playlist.helper') {
@@ -343,6 +362,7 @@ function clearPlaylistHelperVideoIdSet(label = 'playlist.helper') {
   const set = getPlaylistHelperVideoIdSet();
   const helperIds = Array.from(set);
   if (helperIds.length > 0) {
+    clearStaleHelpersFromVListData(helperIds);
     schedulePlaylistHelperDomCleanup(helperIds, `${label}.registry.cleared`);
     for (const helperId of helperIds) retirePlaylistHelperVideoId(helperId, `${label}.registry`);
     set.clear();
