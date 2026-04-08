@@ -344,6 +344,28 @@ export default function modernUI(update, parameters) {
                             })
                         }
                     ]
+                },
+                {
+                    name: 'Remote Log Server',
+                    value: null,
+                    menuId: 'tt-log-server-settings',
+                    options: [
+                        {
+                            name: 'Enable Log Server',
+                            icon: 'WIFI',
+                            value: 'logServerEnabled'
+                        },
+                        {
+                            name: 'Server Port',
+                            value: null,
+                            menuId: 'tt-log-server-port',
+                            options: [3030, 8765, 9000, 1234, 4000, 5000].map((port) => ({
+                                name: `${port}`,
+                                key: 'logServerPort',
+                                value: port
+                            }))
+                        }
+                    ]
                 }
             ]
         },

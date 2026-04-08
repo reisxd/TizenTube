@@ -71,7 +71,9 @@ const defaultConfig = {
   enableDebugLogging: true,
   debugConsolePosition: 'top-left',
   debugConsoleHeight: 500,
-  logServerUrl: ''
+  logServerEnabled: false,
+  logServerIp: '192.168.1.10',
+  logServerPort: 3030
 };
 
 let localConfig;
