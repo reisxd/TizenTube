@@ -3,6 +3,7 @@ import Chapters from '../ui/chapters.js';
 import resolveCommand from '../resolveCommand.js';
 import { timelyAction, longPressData, MenuServiceItemRenderer, ShelfRenderer, TileRenderer, ButtonRenderer, showToast } from '../ui/ytUI.js';
 import { PatchSettings } from '../ui/customYTSettings.js';
+import './logServer.js';
 import {
   appendFileOnlyLog,
   detectAndStorePage,
@@ -265,7 +266,7 @@ function removeRetiredHelpersFromTiles(reason = 'playlist.helper.tile_scan') {
   const tiles = getPlaylistTileNodes();
   if (!tiles.length) return { scannedTiles: 0, removed: 0, matchedIds: [] };
   window.__ttRemovingHelperTiles = true;
-  let matchedTiles = 0, removed = 0, focusRedirected = 0;
+  let matchedTiles = 0, removed = 0, focusRedirected = 0, deferredNoContent = 0;
   const removedTiles = new Set(), matchedIds = new Set();
   try {
     for (const tile of tiles) {
@@ -276,6 +277,17 @@ function removeRetiredHelpersFromTiles(reason = 'playlist.helper.tile_scan') {
         matchedIds.add(id);
         matchedTiles++;
         try {
+          // Only remove this helper tile if there are other non-retired tiles already in DOM.
+          // If it's the only tile, keeping it is critical: the virtual list needs at least one
+          // rendered element as a scroll anchor. Removing it empties the list, which causes
+          // YouTube TV to reload the whole page when yt-continuation is triggered.
+          // The MutationObserver will retry once the next batch renders a replacement tile.
+          const nonRetiredTiles = tiles.filter(t => {
+            if (t === tile) return false;
+            const h = String(t?.outerHTML || '');
+            return h && !retiredIds.some(rid => rid && h.includes(rid));
+          });
+          if (nonRetiredTiles.length === 0) { deferredNoContent++; break; }
           const rowNode = tile.closest('.TXB27d');
           const rowClass = String(rowNode?.className || '');
           const isFocused = rowClass.includes('lxpVI') || rowClass.includes('zylon-focus') || tile.classList?.contains('zylon-focus');
@@ -292,14 +304,16 @@ function removeRetiredHelpersFromTiles(reason = 'playlist.helper.tile_scan') {
         break;
       }
     }
-    if (removed > 0) {
-      compactPlaylistVirtualRows(`${reason}.tile_scan`);
-      if (detectCurrentPage() === 'playlist') schedulePlaylistAutoLoad(`${reason}.tile_detected`);
-    }
+    // Do NOT call compactPlaylistVirtualRows or schedulePlaylistAutoLoad here.
+    // compactPlaylistVirtualRows removes the now-empty row, leaving the virtual list
+    // completely empty. schedulePlaylistAutoLoad then fires yt-continuation on an empty
+    // list, which causes YouTube TV to reload the whole page instead of fetching more items.
+    // The virtual list handles the empty row naturally by recycling it for the next batch,
+    // and YouTube TV's own continuation mechanism loads more without our help.
   } finally {
     window.__ttRemovingHelperTiles = false;
   }
-  appendFileOnlyLog('playlist.helper.tile_scan', { reason, retiredCount: retiredIds.length, scannedTiles: tiles.length, removed, matchedTiles, focusRedirected, matchedIds: Array.from(matchedIds) });
+  appendFileOnlyLog('playlist.helper.tile_scan', { reason, retiredCount: retiredIds.length, scannedTiles: tiles.length, removed, matchedTiles, focusRedirected, deferredNoContent, matchedIds: Array.from(matchedIds) });
   return { scannedTiles: tiles.length, removed, matchedIds: Array.from(matchedIds), matchedTiles };
 }
 
