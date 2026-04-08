@@ -363,3 +363,137 @@ export function updateProgressCache(r) {
 }
 
 export function startEmptyTileObserver() {}
+
+// ── Normalizers (shared by adblock + any future renderer filters) ─────────────
+
+export function normalizeHorizontalListRenderer(hlr, _context = '') {
+  if (!hlr || !Array.isArray(hlr.items)) return;
+  const count = hlr.items.length;
+  if (typeof hlr.visibleItemCount === 'number') hlr.visibleItemCount = count;
+  if (typeof hlr.collapsedItemCount === 'number') hlr.collapsedItemCount = count;
+  if (typeof hlr.totalItemCount === 'number') hlr.totalItemCount = count;
+  const clamp = (v) => (typeof v !== 'number') ? v : (count <= 0 ? 0 : Math.max(0, Math.min(count - 1, v)));
+  if (typeof hlr.selectedIndex === 'number') hlr.selectedIndex = clamp(hlr.selectedIndex);
+  if (typeof hlr.focusIndex === 'number') hlr.focusIndex = clamp(hlr.focusIndex);
+  if (typeof hlr.currentIndex === 'number') hlr.currentIndex = clamp(hlr.currentIndex);
+}
+
+export function normalizeGridRenderer(gridRenderer, _context = '') {
+  if (!gridRenderer || !Array.isArray(gridRenderer.items)) return;
+  const count = gridRenderer.items.length;
+  if (typeof gridRenderer.visibleItemCount === 'number') gridRenderer.visibleItemCount = count;
+  if (typeof gridRenderer.totalItemCount === 'number') gridRenderer.totalItemCount = count;
+  if (typeof gridRenderer.currentIndex === 'number') {
+    gridRenderer.currentIndex = count <= 0 ? 0 : Math.max(0, Math.min(count - 1, gridRenderer.currentIndex));
+  }
+}
+
+// ── Video ID extraction helper ────────────────────────────────────────────────
+
+export function getItemVideoId(item) {
+  return String(
+    item?.tileRenderer?.contentId ||
+    item?.tileRenderer?.onSelectCommand?.watchEndpoint?.videoId ||
+    item?.tileRenderer?.onSelectCommand?.watchEndpoint?.playlistId ||
+    item?.tileRenderer?.onSelectCommand?.reelWatchEndpoint?.videoId ||
+    ''
+  );
+}
+
+// ── Deep watch-progress extraction ───────────────────────────────────────────
+
+export function collectWatchProgressEntries(node, out = [], depth = 0, seen = new WeakSet()) {
+  if (!node || depth > 10) return out;
+  if (Array.isArray(node)) { for (const child of node) collectWatchProgressEntries(child, out, depth + 1, seen); return out; }
+  if (typeof node !== 'object') return out;
+  if (seen.has(node)) return out;
+  seen.add(node);
+  const id = node.videoId || node.externalVideoId || node.contentId || null;
+  const pctRaw = node.watchProgressPercentage ?? node.percentDurationWatched ?? node.watchedPercent ?? null;
+  const pct = Number(pctRaw);
+  if (id && Number.isFinite(pct)) out.push({ id: String(id), percent: pct, source: 'deep_scan' });
+  for (const key of Object.keys(node)) collectWatchProgressEntries(node[key], out, depth + 1, seen);
+  return out;
+}
+
+// ── Shared playlist button helpers ────────────────────────────────────────────
+// Both playlistContinue.js and playlistScrollBottom.js inject custom buttons
+// into the playlist header using these shared utilities.
+
+export function getPlaylistButtons(r) {
+  const twoCol = r?.contents?.tvBrowseRenderer?.content?.tvSurfaceContentRenderer?.content?.twoColumnRenderer;
+  if (!twoCol) return null;
+  const leftCol = twoCol?.leftColumn;
+  const headerA = leftCol?.playlistHeaderRenderer;
+  const headerB = leftCol?.entityMetadataRenderer;
+  let headerC = null;
+  const slrContents = leftCol?.sectionListRenderer?.contents;
+  if (Array.isArray(slrContents)) {
+    for (const item of slrContents) {
+      if (item?.playlistHeaderRenderer) { headerC = item.playlistHeaderRenderer; break; }
+      if (item?.entityMetadataRenderer) { headerC = item.entityMetadataRenderer; break; }
+    }
+  }
+  const header = headerA || headerB || headerC;
+  if (!header) return null;
+  return header.buttons || header.actionButtons || (Array.isArray(header.actions) ? header.actions : null);
+}
+
+export function injectPlaylistButton(buttons, actionName, label, iconType) {
+  if (!Array.isArray(buttons) || !buttons.length) return false;
+  if (buttons.some(b =>
+    b?.buttonRenderer?.command?.customAction?.action === actionName ||
+    b?.buttonRenderer?.serviceEndpoint?.customAction?.action === actionName
+  )) return false;
+  const existing =
+    buttons.find(b => b?.buttonRenderer?.text?.runs || b?.buttonRenderer?.text?.simpleText) ||
+    buttons.find(b => b?.buttonRenderer);
+  if (!existing) return false;
+  const btn = { buttonRenderer: JSON.parse(JSON.stringify(existing.buttonRenderer)) };
+  const br = btn.buttonRenderer;
+  if (br.text?.runs) {
+    br.text.runs[0].text = label;
+  } else if (br.text?.simpleText) {
+    br.text.simpleText = label;
+  } else {
+    br.text = { runs: [{ text: label }] };
+  }
+  if (br.icon) br.icon.iconType = iconType;
+  else br.icon = { iconType };
+  const cmd = { clickTrackingParams: null, customAction: { action: actionName } };
+  br.command = cmd;
+  br.serviceEndpoint = cmd;
+  if (br.navigationEndpoint) delete br.navigationEndpoint;
+  if (br.onLongPressCommand) delete br.onLongPressCommand;
+  if (br.accessibilityData) br.accessibilityData = { accessibilityData: { label } };
+  buttons.push(btn);
+  return true;
+}
+
+// ── CSS-based helper tile hider ───────────────────────────────────────────────
+// Hides helper tiles by injecting a <style> rule keyed to the video ID.
+// More robust than DOM removal because the virtual list re-renders from its
+// internal data; CSS persists across re-renders.
+
+const _HELPER_STYLE_ID = 'tt-playlist-helper-hide';
+
+export function updateHelperHideStyle(helperIds) {
+  if (typeof document === 'undefined') return;
+  let style = document.getElementById(_HELPER_STYLE_ID);
+  if (!style) {
+    style = document.createElement('style');
+    style.id = _HELPER_STYLE_ID;
+    (document.head || document.documentElement).appendChild(style);
+  }
+  if (!helperIds || !helperIds.size) { style.textContent = ''; return; }
+  const ids = Array.from(helperIds);
+  const selectors = ids.flatMap(id => [
+    `[data-video-id="${id}"]`,
+    `[video-id="${id}"]`,
+    `[data-content-id="${id}"]`,
+    `[content-id="${id}"]`,
+  ]);
+  // visibility:hidden keeps the element in layout (virtual list can still
+  // navigate to it), pointer-events:none prevents accidental clicks.
+  style.textContent = `${selectors.join(', ')} { visibility: hidden !important; pointer-events: none !important; }`;
+}
