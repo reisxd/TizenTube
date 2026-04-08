@@ -265,7 +265,7 @@ function removeRetiredHelpersFromTiles(reason = 'playlist.helper.tile_scan') {
   const tiles = getPlaylistTileNodes();
   if (!tiles.length) return { scannedTiles: 0, removed: 0, matchedIds: [] };
   window.__ttRemovingHelperTiles = true;
-  let matchedTiles = 0, removed = 0, skippedUnsafe = 0;
+  let matchedTiles = 0, removed = 0, focusRedirected = 0;
   const removedTiles = new Set(), matchedIds = new Set();
   try {
     for (const tile of tiles) {
@@ -278,8 +278,15 @@ function removeRetiredHelpersFromTiles(reason = 'playlist.helper.tile_scan') {
         try {
           const rowNode = tile.closest('.TXB27d');
           const rowClass = String(rowNode?.className || '');
-          const focused = rowClass.includes('lxpVI') || rowClass.includes('zylon-focus') || tile.classList?.contains('zylon-focus');
-          if (!isHelperLikePlaylistNode(rowNode, tile) || focused) { skippedUnsafe++; break; }
+          const isFocused = rowClass.includes('lxpVI') || rowClass.includes('zylon-focus') || tile.classList?.contains('zylon-focus');
+          if (isFocused) {
+            focusRedirected++;
+            try {
+              const vlist = document.querySelector('ytlr-playlist-video-list-renderer yt-virtual-list') || document.querySelector('yt-virtual-list');
+              if (vlist && typeof vlist.focus === 'function') vlist.focus();
+              else if (vlist) vlist.dispatchEvent(new Event('focus'));
+            } catch (_) {}
+          }
           if (!removedTiles.has(tile)) { removedTiles.add(tile); tile.remove(); removed++; }
         } catch (_) { }
         break;
@@ -292,7 +299,7 @@ function removeRetiredHelpersFromTiles(reason = 'playlist.helper.tile_scan') {
   } finally {
     window.__ttRemovingHelperTiles = false;
   }
-  appendFileOnlyLog('playlist.helper.tile_scan', { reason, retiredCount: retiredIds.length, scannedTiles: tiles.length, removed, matchedTiles, skippedUnsafe, matchedIds: Array.from(matchedIds) });
+  appendFileOnlyLog('playlist.helper.tile_scan', { reason, retiredCount: retiredIds.length, scannedTiles: tiles.length, removed, matchedTiles, focusRedirected, matchedIds: Array.from(matchedIds) });
   return { scannedTiles: tiles.length, removed, matchedIds: Array.from(matchedIds), matchedTiles };
 }
 
