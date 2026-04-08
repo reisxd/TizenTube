@@ -72,7 +72,7 @@ const defaultConfig = {
   debugConsolePosition: 'top-left',
   debugConsoleHeight: 500,
   logServerEnabled: false,
-  logServerIp: '192.168.1.10',
+  logServerIp: '192.168.50.98',
   logServerPort: 3030
 };
 
