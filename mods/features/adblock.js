@@ -42,6 +42,18 @@ function getRetiredPlaylistHelperVideoIdSet() {
   return window.__ttRetiredPlaylistHelperVideoIds;
 }
 
+// Updates the CSS hide rule to cover both active helpers AND retired helpers.
+// The virtual list re-renders retired tiles from its internal data model on every scroll,
+// so DOM removal alone causes a visible flash (tile appears → 50ms later removed → repeat).
+// CSS visibility:hidden persists across re-renders and eliminates the flash entirely.
+function updateAllHelperHideStyles() {
+  const combined = new Set([
+    ...getPlaylistHelperVideoIdSet(),
+    ...getRetiredPlaylistHelperVideoIdSet(),
+  ]);
+  updateHelperHideStyle(combined);
+}
+
 function storePlaylistContinuationToken(continuations, label = '') {
   try {
     const token = continuations?.[0]?.nextContinuationData?.continuation
@@ -318,6 +330,10 @@ function retirePlaylistHelperVideoId(videoId, label = 'playlist.helper') {
   const id = String(videoId || '').trim();
   if (!id) return;
   getRetiredPlaylistHelperVideoIdSet().add(id);
+  // CSS-hide the retired tile immediately so it stays invisible even when the virtual
+  // list re-renders it during scroll (DOM removal alone causes a flash: tile appears →
+  // observer removes → vlist re-renders → repeat). CSS persists across re-renders.
+  updateAllHelperHideStyles();
   ensurePlaylistHelperObserver();
   // Do NOT call removeRetiredHelpersFromTiles immediately. At retirement time the new
   // batch content has not yet been rendered, so the helper is the only tile in DOM.
@@ -338,7 +354,7 @@ function registerPlaylistHelperVideoId(videoId, label = 'playlist.helper') {
   const retired = getRetiredPlaylistHelperVideoIdSet();
   if (retired.delete(id)) appendFileOnlyLog(`${label}.register.unretire`, { videoId: id });
   appendFileOnlyLog(`${label}.register`, { videoId: id, total: set.size });
-  updateHelperHideStyle(set);
+  updateAllHelperHideStyles();
 }
 
 function unregisterPlaylistHelperVideoId(videoId, label = 'playlist.helper') {
@@ -358,7 +374,7 @@ function clearPlaylistHelperVideoIdSet(label = 'playlist.helper') {
     schedulePlaylistHelperDomCleanup(helperIds, `${label}.registry.cleared`);
     for (const helperId of helperIds) retirePlaylistHelperVideoId(helperId, `${label}.registry`);
     set.clear();
-    updateHelperHideStyle(set);
+    updateAllHelperHideStyles();
     appendFileOnlyLog(`${label}.registry.cleared`, { cleared: helperIds.length, helperIds });
   }
 }
@@ -431,6 +447,7 @@ function filterContinuationItems(items, pageName, hasContinuation = false, label
     if (retiredSet.size > 0) {
       appendFileOnlyLog('playlist.retired.cleared_on_fresh', { count: retiredSet.size, ids: Array.from(retiredSet) });
       retiredSet.clear();
+      updateAllHelperHideStyles();
     }
   }
   clearKeepOneMarkers(items, label);
