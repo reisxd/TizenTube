@@ -70,7 +70,8 @@ const defaultConfig = {
   enableDebugConsole: false,
   enableDebugLogging: true,
   debugConsolePosition: 'top-left',
-  debugConsoleHeight: 500
+  debugConsoleHeight: 500,
+  logServerUrl: ''
 };
 
 let localConfig;
