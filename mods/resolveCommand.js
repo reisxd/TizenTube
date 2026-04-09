@@ -5,7 +5,6 @@ import { speedSettings } from './ui/speedUI.js';
 import { showToast, buttonItem } from './ui/ytUI.js';
 import checkForUpdates from './features/updater.js';
 import { playlistContinue } from './features/playlistContinue.js';
-import { playlistScrollBottom } from './features/playlistScrollBottom.js';
 
 export default function resolveCommand(cmd, _) {
     // resolveCommand function is pretty OP, it can do from opening modals, changing client settings and way more.
@@ -201,9 +200,6 @@ function customAction(action, parameters) {
             break;
         case 'PLAYLIST_CONTINUE':
             playlistContinue(resolveCommand, showToast);
-            break;
-        case 'PLAYLIST_SCROLL_BOTTOM':
-            playlistScrollBottom(showToast);
             break;
     }
 }

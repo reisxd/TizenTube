@@ -180,9 +180,9 @@ export function isShortsShelf(shelve) {
 // ── Filter shorts from an item array ─────────────────────────────────────────
 
 export function filterShortsFromItems(items, pageName) {
-  // Playlists only contain regular videos, never shorts. Skip the check entirely
-  // to avoid noisy shorts.miss log entries for every playlist tile.
-  if (!Array.isArray(items) || configRead('enableShorts') || pageName === 'playlist') return items;
+  // Playlist tiles (playlist/playlists pages) are never shorts. Skip the check
+  // entirely to avoid noisy shorts.miss log entries for every tile.
+  if (!Array.isArray(items) || configRead('enableShorts') || pageName === 'playlist' || pageName === 'playlists') return items;
   const before = items.length;
   const filtered = items.filter(item => {
     const info = getShortInfo(item, { pageName });
