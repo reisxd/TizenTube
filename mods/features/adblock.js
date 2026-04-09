@@ -102,16 +102,8 @@ function attemptPlaylistAutoLoad(reason = 'playlist.auto_load', attempt = 0) {
     }
   } catch (_) {}
 
-  // Fallback 2: ArrowDown events on document. The virtual list's focus manager routes
-  // these through its own item-index system; reaching the last item triggers the fetch.
-  const arrowOpts = { key: 'ArrowDown', code: 'ArrowDown', keyCode: 40, which: 40, bubbles: true, cancelable: true };
-  for (let i = 0; i < 4; i++) {
-    setTimeout(() => {
-      try { document.dispatchEvent(new KeyboardEvent('keydown', arrowOpts)); } catch (_) {}
-      try { document.dispatchEvent(new KeyboardEvent('keyup', arrowOpts)); } catch (_) {}
-    }, i * 120);
-  }
-  appendFileOnlyLog('playlist.auto_load.trigger', { reason, attempt, method: 'arrowdown_fallback' });
+  // All available triggers exhausted — nothing to do.
+  appendFileOnlyLog('playlist.auto_load.trigger', { reason, attempt, method: 'no_trigger' });
 }
 
 function schedulePlaylistAutoLoad(reason = 'playlist.auto_load') {
@@ -129,7 +121,10 @@ function schedulePlaylistAutoLoad(reason = 'playlist.auto_load') {
   const cooldownUntil = Number(window.__ttPlaylistAutoLoadCooldownUntil || 0);
   if (now < cooldownUntil) return;
   window.__ttPlaylistAutoLoadCooldownUntil = now + 2600;
-  [0, 150, 500, 1000, 1800].forEach((delay, index) => setTimeout(() => attemptPlaylistAutoLoad(reason, index), delay));
+  [0, 150, 500, 1000, 1800].forEach((delay, index) => setTimeout(() => {
+    if (window.__ttBatchCollectActive) return; // batch collect already running
+    attemptPlaylistAutoLoad(reason, index);
+  }, delay));
 }
 
 function showPlaylistAllHiddenNotice(reason = 'playlist.all_hidden') {

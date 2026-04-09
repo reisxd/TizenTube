@@ -102,8 +102,10 @@ const _xhrData = (typeof WeakMap !== 'undefined') ? new WeakMap() : null;
 if (_xhrData && typeof XMLHttpRequest !== 'undefined') {
   const proto = XMLHttpRequest.prototype;
 
-  // Properties to intercept: [property, fallback native getter]
-  const props = ['responseText', 'response', 'status', 'statusText', 'readyState'];
+  // Properties to intercept — includes responseType so we can force '' to make
+  // YouTube TV use the responseText → JSON.parse path instead of the pre-parsed
+  // 'json' responseType path (which bypasses our JSON.parse filter entirely).
+  const props = ['responseText', 'response', 'status', 'statusText', 'readyState', 'responseType'];
   for (const prop of props) {
     const desc = Object.getOwnPropertyDescriptor(proto, prop);
     if (!desc || !desc.get) continue; // not a getter — skip
@@ -139,19 +141,25 @@ if (_xhrData && typeof XMLHttpRequest !== 'undefined') {
 
 function _deliverXHRResponse(xhr, bodyStr, status) {
   try {
+    // Read native responseType BEFORE setting WeakMap (no override exists yet)
+    const nativeRt = (() => { try { return xhr.responseType || ''; } catch (_) { return ''; } })();
+
+    // Force responseType to '' so YouTube TV reads responseText and calls JSON.parse.
+    // When responseType is 'json', the browser pre-parses xhr.response internally and
+    // YouTube TV reads it as a plain object — bypassing our JSON.parse filter entirely.
+    // Overriding responseType to '' routes through the text path where our filter runs.
     const payload = {
       responseText: bodyStr,
-      response:     bodyStr,
+      response:     bodyStr,   // consistent with responseType=''
+      responseType: '',        // lie: pretend this is a plain text response
       status:       status || 200,
       statusText:   'OK',
       readyState:   4,
     };
 
     if (_xhrData) {
-      // Primary path: WeakMap prototype override (reliable on old WebKit)
       _xhrData.set(xhr, payload);
     } else {
-      // Fallback: try Object.defineProperty on instance (may silently fail)
       for (const [prop, val] of Object.entries(payload)) {
         try {
           Object.defineProperty(xhr, prop, { value: val, configurable: true, writable: true });
@@ -161,27 +169,30 @@ function _deliverXHRResponse(xhr, bodyStr, status) {
       }
     }
 
-    // Check what YouTube TV will actually read back (diagnostic)
+    // Diagnostic: confirm what YouTube TV will actually read back
     const rtLen = (() => { try { return xhr.responseText?.length || 0; } catch (_) { return -1; } })();
-    _log('playlist.batch_collect.deliver_check', { rtLen, status: xhr.status, readyState: xhr.readyState });
+    _log('playlist.batch_collect.deliver_check', {
+      rtLen, status: xhr.status, readyState: xhr.readyState,
+      nativeRt, overriddenRt: xhr.responseType,
+    });
 
-    // Fire readystatechange for states 2 → 4 (HEADERS_RECEIVED, LOADING, DONE)
+    // Fire readystatechange for states 2 → 4
     for (const state of [2, 3, 4]) {
-      if (_xhrData) _xhrData.get(xhr) && (_xhrData.get(xhr).readyState = state);
+      if (_xhrData) { const e = _xhrData.get(xhr); if (e) e.readyState = state; }
       try { xhr.dispatchEvent(new Event('readystatechange')); } catch (_) {}
     }
     if (typeof xhr.onreadystatechange === 'function') {
       try { xhr.onreadystatechange(); } catch (_) {}
     }
 
-    // Fire load / loadend
-    try { xhr.dispatchEvent(new Event('load')); } catch (_) {}
-    try { xhr.dispatchEvent(new Event('loadend')); } catch (_) {}
+    // Fire load / loadend — use ProgressEvent if available (more XHR-compatible)
+    const PE = typeof ProgressEvent !== 'undefined' ? ProgressEvent : Event;
+    try { xhr.dispatchEvent(new PE('load')); } catch (_) {}
+    try { xhr.dispatchEvent(new PE('loadend')); } catch (_) {}
     if (typeof xhr.onload === 'function') {
       try { xhr.onload(); } catch (_) {}
     }
 
-    // Clean up WeakMap entry after a short delay (let handlers finish first)
     if (_xhrData) {
       setTimeout(() => { try { _xhrData.delete(xhr); } catch (_) {} }, 5000);
     }
