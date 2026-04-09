@@ -1,23 +1,24 @@
 /**
  * playlistBatchCollect.js
  *
- * Intercepts YouTube TV playlist continuation fetch requests.
- * When a playlist continuation arrives, immediately fetches ALL remaining
- * batches in sequence and combines them into a single response before
- * returning it to YouTube TV.
+ * Intercepts YouTube TV playlist continuation requests (both XMLHttpRequest
+ * and window.fetch). When a playlist continuation arrives, immediately fetches
+ * ALL remaining batches in sequence and combines them into a single response
+ * before returning it to YouTube TV.
  *
  * The existing JSON.parse filter then processes all items at once, so the
  * virtual list only sees unwatched videos — no empty spaces, no helper tile
  * cycling, and no repeated scroll-to-bottom triggers.
  *
  * Only active when enablePlaylistBatchCollect is true (default: true).
- * Falls back gracefully on any error: if a sub-request fails or the
- * Response constructor is unavailable, the original single-batch response
- * is returned unchanged.
+ * Falls back gracefully on any error.
  *
- * Transport note: this patches window.fetch. If YouTube TV uses
- * XMLHttpRequest instead, the patch is a no-op for those requests (the
- * JSON.parse filter still runs, just on one batch at a time as before).
+ * Transport note: YouTube TV on Tizen 5.0/5.5 uses XMLHttpRequest, not
+ * window.fetch. Both transports are patched here. The fetch patch covers
+ * environments where fetch is used (desktop browser dev/testing).
+ *
+ * XHR delivery: synthetic responses are delivered via Object.defineProperty
+ * (to shadow read-only properties) + dispatchEvent (readystatechange/load).
  */
 
 import { appendFileOnlyLog } from './hideWatched.js';
@@ -26,6 +27,14 @@ import { configRead } from '../config.js';
 function _log(label, payload) {
   try { appendFileOnlyLog(label, payload); } catch (_) {}
 }
+
+// ── Save native implementations before any patching ──────────────────────────
+
+// Native fetch — used by both the fetch patch and the XHR interceptor to make
+// sub-requests without going through the patched XHR/fetch again.
+const _nativeFetch = (typeof window.fetch === 'function')
+  ? window.fetch.bind(window)
+  : null;
 
 // ── URL detection ─────────────────────────────────────────────────────────────
 
@@ -53,13 +62,12 @@ function _getToken(continuations) {
       || null;
 }
 
-// ── Synthesize a Response from a mutated data object ─────────────────────────
+// ── Synthesize a Response from a mutated data object (fetch path) ─────────────
 
 function _makeResponse(data, originalResponse) {
   const headers = new Headers();
   try {
     originalResponse.headers.forEach((v, k) => {
-      // Strip encoding/length headers — we return plain uncompressed JSON
       if (/^(content-encoding|transfer-encoding|content-length)$/i.test(k)) return;
       try { headers.set(k, v); } catch (_) {}
     });
@@ -69,6 +77,47 @@ function _makeResponse(data, originalResponse) {
     status: originalResponse.status || 200,
     headers,
   });
+}
+
+// ── Deliver synthetic response to an XHR object ───────────────────────────────
+
+function _deliverXHRResponse(xhr, bodyStr, status) {
+  try {
+    // Shadow read-only XHR properties with own configurable properties
+    const def = (prop, val) => {
+      try {
+        Object.defineProperty(xhr, prop, { value: val, configurable: true, writable: true });
+      } catch (_) {
+        try { xhr[prop] = val; } catch (_2) {}
+      }
+    };
+
+    def('status',       status || 200);
+    def('statusText',   'OK');
+    def('responseText', bodyStr);
+    def('response',     bodyStr);
+
+    // Fire readystatechange for states 1 (open), 2 (headers), 3 (loading), 4 (done)
+    // YouTube TV typically only cares about state 4, but fire them all for safety.
+    for (const state of [1, 2, 3, 4]) {
+      def('readyState', state);
+      try { xhr.dispatchEvent(new Event('readystatechange')); } catch (_) {}
+      if (state === 4) {
+        if (typeof xhr.onreadystatechange === 'function') {
+          try { xhr.onreadystatechange(); } catch (_) {}
+        }
+      }
+    }
+
+    // Fire load / loadend
+    try { xhr.dispatchEvent(new Event('load')); } catch (_) {}
+    try { xhr.dispatchEvent(new Event('loadend')); } catch (_) {}
+    if (typeof xhr.onload === 'function') {
+      try { xhr.onload(); } catch (_) {}
+    }
+  } catch (err) {
+    _log('playlist.batch_collect.deliver_error', { err: String(err?.message || err) });
+  }
 }
 
 // ── Progress overlay ──────────────────────────────────────────────────────────
@@ -107,21 +156,27 @@ function _makeAbort() {
 }
 
 // ── Core: collect all remaining batches ───────────────────────────────────────
+//
+// contextOverride: pass the request context object directly when the caller
+// already has it (XHR path) — avoids re-parsing the body.
 
-async function _collectAll(origFetch, url, options, plc) {
+async function _collectAll(url, plc, contextOverride) {
   const MAX = Math.max(1, Math.min(500, Number(configRead('playlistBatchCollectMaxBatches') || 50)));
-  const context = _parseBody(options)?.context;
+
+  const context = contextOverride;
   if (!context) return null; // Can't reconstruct sub-requests without context
+
+  if (!_nativeFetch) return null; // No native fetch available
 
   const allContents = Array.isArray(plc.contents) ? [...plc.contents] : [];
   let continuations = plc.continuations;
   let batchesLoaded = 1;
-  const nativeAbort = typeof AbortController !== 'undefined';
   const abort = _makeAbort();
+  const nativeAbort = typeof AbortController !== 'undefined';
 
   const onNav = () => abort.abort();
   window.addEventListener('hashchange', onNav, { once: true });
-  window.addEventListener('popstate', onNav, { once: true });
+  window.addEventListener('popstate',   onNav, { once: true });
 
   _showProgress(`Playlist: loading batch ${batchesLoaded}…`);
 
@@ -131,14 +186,17 @@ async function _collectAll(origFetch, url, options, plc) {
       if (!token) break;
 
       const fetchOpts = {
-        ...options,
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
         body: JSON.stringify({ context, continuation: token }),
+        credentials: 'include',
+        mode: 'cors',
       };
       if (nativeAbort) fetchOpts.signal = abort.signal;
 
       let nextData;
       try {
-        const nextResp = await origFetch(url, fetchOpts);
+        const nextResp = await _nativeFetch(url, fetchOpts);
         nextData = await nextResp.json();
       } catch (err) {
         _log('playlist.batch_collect.sub_error', {
@@ -160,7 +218,7 @@ async function _collectAll(origFetch, url, options, plc) {
     }
   } finally {
     window.removeEventListener('hashchange', onNav);
-    window.removeEventListener('popstate', onNav);
+    window.removeEventListener('popstate',   onNav);
     _hideProgress();
   }
 
@@ -174,25 +232,122 @@ async function _collectAll(origFetch, url, options, plc) {
   return { allContents, continuations };
 }
 
-// ── Fetch override ────────────────────────────────────────────────────────────
+// ── XHR interception ──────────────────────────────────────────────────────────
 
-if (typeof window.fetch === 'function') {
-  const _origFetch = window.fetch.bind(window);
+if (typeof XMLHttpRequest !== 'undefined') {
+  const _origXHROpen        = XMLHttpRequest.prototype.open;
+  const _origXHRSetHeader   = XMLHttpRequest.prototype.setRequestHeader;
+  const _origXHRSend        = XMLHttpRequest.prototype.send;
 
-  window.fetch = async function playlistBatchCollectFetch(url, options) {
-    // Fast path: only care about YouTube InnerTube browse API
-    if (!_isBrowseUrl(url)) return _origFetch(url, options);
+  XMLHttpRequest.prototype.open = function (method, url) {
+    this.__ttUrl    = url;
+    this.__ttMethod = method;
+    this.__ttReqHeaders = {};
+    return _origXHROpen.apply(this, arguments);
+  };
 
-    // Must be a continuation request (body has continuation + context)
-    const reqBody = _parseBody(options);
-    if (!reqBody?.continuation || !reqBody?.context) return _origFetch(url, options);
+  XMLHttpRequest.prototype.setRequestHeader = function (name, value) {
+    if (this.__ttReqHeaders) this.__ttReqHeaders[name] = value;
+    return _origXHRSetHeader.apply(this, arguments);
+  };
+
+  XMLHttpRequest.prototype.send = function (body) {
+    const url = this.__ttUrl;
+
+    // Fast path: not a browse URL
+    if (!_isBrowseUrl(url)) {
+      return _origXHRSend.apply(this, arguments);
+    }
+
+    // Must be a continuation request
+    const reqBody = _parseBody({ body });
+    if (!reqBody?.continuation || !reqBody?.context) {
+      return _origXHRSend.apply(this, arguments);
+    }
 
     // Feature flag
-    if (!configRead('enablePlaylistBatchCollect')) return _origFetch(url, options);
+    if (!configRead('enablePlaylistBatchCollect')) {
+      return _origXHRSend.apply(this, arguments);
+    }
+
+    // Async interception — do NOT call _origXHRSend
+    const xhr     = this;
+    const method  = xhr.__ttMethod || 'POST';
+    const headers = Object.assign(
+      { 'content-type': 'application/json' },
+      xhr.__ttReqHeaders || {}
+    );
+
+    window.__ttBatchCollectActive = true;
+
+    ;(async () => {
+      let data;
+      let rawStatus = 200;
+
+      try {
+        const resp = await _nativeFetch(url, {
+          method,
+          headers,
+          body,
+          credentials: 'include',
+          mode: 'cors',
+        });
+        rawStatus = resp.status;
+        data = await resp.json();
+      } catch (err) {
+        _log('playlist.batch_collect.xhr_fetch_error', { err: String(err?.message || err) });
+        window.__ttBatchCollectActive = false;
+        // Fall back to real XHR
+        try { _origXHRSend.call(xhr, body); } catch (_) {}
+        return;
+      }
+
+      // Only intercept playlist continuation responses that have more batches
+      const plc = data?.continuationContents?.playlistVideoListContinuation;
+      if (plc && Array.isArray(plc.contents) && plc.continuations) {
+        let collected;
+        try {
+          collected = await _collectAll(url, plc, reqBody.context);
+        } catch (err) {
+          _log('playlist.batch_collect.collect_error', { err: String(err?.message || err) });
+        }
+        if (collected) {
+          plc.contents     = collected.allContents;
+          plc.continuations = collected.continuations;
+        }
+      } else {
+        _log('playlist.batch_collect.xhr_no_plc', {
+          hasPlc: !!plc,
+          hasContinuations: !!(plc?.continuations),
+        });
+      }
+
+      window.__ttBatchCollectActive = false;
+
+      _deliverXHRResponse(xhr, JSON.stringify(data), rawStatus);
+    })();
+  };
+
+  _log('playlist.batch_collect.xhr_installed', {});
+}
+
+// ── Fetch override ────────────────────────────────────────────────────────────
+
+if (_nativeFetch) {
+  window.fetch = async function playlistBatchCollectFetch(url, options) {
+    // Fast path: only care about YouTube InnerTube browse API
+    if (!_isBrowseUrl(url)) return _nativeFetch(url, options);
+
+    // Must be a continuation request
+    const reqBody = _parseBody(options);
+    if (!reqBody?.continuation || !reqBody?.context) return _nativeFetch(url, options);
+
+    // Feature flag
+    if (!configRead('enablePlaylistBatchCollect')) return _nativeFetch(url, options);
 
     // Make the original request first
     let response;
-    try { response = await _origFetch(url, options); }
+    try { response = await _nativeFetch(url, options); }
     catch (err) { throw err; }
 
     // Read the response — clone so `response` is still usable as fallback
@@ -203,27 +358,31 @@ if (typeof window.fetch === 'function') {
     // Only intercept playlist continuation responses that have more batches
     const plc = data?.continuationContents?.playlistVideoListContinuation;
     if (!plc || !Array.isArray(plc.contents) || !plc.continuations) {
-      return response; // Not a playlist continuation, or already the last batch
+      return response;
     }
+
+    window.__ttBatchCollectActive = true;
 
     // Collect all remaining batches
     let collected;
-    try { collected = await _collectAll(_origFetch, url, options, plc); }
+    try { collected = await _collectAll(url, plc, reqBody.context); }
     catch (err) {
       _log('playlist.batch_collect.error', { err: String(err?.message || err) });
-      return response; // Fallback: return original single-batch response
+      window.__ttBatchCollectActive = false;
+      return response;
     }
+
+    window.__ttBatchCollectActive = false;
+
     if (!collected) return response;
 
     // Mutate the response data in-place
-    plc.contents = collected.allContents;
-    // null = all batches loaded (JSON.parse will see hasContinuation=false → clear helpers)
-    // set  = hit MAX_BATCHES limit, normal continuation flow takes over for the rest
+    plc.contents      = collected.allContents;
     plc.continuations = collected.continuations;
 
     try { return _makeResponse(data, response); }
-    catch (_) { return response; } // Fallback if Response constructor fails (very old WebKit)
+    catch (_) { return response; }
   };
 
-  _log('playlist.batch_collect.installed', {});
+  _log('playlist.batch_collect.fetch_installed', {});
 }
