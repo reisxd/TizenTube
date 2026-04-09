@@ -122,7 +122,6 @@ function schedulePlaylistAutoLoad(reason = 'playlist.auto_load') {
   if (now < cooldownUntil) return;
   window.__ttPlaylistAutoLoadCooldownUntil = now + 2600;
   [0, 150, 500, 1000, 1800].forEach((delay, index) => setTimeout(() => {
-    if (window.__ttBatchCollectActive) return; // batch collect already running
     attemptPlaylistAutoLoad(reason, index);
   }, delay));
 }
@@ -528,6 +527,18 @@ function processResponsePayload(payload, detectedPage) {
   }
   if (payload?.continuationContents?.playlistVideoListContinuation?.contents) {
     const plc = payload.continuationContents.playlistVideoListContinuation;
+    // Inject pre-fetched batch if background collect has finished.
+    // Objects are already in memory as JS — no re-parsing of large JSON strings.
+    const prefetch = window.__ttPrefetchedBatch;
+    if (prefetch && Array.isArray(prefetch.allContents)) {
+      window.__ttPrefetchedBatch = null;
+      plc.contents      = prefetch.allContents;
+      plc.continuations = prefetch.continuations;
+      appendFileOnlyLog('playlist.batch_collect.injected', {
+        items: plc.contents.length,
+        hasMore: !!plc.continuations,
+      });
+    }
     plc.contents = filterContinuationItems(plc.contents, detectedPage, !!plc?.continuations, 'arrayPayload.playlist.continuation');
   }
   const arrayTopPlaylistRenderer = payload?.contents?.tvBrowseRenderer?.content?.tvSurfaceContentRenderer?.content?.twoColumnRenderer?.rightColumn?.playlistVideoListRenderer;
