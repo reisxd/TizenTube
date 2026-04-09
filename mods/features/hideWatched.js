@@ -417,8 +417,8 @@ export function collectWatchProgressEntries(node, out = [], depth = 0, seen = ne
 }
 
 // ── Shared playlist button helpers ────────────────────────────────────────────
-// Both playlistContinue.js and playlistScrollBottom.js inject custom buttons
-// into the playlist header using these shared utilities.
+// playlistContinue.js injects a custom button into the playlist header
+// using these shared utilities.
 
 export function getPlaylistButtons(r) {
   const twoCol = r?.contents?.tvBrowseRenderer?.content?.tvSurfaceContentRenderer?.content?.twoColumnRenderer;
