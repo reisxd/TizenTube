@@ -17,8 +17,14 @@
  * window.fetch. Both transports are patched here. The fetch patch covers
  * environments where fetch is used (desktop browser dev/testing).
  *
- * XHR delivery: synthetic responses are delivered via Object.defineProperty
- * (to shadow read-only properties) + dispatchEvent (readystatechange/load).
+ * XHR delivery: responses are injected via XMLHttpRequest.prototype getter
+ * overrides backed by a WeakMap. This is more reliable than Object.defineProperty
+ * on instances, which silently fails on old WebKit (Tizen 5.0) for native XHR
+ * properties stored in internal slots.
+ *
+ * De-duplication: window.__ttBatchCollectActive is set synchronously in send()
+ * before the async block starts, so subsequent duplicate XHR sends (fired by
+ * schedulePlaylistAutoLoad's 5-attempt schedule) are dropped immediately.
  */
 
 import { appendFileOnlyLog } from './hideWatched.js';
@@ -79,34 +85,93 @@ function _makeResponse(data, originalResponse) {
   });
 }
 
+// ── WeakMap-based XHR property override ──────────────────────────────────────
+//
+// Object.defineProperty on XHR *instances* silently fails on old WebKit (Tizen
+// 5.0) for properties backed by native internal slots (responseText, status,
+// readyState, etc.). The own-property is never created, so the prototype getter
+// always wins and returns the native (empty) value.
+//
+// Fix: patch the prototype getters themselves to check a WeakMap first. When
+// we want to deliver a synthetic response to a specific XHR, we store its data
+// in the WeakMap; the prototype getter returns that data instead of the native
+// value. After delivery we clean up the entry.
+
+const _xhrData = (typeof WeakMap !== 'undefined') ? new WeakMap() : null;
+
+if (_xhrData && typeof XMLHttpRequest !== 'undefined') {
+  const proto = XMLHttpRequest.prototype;
+
+  // Properties to intercept: [property, fallback native getter]
+  const props = ['responseText', 'response', 'status', 'statusText', 'readyState'];
+  for (const prop of props) {
+    const desc = Object.getOwnPropertyDescriptor(proto, prop);
+    if (!desc || !desc.get) continue; // not a getter — skip
+    const nativeGet = desc.get;
+    try {
+      Object.defineProperty(proto, prop, {
+        get() {
+          const override = _xhrData.get(this);
+          if (override && prop in override) return override[prop];
+          return nativeGet.call(this);
+        },
+        configurable: true,
+      });
+    } catch (_) {}
+  }
+
+  // Also intercept getAllResponseHeaders so callers don't see an empty string
+  const nativeGetHeaders = proto.getAllResponseHeaders;
+  if (typeof nativeGetHeaders === 'function') {
+    try {
+      proto.getAllResponseHeaders = function getAllResponseHeaders() {
+        const override = _xhrData.get(this);
+        if (override) return 'content-type: application/json\r\n';
+        return nativeGetHeaders.call(this);
+      };
+    } catch (_) {}
+  }
+
+  _log('playlist.batch_collect.weakmap_installed', {});
+}
+
 // ── Deliver synthetic response to an XHR object ───────────────────────────────
 
 function _deliverXHRResponse(xhr, bodyStr, status) {
   try {
-    // Shadow read-only XHR properties with own configurable properties
-    const def = (prop, val) => {
-      try {
-        Object.defineProperty(xhr, prop, { value: val, configurable: true, writable: true });
-      } catch (_) {
-        try { xhr[prop] = val; } catch (_2) {}
-      }
+    const payload = {
+      responseText: bodyStr,
+      response:     bodyStr,
+      status:       status || 200,
+      statusText:   'OK',
+      readyState:   4,
     };
 
-    def('status',       status || 200);
-    def('statusText',   'OK');
-    def('responseText', bodyStr);
-    def('response',     bodyStr);
-
-    // Fire readystatechange for states 1 (open), 2 (headers), 3 (loading), 4 (done)
-    // YouTube TV typically only cares about state 4, but fire them all for safety.
-    for (const state of [1, 2, 3, 4]) {
-      def('readyState', state);
-      try { xhr.dispatchEvent(new Event('readystatechange')); } catch (_) {}
-      if (state === 4) {
-        if (typeof xhr.onreadystatechange === 'function') {
-          try { xhr.onreadystatechange(); } catch (_) {}
+    if (_xhrData) {
+      // Primary path: WeakMap prototype override (reliable on old WebKit)
+      _xhrData.set(xhr, payload);
+    } else {
+      // Fallback: try Object.defineProperty on instance (may silently fail)
+      for (const [prop, val] of Object.entries(payload)) {
+        try {
+          Object.defineProperty(xhr, prop, { value: val, configurable: true, writable: true });
+        } catch (_) {
+          try { xhr[prop] = val; } catch (_2) {}
         }
       }
+    }
+
+    // Check what YouTube TV will actually read back (diagnostic)
+    const rtLen = (() => { try { return xhr.responseText?.length || 0; } catch (_) { return -1; } })();
+    _log('playlist.batch_collect.deliver_check', { rtLen, status: xhr.status, readyState: xhr.readyState });
+
+    // Fire readystatechange for states 2 → 4 (HEADERS_RECEIVED, LOADING, DONE)
+    for (const state of [2, 3, 4]) {
+      if (_xhrData) _xhrData.get(xhr) && (_xhrData.get(xhr).readyState = state);
+      try { xhr.dispatchEvent(new Event('readystatechange')); } catch (_) {}
+    }
+    if (typeof xhr.onreadystatechange === 'function') {
+      try { xhr.onreadystatechange(); } catch (_) {}
     }
 
     // Fire load / loadend
@@ -114,6 +179,11 @@ function _deliverXHRResponse(xhr, bodyStr, status) {
     try { xhr.dispatchEvent(new Event('loadend')); } catch (_) {}
     if (typeof xhr.onload === 'function') {
       try { xhr.onload(); } catch (_) {}
+    }
+
+    // Clean up WeakMap entry after a short delay (let handlers finish first)
+    if (_xhrData) {
+      setTimeout(() => { try { _xhrData.delete(xhr); } catch (_) {} }, 5000);
     }
   } catch (err) {
     _log('playlist.batch_collect.deliver_error', { err: String(err?.message || err) });
@@ -156,17 +226,12 @@ function _makeAbort() {
 }
 
 // ── Core: collect all remaining batches ───────────────────────────────────────
-//
-// contextOverride: pass the request context object directly when the caller
-// already has it (XHR path) — avoids re-parsing the body.
 
-async function _collectAll(url, plc, contextOverride) {
+async function _collectAll(url, plc, context) {
   const MAX = Math.max(1, Math.min(500, Number(configRead('playlistBatchCollectMaxBatches') || 50)));
 
-  const context = contextOverride;
-  if (!context) return null; // Can't reconstruct sub-requests without context
-
-  if (!_nativeFetch) return null; // No native fetch available
+  if (!context) return null;
+  if (!_nativeFetch) return null;
 
   const allContents = Array.isArray(plc.contents) ? [...plc.contents] : [];
   let continuations = plc.continuations;
@@ -235,13 +300,13 @@ async function _collectAll(url, plc, contextOverride) {
 // ── XHR interception ──────────────────────────────────────────────────────────
 
 if (typeof XMLHttpRequest !== 'undefined') {
-  const _origXHROpen        = XMLHttpRequest.prototype.open;
-  const _origXHRSetHeader   = XMLHttpRequest.prototype.setRequestHeader;
-  const _origXHRSend        = XMLHttpRequest.prototype.send;
+  const _origXHROpen      = XMLHttpRequest.prototype.open;
+  const _origXHRSetHeader = XMLHttpRequest.prototype.setRequestHeader;
+  const _origXHRSend      = XMLHttpRequest.prototype.send;
 
   XMLHttpRequest.prototype.open = function (method, url) {
-    this.__ttUrl    = url;
-    this.__ttMethod = method;
+    this.__ttUrl        = url;
+    this.__ttMethod     = method;
     this.__ttReqHeaders = {};
     return _origXHROpen.apply(this, arguments);
   };
@@ -255,22 +320,24 @@ if (typeof XMLHttpRequest !== 'undefined') {
     const url = this.__ttUrl;
 
     // Fast path: not a browse URL
-    if (!_isBrowseUrl(url)) {
-      return _origXHRSend.apply(this, arguments);
-    }
+    if (!_isBrowseUrl(url)) return _origXHRSend.apply(this, arguments);
 
     // Must be a continuation request
     const reqBody = _parseBody({ body });
-    if (!reqBody?.continuation || !reqBody?.context) {
-      return _origXHRSend.apply(this, arguments);
-    }
+    if (!reqBody?.continuation || !reqBody?.context) return _origXHRSend.apply(this, arguments);
 
     // Feature flag
-    if (!configRead('enablePlaylistBatchCollect')) {
-      return _origXHRSend.apply(this, arguments);
-    }
+    if (!configRead('enablePlaylistBatchCollect')) return _origXHRSend.apply(this, arguments);
 
-    // Async interception — do NOT call _origXHRSend
+    // De-duplicate: if a batch collect is already in progress, drop this
+    // duplicate continuation request. The running collect will deliver all
+    // batches; this one can be safely discarded.
+    if (window.__ttBatchCollectActive) return;
+
+    // Mark active synchronously — before the first await — so any subsequent
+    // send() calls that arrive before we yield see the flag immediately.
+    window.__ttBatchCollectActive = true;
+
     const xhr     = this;
     const method  = xhr.__ttMethod || 'POST';
     const headers = Object.assign(
@@ -278,27 +345,20 @@ if (typeof XMLHttpRequest !== 'undefined') {
       xhr.__ttReqHeaders || {}
     );
 
-    window.__ttBatchCollectActive = true;
-
     ;(async () => {
       let data;
       let rawStatus = 200;
 
       try {
         const resp = await _nativeFetch(url, {
-          method,
-          headers,
-          body,
-          credentials: 'include',
-          mode: 'cors',
+          method, headers, body, credentials: 'include', mode: 'cors',
         });
         rawStatus = resp.status;
         data = await resp.json();
       } catch (err) {
         _log('playlist.batch_collect.xhr_fetch_error', { err: String(err?.message || err) });
         window.__ttBatchCollectActive = false;
-        // Fall back to real XHR
-        try { _origXHRSend.call(xhr, body); } catch (_) {}
+        try { _origXHRSend.call(xhr, body); } catch (_) {} // fallback to real XHR
         return;
       }
 
@@ -312,7 +372,7 @@ if (typeof XMLHttpRequest !== 'undefined') {
           _log('playlist.batch_collect.collect_error', { err: String(err?.message || err) });
         }
         if (collected) {
-          plc.contents     = collected.allContents;
+          plc.contents      = collected.allContents;
           plc.continuations = collected.continuations;
         }
       } else {
@@ -326,6 +386,7 @@ if (typeof XMLHttpRequest !== 'undefined') {
 
       _deliverXHRResponse(xhr, JSON.stringify(data), rawStatus);
     })();
+    // Do NOT call _origXHRSend — we handle delivery ourselves
   };
 
   _log('playlist.batch_collect.xhr_installed', {});
@@ -335,35 +396,28 @@ if (typeof XMLHttpRequest !== 'undefined') {
 
 if (_nativeFetch) {
   window.fetch = async function playlistBatchCollectFetch(url, options) {
-    // Fast path: only care about YouTube InnerTube browse API
     if (!_isBrowseUrl(url)) return _nativeFetch(url, options);
 
-    // Must be a continuation request
     const reqBody = _parseBody(options);
     if (!reqBody?.continuation || !reqBody?.context) return _nativeFetch(url, options);
 
-    // Feature flag
     if (!configRead('enablePlaylistBatchCollect')) return _nativeFetch(url, options);
 
-    // Make the original request first
+    if (window.__ttBatchCollectActive) return _nativeFetch(url, options);
+
     let response;
     try { response = await _nativeFetch(url, options); }
     catch (err) { throw err; }
 
-    // Read the response — clone so `response` is still usable as fallback
     let data;
     try { data = await response.clone().json(); }
     catch (_) { return response; }
 
-    // Only intercept playlist continuation responses that have more batches
     const plc = data?.continuationContents?.playlistVideoListContinuation;
-    if (!plc || !Array.isArray(plc.contents) || !plc.continuations) {
-      return response;
-    }
+    if (!plc || !Array.isArray(plc.contents) || !plc.continuations) return response;
 
     window.__ttBatchCollectActive = true;
 
-    // Collect all remaining batches
     let collected;
     try { collected = await _collectAll(url, plc, reqBody.context); }
     catch (err) {
@@ -376,7 +430,6 @@ if (_nativeFetch) {
 
     if (!collected) return response;
 
-    // Mutate the response data in-place
     plc.contents      = collected.allContents;
     plc.continuations = collected.continuations;
 
