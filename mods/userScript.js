@@ -25,4 +25,3 @@ import "./ui/customGuideAction.js";
 import "./features/autoFrameRate.js";
 import "./features/visualConsole.js";
 import "./features/playlistContinue.js";
-import "./features/playlistScrollBottom.js";
