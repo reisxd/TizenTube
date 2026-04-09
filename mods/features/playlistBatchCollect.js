@@ -181,8 +181,12 @@ async function _collectAll(url, plc, context) {
 
 async function _startBackgroundCollect(url, plc, context) {
   if (window.__ttPrefetchStarted) return;
+  // If prefetch data is already ready, don't overwrite it — adblock.js will consume it.
+  if (window.__ttPrefetchedBatch) return;
   window.__ttPrefetchStarted = true;
-  window.__ttPrefetchedBatch = null;
+  // Do NOT null __ttPrefetchedBatch here. adblock.js clears it at injection time.
+  // Nulling it here creates a race: real XHR may complete before the seed fetch returns,
+  // and JSON.parse would find null instead of the ready prefetch.
 
   let collected = null;
   try {
@@ -241,6 +245,12 @@ if (typeof XMLHttpRequest !== 'undefined') {
 
     // Feature flag
     if (!configRead('enablePlaylistBatchCollect')) return _origXHRSend.apply(this, arguments);
+
+    // Prefetch data already ready — let real XHR through; JSON.parse injection
+    // in adblock.js will consume __ttPrefetchedBatch on the next response.
+    // Do NOT start another seed fetch: that would race the real XHR and risk
+    // overwriting (via _startBackgroundCollect) the prefetch before injection fires.
+    if (window.__ttPrefetchedBatch) return _origXHRSend.apply(this, arguments);
 
     // Let the real XHR through immediately so YouTube TV gets its response
     // within ~200ms and never hits the ~800ms timeout / page-reset.
