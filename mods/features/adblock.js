@@ -464,6 +464,10 @@ function filterContinuationItems(items, pageName, hasContinuation = false, label
       fallbackItem.__ttKeepOneForContinuationParseSeq = Number(window.__ttParseSeq || 0);
       registerPlaylistHelperVideoId(getItemVideoId(fallbackItem), `${label}.keep-one`);
     }
+    // All items in this batch are watched — auto-fetch the next batch without waiting
+    // for the user to scroll. The continuation token is already stored at this point.
+    // This cascades through all-watched batches automatically until unwatched content appears.
+    schedulePlaylistAutoLoad(`${label}.keep-one`);
     return [fallbackItem];
   }
   if (pageName === 'playlist' && !hasContinuation && filteredItems.length === 0) showPlaylistAllHiddenNotice(`${label}.no_continuation_all_hidden`);
