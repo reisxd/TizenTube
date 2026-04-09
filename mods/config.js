@@ -73,7 +73,9 @@ const defaultConfig = {
   debugConsoleHeight: 500,
   logServerEnabled: false,
   logServerIp: '192.168.50.98',
-  logServerPort: 3030
+  logServerPort: 3030,
+  enablePlaylistBatchCollect: true,
+  playlistBatchCollectMaxBatches: 50
 };
 
 let localConfig;
