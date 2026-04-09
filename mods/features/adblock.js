@@ -4,6 +4,7 @@ import resolveCommand from '../resolveCommand.js';
 import { timelyAction, longPressData, MenuServiceItemRenderer, ShelfRenderer, TileRenderer, ButtonRenderer, showToast } from '../ui/ytUI.js';
 import { PatchSettings } from '../ui/customYTSettings.js';
 import './logServer.js';
+import './playlistBatchCollect.js';
 import {
   appendFileOnlyLog,
   detectAndStorePage,
