@@ -270,6 +270,11 @@ if (typeof XMLHttpRequest !== 'undefined') {
       return _origXHRSend.apply(this, arguments);
     }
 
+    // De-duplicate: if a batch collect is already in progress, drop this
+    // duplicate continuation request silently. schedulePlaylistAutoLoad fires
+    // up to 5 yt-continuation triggers; only the first should run collect.
+    if (window.__ttBatchCollectActive) return;
+
     // Async interception — do NOT call _origXHRSend
     const xhr     = this;
     const method  = xhr.__ttMethod || 'POST';
