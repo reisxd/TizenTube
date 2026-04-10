@@ -335,7 +335,7 @@ class SponsorBlockHandler {
       } catch (skipErr) {
         console.warn('[SponsorBlock] scheduleSkip timeout handler error:', skipErr);
       }
-    }, (start - this.video.currentTime) * 1000);
+    }, (start - this.video.currentTime) * 1000 / (this.video.playbackRate || 1));
   }
 
   destroy() {
