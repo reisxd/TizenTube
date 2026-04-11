@@ -5,26 +5,24 @@ function attachToVideoPlayer() {
     const video = document.querySelector('video');
     if (!player) return setTimeout(attachToVideoPlayer, 500);
 
-    player.addEventListener('onStateChange', state => {
+    player.addEventListener('onPlaybackStartExternal', () => {
         try {
-            if (state === 1) {
-                if (window.location.href.indexOf('watch') === -1) return;
-                const statsForNerds = player.getStatsForNerds();
+            if (window.location.href.indexOf('watch') === -1) return;
+            const statsForNerds = player.getStatsForNerds();
 
-                const resolutionMatch = statsForNerds.resolution.match(/(\d+)x(\d+)@([\d.]+)/);
-                const pauseFor = configRead('autoFrameRatePauseVideoFor');
+            const resolutionMatch = statsForNerds.resolution.match(/(\d+)x(\d+)@([\d.]+)/);
+            const pauseFor = configRead('autoFrameRatePauseVideoFor');
 
-                if (resolutionMatch) {
-                    const fps = resolutionMatch[3];
-                    if (configRead('autoFrameRate') && window.h5vcc && window.h5vcc.tizentube && window.h5vcc.tizentube.SetFrameRate) {
-                        if (pauseFor > 0) {
-                            video.pause();
-                            setTimeout(() => {
-                                video.play();
-                            }, pauseFor);
-                        }
-                        window.h5vcc.tizentube.SetFrameRate(parseFloat(fps));
+            if (resolutionMatch) {
+                const fps = resolutionMatch[3];
+                if (configRead('autoFrameRate') && window.h5vcc && window.h5vcc.tizentube && window.h5vcc.tizentube.SetFrameRate) {
+                    if (pauseFor > 0) {
+                        video.pause();
+                        setTimeout(() => {
+                            video.play();
+                        }, pauseFor);
                     }
+                    window.h5vcc.tizentube.SetFrameRate(parseFloat(fps));
                 }
             }
         } catch (e) {

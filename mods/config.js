@@ -2,6 +2,7 @@ const CONFIG_KEY = 'ytaf-configuration';
 const defaultConfig = {
   enableAdBlock: true,
   enableSponsorBlock: true,
+  enableSponsorBlockToasts: true,
   sponsorBlockManualSkips: ['intro', 'outro', 'filler'],
   enableSponsorBlockSponsor: true,
   enableSponsorBlockIntro: true,
@@ -25,6 +26,8 @@ const defaultConfig = {
   enableShorts: true,
   dontCheckUpdateUntil: 0,
   enableWhoIsWatchingMenu: false,
+  permanentlyEnableWhoIsWatchingMenu: false,
+  enableWhosWatchingMenuOnAppExit: false,
   enableShowUserLanguage: true,
   enableShowOtherLanguages: false,
   showWelcomeToast: true,
@@ -46,10 +49,13 @@ const defaultConfig = {
   speedSettingsIncrement: 0.25,
   videoPreferredCodec: 'any',
   launchToOnStartup: null,
+  reloadHomeOnStartup: true,
   disabledSidebarContents: [],
   enableUpdater: true,
   autoFrameRate: false,
-  autoFrameRatePauseVideoFor: 0
+  autoFrameRatePauseVideoFor: 0,
+  enableSigninReminder: false,
+  sortSubscriptionsByAlphabet: false,
 };
 
 let localConfig;
