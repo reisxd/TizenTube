@@ -7,11 +7,13 @@ JSON.parse = function () {
 
     const disabledSidebarContents = configRead('disabledSidebarContents');
     if (r.items && Array.isArray(r.items) && r.items[0].guideSectionRenderer) {
+        if (!disabledSidebarContents.length) return r;
         for (let i = 0; i < r.items.length; i++) {
             const section = r.items[i].guideSectionRenderer;
             for (let j = 0; j < section.items.length; j++) {
                 const item = section.items[j].guideEntryRenderer;
                 if (!item) continue;
+                if (!item.icon) continue;
                 if (disabledSidebarContents.includes(item.icon.iconType)) {
                     section.items.splice(j, 1);
                     j--;

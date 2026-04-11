@@ -1,8 +1,9 @@
 import { SettingActionRenderer, SettingsCategory } from './ytUI.js';
+import { t } from 'i18next';
 
 function PatchSettings(settingsObject) {
     const tizentubeOpenAction = SettingActionRenderer(
-        'TizenTube Settings',
+        t('settings.ttSettings.title'),
         'tizentube_open_action',
         {
             customAction: {
@@ -10,7 +11,7 @@ function PatchSettings(settingsObject) {
                 parameters: []
             }
         },
-        'Open TizenTube Settings',
+        t('settings.ttSettings.summary'),
         'https://www.gstatic.com/ytlr/img/parent_code.png'
     )
 
