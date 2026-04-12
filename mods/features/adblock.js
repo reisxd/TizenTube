@@ -4,6 +4,7 @@ import resolveCommand from '../resolveCommand.js';
 import { timelyAction, longPressData, MenuServiceItemRenderer, ShelfRenderer, TileRenderer, ButtonRenderer } from '../ui/ytUI.js';
 import { PatchSettings } from '../ui/customYTSettings.js';
 import { t } from 'i18next';
+import { applyLibraryTabHiding } from './libraryTabHider.js';
 
 /**
  * This is a minimal reimplementation of the following uBlock Origin rule:
@@ -17,6 +18,8 @@ import { t } from 'i18next';
 const origParse = JSON.parse;
 JSON.parse = function () {
   const r = origParse.apply(this, arguments);
+
+  try {
   const adBlockEnabled = configRead('enableAdBlock');
   const signinReminderEnabled = configRead('enableSigninReminder');
 
@@ -47,6 +50,11 @@ JSON.parse = function () {
         return format.mimeType.includes(preferredCodec);
       });
     }
+  }
+
+  const hiddenLibraryTabIds = configRead('hiddenLibraryTabIds');
+  if (Array.isArray(hiddenLibraryTabIds) && hiddenLibraryTabIds.length > 0) {
+    applyLibraryTabHiding(r, hiddenLibraryTabIds);
   }
 
   // Drop "masthead" ad from home screen
@@ -172,9 +180,9 @@ JSON.parse = function () {
     }
   }
   /*
- 
+
   Chapters are disabled due to the API removing description data which was used to generate chapters
- 
+
   if (r?.contents?.singleColumnWatchNextResults?.results?.results?.contents && configRead('enableChapters')) {
     const chapterData = Chapters(r);
     r.frameworkUpdates.entityBatchUpdate.mutations.push(chapterData);
@@ -249,6 +257,10 @@ JSON.parse = function () {
         });
       }
     }
+  }
+
+  } catch (_) {
+    // Keep response unchanged if parsing hook hits an edge-case.
   }
 
   return r;
