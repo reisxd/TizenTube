@@ -18,6 +18,8 @@ import { applyLibraryTabHiding } from './libraryTabHider.js';
 const origParse = JSON.parse;
 JSON.parse = function () {
   const r = origParse.apply(this, arguments);
+
+  try {
   const adBlockEnabled = configRead('enableAdBlock');
   const signinReminderEnabled = configRead('enableSigninReminder');
 
@@ -255,6 +257,10 @@ JSON.parse = function () {
         });
       }
     }
+  }
+
+  } catch (_) {
+    // Keep response unchanged if parsing hook hits an edge-case.
   }
 
   return r;
