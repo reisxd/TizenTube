@@ -1,0 +1,193 @@
+{
+    "__contributors": [
+        "Benetis"
+    ],
+    "settings": {
+        "options": {
+            "socialMedia": {
+                "title": "Socialinių tinklų nuorodos",
+                "qrCodeScanMessage": "Galite apsilankyti puslapyje „{{name}}“ nuskenavę žemiau pateiktą QR kodą."
+            },
+            "adBlock": "Reklamų blokavimas",
+            "sponsorblock": {
+                "title": "„SponsorBlock“ nustatymai",
+                "options": {
+                    "enableSB": "Įjungti „SponsorBlock“",
+                    "manualSkip": "Rankinis „SponsorBlock“ segmentų praleidimas",
+                    "segments": "Segmentai",
+                    "categories": {
+                        "sponsor": "Praleisti rėmėjų segmentus",
+                        "intro": "Praleisti įžangų segmentus",
+                        "outro": "Praleisti pabaigų segmentus",
+                        "interaction": "Praleisti sąveikos priminimų segmentus",
+                        "selfpromo": "Praleisti savireklamos segmentus",
+                        "preview": "Praleisti anonsų/santraukų segmentus",
+                        "filler": "Praleisti pašalinių komentarų/juokelių segmentus",
+                        "music_offtopic": "Praleisti nesusijusius muzikinius segmentus",
+                        "highlights": "Įjungti svarbiausius momentus"
+                    },
+                    "showSBToasts": "Rodyti „SponsorBlock“ trumpalaikius pranešimus"
+                }
+            },
+            "dearrow": {
+                "title": "„DeArrow“ nustatymai",
+                "options": {
+                    "enableDA": "Įjungti „DeArrow“",
+                    "enableDAThumbnails": "Įjungti „DeArrow“ miniatiūras"
+                }
+            },
+            "misc": {
+                "title": "Kiti nustatymai",
+                "options": {
+                    "endScreenCards": "Slėpti pabaigos užsklandos korteles",
+                    "youThereRenderer": "Įjungti „Ar vis dar žiūrite?“ atvaizdavimą",
+                    "paidPromoOverlay": "Įjungti „Turi apmokamos reklamos“ perdangą",
+                    "whosWatching": {
+                        "title": "„Kas žiūri?“ meniu",
+                        "options": {
+                            "enableWW": "Įjungti „Kas žiūri?“ meniu",
+                            "permaEnableWW": "Visam laikui įjungti „Kas žiūri?“ meniu",
+                            "enableWWOnExit": "Įjungti „Kas žiūri?“ meniu uždarant programėlę"
+                        }
+                    },
+                    "fixUI": "Taisyti vartotojo sąsają",
+                    "hqThumbnails": "Įjungti aukštos kokybės miniatiūras",
+                    "longPress": "Įjungti ilgo paspaudimo veiksmus",
+                    "shorts": "Įjungti trumpuosius vaizdo įrašus („Shorts“)",
+                    "videoPreviews": "Įjungti vaizdo įrašų peržiūras",
+                    "ttWelcomeMsg": "Rodyti „TizenTube“ pasisveikinimą",
+                    "guestSignInReminder": "Rodyti svečio prisijungimo priminimą",
+                    "reloadHomeOnStartup": "Atnaujinti pagrindinį puslapį paleidžiant"
+                }
+            },
+            "subtitles": {
+                "title": "Subtitrų nustatymai",
+                "options": {
+                    "showLocalSubtitle": "Rodyti vietinius subtitrus",
+                    "showHiddenSubtitles": "Rodyti paslėptus subtitrus"
+                }
+            },
+            "videoPlayer": {
+                "title": "Vaizdo grotuvo nustatymai",
+                "subtitle": "Pritaikykite vaizdo grotuvo funkcijas",
+                "options": {
+                    "patching": {
+                        "title": "Vaizdo grotuvo vartotojo sąsajos pataisos",
+                        "options": {
+                            "enableVPUIPatching": "Įjungti vaizdo grotuvo vartotojo sąsajos pataisas",
+                            "previousNextBtns": "Įjungti mygtukus „Ankstesnis“ ir „Kitas“",
+                            "showSuperThxBtn": "Rodyti mygtuką „Super padėka“",
+                            "showSpeedCtrlBtn": "Rodyti greičio valdymo mygtuką"
+                        }
+                    },
+                    "preferredVideoQuality": {
+                        "title": "Pageidaujama vaizdo kokybė",
+                        "subtitle": "Pasirinkite pageidaujamą arba antrą geriausią vaizdo kokybę, kuri bus taikoma pradedant atkūrimą"
+                    },
+                    "speedSettings": {
+                        "title": "Greičio nustatymų žingsniai",
+                        "subtitle": "Nustatykite vaizdo įrašo atkūrimo greičio keitimo žingsnius"
+                    },
+                    "preferredVideoCodec": {
+                        "title": "Pageidaujamas vaizdo kodekas",
+                        "subtitle": "Pasirinkite norimą vaizdo kodeką atkūrimui"
+                    },
+                    "afr": "Automatinis kadrų dažnis",
+                    "afrPauseDuration": {
+                        "title": "Automatinio kadrų dažnio pauzės trukmė",
+                        "subtitle": "Nustatykite trukmę (sekundėmis), kuriai vaizdo įrašo atkūrimas bus pristabdytas, kai keičiate kadrų dažnį"
+                    }
+                }
+            },
+            "uiSettings": {
+                "title": "Vartotojo sąsajos nustatymai",
+                "subtitle": "Pritaikykite vartotojo sąsają pagal savo poreikius",
+                "options": {
+                    "hideWatchedVideos": {
+                        "title": "Paslėpti peržiūrėtus vaizdo įrašus",
+                        "options": {
+                            "enableHideWatchedVideos": "Įjungti peržiūrėtų vaizdo įrašų slėpimą",
+                            "watchedVideosThreshold": {
+                                "title": "Peržiūrėtų vaizdo įrašų riba",
+                                "subtitle": "Nustatykite procentinę ribą, kurią pasiekus žiūrėti vaizdo įrašai bus paslėpti"
+                            },
+                            "setPagesToHideWatchedVideos": "Pasirinkti puslapius, kuriuose slėpti peržiūrėtus vaizdo įrašus"
+                        }
+                    },
+                    "screenDimming": {
+                        "title": "Ekrano pritemdymas",
+                        "options": {
+                            "enableScreenDimming": "Įgalinti Ekrano pritemdymą",
+                            "dimmingTimeout": {
+                                "title": "Pritemdymo delsa",
+                                "subtitle": "Nustatykite neveiklumo laiką (sekundėmis), po kurio ekranas pritems"
+                            },
+                            "dimmingOpacity": {
+                                "title": "Pritemdymo lygis",
+                                "subtitle": "Nustatykite ekrano pritemdymo lygį"
+                            }
+                        }
+                    },
+                    "disableSidebarContents": {
+                        "title": "Išjungti šoninės juostos turinius",
+                        "subtitle": "Pasirinkite, kurį šoninės juostos turinį išjungti"
+                    },
+                    "launchToOnStartup": {
+                        "title": "Pradinis puslapis paleidžiant",
+                        "subtitle": "Pasirinkite numatytąjį puslapį, kurį „TizenTube“ atidarys paleidimo metu"
+                    },
+                    "sortSubscriptionsByAlphabet": "Rūšiuoti prenumeratas abėcėlės tvarka"
+                }
+            },
+            "updater": {
+                "title": "„TizenTube Cobalt“ naujinimo įrankis",
+                "menuSubtitle": "Valdykite „TizenTube Cobalt“ naujinimus",
+                "versionSubtitle": "Dabartinė versija: {{version}}",
+                "options": {
+                    "checkForUpdates": "Tikrinti ar yra naujinimų",
+                    "checkForUpdatesOnStartup": "Tikrinti naujinimus paleidžiant"
+                }
+            }
+        },
+        "ttSettings": {
+            "title": "„TizenTube“ nustatymai",
+            "madeByText": "Sukūrta Reis Can (reisxd) su ❤️",
+            "summary": "Atidaryti „TizenTube“ nustatymus"
+        },
+        "supportTT": {
+            "title": "Paremkite „TizenTube“",
+            "subtitle": "❤️ Parodykite paramą „TizenTube“ ir jo vystymui",
+            "content": {
+                "1": "Jei jums patinka naudotis „TizenTube“ ir norėtumėte paremti projekto vystymą, apsvarstykite šias galimybes:",
+                "2": "1. Pažymėkite „GitHub“ saugyklą žvaigždute, kad padidintumėte jos matomumą.",
+                "3": "2. Pasidalinkite „TizenTube“ su kitais.",
+                "4": "Jei norite prisidėti finansiškai, apsvarstykite galimybę paaukoti:",
+                "5": "- „Buy Me A Coffee“: https://www.buymeacoffee.com/reisxd (pageidautina)",
+                "6": "- „GitHub Sponsors“: https://github.com/sponsors/reisxd"
+            }
+        }
+    },
+    "welcomeMsg": {
+        "title": "Sveiki! Čia – „TizenTube“",
+        "subtitle": "Eikite į nustatymus ir pasirinkite „„TizenTube“ nustatymai“, jei norite juos keisti."
+    },
+    "sponsorblock": {
+        "segments": {
+            "sponsor": "remiamas segmentas",
+            "intro": "įžanga",
+            "outro": "pabaiga",
+            "interaction": "sąveikos priminimas",
+            "selfpromo": "savireklama",
+            "preview": "santrauka arba anonsas",
+            "filler": "pašaliniai komentarai",
+            "music_offtopic": "nemuzikinė dalis",
+            "poi_highlight": "svarbiausias momentas"
+        },
+        "toasts": {
+            "skipping": "Praleidžiama: {{segment}}",
+            "notSkipping": "Nepraleidžiama: {{segment}} (buvo praleista {{count}} kartų (-us))",
+            "skip": "Praleisti: {{segment}}",
+            "skipToHighlight": "Pešokti prie svarbiausio momento"
+        }
+    }
+}
