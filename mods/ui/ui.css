@@ -155,3 +155,8 @@ div[idomkey="shadow"] {
 .ytContribIconHost::before {
     font-family: "YouTube Icons Outlined";
 }
+
+/* Reduce extended sidebar width so it doesn't overlap subscriptions content. */
+ytlr-guide-response {
+  width: clamp(240px, 22vw, 360px) !important;
+}
