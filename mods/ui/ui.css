@@ -156,20 +156,11 @@ div[idomkey="shadow"] {
     font-family: "YouTube Icons Outlined";
 }
 
-/* Reduce the expanded guide panel footprint to avoid covering page content. */
-ytlr-guide-response[aria-hidden="false"] {
-  width: 21rem !important;
-  max-width: 21rem !important;
-}
-
-ytlr-guide-response[aria-hidden="false"] .MFDzfe,
-ytlr-guide-response[aria-hidden="false"] .geClSe,
-ytlr-guide-response[aria-hidden="false"] .hsdF6b {
-  width: 18.25rem !important;
-  max-width: 18.25rem !important;
-}
-
-ytlr-guide-response[aria-hidden="false"].RYo6Fb {
-  width: 18.25rem !important;
-  max-width: 18.25rem !important;
+/* Narrow only the expanded guide variant to avoid overlapping page content. */
+ytlr-guide-response.RYo6Fb[aria-hidden="false"],
+ytlr-guide-response.RYo6Fb[aria-hidden="false"] .MFDzfe,
+ytlr-guide-response.RYo6Fb[aria-hidden="false"] .geClSe,
+ytlr-guide-response.RYo6Fb[aria-hidden="false"] .hsdF6b {
+  width: 17.75rem !important;
+  max-width: 17.75rem !important;
 }
