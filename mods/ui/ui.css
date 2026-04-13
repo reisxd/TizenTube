@@ -156,7 +156,14 @@ div[idomkey="shadow"] {
     font-family: "YouTube Icons Outlined";
 }
 
-/* Reduce extended sidebar width so it doesn't overlap subscriptions content. */
-ytlr-guide-response {
-  width: clamp(240px, 22vw, 360px) !important;
+/* Reduce the expanded guide panel footprint to avoid covering page content. */
+ytlr-guide-response[aria-hidden="false"] {
+  width: 21rem !important;
+  max-width: 21rem !important;
+}
+
+ytlr-guide-response[aria-hidden="false"] .MFDzfe,
+ytlr-guide-response[aria-hidden="false"] .geClSe {
+  width: 18.25rem !important;
+  max-width: 18.25rem !important;
 }
