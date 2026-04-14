@@ -12,6 +12,7 @@ function getLogServerIpOctets() {
     return parts.map((v) => Math.max(0, Math.min(255, Math.floor(v))));
 }
 
+<<<<<<< codex/fix-sidebar-overlap-on-youtube
 export function getLogServerIpString() {
     return getLogServerIpOctets().join('.');
 }
@@ -20,6 +21,17 @@ export function buildLogServerIpEditorOptions() {
     const octets = getLogServerIpOctets();
     const labels = ['First', 'Second', 'Third', 'Fourth'];
     const options = [];
+=======
+function buildLogServerIpEditorOptions() {
+    const octets = getLogServerIpOctets();
+    const labels = ['First', 'Second', 'Third', 'Fourth'];
+    const options = [
+        {
+            name: `Current IP: ${octets.join('.')}`,
+            subtitle: 'Use the octet controls below to adjust this quickly.'
+        }
+    ];
+>>>>>>> main
 
     for (let i = 0; i < 4; i++) {
         const current = octets[i];
@@ -411,12 +423,19 @@ export default function modernUI(update, parameters) {
                         },
                         {
                             name: 'Server IP (Octet Editor)',
+<<<<<<< codex/fix-sidebar-overlap-on-youtube
                             subtitle: `Current: ${getLogServerIpString()}`,
+=======
+>>>>>>> main
                             value: null,
                             menuId: 'tt-log-server-ip',
                             menuHeader: {
                                 title: 'Remote Log Server IP',
+<<<<<<< codex/fix-sidebar-overlap-on-youtube
                                 subtitle: `Current: ${getLogServerIpString()} • adjust each octet with +/- controls`
+=======
+                                subtitle: 'Adjust each octet with +/- controls (no long 0-255 scrolling)'
+>>>>>>> main
                             },
                             options: buildLogServerIpEditorOptions()
                         },
