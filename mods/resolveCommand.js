@@ -1,6 +1,6 @@
 import { configWrite, configRead } from './config.js';
 import { enablePip } from './features/pictureInPicture.js';
-import modernUI, { optionShow } from './ui/settings.js';
+import modernUI, { optionShow, buildLogServerIpEditorOptions, getLogServerIpString } from './ui/settings.js';
 import { speedSettings } from './ui/speedUI.js';
 import { showToast, buttonItem } from './ui/ytUI.js';
 import checkForUpdates from './features/updater.js';
@@ -224,10 +224,24 @@ function customAction(action, parameters) {
             configWrite('logServerIp', nextIp);
             console.info('[LogServer] logServerIp changed to', nextIp);
             showToast('TizenTube', `Log server IP: ${nextIp}`);
+            optionShow({
+                options: buildLogServerIpEditorOptions(),
+                selectedIndex: 0,
+                update: true,
+                menuId: 'tt-log-server-ip',
+                menuHeader: {
+                    title: 'Remote Log Server IP',
+                    subtitle: `Current: ${getLogServerIpString()} • adjust each octet with +/- controls`
+                }
+            }, true);
             break;
         }
         case 'LOG_SERVER_TEST_PING': {
             const url = logServerUrlFromConfig();
+            if (!url || url.includes('http://:')) {
+                showToast('TizenTube', 'Set a valid Log Server IP first.');
+                break;
+            }
             fetch(url, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },

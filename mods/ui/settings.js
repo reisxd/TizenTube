@@ -12,15 +12,14 @@ function getLogServerIpOctets() {
     return parts.map((v) => Math.max(0, Math.min(255, Math.floor(v))));
 }
 
-function buildLogServerIpEditorOptions() {
+export function getLogServerIpString() {
+    return getLogServerIpOctets().join('.');
+}
+
+export function buildLogServerIpEditorOptions() {
     const octets = getLogServerIpOctets();
     const labels = ['First', 'Second', 'Third', 'Fourth'];
-    const options = [
-        {
-            name: `Current IP: ${octets.join('.')}`,
-            subtitle: 'Use the octet controls below to adjust this quickly.'
-        }
-    ];
+    const options = [];
 
     for (let i = 0; i < 4; i++) {
         const current = octets[i];
@@ -412,11 +411,12 @@ export default function modernUI(update, parameters) {
                         },
                         {
                             name: 'Server IP (Octet Editor)',
+                            subtitle: `Current: ${getLogServerIpString()}`,
                             value: null,
                             menuId: 'tt-log-server-ip',
                             menuHeader: {
                                 title: 'Remote Log Server IP',
-                                subtitle: 'Adjust each octet with +/- controls (no long 0-255 scrolling)'
+                                subtitle: `Current: ${getLogServerIpString()} • adjust each octet with +/- controls`
                             },
                             options: buildLogServerIpEditorOptions()
                         },
@@ -429,6 +429,14 @@ export default function modernUI(update, parameters) {
                                 key: 'logServerPort',
                                 value: port
                             }))
+                        },
+                        {
+                            name: 'Test Log Server Connection',
+                            subtitle: 'Send a test POST to /tv-log (works even if Log Server is disabled)',
+                            icon: 'SEND',
+                            customAction: {
+                                action: 'LOG_SERVER_TEST_PING'
+                            }
                         }
                     ]
                 }
@@ -1103,6 +1111,17 @@ export function optionShow(parameters, update) {
             if (!option) continue;
             if (option.compactLinkRenderer) {
                 buttons.push(option);
+                index++;
+                continue;
+            }
+            if (option.customAction) {
+                buttons.push(
+                    buttonItem(
+                        { title: option.name, subtitle: option.subtitle },
+                        { icon: option.icon ? option.icon : 'SEND' },
+                        [{ customAction: option.customAction }]
+                    )
+                );
                 index++;
                 continue;
             }
