@@ -6,7 +6,7 @@
  *
  * Configuration (Settings → Debug → Remote Log Server):
  *   logServerEnabled  bool    default false
- *   logServerIp       string  default '192.168.50.98'   (set via debug console, see below)
+ *   logServerIp       string  default '192.168.10.11'   (configurable from settings)
  *   logServerPort     number  default 3030
  *
  * To change the IP (no text input on TV remote — use the debug console):
@@ -19,7 +19,7 @@
  * The _formatted field is used by the PS1 receiver for clean display.
  */
 
-import { configRead } from '../config.js';
+import { configRead, LOG_SERVER_DEFAULT_IP } from '../config.js';
 
 let _queue = [];
 let _draining = false;
@@ -37,11 +37,12 @@ function isEnabled() {
 function getUrl() {
   if (!isEnabled()) return '';
   try {
-    const ip = String(configRead('logServerIp') || '192.168.50.98').trim();
+    const ip = String(configRead('logServerIp') || LOG_SERVER_DEFAULT_IP).trim();
     const port = Number(configRead('logServerPort') || 3030);
     if (!ip) return '';
     const url = `http://${ip}:${port}/tv-log`;
     if (url !== _lastUrl) {
+      if (_lastUrl) console.info('[LogServer] URL changed:', _lastUrl, '→', url);
       _lastUrl = url;
       _failCount = 0;
       _disabledUntil = 0;
@@ -65,7 +66,10 @@ function drain() {
     _queue.shift();
   }).catch(() => {
     _failCount++;
-    if (_failCount >= MAX_FAILS) _disabledUntil = Date.now() + FAIL_BACKOFF_MS;
+    if (_failCount >= MAX_FAILS) {
+      _disabledUntil = Date.now() + FAIL_BACKOFF_MS;
+      console.warn('[LogServer] Entering backoff after repeated failures. Retry after', new Date(_disabledUntil).toISOString());
+    }
     _queue.shift();
   }).finally(() => {
     _draining = false;
@@ -76,6 +80,7 @@ function drain() {
 function enqueue(rawLine) {
   if (!isEnabled()) return;
   if (_failCount >= MAX_FAILS && Date.now() >= _disabledUntil) {
+    console.info('[LogServer] Backoff elapsed, resuming log forwarding');
     _failCount = 0;
     _disabledUntil = 0;
   }

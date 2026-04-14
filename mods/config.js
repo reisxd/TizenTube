@@ -1,4 +1,5 @@
 const CONFIG_KEY = 'ytaf-configuration';
+export const LOG_SERVER_DEFAULT_IP = '192.168.10.11';
 const defaultConfig = {
   enableAdBlock: true,
   enableSponsorBlock: true,
@@ -72,7 +73,7 @@ const defaultConfig = {
   debugConsolePosition: 'top-left',
   debugConsoleHeight: 500,
   logServerEnabled: false,
-  logServerIp: '192.168.50.98',
+  logServerIp: LOG_SERVER_DEFAULT_IP,
   logServerPort: 3030,
   enablePlaylistBatchCollect: true,
   playlistBatchCollectMaxBatches: 50

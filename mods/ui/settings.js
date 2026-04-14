@@ -1,4 +1,4 @@
-import { configRead } from '../config.js';
+import { configRead, LOG_SERVER_DEFAULT_IP } from '../config.js';
 import { showModal, buttonItem, overlayPanelItemListRenderer, scrollPaneRenderer, overlayMessageRenderer, QrCodeRenderer } from './ytUI.js';
 import { getUserLanguageOptionName } from '../features/moreSubtitles.js';
 import qrcode from 'qrcode-npm';
@@ -6,9 +6,10 @@ import qrcode from 'qrcode-npm';
 const qrcodes = {};
 
 function getLogServerIpOctets() {
-    const raw = String(configRead('logServerIp') || '192.168.50.98').trim();
+    const defaultParts = LOG_SERVER_DEFAULT_IP.split('.').map((v) => Number(v));
+    const raw = String(configRead('logServerIp') || LOG_SERVER_DEFAULT_IP).trim();
     const parts = raw.split('.').map((v) => Number(v));
-    if (parts.length !== 4 || parts.some((v) => Number.isNaN(v))) return [192, 168, 50, 98];
+    if (parts.length !== 4 || parts.some((v) => Number.isNaN(v))) return defaultParts;
     return parts.map((v) => Math.max(0, Math.min(255, Math.floor(v))));
 }
 

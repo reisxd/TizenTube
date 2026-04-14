@@ -1,4 +1,4 @@
-import { configWrite, configRead } from './config.js';
+import { configWrite, configRead, LOG_SERVER_DEFAULT_IP } from './config.js';
 import { enablePip } from './features/pictureInPicture.js';
 import modernUI, { optionShow } from './ui/settings.js';
 import { speedSettings } from './ui/speedUI.js';
@@ -7,14 +7,15 @@ import checkForUpdates from './features/updater.js';
 import { playlistContinue } from './features/playlistContinue.js';
 
 function parseLogServerIp() {
-    const raw = String(configRead('logServerIp') || '192.168.50.98').trim();
+    const defaultParts = LOG_SERVER_DEFAULT_IP.split('.').map((v) => Number(v));
+    const raw = String(configRead('logServerIp') || LOG_SERVER_DEFAULT_IP).trim();
     const parts = raw.split('.').map((v) => Number(v));
-    if (parts.length !== 4 || parts.some((v) => Number.isNaN(v))) return [192, 168, 50, 98];
+    if (parts.length !== 4 || parts.some((v) => Number.isNaN(v))) return defaultParts;
     return parts.map((v) => Math.max(0, Math.min(255, Math.floor(v))));
 }
 
 function logServerUrlFromConfig() {
-    const ip = String(configRead('logServerIp') || '192.168.50.98').trim();
+    const ip = String(configRead('logServerIp') || LOG_SERVER_DEFAULT_IP).trim();
     const port = Number(configRead('logServerPort') || 3030);
     return `http://${ip}:${port}/tv-log`;
 }
@@ -222,6 +223,7 @@ function customAction(action, parameters) {
             octets[octetIndex] = Math.max(0, Math.min(255, octets[octetIndex] + delta));
             const nextIp = octets.join('.');
             configWrite('logServerIp', nextIp);
+            console.info('[LogServer] logServerIp changed to', nextIp);
             showToast('TizenTube', `Log server IP: ${nextIp}`);
             break;
         }
