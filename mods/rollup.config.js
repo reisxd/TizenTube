@@ -30,7 +30,6 @@ export default {
                 }],
             ],
         }),
-        json(),
         terser({
             ecma: '5',
             mangle: true,
