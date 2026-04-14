@@ -5,6 +5,60 @@ import qrcode from 'qrcode-npm';
 
 const qrcodes = {};
 
+function getLogServerIpOctets() {
+    const raw = String(configRead('logServerIp') || '').trim();
+    const parts = raw.split('.').map((v) => Number(v));
+    if (parts.length !== 4 || parts.some((v) => Number.isNaN(v))) return [0, 0, 0, 0];
+    return parts.map((v) => Math.max(0, Math.min(255, Math.floor(v))));
+}
+
+export function getLogServerIpString() {
+    return getLogServerIpOctets().join('.');
+}
+
+export function buildLogServerIpEditorOptions() {
+    const octets = getLogServerIpOctets();
+    const labels = ['First', 'Second', 'Third', 'Fourth'];
+    const options = [];
+
+    for (let i = 0; i < 4; i++) {
+        const current = octets[i];
+        options.push({
+            name: `${labels[i]} octet (${current})`,
+            value: null,
+            menuId: `tt-log-server-ip-octet-${i}`,
+            menuHeader: {
+                title: `${labels[i]} IP Octet`,
+                subtitle: `Current IP: ${octets.join('.')}`
+            },
+            options: [
+                buttonItem(
+                    { title: '-10' },
+                    { icon: 'REMOVE' },
+                    [{ customAction: { action: 'LOG_SERVER_IP_ADJUST', parameters: { octetIndex: i, delta: -10 } } }]
+                ),
+                buttonItem(
+                    { title: '-1' },
+                    { icon: 'REMOVE' },
+                    [{ customAction: { action: 'LOG_SERVER_IP_ADJUST', parameters: { octetIndex: i, delta: -1 } } }]
+                ),
+                buttonItem(
+                    { title: '+1' },
+                    { icon: 'ADD' },
+                    [{ customAction: { action: 'LOG_SERVER_IP_ADJUST', parameters: { octetIndex: i, delta: 1 } } }]
+                ),
+                buttonItem(
+                    { title: '+10' },
+                    { icon: 'ADD' },
+                    [{ customAction: { action: 'LOG_SERVER_IP_ADJUST', parameters: { octetIndex: i, delta: 10 } } }]
+                )
+            ]
+        });
+    }
+
+    return options;
+}
+
 export default function modernUI(update, parameters) {
     const settings = [
         {
@@ -354,6 +408,17 @@ export default function modernUI(update, parameters) {
                             name: 'Enable Log Server',
                             icon: 'WIFI',
                             value: 'logServerEnabled'
+                        },
+                        {
+                            name: 'Server IP (Octet Editor)',
+                            subtitle: `Current: ${getLogServerIpString()}`,
+                            value: null,
+                            menuId: 'tt-log-server-ip',
+                            menuHeader: {
+                                title: 'Remote Log Server IP',
+                                subtitle: `Current: ${getLogServerIpString()} • adjust each octet with +/- controls`
+                            },
+                            options: buildLogServerIpEditorOptions()
                         },
                         {
                             name: 'Server Port',
