@@ -238,6 +238,10 @@ function customAction(action, parameters) {
         }
         case 'LOG_SERVER_TEST_PING': {
             const url = logServerUrlFromConfig();
+            if (!url || url.includes('http://:')) {
+                showToast('TizenTube', 'Set a valid Log Server IP first.');
+                break;
+            }
             fetch(url, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },

@@ -429,6 +429,14 @@ export default function modernUI(update, parameters) {
                                 key: 'logServerPort',
                                 value: port
                             }))
+                        },
+                        {
+                            name: 'Test Log Server Connection',
+                            subtitle: 'Send a test POST to /tv-log (works even if Log Server is disabled)',
+                            icon: 'SEND',
+                            customAction: {
+                                action: 'LOG_SERVER_TEST_PING'
+                            }
                         }
                     ]
                 }
@@ -1103,6 +1111,17 @@ export function optionShow(parameters, update) {
             if (!option) continue;
             if (option.compactLinkRenderer) {
                 buttons.push(option);
+                index++;
+                continue;
+            }
+            if (option.customAction) {
+                buttons.push(
+                    buttonItem(
+                        { title: option.name, subtitle: option.subtitle },
+                        { icon: option.icon ? option.icon : 'SEND' },
+                        [{ customAction: option.customAction }]
+                    )
+                );
                 index++;
                 continue;
             }
