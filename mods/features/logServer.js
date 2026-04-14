@@ -6,7 +6,7 @@
  *
  * Configuration (Settings → Debug → Remote Log Server):
  *   logServerEnabled  bool    default false
- *   logServerIp       string  default '192.168.50.98'   (set via debug console, see below)
+ *   logServerIp       string  default '192.168.10.11'   (configurable from settings)
  *   logServerPort     number  default 3030
  *
  * To change the IP (no text input on TV remote — use the debug console):
@@ -24,8 +24,11 @@ import { configRead } from '../config.js';
 let _queue = [];
 let _draining = false;
 let _failCount = 0;
+let _disabledUntil = 0;
+let _lastUrl = '';
 const MAX_QUEUE = 300;
 const MAX_FAILS = 10;
+const FAIL_BACKOFF_MS = 30 * 1000;
 
 function isEnabled() {
   try { return !!configRead('logServerEnabled'); } catch { return false; }
@@ -34,28 +37,35 @@ function isEnabled() {
 function getUrl() {
   if (!isEnabled()) return '';
   try {
-    const ip = String(configRead('logServerIp') || '192.168.50.98').trim();
+    const ip = String(configRead('logServerIp') || '').trim();
     const port = Number(configRead('logServerPort') || 3030);
     if (!ip) return '';
-    return `http://${ip}:${port}/tv-log`;
+    const url = `http://${ip}:${port}/tv-log`;
+    if (url !== _lastUrl) {
+      if (_lastUrl) console.info('[LogServer] URL changed:', _lastUrl, '→', url);
+      _lastUrl = url;
+      _failCount = 0;
+      _disabledUntil = 0;
+    }
+    return url;
   } catch { return ''; }
 }
 
 function drain() {
   if (_draining || _queue.length === 0) return;
   const url = getUrl();
-  if (!url || _failCount >= MAX_FAILS) { _queue = []; return; }
+  if (!url || (_failCount >= MAX_FAILS && Date.now() < _disabledUntil)) { _queue = []; return; }
   _draining = true;
   const entry = _queue[0];
-  fetch(url, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(entry),
-  }).then(() => {
+  sendRemotePayload(url, entry).then(() => {
     _failCount = 0;
     _queue.shift();
   }).catch(() => {
     _failCount++;
+    if (_failCount >= MAX_FAILS) {
+      _disabledUntil = Date.now() + FAIL_BACKOFF_MS;
+      console.warn('[LogServer] Entering backoff after repeated failures. Retry after', new Date(_disabledUntil).toISOString());
+    }
     _queue.shift();
   }).finally(() => {
     _draining = false;
@@ -63,8 +73,39 @@ function drain() {
   });
 }
 
+function sendRemotePayload(url, entry) {
+  const body = JSON.stringify(entry);
+  try {
+    if (navigator?.sendBeacon) {
+      const ok = navigator.sendBeacon(url, new Blob([body], { type: 'application/json' }));
+      if (ok) return Promise.resolve();
+    }
+  } catch (_) {}
+
+  return new Promise((resolve, reject) => {
+    try {
+      const xhr = new XMLHttpRequest();
+      xhr.open('POST', url, true);
+      xhr.setRequestHeader('Content-Type', 'application/json');
+      xhr.timeout = 4000;
+      xhr.onload = () => resolve();
+      xhr.onerror = () => reject(new Error('xhr_error'));
+      xhr.ontimeout = () => reject(new Error('xhr_timeout'));
+      xhr.send(body);
+    } catch (err) {
+      reject(err);
+    }
+  });
+}
+
 function enqueue(rawLine) {
-  if (!isEnabled() || _failCount >= MAX_FAILS) return;
+  if (!isEnabled()) return;
+  if (_failCount >= MAX_FAILS && Date.now() >= _disabledUntil) {
+    console.info('[LogServer] Backoff elapsed, resuming log forwarding');
+    _failCount = 0;
+    _disabledUntil = 0;
+  }
+  if (_failCount >= MAX_FAILS && Date.now() < _disabledUntil) return;
   try {
     const m = rawLine.match(/^\[([^\]]+)\] \[TT_ADBLOCK_FILE\] (\S+) ([\s\S]*)$/);
     let entry;
@@ -121,4 +162,5 @@ install();
 
 export function resetLogServerFailCount() {
   _failCount = 0;
+  _disabledUntil = 0;
 }
