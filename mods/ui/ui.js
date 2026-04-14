@@ -8,6 +8,7 @@ import modernUI from './settings.js';
 import resolveCommand, { patchResolveCommand } from '../resolveCommand.js';
 import { pipToFullscreen } from '../features/pictureInPicture.js';
 import getCommandExecutor from './customCommandExecution.js';
+import { t } from 'i18next';
 
 // It just works, okay?
 // Wait for both a video element AND _yttv to be ready before initialising
@@ -230,7 +231,7 @@ function execute_once_dom_loaded() {
   document.addEventListener('keydown', eventHandler, true);
   if (configRead('showWelcomeToast')) {
     setTimeout(() => {
-      showToast('Welcome to TizenTube', 'Press [GREEN]/G to open TizenTube Settings, [RED]/R for Theme Settings, [YELLOW]/Y for Debug Console.');
+      showToast(t('welcomeMsg.title'), t('welcomeMsg.subtitle'));
     }, 2000);
   }
 

@@ -1,0 +1,193 @@
+{
+    "__contributors": [
+        "thegouhund"
+    ],
+    "settings": {
+        "options": {
+            "socialMedia": {
+                "title": "Tautan Media Sosial",
+                "qrCodeScanMessage": "Anda dapat mengunjungi halaman {{name}} dengan memindai kode QR di bawah ini."
+            },
+            "adBlock": "Pemblokir Iklan",
+            "sponsorblock": {
+                "title": "Pengaturan SponsorBlock",
+                "options": {
+                    "enableSB": "Aktifkan SponsorBlock",
+                    "manualSkip": "Lewati Segmen SponsorBlock Secara Manual",
+                    "segments": "Segmen",
+                    "categories": {
+                        "sponsor": "Lewati Segmen Sponsor",
+                        "intro": "Lewati Segmen Intro",
+                        "outro": "Lewati Segmen Outro",
+                        "interaction": "Lewati Segmen Pengingat Interaksi",
+                        "selfpromo": "Lewati Segmen Promosi Diri",
+                        "preview": "Lewati Segmen Pratinjau/Rekap",
+                        "filler": "Lewati Segmen OOT/Lelucon",
+                        "music_offtopic": "Lewati Segmen Musik di Luar Topik",
+                        "highlights": "Aktifkan Sorotan"
+                    },
+                    "showSBToasts": "Tampilkan Notifikasi SponsorBlock"
+                }
+            },
+            "dearrow": {
+                "title": "Pengaturan DeArrow",
+                "options": {
+                    "enableDA": "Aktifkan DeArrow",
+                    "enableDAThumbnails": "Aktifkan Thumbnail DeArrow"
+                }
+            },
+            "misc": {
+                "title": "Pengaturan Lainnya",
+                "options": {
+                    "endScreenCards": "Sembunyikan Kartu Layar Akhir",
+                    "youThereRenderer": "Aktifkan Renderer 'Masih menonton?'",
+                    "paidPromoOverlay": "Aktifkan Overlay 'Mengandung promosi berbayar'",
+                    "whosWatching": {
+                        "title": "Menu Siapa yang Menonton",
+                        "options": {
+                            "enableWW": "Aktifkan Menu Siapa yang Menonton",
+                            "permaEnableWW": "Aktifkan Menu Siapa yang Menonton Secara Permanen",
+                            "enableWWOnExit": "Aktifkan Menu Siapa yang Menonton saat Keluar Aplikasi"
+                        }
+                    },
+                    "fixUI": "Perbaiki UI",
+                    "hqThumbnails": "Aktifkan Thumbnail Kualitas Tinggi",
+                    "longPress": "Aktifkan Aksi Tekan Lama",
+                    "shorts": "Aktifkan Shorts",
+                    "videoPreviews": "Aktifkan Pratinjau Video",
+                    "ttWelcomeMsg": "Tampilkan Pesan Selamat Datang TT",
+                    "guestSignInReminder": "Tampilkan Pengingat Masuk Tamu",
+                    "reloadHomeOnStartup": "Muat Ulang Beranda saat Startup"
+                }
+            },
+            "subtitles": {
+                "title": "Pengaturan Subtitle",
+                "options": {
+                    "showLocalSubtitle": "Tampilkan Subtitle Lokal",
+                    "showHiddenSubtitles": "Tampilkan Subtitle Tersembunyi"
+                }
+            },
+            "videoPlayer": {
+                "title": "Pengaturan Pemutar Video",
+                "subtitle": "Sesuaikan fitur pemutar video",
+                "options": {
+                    "patching": {
+                        "title": "Patch UI Pemutar Video",
+                        "options": {
+                            "enableVPUIPatching": "Aktifkan Patch UI Pemutar Video",
+                            "previousNextBtns": "Aktifkan Tombol Sebelumnya dan Berikutnya",
+                            "showSuperThxBtn": "Tampilkan Tombol Super Thanks",
+                            "showSpeedCtrlBtn": "Tampilkan Tombol Kontrol Kecepatan"
+                        }
+                    },
+                    "preferredVideoQuality": {
+                        "title": "Kualitas Video Pilihan",
+                        "subtitle": "Pilih kualitas video pilihan atau kualitas terbaik berikutnya yang diterapkan saat pemutaran dimulai"
+                    },
+                    "speedSettings": {
+                        "title": "Kenaikan Pengaturan Kecepatan",
+                        "subtitle": "Atur nilai kenaikan untuk penyesuaian kecepatan pemutaran video"
+                    },
+                    "preferredVideoCodec": {
+                        "title": "Codec Video Pilihan",
+                        "subtitle": "Pilih codec video pilihan untuk pemutaran"
+                    },
+                    "afr": "Frame Rate Otomatis",
+                    "afrPauseDuration": {
+                        "title": "Durasi Jeda Frame Rate Otomatis",
+                        "subtitle": "Atur durasi (dalam detik) untuk menjeda pemutaran video saat menyesuaikan frame rate"
+                    }
+                }
+            },
+            "uiSettings": {
+                "title": "Pengaturan Antarmuka",
+                "subtitle": "Sesuaikan UI sesuai keinginan Anda",
+                "options": {
+                    "hideWatchedVideos": {
+                        "title": "Sembunyikan Video yang Sudah Ditonton",
+                        "options": {
+                            "enableHideWatchedVideos": "Aktifkan Sembunyikan Video yang Sudah Ditonton",
+                            "watchedVideosThreshold": {
+                                "title": "Batas Video Ditonton",
+                                "subtitle": "Atur batas persentase untuk menyembunyikan video yang sudah ditonton"
+                            },
+                            "setPagesToHideWatchedVideos": "Atur Halaman untuk Menyembunyikan Video yang Telah Ditonton"
+                        }
+                    },
+                    "screenDimming": {
+                        "title": "Peredupan Layar",
+                        "options": {
+                            "enableScreenDimming": "Aktifkan Peredupan Layar",
+                            "dimmingTimeout": {
+                                "title": "Batas Waktu Peredupan",
+                                "subtitle": "Atur batas waktu tidak aktif (dalam detik) sebelum layar meredup"
+                            },
+                            "dimmingOpacity": {
+                                "title": "Opasitas Peredupan",
+                                "subtitle": "Atur tingkat opasitas untuk peredupan layar"
+                            }
+                        }
+                    },
+                    "disableSidebarContents": {
+                        "title": "Nonaktifkan Konten Sidebar",
+                        "subtitle": "Pilih konten sidebar yang ingin dinonaktifkan"
+                    },
+                    "launchToOnStartup": {
+                        "title": "Halaman yang Dibuka saat Startup",
+                        "subtitle": "Pilih halaman default yang dibuka TizenTube saat startup"
+                    },
+                    "sortSubscriptionsByAlphabet": "Sort Subscriptions Alphabetically"
+                }
+            },
+            "updater": {
+                "title": "Pembaruan TizenTube Cobalt",
+                "menuSubtitle": "Kelola pembaruan TizenTube Cobalt",
+                "versionSubtitle": "Versi saat ini: {{version}}",
+                "options": {
+                    "checkForUpdates": "Periksa pembaruan",
+                    "checkForUpdatesOnStartup": "Periksa pembaruan saat startup"
+                }
+            }
+        },
+        "ttSettings": {
+            "title": "Pengaturan TizenTube",
+            "madeByText": "Dibuat oleh Reis Can (reisxd) dengan ❤️",
+            "summary": "Buka Pengaturan TizenTube"
+        },
+        "supportTT": {
+            "title": "Dukung TizenTube",
+            "subtitle": "❤️ Tunjukkan dukungan untuk TizenTube dan pengembangannya",
+            "content": {
+                "1": "Jika Anda senang menggunakan TizenTube dan ingin mendukung pengembangannya, pertimbangkan hal berikut:",
+                "2": "1. Beri bintang pada repositori GitHub untuk membantu meningkatkan visibilitas.",
+                "3": "2. Bagikan TizenTube kepada orang lain.",
+                "4": "Jika Anda ingin berkontribusi secara finansial, pertimbangkan untuk berdonasi:",
+                "5": "- Buy Me A Coffee: https://www.buymeacoffee.com/reisxd (disarankan)",
+                "6": "- GitHub Sponsors: https://github.com/sponsors/reisxd"
+            }
+        }
+    },
+    "welcomeMsg": {
+        "title": "Selamat Datang di TizenTube",
+        "subtitle": "Buka pengaturan lalu klik Pengaturan TizenTube untuk mengatur fitur."
+    },
+    "sponsorblock": {
+        "segments": {
+            "sponsor": "segmen sponsor",
+            "intro": "intro",
+            "outro": "outro",
+            "interaction": "pengingat interaksi",
+            "selfpromo": "promosi diri",
+            "preview": "rekap atau pratinjau",
+            "filler": "lelucon",
+            "music_offtopic": "bagian non-musik",
+            "poi_highlight": "sorotan"
+        },
+        "toasts": {
+            "skipping": "Melewati {{segment}}",
+            "notSkipping": "Tidak melewati {{segment}} (sudah dilewati {{count}} kali)",
+            "skip": "Lewati {{segment}}",
+            "skipToHighlight": "Lewati ke sorotan"
+        }
+    }
+}

@@ -3,6 +3,7 @@ import Chapters from '../ui/chapters.js';
 import resolveCommand from '../resolveCommand.js';
 import { timelyAction, longPressData, MenuServiceItemRenderer, ShelfRenderer, TileRenderer, ButtonRenderer } from '../ui/ytUI.js';
 import { PatchSettings } from '../ui/customYTSettings.js';
+import { t } from 'i18next';
 
 /**
  * This is a minimal reimplementation of the following uBlock Origin rule:
@@ -67,7 +68,7 @@ JSON.parse = function () {
         );
 
       for (const shelve of r.contents.tvBrowseRenderer.content.tvSurfaceContentRenderer.content.sectionListRenderer.contents) {
-        if (shelve.shelfRenderer) {
+        if (shelve.shelfRenderer && shelve.shelfRenderer.content?.horizontalListRenderer?.items) {
           shelve.shelfRenderer.content.horizontalListRenderer.items =
             shelve.shelfRenderer.content.horizontalListRenderer.items.filter(
               (item) => !item.adSlotRenderer
@@ -120,10 +121,25 @@ JSON.parse = function () {
   }
 
   if (r?.contents?.tvBrowseRenderer?.content?.tvSecondaryNavRenderer?.sections) {
-    for (const section of r.contents.tvBrowseRenderer.content.tvSecondaryNavRenderer.sections) {
-      for (const tab of section.tvSecondaryNavSectionRenderer.tabs) {
+    for (let i = 0; i < r.contents.tvBrowseRenderer.content.tvSecondaryNavRenderer.sections.length; i++) {
+      const section = r.contents.tvBrowseRenderer.content.tvSecondaryNavRenderer.sections[i].tvSecondaryNavSectionRenderer;
+      if (!section || !section.tabs) continue;
+
+      if (configRead('sortSubscriptionsByAlphabet')) {
+        section.tabs.sort((a, b) => {
+          if (a.tabRenderer.selected && !b.tabRenderer.selected) return -1;
+          if (!a.tabRenderer.selected && b.tabRenderer.selected) return 1;
+          return a.tabRenderer.title.localeCompare(b.tabRenderer.title);
+        });
+      }
+
+      for (let j = 0; j < section.tabs.length; j++) {
+        const tab = section.tabs[j];
         if (tab.tabRenderer.content?.tvSurfaceContentRenderer?.content?.sectionListRenderer?.contents) {
-          processShelves(tab.tabRenderer.content.tvSurfaceContentRenderer?.content?.sectionListRenderer.contents);
+          const index = section.tabs.indexOf(tab);
+          const clone = tab.tabRenderer.content.tvSurfaceContentRenderer.content.sectionListRenderer.contents;
+          processShelves(clone);
+          section.tabs[index].tabRenderer.content.tvSurfaceContentRenderer.content.sectionListRenderer.contents = clone;
         }
       }
     }
@@ -184,7 +200,7 @@ JSON.parse = function () {
       for (const segment of window.sponsorblock.segments) {
         if (manualSkippedSegments.includes(segment.category)) {
           const timelyActionData = timelyAction(
-            `Skip ${segment.category}`,
+            t('sponsorblock.toasts.skip', { segment: segment.category }),
             'SKIP_NEXT',
             {
               clickTrackingParams: null,
@@ -218,7 +234,7 @@ JSON.parse = function () {
           button: {
             buttonRenderer: ButtonRenderer(
               false,
-              'Skip to highlight',
+              t('sponsorblock.toasts.skipToHighlight'),
               'SKIP_NEXT',
               {
                 clickTrackingParams: null,
@@ -250,6 +266,7 @@ for (const key in window._yttv) {
 function processShelves(shelves, shouldAddPreviews = true) {
   for (const shelve of shelves) {
     if (shelve.shelfRenderer) {
+      if (!shelve.shelfRenderer.content?.horizontalListRenderer?.items) continue;
       deArrowify(shelve.shelfRenderer.content.horizontalListRenderer.items);
       hqify(shelve.shelfRenderer.content.horizontalListRenderer.items);
       addLongPress(shelve.shelfRenderer.content.horizontalListRenderer.items);
@@ -274,6 +291,7 @@ function addPreviews(items) {
     if (item.tileRenderer) {
       const watchEndpoint = item.tileRenderer.onSelectCommand;
       if (item.tileRenderer?.onFocusCommand?.playbackEndpoint) continue;
+      if (item.tileRenderer?.onFocusCommand?.commandExecutorCommand) continue;
       item.tileRenderer.onFocusCommand = {
         startInlinePlaybackCommand: {
           blockAdoption: true,
@@ -340,6 +358,8 @@ function hqify(items) {
     if (!item.tileRenderer) continue;
     if (item.tileRenderer.style !== 'TILE_STYLE_YTLR_DEFAULT') continue;
     if (configRead('enableHqThumbnails')) {
+      if (!item.tileRenderer.onSelectCommand?.watchEndpoint?.videoId) continue;
+      if (!item.tileRenderer.header?.tileHeaderRenderer?.thumbnail?.thumbnails?.[0]?.url) continue;
       const videoID = item.tileRenderer.onSelectCommand.watchEndpoint.videoId;
       const queryArgs = item.tileRenderer.header.tileHeaderRenderer.thumbnail.thumbnails[0].url.split('?')[1];
       item.tileRenderer.header.tileHeaderRenderer.thumbnail.thumbnails = [
@@ -357,7 +377,7 @@ function addLongPress(items) {
   for (const item of items) {
     if (!item.tileRenderer) continue;
     if (item.tileRenderer.style !== 'TILE_STYLE_YTLR_DEFAULT') continue;
-    if (item.tileRenderer.onLongPressCommand) {
+    if (item.tileRenderer.onLongPressCommand?.showMenuCommand) {
       item.tileRenderer.onLongPressCommand.showMenuCommand.menu.menuRenderer.items.push(MenuServiceItemRenderer('Add to Queue', {
         clickTrackingParams: null,
         playlistEditEndpoint: {
@@ -370,7 +390,12 @@ function addLongPress(items) {
       continue;
     }
     if (!configRead('enableLongPress')) continue;
-    const subtitle = item.tileRenderer.metadata.tileMetadataRenderer.lines[0].lineRenderer.items[0].lineItemRenderer.text;
+    if (!item.tileRenderer?.metadata?.tileMetadataRenderer) continue;
+    if (!item.tileRenderer?.header?.tileHeaderRenderer?.thumbnail?.thumbnails) continue;
+    if (!item.tileRenderer.onSelectCommand?.watchEndpoint) continue;
+    const subtitleNode = item.tileRenderer.metadata.tileMetadataRenderer.lines?.[0]?.lineRenderer?.items?.[0]?.lineItemRenderer?.text;
+    if (!subtitleNode) continue;
+    const subtitle = subtitleNode;
     const data = longPressData({
       videoId: item.tileRenderer.contentId,
       thumbnails: item.tileRenderer.header.tileHeaderRenderer.thumbnail.thumbnails,
@@ -389,8 +414,9 @@ function hideVideo(items) {
     const progressBar = item.tileRenderer.header?.tileHeaderRenderer?.thumbnailOverlays?.find(overlay => overlay.thumbnailOverlayResumePlaybackRenderer)?.thumbnailOverlayResumePlaybackRenderer;
     if (!progressBar) return true;
     const pages = configRead('hideWatchedVideosPages');
+    if (!pages.length) return true;
     const hash = location.hash.substring(1);
-    const pageName = hash === '/' ? 'home' : hash.startsWith('/search') ? 'search' : hash.split('?')[1].split('&')[0].split('=')[1].replace('FE', '').replace('topics_', '');
+    const pageName = hash === '/' ? 'home' : hash.startsWith('/search') ? 'search' : hash.split('?')[1]?.split('&')[0]?.split('=')[1]?.replace('FE', '')?.replace('topics_', '') ?? '';
     if (!pages.includes(pageName)) return true;
 
     const percentWatched = (progressBar.percentDurationWatched || 0);

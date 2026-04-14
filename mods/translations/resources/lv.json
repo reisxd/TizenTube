@@ -1,0 +1,193 @@
+{
+    "__contributors": [
+        "LvKafija"
+    ],
+    "settings": {
+        "options": {
+            "socialMedia": {
+                "title": "Sociālo mēdiju saites",
+                "qrCodeScanMessage": "Jūs varat apmeklēt {{name}} lapu, noskenējot zemāk redzamo QR kodu."
+            },
+            "adBlock": "Reklāmu bloķētājs",
+            "sponsorblock": {
+                "title": "SponsorBlock iestatījumi",
+                "options": {
+                    "enableSB": "Iespējot SponsorBlock",
+                    "manualSkip": "Manuāla SponsorBlock segmentu izlaišana",
+                    "segments": "Segmenti",
+                    "categories": {
+                        "sponsor": "Izlaist sponsoru segmentus",
+                        "intro": "Izlaist ievada segmentus",
+                        "outro": "Izlaist beigu segmentus",
+                        "interaction": "Izlaist aicinājumus uz mijiedarbību",
+                        "selfpromo": "Izlaist pašreklāmas segmentus",
+                        "preview": "Izlaist priekšskatījuma/kopsavilkuma segmentus",
+                        "filler": "Izlaist liekvārdību/jokus",
+                        "music_offtopic": "Izlaist nesaistītas mūzikas segmentus",
+                        "highlights": "Iespējot izcēlumus"
+                    },
+                    "showSBToasts": "Rādīt SponsorBlock paziņojumus"
+                }
+            },
+            "dearrow": {
+                "title": "DeArrow iestatījumi",
+                "options": {
+                    "enableDA": "Iespējot DeArrow",
+                    "enableDAThumbnails": "Iespējot DeArrow sīktēlus"
+                }
+            },
+            "misc": {
+                "title": "Dažādi iestatījumi",
+                "options": {
+                    "endScreenCards": "Slēpt beigu ekrāna kartītes",
+                    "youThereRenderer": "Iespējot 'Vai jūs joprojām skatāties?' logu",
+                    "paidPromoOverlay": "Iespējot 'Ietver apmaksātu reklāmu' pārklājumu",
+                    "whosWatching": {
+                        "title": "Izvēlne 'Kas skatās?'",
+                        "options": {
+                            "enableWW": "Iespējot 'Kas skatās?' izvēlni",
+                            "permaEnableWW": "Pastāvīgi iespējot 'Kas skatās?' izvēlni",
+                            "enableWWOnExit": "Rādīt 'Kas skatās?' izvēlni, aizverot lietotni"
+                        }
+                    },
+                    "fixUI": "Labot saskarni (UI)",
+                    "hqThumbnails": "Iespējot augstas kvalitātes sīktēlus",
+                    "longPress": "Iespējot garā nospiediena darbības",
+                    "shorts": "Iespējot Shorts",
+                    "videoPreviews": "Iespējot video priekšskatījumus",
+                    "ttWelcomeMsg": "Rādīt TT sveiciena ziņojumu",
+                    "guestSignInReminder": "Rādīt viesa pieteikšanās atgādinājumu",
+                    "reloadHomeOnStartup": "Pārlādēt sākumlapu palaišanas brīdī"
+                }
+            },
+            "subtitles": {
+                "title": "Subtitru iestatījumi",
+                "options": {
+                    "showLocalSubtitle": "Rādīt vietējos subtitrus",
+                    "showHiddenSubtitles": "Rādīt slēptos subtitrus"
+                }
+            },
+            "videoPlayer": {
+                "title": "Video atskaņotāja iestatījumi",
+                "subtitle": "Pielāgot video atskaņotāja funkcijas",
+                "options": {
+                    "patching": {
+                        "title": "Video atskaņotāja UI ielāpi",
+                        "options": {
+                            "enableVPUIPatching": "Iespējot video atskaņotāja UI ielāpus",
+                            "previousNextBtns": "Iespējot pogas 'Iepriekšējais' un 'Nākamais'",
+                            "showSuperThxBtn": "Rādīt 'Super Thanks' pogu",
+                            "showSpeedCtrlBtn": "Rādīt ātruma kontroles pogu"
+                        }
+                    },
+                    "preferredVideoQuality": {
+                        "title": "Vēlamā video kvalitāte",
+                        "subtitle": "Izvēlieties vēlamo vai nākamo labāko video kvalitāti atskaņošanas sākumā"
+                    },
+                    "speedSettings": {
+                        "title": "Ātruma iestatījumu soļi",
+                        "subtitle": "Iestatiet ātruma pieauguma soļus video atskaņošanas pielāgošanai"
+                    },
+                    "preferredVideoCodec": {
+                        "title": "Vēlamais video kodeks",
+                        "subtitle": "Izvēlieties vēlamo video kodeku atskaņošanai"
+                    },
+                    "afr": "Automātisks kadru nomaiņas ātrums (AFR)",
+                    "afrPauseDuration": {
+                        "title": "AFR pauzes ilgums",
+                        "subtitle": "Iestatiet ilgumu (sekundēs), uz kādu apturēt atskaņošanu, pielāgojot kadru nomaiņas ātrumu"
+                    }
+                }
+            },
+            "uiSettings": {
+                "title": "Lietotāja saskarnes iestatījumi",
+                "subtitle": "Pielāgojiet saskarni savām vēlmēm",
+                "options": {
+                    "hideWatchedVideos": {
+                        "title": "Slēpt noskatītos video",
+                        "options": {
+                            "enableHideWatchedVideos": "Iespējot noskatīto video slēpšanu",
+                            "watchedVideosThreshold": {
+                                "title": "Noskatīto video slieksnis",
+                                "subtitle": "Iestatiet procentuālo slieksni noskatīto video slēpšanai"
+                            },
+                            "setPagesToHideWatchedVideos": "Izvēlēties lapas, kurās slēpt noskatītos video"
+                        }
+                    },
+                    "screenDimming": {
+                        "title": "Ekrāna aptumšošana",
+                        "options": {
+                            "enableScreenDimming": "Iespējot ekrāna aptumšošanu",
+                            "dimmingTimeout": {
+                                "title": "Aptumšošanas noildze",
+                                "subtitle": "Iestatiet bezdarbības laiku (sekundēs), pirms ekrāns aptumšojas"
+                            },
+                            "dimmingOpacity": {
+                                "title": "Aptumšošanas intensitāte",
+                                "subtitle": "Iestatiet ekrāna aptumšošanas caurspīdīguma līmeni"
+                            }
+                        }
+                    },
+                    "disableSidebarContents": {
+                        "title": "Atspējot sānjoslas saturu",
+                        "subtitle": "Izvēlieties sānjoslas elementus, kurus atspējot"
+                    },
+                    "launchToOnStartup": {
+                        "title": "Sākumlapa palaišanas brīdī",
+                        "subtitle": "Izvēlieties noklusējuma lapu, kuru TizenTube atvērs palaišanas brīdī"
+                    },
+                    "sortSubscriptionsByAlphabet": "Sort Subscriptions Alphabetically"
+                }
+            },
+            "updater": {
+                "title": "TizenTube Cobalt atjauninātājs",
+                "menuSubtitle": "Pārvaldīt TizenTube Cobalt atjauninājumus",
+                "versionSubtitle": "Pašreizējā versija: {{version}}",
+                "options": {
+                    "checkForUpdates": "Pārbaudīt atjauninājumus",
+                    "checkForUpdatesOnStartup": "Pārbaudīt atjauninājumus palaišanas brīdī"
+                }
+            }
+        },
+        "ttSettings": {
+            "title": "TizenTube iestatījumi",
+            "madeByText": "Izveidoja Reis Can (reisxd) ar ❤️",
+            "summary": "Atvērt TizenTube iestatījumus"
+        },
+        "supportTT": {
+            "title": "Atbalstīt TizenTube",
+            "subtitle": "❤️ Atbalstiet TizenTube un tā izstrādi",
+            "content": {
+                "1": "Ja jums patīk lietot TizenTube un vēlaties atbalstīt tā izstrādi, apsveriet sekojošo:",
+                "2": "1. Atzīmējiet GitHub repozitoriju ar zvaigznīti, lai palīdzētu uzlabot tā redzamību.",
+                "3": "2. Dalieties ar TizenTube ar citiem.",
+                "4": "Ja vēlaties sniegt finansiālu ieguldījumu, apsveriet ziedošanu:",
+                "5": "- Buy Me A Coffee: https://www.buymeacoffee.com/reisxd (ieteicams)",
+                "6": "- GitHub Sponsors: https://github.com/sponsors/reisxd"
+            }
+        }
+    },
+    "welcomeMsg": {
+        "title": "Laipni lūdzam TizenTube",
+        "subtitle": "Dodieties uz iestatījumiem un noklikšķiniet uz 'TizenTube iestatījumi', lai veiktu izmaiņas."
+    },
+    "sponsorblock": {
+        "segments": {
+            "sponsor": "sponsorēts segments",
+            "intro": "ievads",
+            "outro": "beigas",
+            "interaction": "atgādinājums par mijiedarbību",
+            "selfpromo": "pašreklāma",
+            "preview": "kopsavilkums vai priekšskatījums",
+            "filler": "novirzīšanās no tēmas",
+            "music_offtopic": "nemuzikāla daļa",
+            "poi_highlight": "izcēlums"
+        },
+        "toasts": {
+            "skipping": "Izlaiž: {{segment}}",
+            "notSkipping": "Neizlaiž {{segment}} (tika izlaists {{count}} reizes)",
+            "skip": "Izlaist {{segment}}",
+            "skipToHighlight": "Pāriet uz izcēlumu"
+        }
+    }
+}
