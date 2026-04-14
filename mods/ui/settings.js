@@ -12,10 +12,6 @@ function getLogServerIpOctets() {
     return parts.map((v) => Math.max(0, Math.min(255, Math.floor(v))));
 }
 
-export function getLogServerIpString() {
-    return getLogServerIpOctets().join('.');
-}
-
 export function buildLogServerIpEditorOptions() {
     const octets = getLogServerIpOctets();
     const labels = ['First', 'Second', 'Third', 'Fourth'];
@@ -29,7 +25,7 @@ export function buildLogServerIpEditorOptions() {
             menuId: `tt-log-server-ip-octet-${i}`,
             menuHeader: {
                 title: `${labels[i]} IP Octet`,
-                subtitle: `Current IP: ${octets.join('.')}`
+                subtitle: 'Adjust this octet with +/- controls'
             },
             options: [
                 buttonItem(
@@ -411,12 +407,12 @@ export default function modernUI(update, parameters) {
                         },
                         {
                             name: 'Server IP (Octet Editor)',
-                            subtitle: `Current: ${getLogServerIpString()}`,
+                            subtitle: 'Adjust each octet with +/- controls',
                             value: null,
                             menuId: 'tt-log-server-ip',
                             menuHeader: {
                                 title: 'Remote Log Server IP',
-                                subtitle: `Current: ${getLogServerIpString()} • adjust each octet with +/- controls`
+                                subtitle: 'Adjust each octet with +/- controls'
                             },
                             options: buildLogServerIpEditorOptions()
                         },

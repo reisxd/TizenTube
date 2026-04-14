@@ -59,7 +59,9 @@ function drain() {
   const entry = _queue[0];
   fetch(url, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    mode: 'no-cors',
+    keepalive: true,
+    headers: { 'Content-Type': 'text/plain;charset=UTF-8' },
     body: JSON.stringify(entry),
   }).then(() => {
     _failCount = 0;

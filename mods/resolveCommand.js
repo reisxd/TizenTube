@@ -1,6 +1,6 @@
 import { configWrite, configRead } from './config.js';
 import { enablePip } from './features/pictureInPicture.js';
-import modernUI, { optionShow, buildLogServerIpEditorOptions, getLogServerIpString } from './ui/settings.js';
+import modernUI, { optionShow, buildLogServerIpEditorOptions } from './ui/settings.js';
 import { speedSettings } from './ui/speedUI.js';
 import { showToast, buttonItem } from './ui/ytUI.js';
 import checkForUpdates from './features/updater.js';
@@ -223,7 +223,6 @@ function customAction(action, parameters) {
             const nextIp = octets.join('.');
             configWrite('logServerIp', nextIp);
             console.info('[LogServer] logServerIp changed to', nextIp);
-            showToast('TizenTube', `Log server IP: ${nextIp}`);
             optionShow({
                 options: buildLogServerIpEditorOptions(),
                 selectedIndex: 0,
@@ -231,7 +230,7 @@ function customAction(action, parameters) {
                 menuId: 'tt-log-server-ip',
                 menuHeader: {
                     title: 'Remote Log Server IP',
-                    subtitle: `Current: ${getLogServerIpString()} • adjust each octet with +/- controls`
+                    subtitle: 'Adjust each octet with +/- controls'
                 }
             }, true);
             break;
@@ -242,9 +241,13 @@ function customAction(action, parameters) {
                 showToast('TizenTube', 'Set a valid Log Server IP first.');
                 break;
             }
+            if (!Array.isArray(window.__ttFileOnlyLogs)) window.__ttFileOnlyLogs = [];
+            window.__ttFileOnlyLogs.push(`[${new Date().toISOString()}] [TT_ADBLOCK_FILE] logserver.test.start ${JSON.stringify({ url })}`);
             fetch(url, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                mode: 'no-cors',
+                keepalive: true,
+                headers: { 'Content-Type': 'text/plain;charset=UTF-8' },
                 body: JSON.stringify({
                     ts: new Date().toISOString(),
                     level: 'INFO',
@@ -253,8 +256,12 @@ function customAction(action, parameters) {
                     _formatted: `[${new Date().toISOString()}] [INFO] [TizenTube] Manual test ping from settings`,
                 }),
             }).then(() => {
+                window.__ttFileOnlyLogs.push(`[${new Date().toISOString()}] [TT_ADBLOCK_FILE] logserver.test.success ${JSON.stringify({ url })}`);
                 showToast('TizenTube', `Log ping sent to ${url}`);
             }).catch((err) => {
+                const msg = String(err?.message || err);
+                window.__ttFileOnlyLogs.push(`[${new Date().toISOString()}] [TT_ADBLOCK_FILE] logserver.test.fail ${JSON.stringify({ url, msg })}`);
+                console.warn('[LogServer] Test ping failed', { url, msg });
                 showToast('TizenTube', `Log ping failed: ${String(err?.message || err)}`);
             });
             break;
