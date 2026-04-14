@@ -14,6 +14,7 @@ function parseLogServerIp() {
 }
 
 function logServerUrlFromConfig() {
+<<<<<<< codex/fix-sidebar-overlap-on-youtube
   const ip = String(configRead('logServerIp') || '').trim();
   const port = Number(configRead('logServerPort') || 3030);
   return `http://${ip}:${port}/tv-log`;
@@ -42,6 +43,11 @@ function sendRemotePayload(url, payload) {
             reject(err);
         }
     });
+=======
+    const ip = String(configRead('logServerIp') || '').trim();
+    const port = Number(configRead('logServerPort') || 3030);
+    return `http://${ip}:${port}/tv-log`;
+>>>>>>> main
 }
 
 export default function resolveCommand(cmd, _) {
@@ -268,13 +274,27 @@ function customAction(action, parameters) {
             }
             if (!Array.isArray(window.__ttFileOnlyLogs)) window.__ttFileOnlyLogs = [];
             window.__ttFileOnlyLogs.push(`[${new Date().toISOString()}] [TT_ADBLOCK_FILE] logserver.test.start ${JSON.stringify({ url })}`);
+<<<<<<< codex/fix-sidebar-overlap-on-youtube
             sendRemotePayload(url, {
+=======
+            fetch(url, {
+                method: 'POST',
+                mode: 'no-cors',
+                keepalive: true,
+                headers: { 'Content-Type': 'text/plain;charset=UTF-8' },
+                body: JSON.stringify({
+>>>>>>> main
                     ts: new Date().toISOString(),
                     level: 'INFO',
                     context: 'TizenTube',
                     message: 'Manual test ping from settings',
                     _formatted: `[${new Date().toISOString()}] [INFO] [TizenTube] Manual test ping from settings`,
+<<<<<<< codex/fix-sidebar-overlap-on-youtube
                 }).then(() => {
+=======
+                }),
+            }).then(() => {
+>>>>>>> main
                 window.__ttFileOnlyLogs.push(`[${new Date().toISOString()}] [TT_ADBLOCK_FILE] logserver.test.success ${JSON.stringify({ url })}`);
                 showToast('TizenTube', `Log ping sent to ${url}`);
             }).catch((err) => {
