@@ -57,13 +57,7 @@ function drain() {
   if (!url || (_failCount >= MAX_FAILS && Date.now() < _disabledUntil)) { _queue = []; return; }
   _draining = true;
   const entry = _queue[0];
-  fetch(url, {
-    method: 'POST',
-    mode: 'no-cors',
-    keepalive: true,
-    headers: { 'Content-Type': 'text/plain;charset=UTF-8' },
-    body: JSON.stringify(entry),
-  }).then(() => {
+  sendRemotePayload(url, entry).then(() => {
     _failCount = 0;
     _queue.shift();
   }).catch(() => {
@@ -76,6 +70,31 @@ function drain() {
   }).finally(() => {
     _draining = false;
     if (_queue.length > 0) setTimeout(drain, 50);
+  });
+}
+
+function sendRemotePayload(url, entry) {
+  const body = JSON.stringify(entry);
+  try {
+    if (navigator?.sendBeacon) {
+      const ok = navigator.sendBeacon(url, new Blob([body], { type: 'application/json' }));
+      if (ok) return Promise.resolve();
+    }
+  } catch (_) {}
+
+  return new Promise((resolve, reject) => {
+    try {
+      const xhr = new XMLHttpRequest();
+      xhr.open('POST', url, true);
+      xhr.setRequestHeader('Content-Type', 'application/json');
+      xhr.timeout = 4000;
+      xhr.onload = () => resolve();
+      xhr.onerror = () => reject(new Error('xhr_error'));
+      xhr.ontimeout = () => reject(new Error('xhr_timeout'));
+      xhr.send(body);
+    } catch (err) {
+      reject(err);
+    }
   });
 }
 

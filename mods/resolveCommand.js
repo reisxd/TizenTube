@@ -14,9 +14,34 @@ function parseLogServerIp() {
 }
 
 function logServerUrlFromConfig() {
-    const ip = String(configRead('logServerIp') || '').trim();
-    const port = Number(configRead('logServerPort') || 3030);
-    return `http://${ip}:${port}/tv-log`;
+  const ip = String(configRead('logServerIp') || '').trim();
+  const port = Number(configRead('logServerPort') || 3030);
+  return `http://${ip}:${port}/tv-log`;
+}
+
+function sendRemotePayload(url, payload) {
+    const body = JSON.stringify(payload);
+    try {
+        if (navigator?.sendBeacon) {
+            const ok = navigator.sendBeacon(url, new Blob([body], { type: 'application/json' }));
+            if (ok) return Promise.resolve();
+        }
+    } catch (_) {}
+
+    return new Promise((resolve, reject) => {
+        try {
+            const xhr = new XMLHttpRequest();
+            xhr.open('POST', url, true);
+            xhr.setRequestHeader('Content-Type', 'application/json');
+            xhr.timeout = 4000;
+            xhr.onload = () => resolve();
+            xhr.onerror = () => reject(new Error('xhr_error'));
+            xhr.ontimeout = () => reject(new Error('xhr_timeout'));
+            xhr.send(body);
+        } catch (err) {
+            reject(err);
+        }
+    });
 }
 
 export default function resolveCommand(cmd, _) {
@@ -243,19 +268,13 @@ function customAction(action, parameters) {
             }
             if (!Array.isArray(window.__ttFileOnlyLogs)) window.__ttFileOnlyLogs = [];
             window.__ttFileOnlyLogs.push(`[${new Date().toISOString()}] [TT_ADBLOCK_FILE] logserver.test.start ${JSON.stringify({ url })}`);
-            fetch(url, {
-                method: 'POST',
-                mode: 'no-cors',
-                keepalive: true,
-                headers: { 'Content-Type': 'text/plain;charset=UTF-8' },
-                body: JSON.stringify({
+            sendRemotePayload(url, {
                     ts: new Date().toISOString(),
                     level: 'INFO',
                     context: 'TizenTube',
                     message: 'Manual test ping from settings',
                     _formatted: `[${new Date().toISOString()}] [INFO] [TizenTube] Manual test ping from settings`,
-                }),
-            }).then(() => {
+                }).then(() => {
                 window.__ttFileOnlyLogs.push(`[${new Date().toISOString()}] [TT_ADBLOCK_FILE] logserver.test.success ${JSON.stringify({ url })}`);
                 showToast('TizenTube', `Log ping sent to ${url}`);
             }).catch((err) => {
