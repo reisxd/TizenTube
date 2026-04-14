@@ -1,4 +1,4 @@
-import { configWrite, configRead, LOG_SERVER_DEFAULT_IP } from './config.js';
+import { configWrite, configRead } from './config.js';
 import { enablePip } from './features/pictureInPicture.js';
 import modernUI, { optionShow } from './ui/settings.js';
 import { speedSettings } from './ui/speedUI.js';
@@ -7,15 +7,14 @@ import checkForUpdates from './features/updater.js';
 import { playlistContinue } from './features/playlistContinue.js';
 
 function parseLogServerIp() {
-    const defaultParts = LOG_SERVER_DEFAULT_IP.split('.').map((v) => Number(v));
-    const raw = String(configRead('logServerIp') || LOG_SERVER_DEFAULT_IP).trim();
+    const raw = String(configRead('logServerIp') || '').trim();
     const parts = raw.split('.').map((v) => Number(v));
-    if (parts.length !== 4 || parts.some((v) => Number.isNaN(v))) return defaultParts;
+    if (parts.length !== 4 || parts.some((v) => Number.isNaN(v))) return [0, 0, 0, 0];
     return parts.map((v) => Math.max(0, Math.min(255, Math.floor(v))));
 }
 
 function logServerUrlFromConfig() {
-    const ip = String(configRead('logServerIp') || LOG_SERVER_DEFAULT_IP).trim();
+    const ip = String(configRead('logServerIp') || '').trim();
     const port = Number(configRead('logServerPort') || 3030);
     return `http://${ip}:${port}/tv-log`;
 }

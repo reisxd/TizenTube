@@ -19,7 +19,7 @@
  * The _formatted field is used by the PS1 receiver for clean display.
  */
 
-import { configRead, LOG_SERVER_DEFAULT_IP } from '../config.js';
+import { configRead } from '../config.js';
 
 let _queue = [];
 let _draining = false;
@@ -37,7 +37,7 @@ function isEnabled() {
 function getUrl() {
   if (!isEnabled()) return '';
   try {
-    const ip = String(configRead('logServerIp') || LOG_SERVER_DEFAULT_IP).trim();
+    const ip = String(configRead('logServerIp') || '').trim();
     const port = Number(configRead('logServerPort') || 3030);
     if (!ip) return '';
     const url = `http://${ip}:${port}/tv-log`;
