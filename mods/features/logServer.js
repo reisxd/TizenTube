@@ -24,8 +24,11 @@ import { configRead } from '../config.js';
 let _queue = [];
 let _draining = false;
 let _failCount = 0;
+let _disabledUntil = 0;
+let _lastUrl = '';
 const MAX_QUEUE = 300;
 const MAX_FAILS = 10;
+const FAIL_BACKOFF_MS = 30 * 1000;
 
 function isEnabled() {
   try { return !!configRead('logServerEnabled'); } catch { return false; }
@@ -37,14 +40,20 @@ function getUrl() {
     const ip = String(configRead('logServerIp') || '192.168.50.98').trim();
     const port = Number(configRead('logServerPort') || 3030);
     if (!ip) return '';
-    return `http://${ip}:${port}/tv-log`;
+    const url = `http://${ip}:${port}/tv-log`;
+    if (url !== _lastUrl) {
+      _lastUrl = url;
+      _failCount = 0;
+      _disabledUntil = 0;
+    }
+    return url;
   } catch { return ''; }
 }
 
 function drain() {
   if (_draining || _queue.length === 0) return;
   const url = getUrl();
-  if (!url || _failCount >= MAX_FAILS) { _queue = []; return; }
+  if (!url || (_failCount >= MAX_FAILS && Date.now() < _disabledUntil)) { _queue = []; return; }
   _draining = true;
   const entry = _queue[0];
   fetch(url, {
@@ -56,6 +65,7 @@ function drain() {
     _queue.shift();
   }).catch(() => {
     _failCount++;
+    if (_failCount >= MAX_FAILS) _disabledUntil = Date.now() + FAIL_BACKOFF_MS;
     _queue.shift();
   }).finally(() => {
     _draining = false;
@@ -64,7 +74,12 @@ function drain() {
 }
 
 function enqueue(rawLine) {
-  if (!isEnabled() || _failCount >= MAX_FAILS) return;
+  if (!isEnabled()) return;
+  if (_failCount >= MAX_FAILS && Date.now() >= _disabledUntil) {
+    _failCount = 0;
+    _disabledUntil = 0;
+  }
+  if (_failCount >= MAX_FAILS && Date.now() < _disabledUntil) return;
   try {
     const m = rawLine.match(/^\[([^\]]+)\] \[TT_ADBLOCK_FILE\] (\S+) ([\s\S]*)$/);
     let entry;
@@ -121,4 +136,5 @@ install();
 
 export function resetLogServerFailCount() {
   _failCount = 0;
+  _disabledUntil = 0;
 }

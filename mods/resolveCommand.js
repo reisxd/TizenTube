@@ -6,6 +6,19 @@ import { showToast, buttonItem } from './ui/ytUI.js';
 import checkForUpdates from './features/updater.js';
 import { playlistContinue } from './features/playlistContinue.js';
 
+function parseLogServerIp() {
+    const raw = String(configRead('logServerIp') || '192.168.50.98').trim();
+    const parts = raw.split('.').map((v) => Number(v));
+    if (parts.length !== 4 || parts.some((v) => Number.isNaN(v))) return [192, 168, 50, 98];
+    return parts.map((v) => Math.max(0, Math.min(255, Math.floor(v))));
+}
+
+function logServerUrlFromConfig() {
+    const ip = String(configRead('logServerIp') || '192.168.50.98').trim();
+    const port = Number(configRead('logServerPort') || 3030);
+    return `http://${ip}:${port}/tv-log`;
+}
+
 export default function resolveCommand(cmd, _) {
     // resolveCommand function is pretty OP, it can do from opening modals, changing client settings and way more.
     // Because the client might change, we should find it first.
@@ -201,5 +214,35 @@ function customAction(action, parameters) {
         case 'PLAYLIST_CONTINUE':
             playlistContinue(resolveCommand, showToast);
             break;
+        case 'LOG_SERVER_IP_ADJUST': {
+            const octetIndex = Number(parameters?.octetIndex);
+            const delta = Number(parameters?.delta || 0);
+            if (Number.isNaN(octetIndex) || octetIndex < 0 || octetIndex > 3 || Number.isNaN(delta)) break;
+            const octets = parseLogServerIp();
+            octets[octetIndex] = Math.max(0, Math.min(255, octets[octetIndex] + delta));
+            const nextIp = octets.join('.');
+            configWrite('logServerIp', nextIp);
+            showToast('TizenTube', `Log server IP: ${nextIp}`);
+            break;
+        }
+        case 'LOG_SERVER_TEST_PING': {
+            const url = logServerUrlFromConfig();
+            fetch(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    ts: new Date().toISOString(),
+                    level: 'INFO',
+                    context: 'TizenTube',
+                    message: 'Manual test ping from settings',
+                    _formatted: `[${new Date().toISOString()}] [INFO] [TizenTube] Manual test ping from settings`,
+                }),
+            }).then(() => {
+                showToast('TizenTube', `Log ping sent to ${url}`);
+            }).catch((err) => {
+                showToast('TizenTube', `Log ping failed: ${String(err?.message || err)}`);
+            });
+            break;
+        }
     }
 }
