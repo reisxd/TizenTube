@@ -109,10 +109,9 @@ function execute_once_dom_loaded() {
           const focusedElement = document.querySelector(':focus');
           focusedElement.value = focusedElement.value.slice(0, -1);
         }
-        
 
         if (evt.key === 'Enter' || evt.Uc?.key === 'Enter') {
-                  // If the focused element is a text input, emit a change event.
+          // If the focused element is a text input, emit a change event.
           if (document.querySelector(':focus').type === 'text') {
             document.querySelector(':focus').dispatchEvent(new Event('change'));
           }
@@ -253,7 +252,6 @@ function execute_once_dom_loaded() {
   }
 
   // Fix UI issues, again. Love, Googol.
-  
   if (configRead('enableFixedUI')) {
     try {
       const observer = new MutationObserver((_, _2) => {
