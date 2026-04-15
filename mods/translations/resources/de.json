@@ -74,7 +74,7 @@
                     },
                     "logServer": {
                         "title": "Fernprotokoll-Server",
-                        "enable": "Server aktivieren",
+                        "enable": "Protokollierung aktivieren",
                         "ipEditor": "Server-IP (Oktet-Editor)",
                         "ipEditorSubtitle": "Jeden Oktet mit +/- anpassen",
                         "ipMenuTitle": "Fernprotokoll-Server-IP",
