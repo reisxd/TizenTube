@@ -5,6 +5,7 @@ import { speedSettings } from './ui/speedUI.js';
 import { showToast, buttonItem } from './ui/ytUI.js';
 import checkForUpdates from './features/updater.js';
 import { playlistContinue } from './features/playlistContinue.js';
+import { sendRemotePayload } from './features/logServer.js';
 
 function parseLogServerIp() {
     const raw = String(configRead('logServerIp') || '').trim();
@@ -19,31 +20,6 @@ function logServerUrlFromConfig() {
   return `http://${ip}:${port}/tv-log`;
 }
 
-function sendRemotePayload(url, payload) {
-    const body = JSON.stringify(payload);
-    // Use text/plain to avoid CORS preflight (simple request — no OPTIONS needed).
-    // The PS1 receiver reads the raw body and parses it as JSON regardless of Content-Type.
-    try {
-        if (navigator?.sendBeacon) {
-            const ok = navigator.sendBeacon(url, new Blob([body], { type: 'text/plain' }));
-            if (ok) return Promise.resolve();
-        }
-    } catch (_) {}
-
-    return new Promise((resolve, reject) => {
-        try {
-            const xhr = new XMLHttpRequest();
-            xhr.open('POST', url, true);
-            xhr.timeout = 4000;
-            xhr.onload = () => resolve();
-            xhr.onerror = () => reject(new Error('xhr_error'));
-            xhr.ontimeout = () => reject(new Error('xhr_timeout'));
-            xhr.send(body);
-        } catch (err) {
-            reject(err);
-        }
-    });
-}
 
 export default function resolveCommand(cmd, _) {
     // resolveCommand function is pretty OP, it can do from opening modals, changing client settings and way more.
