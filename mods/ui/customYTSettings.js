@@ -13,7 +13,7 @@ function PatchSettings(settingsObject) {
                 parameters: []
             }
         },
-        `Version: ${APP_VERSION}`,
+        t('settings.ttSettings.version', { version: APP_VERSION }),
         'https://www.gstatic.com/ytlr/img/parent_code.png'
     )
 

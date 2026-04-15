@@ -232,7 +232,8 @@
         "ttSettings": {
             "title": "TizenTube-Einstellungen",
             "madeByText": "Erstellt von Reis Can (reisxd) mit ❤️",
-            "summary": "TizenTube-Einstellungen öffnen"
+            "summary": "TizenTube-Einstellungen öffnen",
+            "version": "Version: {{version}}"
         },
         "supportTT": {
             "title": "TizenTube unterstützen",

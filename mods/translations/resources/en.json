@@ -232,7 +232,8 @@
         "ttSettings": {
             "title": "TizenTube Settings",
             "madeByText": "Made by Reis Can (reisxd) with ❤️",
-            "summary": "Open TizenTube Settings"
+            "summary": "Open TizenTube Settings",
+            "version": "Version: {{version}}"
         },
         "supportTT": {
             "title": "Support TizenTube",
