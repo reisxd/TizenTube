@@ -141,7 +141,7 @@ function showPlaylistAllHiddenNotice(reason = 'playlist.all_hidden') {
     });
     document.body?.appendChild(notice);
   }
-  notice.textContent = 'All videos in this playlist are hidden. Leave playlist to dismiss.';
+  notice.textContent = t('playlist.allHidden');
   const cleanup = () => {
     if (detectCurrentPage() === 'playlist') return;
     document.getElementById(id)?.remove();

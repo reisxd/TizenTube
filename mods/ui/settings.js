@@ -15,18 +15,19 @@ function getLogServerIpOctets() {
 
 export function buildLogServerIpEditorOptions() {
     const octets = getLogServerIpOctets();
-    const labels = ['First', 'Second', 'Third', 'Fourth'];
+    const octetKeys = ['first', 'second', 'third', 'fourth'];
     const options = [];
 
     for (let i = 0; i < 4; i++) {
         const current = octets[i];
+        const label = t(`settings.options.misc.options.logServer.octetNames.${octetKeys[i]}`);
         options.push({
-            name: `${labels[i]} octet (${current})`,
+            name: `${label} octet (${current})`,
             value: null,
             menuId: `tt-log-server-ip-octet-${i}`,
             menuHeader: {
-                title: `${labels[i]} IP Octet`,
-                subtitle: 'Adjust this octet with +/- controls'
+                title: `${label} IP Octet`,
+                subtitle: t('settings.options.misc.options.logServer.octetSubtitle')
             },
             options: [
                 buttonItem(
@@ -357,35 +358,35 @@ export default function modernUI(update, parameters) {
                     value: 'reloadHomeOnStartup'
                 },
                 {
-                    name: 'Debug Console',
+                    name: t('settings.options.misc.options.debugConsole.title'),
                     icon: 'BUG_REPORT',
                     value: null,
                     menuId: 'tt-debug-console-settings',
                     options: [
                         {
-                            name: 'Enable Debug Console',
+                            name: t('settings.options.misc.options.debugConsole.enable'),
                             icon: 'BUG_REPORT',
                             value: 'enableDebugConsole'
                         },
                         {
-                            name: 'Enable Background Debug Logging',
+                            name: t('settings.options.misc.options.debugConsole.enableLogging'),
                             icon: 'ARTICLE',
                             value: 'enableDebugLogging'
                         },
                         {
-                            name: 'Console Position',
+                            name: t('settings.options.misc.options.debugConsole.position'),
                             value: null,
                             menuId: 'tt-debug-console-position',
                             options: [
-                                { name: 'Top Left', key: 'debugConsolePosition', value: 'top-left' },
-                                { name: 'Top Right', key: 'debugConsolePosition', value: 'top-right' },
-                                { name: 'Bottom Left', key: 'debugConsolePosition', value: 'bottom-left' },
-                                { name: 'Bottom Right', key: 'debugConsolePosition', value: 'bottom-right' },
-                                { name: 'Center', key: 'debugConsolePosition', value: 'center' }
+                                { name: t('settings.options.misc.options.debugConsole.positions.topLeft'), key: 'debugConsolePosition', value: 'top-left' },
+                                { name: t('settings.options.misc.options.debugConsole.positions.topRight'), key: 'debugConsolePosition', value: 'top-right' },
+                                { name: t('settings.options.misc.options.debugConsole.positions.bottomLeft'), key: 'debugConsolePosition', value: 'bottom-left' },
+                                { name: t('settings.options.misc.options.debugConsole.positions.bottomRight'), key: 'debugConsolePosition', value: 'bottom-right' },
+                                { name: t('settings.options.misc.options.debugConsole.positions.center'), key: 'debugConsolePosition', value: 'center' }
                             ]
                         },
                         {
-                            name: 'Console Height',
+                            name: t('settings.options.misc.options.debugConsole.height'),
                             value: null,
                             menuId: 'tt-debug-console-height',
                             options: [300, 400, 500, 600, 700, 800, 1054].map((height) => {
@@ -399,28 +400,28 @@ export default function modernUI(update, parameters) {
                     ]
                 },
                 {
-                    name: 'Remote Log Server',
+                    name: t('settings.options.misc.options.logServer.title'),
                     value: null,
                     menuId: 'tt-log-server-settings',
                     options: [
                         {
-                            name: 'Enable Log Server',
+                            name: t('settings.options.misc.options.logServer.enable'),
                             icon: 'WIFI',
                             value: 'logServerEnabled'
                         },
                         {
-                            name: 'Server IP (Octet Editor)',
-                            subtitle: 'Adjust each octet with +/- controls',
+                            name: t('settings.options.misc.options.logServer.ipEditor'),
+                            subtitle: t('settings.options.misc.options.logServer.ipEditorSubtitle'),
                             value: null,
                             menuId: 'tt-log-server-ip',
                             menuHeader: {
-                                title: 'Remote Log Server IP',
-                                subtitle: 'Adjust each octet with +/- controls'
+                                title: t('settings.options.misc.options.logServer.ipMenuTitle'),
+                                subtitle: t('settings.options.misc.options.logServer.ipEditorSubtitle')
                             },
                             options: buildLogServerIpEditorOptions()
                         },
                         {
-                            name: 'Server Port',
+                            name: t('settings.options.misc.options.logServer.port'),
                             value: null,
                             menuId: 'tt-log-server-port',
                             options: [3030, 8765, 9000, 1234, 4000, 5000].map((port) => ({
@@ -430,8 +431,8 @@ export default function modernUI(update, parameters) {
                             }))
                         },
                         {
-                            name: 'Test Log Server Connection',
-                            subtitle: 'Send a test POST to /tv-log (works even if Log Server is disabled)',
+                            name: t('settings.options.misc.options.logServer.test'),
+                            subtitle: t('settings.options.misc.options.logServer.testSubtitle'),
                             icon: 'SEND',
                             customAction: {
                                 action: 'LOG_SERVER_TEST_PING'
@@ -612,82 +613,43 @@ export default function modernUI(update, parameters) {
                             arrayToEdit: 'hideWatchedVideosPages',
                             menuId: 'tt-hide-watched-videos-pages',
                             options: [
-                                {
-                                    name: 'Search Results',
-                                    value: 'search'
-                                },
-                                {
-                                    name: 'Home',
-                                    value: 'home'
-                                },
-                                {
-                                    name: 'Music',
-                                    value: 'music'
-                                },
-                                {
-                                    name: 'Gaming',
-                                    value: 'gaming'
-                                },
-                                {
-                                    name: 'Subscriptions',
-                                    value: 'subscriptions'
-                                },
-                                {
-                                    name: 'Channel Pages',
-                                    value: 'channel'
-                                },
-                                {
-                                    name: 'Library',
-                                    value: 'library'
-                                },
-                                {
-                                    name: 'Library → Playlists Overview',
-                                    icon: 'PLAYLIST_PLAY',
-                                    value: 'playlists'
-                                },
-                                {
-                                    name: 'Library → Individual Playlists (WL, LL, etc)',
-                                    icon: 'PLAYLIST_PLAY',
-                                    value: 'playlist'
-                                },
-                                {
-                                    name: 'Library → History',
-                                    icon: 'HISTORY',
-                                    value: 'history'
-                                },
-                                {
-                                    name: 'More',
-                                    value: 'more'
-                                },
-                                {
-                                    name: 'Watch',
-                                    value: 'watch'
-                                }
+                                { name: t('settings.options.uiSettings.options.hideWatchedVideos.options.pages.search'), value: 'search' },
+                                { name: t('settings.options.uiSettings.options.hideWatchedVideos.options.pages.home'), value: 'home' },
+                                { name: t('settings.options.uiSettings.options.hideWatchedVideos.options.pages.music'), value: 'music' },
+                                { name: t('settings.options.uiSettings.options.hideWatchedVideos.options.pages.gaming'), value: 'gaming' },
+                                { name: t('settings.options.uiSettings.options.hideWatchedVideos.options.pages.subscriptions'), value: 'subscriptions' },
+                                { name: t('settings.options.uiSettings.options.hideWatchedVideos.options.pages.channel'), value: 'channel' },
+                                { name: t('settings.options.uiSettings.options.hideWatchedVideos.options.pages.library'), value: 'library' },
+                                { name: t('settings.options.uiSettings.options.hideWatchedVideos.options.pages.playlists'), icon: 'PLAYLIST_PLAY', value: 'playlists' },
+                                { name: t('settings.options.uiSettings.options.hideWatchedVideos.options.pages.playlist'), icon: 'PLAYLIST_PLAY', value: 'playlist' },
+                                { name: t('settings.options.uiSettings.options.hideWatchedVideos.options.pages.history'), icon: 'HISTORY', value: 'history' },
+                                { name: t('settings.options.uiSettings.options.hideWatchedVideos.options.pages.more'), value: 'more' },
+                                { name: t('settings.options.uiSettings.options.hideWatchedVideos.options.pages.watch'), value: 'watch' }
                             ]
                         }
                     ]
                 },
                 {
-                    name: 'Playlist Batch Load',
+                    name: t('settings.options.uiSettings.options.playlistBatchLoad.title'),
                     icon: 'PLAYLIST_PLAY',
                     value: null,
                     menuId: 'tt-playlist-batch-collect-settings',
                     options: [
                         {
-                            name: 'Load All Batches at Once',
+                            name: t('settings.options.uiSettings.options.playlistBatchLoad.loadAllAtOnce'),
                             icon: 'PLAYLIST_PLAY',
                             value: 'enablePlaylistBatchCollect'
                         },
                         {
-                            name: 'Max Batches to Fetch',
+                            name: t('settings.options.uiSettings.options.playlistBatchLoad.maxBatches'),
                             value: null,
                             menuId: 'tt-playlist-batch-max',
                             menuHeader: {
-                                title: 'Max Batches to Fetch',
-                                subtitle: 'Maximum number of batches to fetch at once (each batch = 15 videos). Higher = more complete but slower initial load.'
+                                title: t('settings.options.uiSettings.options.playlistBatchLoad.maxBatches'),
+                                subtitle: t('settings.options.uiSettings.options.playlistBatchLoad.maxBatchesSubtitle')
                             },
                             options: [10, 20, 50, 100, 200].map((n) => ({
-                                name: `${n} batches (~${n * 15} videos)`,
+                                name: t('settings.options.uiSettings.options.playlistBatchLoad.maxBatchesOption', { n, videos: n * 15 }),
                                 key: 'playlistBatchCollectMaxBatches',
                                 value: n
                             }))
@@ -695,19 +657,19 @@ export default function modernUI(update, parameters) {
                     ]
                 },
                 {
-                    name: 'Library Tabs Buttons to Hide',
+                    name: t('settings.options.uiSettings.options.libraryTabs.title'),
                     icon: 'TAB_LIBRARY',
                     value: null,
                     arrayToEdit: 'hiddenLibraryTabIds',
                     menuId: 'tt-hidden-library-tabs',
                     options: [
-                        { name: 'Music', value: 'femusic_last_played' },
-                        { name: 'Movies & Shows', value: 'festorefront' },
-                        { name: 'Podcasts', value: 'fecollection_podcasts' },
-                        { name: 'My Videos', value: 'femy_videos' },
-                        { name: 'History', value: 'fehistory' },
-                        { name: 'Watch Later', value: 'femy_youtube' },
-                        { name: 'Playlists', value: 'feplaylist_aggregation' }
+                        { name: t('settings.options.uiSettings.options.libraryTabs.options.music'), value: 'femusic_last_played' },
+                        { name: t('settings.options.uiSettings.options.libraryTabs.options.moviesShows'), value: 'festorefront' },
+                        { name: t('settings.options.uiSettings.options.libraryTabs.options.podcasts'), value: 'fecollection_podcasts' },
+                        { name: t('settings.options.uiSettings.options.libraryTabs.options.myVideos'), value: 'femy_videos' },
+                        { name: t('settings.options.uiSettings.options.libraryTabs.options.history'), value: 'fehistory' },
+                        { name: t('settings.options.uiSettings.options.libraryTabs.options.watchLater'), value: 'femy_youtube' },
+                        { name: t('settings.options.uiSettings.options.libraryTabs.options.playlists'), value: 'feplaylist_aggregation' }
                     ]
                 },
                 {
@@ -769,66 +731,18 @@ export default function modernUI(update, parameters) {
                         subtitle: t('settings.options.uiSettings.options.disableSidebarContents.subtitle')
                     },
                     options: [
-                        {
-                            name: 'Search',
-                            icon: 'SEARCH',
-                            value: 'SEARCH'
-                        },
-                        {
-                            name: 'Home',
-                            icon: 'WHAT_TO_WATCH',
-                            value: 'WHAT_TO_WATCH'
-                        },
-                        {
-                            name: 'Sports',
-                            icon: 'TROPHY',
-                            value: 'TROPHY'
-                        },
-                        {
-                            name: 'News',
-                            icon: 'NEWS',
-                            value: 'NEWS'
-                        },
-                        {
-                            name: 'Music',
-                            icon: 'YOUTUBE_MUSIC',
-                            value: 'YOUTUBE_MUSIC'
-                        },
-                        {
-                            name: 'Podcasts',
-                            icon: 'BROADCAST',
-                            value: 'BROADCAST'
-                        },
-                        {
-                            name: 'Movies & TV',
-                            icon: 'CLAPPERBOARD',
-                            value: 'CLAPPERBOARD'
-                        },
-                        {
-                            name: 'Live',
-                            icon: 'LIVE',
-                            value: 'LIVE'
-                        },
-                        {
-                            name: 'Gaming',
-                            icon: 'GAMING',
-                            value: 'GAMING'
-                        },
-                        {
-                            name: 'Subscriptions',
-                            icon: 'SUBSCRIPTIONS',
-                            value: 'SUBSCRIPTIONS'
-                        },
-                        {
-                            name: 'Library',
-                            icon: 'TAB_LIBRARY',
-                            value: 'TAB_LIBRARY'
-                        },
-                        {
-                            name: 'More',
-                            icon: 'TAB_MORE',
-                            value: 'TAB_MORE'
-                        }
+                        { name: t('settings.options.uiSettings.options.nav.search'), icon: 'SEARCH', value: 'SEARCH' },
+                        { name: t('settings.options.uiSettings.options.nav.home'), icon: 'WHAT_TO_WATCH', value: 'WHAT_TO_WATCH' },
+                        { name: t('settings.options.uiSettings.options.nav.sports'), icon: 'TROPHY', value: 'TROPHY' },
+                        { name: t('settings.options.uiSettings.options.nav.news'), icon: 'NEWS', value: 'NEWS' },
+                        { name: t('settings.options.uiSettings.options.nav.music'), icon: 'YOUTUBE_MUSIC', value: 'YOUTUBE_MUSIC' },
+                        { name: t('settings.options.uiSettings.options.nav.podcasts'), icon: 'BROADCAST', value: 'BROADCAST' },
+                        { name: t('settings.options.uiSettings.options.nav.moviesTV'), icon: 'CLAPPERBOARD', value: 'CLAPPERBOARD' },
+                        { name: t('settings.options.uiSettings.options.nav.live'), icon: 'LIVE', value: 'LIVE' },
+                        { name: t('settings.options.uiSettings.options.nav.gaming'), icon: 'GAMING', value: 'GAMING' },
+                        { name: t('settings.options.uiSettings.options.nav.subscriptions'), icon: 'SUBSCRIPTIONS', value: 'SUBSCRIPTIONS' },
+                        { name: t('settings.options.uiSettings.options.nav.library'), icon: 'TAB_LIBRARY', value: 'TAB_LIBRARY' },
+                        { name: t('settings.options.uiSettings.options.nav.more'), icon: 'TAB_MORE', value: 'TAB_MORE' }
                     ]
                 },
                 {
@@ -841,102 +755,18 @@ export default function modernUI(update, parameters) {
                         subtitle: t('settings.options.uiSettings.options.launchToOnStartup.subtitle')
                     },
                     options: [
-                        {
-                            name: 'Search',
-                            icon: 'SEARCH',
-                            key: 'launchToOnStartup',
-                            value: JSON.stringify({
-                                searchEndpoint: { query: '' }
-                            })
-                        },
-                        {
-                            name: 'Home',
-                            icon: 'WHAT_TO_WATCH',
-                            key: 'launchToOnStartup',
-                            value: JSON.stringify({
-                                browseEndpoint: { browseId: 'FEtopics' }
-                            })
-                        },
-                        {
-                            name: 'Sports',
-                            icon: 'TROPHY',
-                            key: 'launchToOnStartup',
-                            value: JSON.stringify({
-                                browseEndpoint: { browseId: 'FEtopics_sports' }
-                            })
-                        },
-                        {
-                            name: 'News',
-                            icon: 'NEWS',
-                            key: 'launchToOnStartup',
-                            value: JSON.stringify({
-                                browseEndpoint: { browseId: 'FEtopics_news' }
-                            })
-                        },
-                        {
-                            name: 'Music',
-                            icon: 'YOUTUBE_MUSIC',
-                            key: 'launchToOnStartup',
-                            value: JSON.stringify({
-                                browseEndpoint: { browseId: 'FEtopics_music' }
-                            })
-                        },
-                        {
-                            name: 'Podcasts',
-                            icon: 'BROADCAST',
-                            key: 'launchToOnStartup',
-                            value: JSON.stringify({
-                                browseEndpoint: { browseId: 'FEtopics_podcasts' }
-                            })
-                        },
-                        {
-                            name: 'Movies & TV',
-                            icon: 'CLAPPERBOARD',
-                            key: 'launchToOnStartup',
-                            value: JSON.stringify({
-                                browseEndpoint: { browseId: 'FEtopics_movies' }
-                            })
-                        },
-                        {
-                            name: 'Gaming',
-                            icon: 'GAMING',
-                            key: 'launchToOnStartup',
-                            value: JSON.stringify({
-                                browseEndpoint: { browseId: 'FEtopics_gaming' }
-                            })
-                        },
-                        {
-                            name: 'Live',
-                            icon: 'LIVE',
-                            key: 'launchToOnStartup',
-                            value: JSON.stringify({
-                                browseEndpoint: { browseId: 'FEtopics_live' }
-                            })
-                        },
-                        {
-                            name: 'Subscriptions',
-                            icon: 'SUBSCRIPTIONS',
-                            key: 'launchToOnStartup',
-                            value: JSON.stringify({
-                                browseEndpoint: { browseId: 'FEsubscriptions' }
-                            })
-                        },
-                        {
-                            name: 'Library',
-                            icon: 'TAB_LIBRARY',
-                            key: 'launchToOnStartup',
-                            value: JSON.stringify({
-                                browseEndpoint: { browseId: 'FElibrary' }
-                            })
-                        },
-                        {
-                            name: 'More',
-                            icon: 'TAB_MORE',
-                            key: 'launchToOnStartup',
-                            value: JSON.stringify({
-                                browseEndpoint: { browseId: 'FEtopics_more' }
-                            })
-                        }
+                        { name: t('settings.options.uiSettings.options.nav.search'), icon: 'SEARCH', key: 'launchToOnStartup', value: JSON.stringify({ searchEndpoint: { query: '' } }) },
+                        { name: t('settings.options.uiSettings.options.nav.home'), icon: 'WHAT_TO_WATCH', key: 'launchToOnStartup', value: JSON.stringify({ browseEndpoint: { browseId: 'FEtopics' } }) },
+                        { name: t('settings.options.uiSettings.options.nav.sports'), icon: 'TROPHY', key: 'launchToOnStartup', value: JSON.stringify({ browseEndpoint: { browseId: 'FEtopics_sports' } }) },
+                        { name: t('settings.options.uiSettings.options.nav.news'), icon: 'NEWS', key: 'launchToOnStartup', value: JSON.stringify({ browseEndpoint: { browseId: 'FEtopics_news' } }) },
+                        { name: t('settings.options.uiSettings.options.nav.music'), icon: 'YOUTUBE_MUSIC', key: 'launchToOnStartup', value: JSON.stringify({ browseEndpoint: { browseId: 'FEtopics_music' } }) },
+                        { name: t('settings.options.uiSettings.options.nav.podcasts'), icon: 'BROADCAST', key: 'launchToOnStartup', value: JSON.stringify({ browseEndpoint: { browseId: 'FEtopics_podcasts' } }) },
+                        { name: t('settings.options.uiSettings.options.nav.moviesTV'), icon: 'CLAPPERBOARD', key: 'launchToOnStartup', value: JSON.stringify({ browseEndpoint: { browseId: 'FEtopics_movies' } }) },
+                        { name: t('settings.options.uiSettings.options.nav.gaming'), icon: 'GAMING', key: 'launchToOnStartup', value: JSON.stringify({ browseEndpoint: { browseId: 'FEtopics_gaming' } }) },
+                        { name: t('settings.options.uiSettings.options.nav.live'), icon: 'LIVE', key: 'launchToOnStartup', value: JSON.stringify({ browseEndpoint: { browseId: 'FEtopics_live' } }) },
+                        { name: t('settings.options.uiSettings.options.nav.subscriptions'), icon: 'SUBSCRIPTIONS', key: 'launchToOnStartup', value: JSON.stringify({ browseEndpoint: { browseId: 'FEsubscriptions' } }) },
+                        { name: t('settings.options.uiSettings.options.nav.library'), icon: 'TAB_LIBRARY', key: 'launchToOnStartup', value: JSON.stringify({ browseEndpoint: { browseId: 'FElibrary' } }) },
+                        { name: t('settings.options.uiSettings.options.nav.more'), icon: 'TAB_MORE', key: 'launchToOnStartup', value: JSON.stringify({ browseEndpoint: { browseId: 'FEtopics_more' } }) }
                     ]
                 },
                 {
