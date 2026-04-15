@@ -79,6 +79,7 @@ function sendViaHttp(entry) {
       xhr.onload    = () => resolve();
       xhr.onerror   = () => reject(new Error('http_relay_error'));
       xhr.ontimeout = () => reject(new Error('http_relay_timeout'));
+      xhr.setRequestHeader('Content-Type', 'text/plain');
       xhr.send(body);
     } catch (err) {
       reject(err);
