@@ -18,7 +18,6 @@ export default {
             browser: true,
             preferBuiltins: false,
         }),
-        json(),
         commonjs({
             include: [/node_modules/, /mods/],
             transformMixedEsModules: true,
