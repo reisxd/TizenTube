@@ -401,6 +401,7 @@ export default function modernUI(update, parameters) {
                 },
                 {
                     name: t('settings.options.misc.options.logServer.title'),
+                    icon: 'ARTICLE',
                     value: null,
                     menuId: 'tt-log-server-settings',
                     options: [
@@ -613,18 +614,18 @@ export default function modernUI(update, parameters) {
                             arrayToEdit: 'hideWatchedVideosPages',
                             menuId: 'tt-hide-watched-videos-pages',
                             options: [
-                                { name: t('settings.options.uiSettings.options.hideWatchedVideos.options.pages.search'), value: 'search' },
-                                { name: t('settings.options.uiSettings.options.hideWatchedVideos.options.pages.home'), value: 'home' },
-                                { name: t('settings.options.uiSettings.options.hideWatchedVideos.options.pages.music'), value: 'music' },
-                                { name: t('settings.options.uiSettings.options.hideWatchedVideos.options.pages.gaming'), value: 'gaming' },
-                                { name: t('settings.options.uiSettings.options.hideWatchedVideos.options.pages.subscriptions'), value: 'subscriptions' },
-                                { name: t('settings.options.uiSettings.options.hideWatchedVideos.options.pages.channel'), value: 'channel' },
-                                { name: t('settings.options.uiSettings.options.hideWatchedVideos.options.pages.library'), value: 'library' },
+                                { name: t('settings.options.uiSettings.options.hideWatchedVideos.options.pages.search'), icon: 'SEARCH', value: 'search' },
+                                { name: t('settings.options.uiSettings.options.hideWatchedVideos.options.pages.home'), icon: 'WHAT_TO_WATCH', value: 'home' },
+                                { name: t('settings.options.uiSettings.options.hideWatchedVideos.options.pages.music'), icon: 'YOUTUBE_MUSIC', value: 'music' },
+                                { name: t('settings.options.uiSettings.options.hideWatchedVideos.options.pages.gaming'), icon: 'GAMING', value: 'gaming' },
+                                { name: t('settings.options.uiSettings.options.hideWatchedVideos.options.pages.subscriptions'), icon: 'SUBSCRIPTIONS', value: 'subscriptions' },
+                                { name: t('settings.options.uiSettings.options.hideWatchedVideos.options.pages.channel'), icon: 'ACCOUNT_BOX', value: 'channel' },
+                                { name: t('settings.options.uiSettings.options.hideWatchedVideos.options.pages.library'), icon: 'TAB_LIBRARY', value: 'library' },
                                 { name: t('settings.options.uiSettings.options.hideWatchedVideos.options.pages.playlists'), icon: 'PLAYLIST_PLAY', value: 'playlists' },
                                 { name: t('settings.options.uiSettings.options.hideWatchedVideos.options.pages.playlist'), icon: 'PLAYLIST_PLAY', value: 'playlist' },
                                 { name: t('settings.options.uiSettings.options.hideWatchedVideos.options.pages.history'), icon: 'HISTORY', value: 'history' },
-                                { name: t('settings.options.uiSettings.options.hideWatchedVideos.options.pages.more'), value: 'more' },
-                                { name: t('settings.options.uiSettings.options.hideWatchedVideos.options.pages.watch'), value: 'watch' }
+                                { name: t('settings.options.uiSettings.options.hideWatchedVideos.options.pages.more'), icon: 'TAB_MORE', value: 'more' },
+                                { name: t('settings.options.uiSettings.options.hideWatchedVideos.options.pages.watch'), icon: 'PLAY_ARROW', value: 'watch' }
                             ]
                         }
                     ]
@@ -663,13 +664,13 @@ export default function modernUI(update, parameters) {
                     arrayToEdit: 'hiddenLibraryTabIds',
                     menuId: 'tt-hidden-library-tabs',
                     options: [
-                        { name: t('settings.options.uiSettings.options.libraryTabs.options.music'), value: 'femusic_last_played' },
-                        { name: t('settings.options.uiSettings.options.libraryTabs.options.moviesShows'), value: 'festorefront' },
-                        { name: t('settings.options.uiSettings.options.libraryTabs.options.podcasts'), value: 'fecollection_podcasts' },
-                        { name: t('settings.options.uiSettings.options.libraryTabs.options.myVideos'), value: 'femy_videos' },
-                        { name: t('settings.options.uiSettings.options.libraryTabs.options.history'), value: 'fehistory' },
-                        { name: t('settings.options.uiSettings.options.libraryTabs.options.watchLater'), value: 'femy_youtube' },
-                        { name: t('settings.options.uiSettings.options.libraryTabs.options.playlists'), value: 'feplaylist_aggregation' }
+                        { name: t('settings.options.uiSettings.options.libraryTabs.options.music'), icon: 'YOUTUBE_MUSIC', value: 'femusic_last_played' },
+                        { name: t('settings.options.uiSettings.options.libraryTabs.options.moviesShows'), icon: 'CLAPPERBOARD', value: 'festorefront' },
+                        { name: t('settings.options.uiSettings.options.libraryTabs.options.podcasts'), icon: 'BROADCAST', value: 'fecollection_podcasts' },
+                        { name: t('settings.options.uiSettings.options.libraryTabs.options.myVideos'), icon: 'VIDEO_YOUTUBE', value: 'femy_videos' },
+                        { name: t('settings.options.uiSettings.options.libraryTabs.options.history'), icon: 'HISTORY', value: 'fehistory' },
+                        { name: t('settings.options.uiSettings.options.libraryTabs.options.watchLater'), icon: 'WATCH_LATER', value: 'femy_youtube' },
+                        { name: t('settings.options.uiSettings.options.libraryTabs.options.playlists'), icon: 'PLAYLIST_PLAY', value: 'feplaylist_aggregation' }
                     ]
                 },
                 {
