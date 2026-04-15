@@ -1,5 +1,6 @@
 import { configRead } from '../config.js';
 import { appendFileOnlyLog, hideVideo, getPlaylistButtons, injectPlaylistButton } from './hideWatched.js';
+import { t } from 'i18next';
 
 function _log(label, payload) {
   appendFileOnlyLog(label, payload);
@@ -81,7 +82,7 @@ JSON.parse = function () {
       if (hasPlaylist) {
         const buttons = getPlaylistButtons(r);
         if (buttons) {
-          const injected = injectPlaylistButton(buttons, 'PLAYLIST_CONTINUE', 'Continue', 'PLAY_ARROW');
+          const injected = injectPlaylistButton(buttons, 'PLAYLIST_CONTINUE', t('playlist.continue'), 'PLAY_ARROW');
           if (injected) _log('playlist.continue.injected', { totalButtons: buttons.length });
         }
       }

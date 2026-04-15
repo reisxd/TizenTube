@@ -57,7 +57,40 @@
                     "videoPreviews": "Videovorschauen aktivieren",
                     "ttWelcomeMsg": "TT-Begrüßungsnachricht anzeigen",
                     "guestSignInReminder": "Gast-Anmeldeerinnerung anzeigen",
-                    "reloadHomeOnStartup": "Startseite beim Start neu laden"
+                    "reloadHomeOnStartup": "Startseite beim Start neu laden",
+                    "debugConsole": {
+                        "title": "Debug-Konsole",
+                        "enable": "Debug-Konsole aktivieren",
+                        "enableLogging": "Hintergrund-Debug-Protokollierung aktivieren",
+                        "position": "Konsolenposition",
+                        "positions": {
+                            "topLeft": "Oben links",
+                            "topRight": "Oben rechts",
+                            "bottomLeft": "Unten links",
+                            "bottomRight": "Unten rechts",
+                            "center": "Mitte"
+                        },
+                        "height": "Konsolenhöhe"
+                    },
+                    "logServer": {
+                        "title": "Fernprotokoll-Server",
+                        "enable": "Server aktivieren",
+                        "ipEditor": "Server-IP (Oktet-Editor)",
+                        "ipEditorSubtitle": "Jeden Oktet mit +/- anpassen",
+                        "ipMenuTitle": "Fernprotokoll-Server-IP",
+                        "octetNames": {
+                            "first": "Erster",
+                            "second": "Zweiter",
+                            "third": "Dritter",
+                            "fourth": "Vierter"
+                        },
+                        "octetLabel": "{{label}} Oktet ({{value}})",
+                        "octetMenuTitle": "{{label}} IP-Oktet",
+                        "octetSubtitle": "Diesen Oktet mit +/- anpassen",
+                        "port": "Server-Port",
+                        "test": "Server-Verbindung testen",
+                        "testSubtitle": "Sendet einen Test-POST an /tv-log (funktioniert auch wenn der Server deaktiviert ist)"
+                    }
                 }
             },
             "subtitles": {
@@ -111,7 +144,21 @@
                                 "title": "Schwellenwert für angesehene Videos",
                                 "subtitle": "Lege den Prozentsatz fest, ab dem Videos als angesehen gelten und ausgeblendet werden"
                             },
-                            "setPagesToHideWatchedVideos": "Seiten festlegen, auf denen angesehene Videos ausgeblendet werden"
+                            "setPagesToHideWatchedVideos": "Seiten festlegen, auf denen angesehene Videos ausgeblendet werden",
+                            "pages": {
+                                "search": "Suchergebnisse",
+                                "home": "Startseite",
+                                "music": "Musik",
+                                "gaming": "Gaming",
+                                "subscriptions": "Abonnements",
+                                "channel": "Kanalseiten",
+                                "library": "Bibliothek",
+                                "playlists": "Bibliothek → Playlist-Übersicht",
+                                "playlist": "Bibliothek → Einzelne Playlists (SFW, LL usw.)",
+                                "history": "Bibliothek → Verlauf",
+                                "more": "Mehr",
+                                "watch": "Video anschauen"
+                            }
                         }
                     },
                     "screenDimming": {
@@ -136,7 +183,40 @@
                         "title": "Startseite beim Start",
                         "subtitle": "Wähle die Standardseite, die TizenTube beim Start öffnet"
                     },
-                    "sortSubscriptionsByAlphabet": "Sort Subscriptions Alphabetically"
+                    "sortSubscriptionsByAlphabet": "Abonnements alphabetisch sortieren",
+                    "playlistBatchLoad": {
+                        "title": "Playlist-Stapelladen",
+                        "loadAllAtOnce": "Alle Stapel auf einmal laden",
+                        "maxBatches": "Maximale Stapelanzahl",
+                        "maxBatchesSubtitle": "Maximale Anzahl an Stapeln, die auf einmal geladen werden (jeder Stapel = 15 Videos). Höher = vollständiger, aber langsamerer erster Ladevorgang.",
+                        "maxBatchesOption": "{{n}} Stapel (~{{videos}} Videos)"
+                    },
+                    "libraryTabs": {
+                        "title": "Bibliotheks-Tabs ausblenden",
+                        "options": {
+                            "music": "Musik",
+                            "moviesShows": "Filme & Serien",
+                            "podcasts": "Podcasts",
+                            "myVideos": "Meine Videos",
+                            "history": "Verlauf",
+                            "watchLater": "Später ansehen",
+                            "playlists": "Playlists"
+                        }
+                    },
+                    "nav": {
+                        "search": "Suche",
+                        "home": "Startseite",
+                        "sports": "Sport",
+                        "news": "Nachrichten",
+                        "music": "Musik",
+                        "podcasts": "Podcasts",
+                        "moviesTV": "Filme & TV",
+                        "live": "Live",
+                        "gaming": "Gaming",
+                        "subscriptions": "Abonnements",
+                        "library": "Bibliothek",
+                        "more": "Mehr"
+                    }
                 }
             },
             "updater": {
@@ -166,6 +246,10 @@
                 "6": "- GitHub Sponsors: https://github.com/sponsors/reisxd"
             }
         }
+    },
+    "playlist": {
+        "allHidden": "Alle Videos in dieser Playlist sind ausgeblendet. Verlasse die Playlist, um die Meldung zu schließen.",
+        "continue": "Weiter"
     },
     "welcomeMsg": {
         "title": "Willkommen bei TizenTube",

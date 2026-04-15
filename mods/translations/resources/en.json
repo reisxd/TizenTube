@@ -57,7 +57,40 @@
                     "videoPreviews": "Enable Video Previews",
                     "ttWelcomeMsg": "Show TT Welcome Message",
                     "guestSignInReminder": "Show Guest Sign In Reminder",
-                    "reloadHomeOnStartup": "Reload Home on Startup"
+                    "reloadHomeOnStartup": "Reload Home on Startup",
+                    "debugConsole": {
+                        "title": "Debug Console",
+                        "enable": "Enable Debug Console",
+                        "enableLogging": "Enable Background Debug Logging",
+                        "position": "Console Position",
+                        "positions": {
+                            "topLeft": "Top Left",
+                            "topRight": "Top Right",
+                            "bottomLeft": "Bottom Left",
+                            "bottomRight": "Bottom Right",
+                            "center": "Center"
+                        },
+                        "height": "Console Height"
+                    },
+                    "logServer": {
+                        "title": "Remote Log Server",
+                        "enable": "Enable Log Server",
+                        "ipEditor": "Server IP (Octet Editor)",
+                        "ipEditorSubtitle": "Adjust each octet with +/- controls",
+                        "ipMenuTitle": "Remote Log Server IP",
+                        "octetNames": {
+                            "first": "First",
+                            "second": "Second",
+                            "third": "Third",
+                            "fourth": "Fourth"
+                        },
+                        "octetLabel": "{{label}} octet ({{value}})",
+                        "octetMenuTitle": "{{label}} IP Octet",
+                        "octetSubtitle": "Adjust this octet with +/- controls",
+                        "port": "Server Port",
+                        "test": "Test Log Server Connection",
+                        "testSubtitle": "Send a test POST to /tv-log (works even if Log Server is disabled)"
+                    }
                 }
             },
             "subtitles": {
@@ -111,7 +144,21 @@
                                 "title": "Watched Videos Threshold",
                                 "subtitle": "Set the percentage threshold for hiding watched videos"
                             },
-                            "setPagesToHideWatchedVideos": "Set Pages to Hide Watched Videos"
+                            "setPagesToHideWatchedVideos": "Set Pages to Hide Watched Videos",
+                        "pages": {
+                            "search": "Search Results",
+                            "home": "Home",
+                            "music": "Music",
+                            "gaming": "Gaming",
+                            "subscriptions": "Subscriptions",
+                            "channel": "Channel Pages",
+                            "library": "Library",
+                            "playlists": "Library → Playlists Overview",
+                            "playlist": "Library → Individual Playlists (WL, LL, etc)",
+                            "history": "Library → History",
+                            "more": "More",
+                            "watch": "Watch"
+                        }
                         }
                     },
                     "screenDimming": {
@@ -136,7 +183,40 @@
                         "title": "Launch To on Startup",
                         "subtitle": "Choose the default page TizenTube opens to on startup"
                     },
-                    "sortSubscriptionsByAlphabet": "Sort Subscriptions Alphabetically"
+                    "sortSubscriptionsByAlphabet": "Sort Subscriptions Alphabetically",
+                    "playlistBatchLoad": {
+                        "title": "Playlist Batch Load",
+                        "loadAllAtOnce": "Load All Batches at Once",
+                        "maxBatches": "Max Batches to Fetch",
+                        "maxBatchesSubtitle": "Maximum number of batches to fetch at once (each batch = 15 videos). Higher = more complete but slower initial load.",
+                        "maxBatchesOption": "{{n}} batches (~{{videos}} videos)"
+                    },
+                    "libraryTabs": {
+                        "title": "Library Tabs Buttons to Hide",
+                        "options": {
+                            "music": "Music",
+                            "moviesShows": "Movies & Shows",
+                            "podcasts": "Podcasts",
+                            "myVideos": "My Videos",
+                            "history": "History",
+                            "watchLater": "Watch Later",
+                            "playlists": "Playlists"
+                        }
+                    },
+                    "nav": {
+                        "search": "Search",
+                        "home": "Home",
+                        "sports": "Sports",
+                        "news": "News",
+                        "music": "Music",
+                        "podcasts": "Podcasts",
+                        "moviesTV": "Movies & TV",
+                        "live": "Live",
+                        "gaming": "Gaming",
+                        "subscriptions": "Subscriptions",
+                        "library": "Library",
+                        "more": "More"
+                    }
                 }
             },
             "updater": {
@@ -166,6 +246,10 @@
                 "6": "- GitHub Sponsors: https://github.com/sponsors/reisxd"
             }
         }
+    },
+    "playlist": {
+        "allHidden": "All videos in this playlist are hidden. Leave playlist to dismiss.",
+        "continue": "Continue"
     },
     "welcomeMsg": {
         "title": "Welcome to TizenTube",
