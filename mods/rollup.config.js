@@ -10,6 +10,7 @@ export default {
     input: "userScript.js",
     output: { file: "../dist/userScript.js", format: "iife" },
     plugins: [
+        json(),
         string({
             include: "**/*.css",
         }),
@@ -17,7 +18,6 @@ export default {
             browser: true,
             preferBuiltins: false,
         }),
-        json(),
         commonjs({
             include: [/node_modules/, /mods/],
             transformMixedEsModules: true,

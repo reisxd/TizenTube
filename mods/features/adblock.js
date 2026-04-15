@@ -3,6 +3,7 @@ import Chapters from '../ui/chapters.js';
 import resolveCommand from '../resolveCommand.js';
 import { timelyAction, longPressData, MenuServiceItemRenderer, ShelfRenderer, TileRenderer, ButtonRenderer, showToast } from '../ui/ytUI.js';
 import { PatchSettings } from '../ui/customYTSettings.js';
+import { t } from 'i18next';
 import './logServer.js';
 import './playlistBatchCollect.js';
 import {
@@ -626,7 +627,7 @@ JSON.parse = function () {
           if (window?.sponsorblock?.segments) {
             for (const segment of window.sponsorblock.segments) {
               if (manualSkippedSegments.includes(segment.category)) {
-                timelyActions.push(timelyAction(`Skip ${segment.category}`, 'SKIP_NEXT', { clickTrackingParams: null, showEngagementPanelEndpoint: { customAction: { action: 'SKIP', parameters: { time: segment.segment[1] } } } }, segment.segment[0] * 1000, segment.segment[1] * 1000 - segment.segment[0] * 1000));
+                timelyActions.push(timelyAction(t('sponsorblock.toasts.skip', { segment: segment.category }), 'SKIP_NEXT', { clickTrackingParams: null, showEngagementPanelEndpoint: { customAction: { action: 'SKIP', parameters: { time: segment.segment[1] } } } }, segment.segment[0] * 1000, segment.segment[1] * 1000 - segment.segment[0] * 1000));
               }
             }
             r.playerOverlays.playerOverlayRenderer.timelyActionRenderers = timelyActions;
@@ -640,7 +641,7 @@ JSON.parse = function () {
           if (window?.sponsorblock?.segments) {
             const category = window.sponsorblock.segments.find(seg => seg.category === 'poi_highlight');
             if (category) {
-              r.transportControls.transportControlsRenderer.promotedActions.push({ type: 'TRANSPORT_CONTROLS_BUTTON_TYPE_SPONSORBLOCK_HIGHLIGHT', button: { buttonRenderer: ButtonRenderer(false, 'Skip to highlight', 'SKIP_NEXT', { clickTrackingParams: null, customAction: { action: 'SKIP', parameters: { time: category.segment[0] } } }) } });
+              r.transportControls.transportControlsRenderer.promotedActions.push({ type: 'TRANSPORT_CONTROLS_BUTTON_TYPE_SPONSORBLOCK_HIGHLIGHT', button: { buttonRenderer: ButtonRenderer(false, t('sponsorblock.toasts.skipToHighlight'), 'SKIP_NEXT', { clickTrackingParams: null, customAction: { action: 'SKIP', parameters: { time: category.segment[0] } } }) } });
             }
           }
         } catch (_) { }
@@ -1054,4 +1055,3 @@ function addLongPress(items) {
     } catch (error) { appendFileOnlyLog('addLongPress.item.error', { message: error?.message || String(error) }); }
   }
 }
-

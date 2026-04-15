@@ -1,18 +1,55 @@
 import sha256 from '../tiny-sha256.js';
 import { configRead } from '../config.js';
 import { showToast } from '../ui/ytUI.js';
+import { t } from 'i18next';
 
 // Copied from https://github.com/ajayyy/SponsorBlock/blob/da1a535de784540ee10166a75a3eb8537073838c/src/config.ts#L113-L134
 const barTypes = {
-  sponsor:        { color: '#00d400', opacity: '0.7', name: 'sponsored segment' },
-  intro:          { color: '#00ffff', opacity: '0.7', name: 'intro' },
-  outro:          { color: '#0202ed', opacity: '0.7', name: 'outro' },
-  interaction:    { color: '#cc00ff', opacity: '0.7', name: 'interaction reminder' },
-  selfpromo:      { color: '#ffff00', opacity: '0.7', name: 'self-promotion' },
-  preview:        { color: '#008fd6', opacity: '0.7', name: 'recap or preview' },
-  filler:         { color: '#7300FF', opacity: '0.9', name: 'tangents' },
-  music_offtopic: { color: '#ff9900', opacity: '0.7', name: 'non-music part' },
-  poi_highlight:  { color: '#9b044c', opacity: '0.7', name: 'highlight' }
+  sponsor: {
+    color: '#00d400',
+    opacity: '0.7',
+    name: t('sponsorblock.segments.sponsor') || 'sponsored segment'
+  },
+  intro: {
+    color: '#00ffff',
+    opacity: '0.7',
+    name: t('sponsorblock.segments.intro') || 'intro'
+  },
+  outro: {
+    color: '#0202ed',
+    opacity: '0.7',
+    name: t('sponsorblock.segments.outro') || 'outro'
+  },
+  interaction: {
+    color: '#cc00ff',
+    opacity: '0.7',
+    name: t('sponsorblock.segments.interaction') || 'interaction reminder'
+  },
+  selfpromo: {
+    color: '#ffff00',
+    opacity: '0.7',
+    name: t('sponsorblock.segments.selfpromo') || 'self-promotion'
+  },
+  preview: {
+    color: '#008fd6',
+    opacity: '0.7',
+    name: t('sponsorblock.segments.preview') || 'recap or preview'
+  },
+  filler: {
+    color: "#7300FF",
+    opacity: "0.9",
+    name: t('sponsorblock.segments.filler') || 'tangents'
+  },
+  music_offtopic: {
+    color: '#ff9900',
+    opacity: '0.7',
+    name: t('sponsorblock.segments.music_offtopic') || 'non-music part'
+  },
+  poi_highlight: {
+    color: '#9b044c',
+    opacity: '0.7',
+    name: t('sponsorblock.segments.poi_highlight') || 'highlight'
+  }
 };
 
 const sponsorblockAPI = 'https://sponsor.ajay.app/api';
@@ -306,7 +343,7 @@ class SponsorBlockHandler {
             if (wasSkippedBefore.lastSkipped - wasSkippedBefore.firstSkipped < 1000) {
               if (!wasSkippedBefore.hasShownToast) {
                 if (configRead('enableSponsorBlockToasts')) {
-                  showToast('SponsorBlock', `Not skipping ${skipName} (was skipped ${wasSkippedBefore.count} times)`);
+                  showToast('SponsorBlock', t('sponsorblock.toasts.notSkipping', { segment: skipName, count: wasSkippedBefore.count }));
                 }
                 wasSkippedBefore.hasShownToast = true;
                 this.skippedCategories.set(segment.UUID, wasSkippedBefore);
@@ -323,7 +360,7 @@ class SponsorBlockHandler {
           }
 
           if (configRead('enableSponsorBlockToasts')) {
-            showToast('SponsorBlock', `Skipping ${skipName}`);
+            showToast('SponsorBlock', t('sponsorblock.toasts.skipping', { segment: skipName }));
           }
           if (this.video.duration - end < 1) {
             this.video.currentTime = end - 1;
