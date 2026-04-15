@@ -22,11 +22,11 @@ export function buildLogServerIpEditorOptions() {
         const current = octets[i];
         const label = t(`settings.options.misc.options.logServer.octetNames.${octetKeys[i]}`);
         options.push({
-            name: `${label} octet (${current})`,
+            name: t('settings.options.misc.options.logServer.octetLabel', { label, value: current }),
             value: null,
             menuId: `tt-log-server-ip-octet-${i}`,
             menuHeader: {
-                title: `${label} IP Octet`,
+                title: t('settings.options.misc.options.logServer.octetMenuTitle', { label }),
                 subtitle: t('settings.options.misc.options.logServer.octetSubtitle')
             },
             options: [

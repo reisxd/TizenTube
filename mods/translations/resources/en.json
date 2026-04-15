@@ -84,6 +84,8 @@
                             "third": "Third",
                             "fourth": "Fourth"
                         },
+                        "octetLabel": "{{label}} octet ({{value}})",
+                        "octetMenuTitle": "{{label}} IP Octet",
                         "octetSubtitle": "Adjust this octet with +/- controls",
                         "port": "Server Port",
                         "test": "Test Log Server Connection",

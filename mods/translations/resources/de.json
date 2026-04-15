@@ -84,6 +84,8 @@
                             "third": "Dritter",
                             "fourth": "Vierter"
                         },
+                        "octetLabel": "{{label}} Oktet ({{value}})",
+                        "octetMenuTitle": "{{label}} IP-Oktet",
                         "octetSubtitle": "Diesen Oktet mit +/- anpassen",
                         "port": "Server-Port",
                         "test": "Server-Verbindung testen",
