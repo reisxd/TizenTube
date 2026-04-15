@@ -21,9 +21,11 @@ function logServerUrlFromConfig() {
 
 function sendRemotePayload(url, payload) {
     const body = JSON.stringify(payload);
+    // Use text/plain to avoid CORS preflight (simple request — no OPTIONS needed).
+    // The PS1 receiver reads the raw body and parses it as JSON regardless of Content-Type.
     try {
         if (navigator?.sendBeacon) {
-            const ok = navigator.sendBeacon(url, new Blob([body], { type: 'application/json' }));
+            const ok = navigator.sendBeacon(url, new Blob([body], { type: 'text/plain' }));
             if (ok) return Promise.resolve();
         }
     } catch (_) {}
@@ -32,7 +34,6 @@ function sendRemotePayload(url, payload) {
         try {
             const xhr = new XMLHttpRequest();
             xhr.open('POST', url, true);
-            xhr.setRequestHeader('Content-Type', 'application/json');
             xhr.timeout = 4000;
             xhr.onload = () => resolve();
             xhr.onerror = () => reject(new Error('xhr_error'));
