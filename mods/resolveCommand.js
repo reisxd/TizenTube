@@ -1,24 +1,12 @@
 import { configWrite, configRead } from './config.js';
 import { enablePip } from './features/pictureInPicture.js';
-import modernUI, { optionShow, buildLogServerIpEditorOptions } from './ui/settings.js';
+import modernUI, { optionShow } from './ui/settings.js';
 import { speedSettings } from './ui/speedUI.js';
 import { showToast, buttonItem } from './ui/ytUI.js';
 import checkForUpdates from './features/updater.js';
 import { playlistContinue } from './features/playlistContinue.js';
 import { sendRemotePayload } from './features/logServer.js';
-
-function parseLogServerIp() {
-    const raw = String(configRead('logServerIp') || '').trim();
-    const parts = raw.split('.').map((v) => Number(v));
-    if (parts.length !== 4 || parts.some((v) => Number.isNaN(v))) return [0, 0, 0, 0];
-    return parts.map((v) => Math.max(0, Math.min(255, Math.floor(v))));
-}
-
-function logServerUrlFromConfig() {
-  const ip = String(configRead('logServerIp') || '').trim();
-  const port = Number(configRead('logServerPort') || 3030);
-  return `http://${ip}:${port}/tv-log`;
-}
+import { t } from 'i18next';
 
 
 export default function resolveCommand(cmd, _) {
@@ -216,49 +204,18 @@ function customAction(action, parameters) {
         case 'PLAYLIST_CONTINUE':
             playlistContinue(resolveCommand, showToast);
             break;
-        case 'LOG_SERVER_IP_ADJUST': {
-            const octetIndex = Number(parameters?.octetIndex);
-            const delta = Number(parameters?.delta || 0);
-            if (Number.isNaN(octetIndex) || octetIndex < 0 || octetIndex > 3 || Number.isNaN(delta)) break;
-            const octets = parseLogServerIp();
-            octets[octetIndex] = Math.max(0, Math.min(255, octets[octetIndex] + delta));
-            const nextIp = octets.join('.');
-            configWrite('logServerIp', nextIp);
-            console.info('[LogServer] logServerIp changed to', nextIp);
-            optionShow({
-                options: buildLogServerIpEditorOptions(),
-                selectedIndex: 0,
-                update: true,
-                menuId: 'tt-log-server-ip',
-                menuHeader: {
-                    title: 'Remote Log Server IP',
-                    subtitle: 'Adjust each octet with +/- controls'
-                }
-            }, true);
-            break;
-        }
         case 'LOG_SERVER_TEST_PING': {
-            const url = logServerUrlFromConfig();
-            if (!url || url.includes('http://:')) {
-                showToast('TizenTube', 'Set a valid Log Server IP first.');
-                break;
-            }
-            if (!Array.isArray(window.__ttFileOnlyLogs)) window.__ttFileOnlyLogs = [];
-            window.__ttFileOnlyLogs.push(`[${new Date().toISOString()}] [TT_ADBLOCK_FILE] logserver.test.start ${JSON.stringify({ url })}`);
-            sendRemotePayload(url, {
-                    ts: new Date().toISOString(),
-                    level: 'INFO',
-                    context: 'TizenTube',
-                    message: 'Manual test ping from settings',
-                    _formatted: `[${new Date().toISOString()}] [INFO] [TizenTube] Manual test ping from settings`,
-                }).then(() => {
-                window.__ttFileOnlyLogs.push(`[${new Date().toISOString()}] [TT_ADBLOCK_FILE] logserver.test.success ${JSON.stringify({ url })}`);
-                showToast('TizenTube', `Log ping sent to ${url}`);
+            const ts = new Date().toISOString();
+            sendRemotePayload(null, {
+                ts,
+                level: 'INFO',
+                context: 'TizenTube',
+                message: 'Manual test ping from settings',
+                _formatted: `[${ts}] [INFO] [TizenTube] Manual test ping from settings`,
+            }).then(() => {
+                showToast('TizenTube', t('settings.options.misc.options.logServer.testSuccess'));
             }).catch((err) => {
-                const msg = String(err?.message || err);
-                window.__ttFileOnlyLogs.push(`[${new Date().toISOString()}] [TT_ADBLOCK_FILE] logserver.test.fail ${JSON.stringify({ url, msg })}`);
-                console.warn('[LogServer] Test ping failed', { url, msg });
-                showToast('TizenTube', `Log ping failed: ${String(err?.message || err)}`);
+                showToast('TizenTube', `${t('settings.options.misc.options.logServer.testFailed')}: ${String(err?.message || err)}`);
             });
             break;
         }

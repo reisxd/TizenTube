@@ -74,22 +74,11 @@
                     },
                     "logServer": {
                         "title": "Remote Log Server",
-                        "enable": "Enable Logging",
-                        "ipEditor": "Server IP (Octet Editor)",
-                        "ipEditorSubtitle": "Adjust each octet with +/- controls",
-                        "ipMenuTitle": "Remote Log Server IP",
-                        "octetNames": {
-                            "first": "First",
-                            "second": "Second",
-                            "third": "Third",
-                            "fourth": "Fourth"
-                        },
-                        "octetLabel": "{{label}} octet ({{value}})",
-                        "octetMenuTitle": "{{label}} IP Octet",
-                        "octetSubtitle": "Adjust this octet with +/- controls",
-                        "port": "Server Port",
+                        "enable": "Enable Remote Logging",
                         "test": "Test Log Server Connection",
-                        "testSubtitle": "Send a test POST to /tv-log (works even if Log Server is disabled)"
+                        "testSubtitle": "Send a test entry via TizenBrew relay to verify the connection",
+                        "testSuccess": "Log ping sent successfully via TizenBrew relay",
+                        "testFailed": "Log ping failed"
                     }
                 }
             },
