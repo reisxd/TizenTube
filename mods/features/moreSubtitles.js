@@ -2,25 +2,32 @@
 // Automatically adds user's local language to subtitle auto-translate menu if not present
 
 import { configRead } from "../config.js";
+import languages from "../translations/language-names.js";
 
 const LANGUAGE_CODES = [
-    "af","sq","am","ar","hy","as","az","eu","be","bn","bs","bg",
-    "my","ca","zh-CN","zh-TW","zh-HK","hr","cs","da","nl","en","et",
-    "fil","fi","fr","gl","ka","de","el","gu","he","hi","hu","is",
-    "id","ga","it","ja","kn","kk","km","ko","ky","lo","lv","lt",
-    "mk","ms","ml","mt","mr","mn","ne","no","or","fa","pl","pt",
-    "pa","ro","ru","sr","si","sk","sl","es","sw","sv","ta","te",
-    "th","tr","uk","ur","uz","vi","cy","yi","yo","zu"
+    "af", "sq", "am", "ar", "hy", "as", "az", "eu", "be", "bn", "bs", "bg",
+    "my", "ca", "zh-CN", "zh-TW", "zh-HK", "hr", "cs", "da", "nl", "en", "et",
+    "fil", "fi", "fr", "gl", "ka", "de", "el", "gu", "he", "hi", "hu", "is",
+    "id", "ga", "it", "ja", "kn", "kk", "km", "ko", "ky", "lo", "lv", "lt",
+    "mk", "ms", "ml", "mt", "mr", "mn", "ne", "no", "or", "fa", "pl", "pt",
+    "pa", "ro", "ru", "sr", "si", "sk", "sl", "es", "sw", "sv", "ta", "te",
+    "th", "tr", "uk", "ur", "uz", "vi", "cy", "yi", "yo", "zu"
 ];
 
 // Return an object mapping language code -> localized language name.
-export function getComprehensiveLanguageList(locale = "en") {
+export function getComprehensiveLanguageList() {
     try {
-        const displayNames = new Intl.DisplayNames([locale], { type: "language" });
         const map = {};
         LANGUAGE_CODES.forEach((code) => {
-            const name = displayNames.of(code) || code;
-            map[code] = name;
+            if (code.includes("-")) {
+                const [lang, region] = code.split("-");
+                const languageName = languages.language.standard.long[lang] || code;
+                const regionName = languages.region.long[region] || region;
+                map[code] = `${languageName} (${regionName})`;
+            } else {
+                const name = languages.language.standard.long[code] || code;
+                map[code] = name;
+            }
         });
         return map;
     } catch (e) {
@@ -32,7 +39,7 @@ export function getComprehensiveLanguageList(locale = "en") {
 
 // Infer the most likely language for a given ISO 3166-1 alpha-2 country code using Intl.Locale.
 // Returns { code, name } or null if unknown.
-export function getCountryLanguage(countryCode, locale = "en") {
+export function getCountryLanguage(countryCode) {
     if (!countryCode) return null;
     try {
         const region = String(countryCode).toUpperCase();
@@ -40,7 +47,7 @@ export function getCountryLanguage(countryCode, locale = "en") {
         const zhRegionMap = { CN: "zh-CN", TW: "zh-TW", HK: "zh-HK", SG: "zh-CN" };
         if (zhRegionMap[region]) {
             const code = zhRegionMap[region];
-            const name = new Intl.DisplayNames([locale], { type: "language" }).of(code) || code;
+            const name = languages.language.standard.long[code] || code;
             return { code, name };
         }
 
@@ -48,8 +55,7 @@ export function getCountryLanguage(countryCode, locale = "en") {
         const maximized = base.maximize ? base.maximize() : base;
         const lang = maximized.language || "en";
 
-        const displayNames = new Intl.DisplayNames([locale], { type: "language" });
-        const name = displayNames.of(lang) || lang;
+        const name = languages.language.standard.long[lang] || lang;
 
         return { code: lang, name };
     } catch (e) {
@@ -97,6 +103,7 @@ export function getUserLanguageOptionName() {
     return "Show Local Subtitle";
 }
 
+
 // Function to check if language already exists in the menu
 function languageExistsInMenu(items, languageCode, languageName) {
     try {
@@ -140,8 +147,8 @@ function createLanguageOption(languageCode, languageName) {
                         {
                             selectSubtitlesTrackCommand: {
                                 translationLanguage: {
-                                    languageCode: languageCode,
-                                    languageName: languageName,
+                                    languageCode,
+                                    languageName,
                                 },
                             },
                         },
@@ -206,6 +213,9 @@ function createSectionTitle(title) {
 // Main function to patch the subtitle menu
 function patchSubtitleMenu() {
     if (isPatched) return;
+
+    const player = document.querySelector('.html5-video-player');
+    if (!player) return setTimeout(patchSubtitleMenu, 250);
 
     if (!window._yttv) return setTimeout(patchSubtitleMenu, 250);
 

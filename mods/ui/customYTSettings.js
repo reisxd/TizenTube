@@ -1,10 +1,11 @@
 import { SettingActionRenderer, SettingsCategory } from './ytUI.js';
+import { t } from 'i18next';
 import rootPkg from '../../package.json';
 const APP_VERSION = rootPkg.version;
 
 function PatchSettings(settingsObject) {
     const tizentubeOpenAction = SettingActionRenderer(
-        'TizenTube Settings',
+        t('settings.ttSettings.title'),
         'tizentube_open_action',
         {
             customAction: {
