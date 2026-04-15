@@ -1,37 +1,24 @@
 /**
- * logServer.js — Remote log forwarding for TizenTube
+ * logServer.js — Remote log forwarding for TizenTube via TizenBrew relay
  *
- * Compatible with https://github.com/KrX3D/TizenYouTube/blob/main/scripts_log_receiver.ps1
- * Run the PS1 script on your Windows PC; it listens on port 3030 at /tv-log by default.
+ * Logs are forwarded through TizenBrew's Node.js service over WebSocket:
+ *   TizenTube (Cobalt JS) → ws://127.0.0.1:8081 (LogEvent type 15)
+ *     → TizenBrew logBus → remoteLogger → http.request → PS1 server on PC
  *
- * Forwarding strategy (in priority order):
- *   1. TizenBrew WebSocket relay — sends a LogEvent (type 15) to TizenBrew's service on
- *      ws://127.0.0.1:8081. TizenBrew's Node.js service then POSTs to the PS1 server via
- *      native http.request — no browser CORS or mixed-content restrictions apply.
- *      IP/port used is whichever is configured in TizenBrew's Remote Logging settings.
+ * This bypasses Cobalt's mixed-content block (HTTPS page → HTTP local server).
+ * IP/port for the PS1 server is configured in TizenBrew's Remote Logging settings.
  *
- *   2. Direct HTTP fallback — if TizenBrew is not connected, posts directly from Cobalt
- *      to the IP/port configured in TizenTube's own Log Server settings.
- *
- * Configuration (Settings → Debug → Remote Log Server):
- *   logServerEnabled  bool    default false
- *   logServerIp       string  (configurable from settings)
- *   logServerPort     number  default 3030
+ * Enable/disable: Settings → Miscellaneous → Remote Log Server → Enable Remote Logging
  */
 
 import { configRead } from '../config.js';
 
-// ── Queue / backoff state ────────────────────────────────────────────────────
-let _queue = [];
-let _draining = false;
-let _failCount = 0;
-let _disabledUntil = 0;
-let _lastUrl = '';
-const MAX_QUEUE = 300;
-const MAX_FAILS = 10;
-const FAIL_BACKOFF_MS = 30 * 1000;
+// ── Enable check ─────────────────────────────────────────────────────────────
+function isEnabled() {
+  try { return !!configRead('logServerEnabled'); } catch { return false; }
+}
 
-// ── TizenBrew WebSocket relay ────────────────────────────────────────────────
+// ── TizenBrew WebSocket relay ─────────────────────────────────────────────────
 const TB_WS_URL = 'ws://127.0.0.1:8081';
 const TB_LOG_EVENT = 15; // wsCommunication.Events.LogEvent
 
@@ -41,7 +28,7 @@ let _wsTBReconnectTimer = 0;
 
 function connectTizenBrew() {
   clearTimeout(_wsTBReconnectTimer);
-  if (typeof WebSocket === 'undefined') return; // Cobalt has no WebSocket — skip
+  if (typeof WebSocket === 'undefined') return;
   try {
     const ws = new WebSocket(TB_WS_URL);
     ws.onopen = () => {
@@ -55,7 +42,6 @@ function connectTizenBrew() {
     };
     ws.onerror = () => {
       if (_wsTB === ws) { _wsTB = null; _wsTBReady = false; }
-      // onclose will fire after onerror — reconnect handled there
     };
   } catch (_) {
     _wsTBReconnectTimer = setTimeout(connectTizenBrew, 8000);
@@ -79,52 +65,20 @@ function sendViaTizenBrew(entry) {
   }
 }
 
-// ── Direct HTTP fallback ─────────────────────────────────────────────────────
-function isEnabled() {
-  try { return !!configRead('logServerEnabled'); } catch { return false; }
-}
+// HTTP relay — POST to TizenBrew's local /tv-log endpoint on the same server
+// that already serves module files. Cobalt can always reach http://127.0.0.1:8081.
+const TB_HTTP_URL = 'http://127.0.0.1:8081/tv-log';
 
-function getUrl() {
-  if (!isEnabled()) return '';
-  try {
-    const ip   = String(configRead('logServerIp') || '').trim();
-    const port = Number(configRead('logServerPort') || 3030);
-    if (!ip) return '';
-    const url = `http://${ip}:${port}/tv-log`;
-    if (url !== _lastUrl) {
-      if (_lastUrl) console.info('[LogServer] URL changed:', _lastUrl, '→', url);
-      _lastUrl = url;
-      _failCount = 0;
-      _disabledUntil = 0;
-    }
-    return url;
-  } catch { return ''; }
-}
-
-// ── Send (WS relay → HTTP fallback) ─────────────────────────────────────────
-export function sendRemotePayload(url, entry) {
-  // 1. Try TizenBrew WS relay — native Node.js POST, no CORS/mixed-content limits
-  if (sendViaTizenBrew(entry)) return Promise.resolve();
-
-  // 2. Direct HTTP fallback
-  // Use text/plain (no Content-Type header) to avoid CORS preflight OPTIONS request.
-  // The PS1 receiver reads the raw body and parses it as JSON regardless of Content-Type.
+function sendViaHttp(entry) {
   const body = JSON.stringify(entry);
-  try {
-    if (navigator?.sendBeacon) {
-      const ok = navigator.sendBeacon(url, new Blob([body], { type: 'text/plain' }));
-      if (ok) return Promise.resolve();
-    }
-  } catch (_) {}
-
   return new Promise((resolve, reject) => {
     try {
       const xhr = new XMLHttpRequest();
-      xhr.open('POST', url, true);
-      xhr.timeout = 4000;
-      xhr.onload  = () => resolve();
-      xhr.onerror = () => reject(new Error('xhr_error'));
-      xhr.ontimeout = () => reject(new Error('xhr_timeout'));
+      xhr.open('POST', TB_HTTP_URL, true);
+      xhr.timeout = 2000;
+      xhr.onload    = () => resolve();
+      xhr.onerror   = () => reject(new Error('http_relay_error'));
+      xhr.ontimeout = () => reject(new Error('http_relay_timeout'));
       xhr.send(body);
     } catch (err) {
       reject(err);
@@ -132,41 +86,34 @@ export function sendRemotePayload(url, entry) {
   });
 }
 
-// ── Queue / drain ────────────────────────────────────────────────────────────
+export function sendRemotePayload(_url, entry) {
+  // 1. WebSocket relay (if Cobalt supports WebSocket and connection is open)
+  if (sendViaTizenBrew(entry)) return Promise.resolve();
+  // 2. HTTP relay to TizenBrew's local server (always reachable from Cobalt)
+  return sendViaHttp(entry);
+}
+
+// ── Queue / drain ─────────────────────────────────────────────────────────────
+let _queue = [];
+let _draining = false;
+const MAX_QUEUE = 300;
+
 function drain() {
   if (_draining || _queue.length === 0) return;
-  // If WS relay is available, URL/failcount don't gate us — send via relay regardless
-  const url = _wsTBReady ? '' : getUrl();
-  if (!_wsTBReady && (!url || (_failCount >= MAX_FAILS && Date.now() < _disabledUntil))) {
-    _queue = [];
-    return;
-  }
+  if (!_wsTBReady) { _queue = []; return; }
   _draining = true;
   const entry = _queue[0];
-  sendRemotePayload(url, entry).then(() => {
-    _failCount = 0;
-    _queue.shift();
-  }).catch(() => {
-    _failCount++;
-    if (_failCount >= MAX_FAILS) {
-      _disabledUntil = Date.now() + FAIL_BACKOFF_MS;
-      console.warn('[LogServer] Entering backoff after repeated failures. Retry after', new Date(_disabledUntil).toISOString());
-    }
-    _queue.shift();
-  }).finally(() => {
-    _draining = false;
-    if (_queue.length > 0) setTimeout(drain, 50);
-  });
+  sendRemotePayload(null, entry)
+    .then(() => { _queue.shift(); })
+    .catch(() => { _queue.shift(); })
+    .finally(() => {
+      _draining = false;
+      if (_queue.length > 0) setTimeout(drain, 50);
+    });
 }
 
 function enqueue(rawLine) {
-  if (!isEnabled() && !_wsTBReady) return;
-  if (_failCount >= MAX_FAILS && Date.now() >= _disabledUntil) {
-    console.info('[LogServer] Backoff elapsed, resuming log forwarding');
-    _failCount = 0;
-    _disabledUntil = 0;
-  }
-  if (!_wsTBReady && _failCount >= MAX_FAILS && Date.now() < _disabledUntil) return;
+  if (!isEnabled()) return;
   try {
     const m = rawLine.match(/^\[([^\]]+)\] \[TT_ADBLOCK_FILE\] (\S+) ([\s\S]*)$/);
     let entry;
@@ -177,7 +124,7 @@ function enqueue(rawLine) {
       const payloadStr = typeof payload === 'object' ? JSON.stringify(payload) : String(payload);
       entry = {
         ts,
-        level:   'INFO',
+        level:      'INFO',
         label,
         payload,
         _formatted: `[${ts}] [INFO] [TizenTube] ${label} ${payloadStr}`,
@@ -203,12 +150,11 @@ function enqueue(rawLine) {
   } catch (_) {}
 }
 
-// ── Install ──────────────────────────────────────────────────────────────────
+// ── Install ───────────────────────────────────────────────────────────────────
 function install() {
   if (window.__ttLogServerInstalled) return;
   window.__ttLogServerInstalled = true;
 
-  // Connect to TizenBrew's WS service for relay forwarding
   connectTizenBrew();
 
   if (!Array.isArray(window.__ttFileOnlyLogs)) window.__ttFileOnlyLogs = [];
@@ -222,8 +168,3 @@ function install() {
 }
 
 install();
-
-export function resetLogServerFailCount() {
-  _failCount = 0;
-  _disabledUntil = 0;
-}

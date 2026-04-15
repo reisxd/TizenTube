@@ -6,57 +6,6 @@ import { getComprehensiveLanguageList } from '../features/moreSubtitles.js';
 
 const qrcodes = {};
 
-function getLogServerIpOctets() {
-    const raw = String(configRead('logServerIp') || '').trim();
-    const parts = raw.split('.').map((v) => Number(v));
-    if (parts.length !== 4 || parts.some((v) => Number.isNaN(v))) return [0, 0, 0, 0];
-    return parts.map((v) => Math.max(0, Math.min(255, Math.floor(v))));
-}
-
-export function buildLogServerIpEditorOptions() {
-    const octets = getLogServerIpOctets();
-    const octetKeys = ['first', 'second', 'third', 'fourth'];
-    const options = [];
-
-    for (let i = 0; i < 4; i++) {
-        const current = octets[i];
-        const label = t(`settings.options.misc.options.logServer.octetNames.${octetKeys[i]}`);
-        options.push({
-            name: t('settings.options.misc.options.logServer.octetLabel', { label, value: current }),
-            value: null,
-            menuId: `tt-log-server-ip-octet-${i}`,
-            menuHeader: {
-                title: t('settings.options.misc.options.logServer.octetMenuTitle', { label }),
-                subtitle: t('settings.options.misc.options.logServer.octetSubtitle')
-            },
-            options: [
-                buttonItem(
-                    { title: '-10' },
-                    { icon: 'REMOVE' },
-                    [{ customAction: { action: 'LOG_SERVER_IP_ADJUST', parameters: { octetIndex: i, delta: -10 } } }]
-                ),
-                buttonItem(
-                    { title: '-1' },
-                    { icon: 'REMOVE' },
-                    [{ customAction: { action: 'LOG_SERVER_IP_ADJUST', parameters: { octetIndex: i, delta: -1 } } }]
-                ),
-                buttonItem(
-                    { title: '+1' },
-                    { icon: 'ADD' },
-                    [{ customAction: { action: 'LOG_SERVER_IP_ADJUST', parameters: { octetIndex: i, delta: 1 } } }]
-                ),
-                buttonItem(
-                    { title: '+10' },
-                    { icon: 'ADD' },
-                    [{ customAction: { action: 'LOG_SERVER_IP_ADJUST', parameters: { octetIndex: i, delta: 10 } } }]
-                )
-            ]
-        });
-    }
-
-    return options;
-}
-
 export default function modernUI(update, parameters) {
     const settings = [
         {
@@ -409,27 +358,6 @@ export default function modernUI(update, parameters) {
                             name: t('settings.options.misc.options.logServer.enable'),
                             icon: 'WIFI',
                             value: 'logServerEnabled'
-                        },
-                        {
-                            name: t('settings.options.misc.options.logServer.ipEditor'),
-                            subtitle: t('settings.options.misc.options.logServer.ipEditorSubtitle'),
-                            value: null,
-                            menuId: 'tt-log-server-ip',
-                            menuHeader: {
-                                title: t('settings.options.misc.options.logServer.ipMenuTitle'),
-                                subtitle: t('settings.options.misc.options.logServer.ipEditorSubtitle')
-                            },
-                            options: buildLogServerIpEditorOptions()
-                        },
-                        {
-                            name: t('settings.options.misc.options.logServer.port'),
-                            value: null,
-                            menuId: 'tt-log-server-port',
-                            options: [3030, 8765, 9000, 1234, 4000, 5000].map((port) => ({
-                                name: `${port}`,
-                                key: 'logServerPort',
-                                value: port
-                            }))
                         },
                         {
                             name: t('settings.options.misc.options.logServer.test'),

@@ -75,21 +75,10 @@
                     "logServer": {
                         "title": "Fernprotokoll-Server",
                         "enable": "Protokollierung aktivieren",
-                        "ipEditor": "Server-IP (Oktet-Editor)",
-                        "ipEditorSubtitle": "Jeden Oktet mit +/- anpassen",
-                        "ipMenuTitle": "Fernprotokoll-Server-IP",
-                        "octetNames": {
-                            "first": "Erster",
-                            "second": "Zweiter",
-                            "third": "Dritter",
-                            "fourth": "Vierter"
-                        },
-                        "octetLabel": "{{label}} Oktet ({{value}})",
-                        "octetMenuTitle": "{{label}} IP-Oktet",
-                        "octetSubtitle": "Diesen Oktet mit +/- anpassen",
-                        "port": "Server-Port",
                         "test": "Server-Verbindung testen",
-                        "testSubtitle": "Sendet einen Test-POST an /tv-log (funktioniert auch wenn der Server deaktiviert ist)"
+                        "testSubtitle": "Sendet einen Testeintrag über TizenBrew, um die Verbindung zu prüfen",
+                        "testSuccess": "Log-Ping erfolgreich über TizenBrew gesendet",
+                        "testFailed": "Log-Ping fehlgeschlagen"
                     }
                 }
             },
