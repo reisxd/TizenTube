@@ -74,7 +74,7 @@
                     },
                     "logServer": {
                         "title": "Remote Log Server",
-                        "enable": "Enable Log Server",
+                        "enable": "Enable Logging",
                         "ipEditor": "Server IP (Octet Editor)",
                         "ipEditorSubtitle": "Adjust each octet with +/- controls",
                         "ipMenuTitle": "Remote Log Server IP",
