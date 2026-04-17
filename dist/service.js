@@ -50302,22 +50302,7 @@ var dial = peerDial;
 var express = express$1;
 var cors = libExports;
 var app = express();
-var allowedOrigins = ['http://localhost:3000'];
-var corsOptions = {
-  origin: function origin(_origin, callback) {
-    if (!_origin) {
-      return callback(null, true);
-    }
-    if (allowedOrigins.indexOf(_origin) !== -1) {
-      return callback(null, true);
-    }
-    return callback(new Error('Not allowed by CORS'));
-  },
-  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-  credentials: true,
-  optionsSuccessStatus: 204
-};
-app.use(cors(corsOptions));
+app.use(cors());
 var PORT = 8085;
 var apps = {
   "YouTube": {
