@@ -308,48 +308,54 @@ function addPreviews(items) {
   }
 }
 
+const _deArrowQueue = [];
+let _deArrowInFlight = 0;
+const _DEARROW_MAX_CONCURRENT = 5;
+
+function _deArrowRunNext() {
+  if (_deArrowInFlight >= _DEARROW_MAX_CONCURRENT || _deArrowQueue.length === 0) return;
+  const task = _deArrowQueue.shift();
+  _deArrowInFlight++;
+  try {
+    const result = task();
+    if (result && typeof result.finally === 'function') result.finally(() => { _deArrowInFlight--; _deArrowRunNext(); });
+    else { _deArrowInFlight--; _deArrowRunNext(); }
+  } catch (_) { _deArrowInFlight--; _deArrowRunNext(); }
+}
+
+function _deArrowEnqueue(taskFn) { _deArrowQueue.push(taskFn); _deArrowRunNext(); }
+
 function deArrowify(items) {
-  for (const item of items) {
-    if (item.adSlotRenderer) {
-      const index = items.indexOf(item);
-      items.splice(index, 1);
-      continue;
-    }
+  if (!Array.isArray(items)) return;
+  for (let i = items.length - 1; i >= 0; i--) {
+    const item = items[i];
+    if (!item || typeof item !== 'object') continue;
+    if (item.adSlotRenderer) { items.splice(i, 1); continue; }
     if (!item.tileRenderer) continue;
-    if (configRead('enableDeArrow')) {
-      const videoID = item.tileRenderer.contentId;
-
-      // Skip playlists, channels — only real video IDs are 11 chars
-      if (!videoID || videoID.length !== 11) continue;
-
+    if (!configRead('enableDeArrow')) continue;
+    const capturedItem = item;
+    const videoID = String(capturedItem.tileRenderer.contentId || capturedItem.tileRenderer.onSelectCommand?.watchEndpoint?.videoId || '');
+    if (!videoID || videoID.length !== 11) continue;
+    _deArrowEnqueue(() =>
       fetch(`https://sponsor.ajay.app/api/branding?videoID=${videoID}`)
-        .then(res => {
-          if (!res.ok) return null; // 404 = no DeArrow data, skip silently
-          return res.json();
-        })
+        .then(res => { if (!res.ok) return null; return res.json(); })
         .then(data => {
           if (!data) return;
-
-          if (data.titles.length > 0) {
+          if (Array.isArray(data.titles) && data.titles.length > 0) {
             const mostVoted = data.titles.reduce((max, title) => max.votes > title.votes ? max : title);
-            item.tileRenderer.metadata.tileMetadataRenderer.title.simpleText = mostVoted.title;
+            capturedItem.tileRenderer.metadata.tileMetadataRenderer.title.simpleText = mostVoted.title;
           }
-
-          if (data.thumbnails.length > 0 && configRead('enableDeArrowThumbnails')) {
+          if (Array.isArray(data.thumbnails) && data.thumbnails.length > 0 && configRead('enableDeArrowThumbnails')) {
             const mostVotedThumbnail = data.thumbnails.reduce((max, thumbnail) => max.votes > thumbnail.votes ? max : thumbnail);
-            if (mostVotedThumbnail.timestamp) {
-              item.tileRenderer.header.tileHeaderRenderer.thumbnail.thumbnails = [
-                {
-                  url: `https://dearrow-thumb.ajay.app/api/v1/getThumbnail?videoID=${videoID}&time=${mostVotedThumbnail.timestamp}`,
-                  width: 1280,
-                  height: 640
-                }
+            if (mostVotedThumbnail.timestamp !== null && mostVotedThumbnail.timestamp !== undefined) {
+              capturedItem.tileRenderer.header.tileHeaderRenderer.thumbnail.thumbnails = [
+                { url: `https://dearrow-thumb.ajay.app/api/v1/getThumbnail?videoID=${videoID}&time=${mostVotedThumbnail.timestamp}`, width: 1280, height: 640 }
               ];
             }
           }
         })
-        .catch(() => { });
-    }
+        .catch(() => {})
+    );
   }
 }
 
