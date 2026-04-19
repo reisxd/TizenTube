@@ -157,7 +157,6 @@ div[idomkey="shadow"] {
 }
 
 /* Narrow only the expanded guide variant to avoid overlapping page content. */
-ytlr-guide-response.RYo6Fb[aria-hidden="false"] {
-  width: 17.75rem !important;
+ytlr-guide-response.RYo6Fb[aria-hidden="false"] .hsdF6b {
   max-width: 17.75rem !important;
 }
