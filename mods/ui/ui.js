@@ -11,9 +11,11 @@ import getCommandExecutor from './customCommandExecution.js';
 import { t } from 'i18next';
 
 // It just works, okay?
+// Wait for both a video element AND _yttv to be ready before initialising
 const interval = setInterval(() => {
   const videoElement = document.querySelector('video');
-  if (videoElement) {
+  const yttvReady = window._yttv && Object.keys(window._yttv).length > 0;
+  if (videoElement && yttvReady) {
     execute_once_dom_loaded();
     patchResolveCommand();
     clearInterval(interval);
@@ -21,6 +23,20 @@ const interval = setInterval(() => {
 }, 250);
 
 let keyTimeout = null;
+
+
+function mapDesktopColorKey(evt) {
+  const code = evt.code || '';
+  const key = (evt.key || '').toLowerCase();
+
+  // Desktop fallbacks for TV remote color keys when testing on Windows.
+  if (code === 'KeyR' || key === 'r' || code === 'F1' || code === 'Digit1') return 403; // RED
+  if (code === 'KeyG' || key === 'g' || code === 'F2' || code === 'Digit2') return 404; // GREEN
+  if (code === 'KeyY' || key === 'y' || code === 'F3' || code === 'Digit3') return 405; // YELLOW
+  if (code === 'KeyB' || key === 'b' || code === 'F4' || code === 'Digit4') return 406; // BLUE
+
+  return evt.keyCode;
+}
 
 function execute_once_dom_loaded() {
 
@@ -94,7 +110,6 @@ function execute_once_dom_loaded() {
           focusedElement.value = focusedElement.value.slice(0, -1);
         }
 
-
         if (evt.key === 'Enter' || evt.Uc?.key === 'Enter') {
           // If the focused element is a text input, emit a change event.
           if (document.querySelector(':focus').type === 'text') {
@@ -107,12 +122,35 @@ function execute_once_dom_loaded() {
   );
 
   try {
-    uiContainer.innerHTML = `
-<h1>TizenTube Theme Configuration</h1>
-<label for="__barColor">Navigation Bar Color: <input type="text" id="__barColor"/></label>
-<label for="__routeColor">Main Content Color: <input type="text" id="__routeColor"/></label>
-<div><small>Sponsor segments skipping - https://sponsor.ajay.app</small></div>
-`;
+    // Build theme UI without innerHTML to avoid TrustedHTML CSP warnings
+    const h1 = document.createElement('h1');
+    h1.textContent = 'TizenTube Theme Configuration';
+    uiContainer.appendChild(h1);
+
+    const label1 = document.createElement('label');
+    label1.setAttribute('for', '__barColor');
+    label1.textContent = 'Navigation Bar Color: ';
+    const input1 = document.createElement('input');
+    input1.type = 'text';
+    input1.id = '__barColor';
+    label1.appendChild(input1);
+    uiContainer.appendChild(label1);
+
+    const label2 = document.createElement('label');
+    label2.setAttribute('for', '__routeColor');
+    label2.textContent = 'Main Content Color: ';
+    const input2 = document.createElement('input');
+    input2.type = 'text';
+    input2.id = '__routeColor';
+    label2.appendChild(input2);
+    uiContainer.appendChild(label2);
+
+    const infoDiv = document.createElement('div');
+    const small = document.createElement('small');
+    small.textContent = 'Sponsor segments skipping - https://sponsor.ajay.app';
+    infoDiv.appendChild(small);
+    uiContainer.appendChild(infoDiv);
+
     document.querySelector('body').appendChild(uiContainer);
 
     uiContainer.querySelector('#__barColor').value = configRead('focusContainerColor');
@@ -129,14 +167,9 @@ function execute_once_dom_loaded() {
   } catch (e) { }
 
   var eventHandler = (evt) => {
+    const mappedKeyCode = mapDesktopColorKey(evt);
+
     // We handle key events ourselves.
-    console.info(
-      'Key event:',
-      evt.type,
-      evt.keyCode,
-      evt.keyCode,
-      evt.defaultPrevented
-    );
     if (configRead('enableScreenDimming')) {
       if (keyTimeout) {
         clearTimeout(keyTimeout);
@@ -149,7 +182,7 @@ function execute_once_dom_loaded() {
         document.getElementById('container').style.setProperty('opacity', (1 - configRead('dimmingOpacity')).toString(), 'important');
       }, configRead('dimmingTimeout') * 1000);
     }
-    if (evt.keyCode == 403) {
+    if (mappedKeyCode == 403) {
       console.info('Taking over!');
       evt.preventDefault();
       evt.stopPropagation();
@@ -167,9 +200,15 @@ function execute_once_dom_loaded() {
         } catch (e) { }
       }
       return false;
-    } else if (evt.keyCode == 404) {
+    } else if (mappedKeyCode == 404) {
       if (evt.type === 'keydown') {
         modernUI();
+      }
+    } else if (mappedKeyCode == 405 || mappedKeyCode == 170) {
+      if (evt.type === 'keydown' && typeof window.toggleDebugConsole === 'function') {
+        evt.preventDefault();
+        evt.stopPropagation();
+        window.toggleDebugConsole();
       }
     } else if (evt.keyCode == 39) {
       // Right key, for PiP
@@ -182,14 +221,13 @@ function execute_once_dom_loaded() {
       }
     };
     return true;
-  }
+  };
 
   // Red, Green, Yellow, Blue
-  // 403, 404, 405, 406
-  // ---, 172, 170, 191
+  // TV key codes: 403, 404, 405, 406
+  // Alternative key codes: ---, 172, 170, 191
+  // Desktop test fallbacks: R/G/Y/B, F1/F2/F3/F4, 1/2/3/4
   document.addEventListener('keydown', eventHandler, true);
-  document.addEventListener('keypress', eventHandler, true);
-  document.addEventListener('keyup', eventHandler, true);
   if (configRead('showWelcomeToast')) {
     setTimeout(() => {
       showToast(t('welcomeMsg.title'), t('welcomeMsg.subtitle'));
@@ -214,7 +252,6 @@ function execute_once_dom_loaded() {
   }
 
   // Fix UI issues, again. Love, Googol.
-
   if (configRead('enableFixedUI')) {
     try {
       const observer = new MutationObserver((_, _2) => {
