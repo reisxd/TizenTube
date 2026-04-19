@@ -27,8 +27,15 @@ export function findFunction(funcName) {
 // Patch resolveCommand to be able to change TizenTube settings
 
 export function patchResolveCommand() {
+    let patched = false;
+
     for (const key in window._yttv) {
         if (window._yttv[key] && window._yttv[key].instance && window._yttv[key].instance.resolveCommand) {
+            // Prevent double-patching
+            if (window._yttv[key].instance.resolveCommand.__ttPatched) {
+                patched = true;
+                continue;
+            }
 
             const ogResolve = window._yttv[key].instance.resolveCommand;
             window._yttv[key].instance.resolveCommand = function (cmd, _) {
@@ -128,7 +135,7 @@ export function patchResolveCommand() {
                     return true;
                 }
 
-                if (cmd?.requestAccountSelectorCommand 
+                if (cmd?.requestAccountSelectorCommand
                     && cmd.requestAccountSelectorCommand?.identityActionContext?.eventTrigger === 'ACCOUNT_EVENT_TRIGGER_ON_EXIT') {
                     if (!configRead('enableWhosWatchingMenuOnAppExit')) {
                         ogResolve.call(this, {
@@ -142,7 +149,15 @@ export function patchResolveCommand() {
 
                 return ogResolve.call(this, cmd, _);
             }
+
+            window._yttv[key].instance.resolveCommand.__ttPatched = true;
+            patched = true;
         }
+    }
+
+    // If nothing was patchable yet, retry
+    if (!patched) {
+        setTimeout(patchResolveCommand, 500);
     }
 }
 
