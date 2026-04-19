@@ -333,8 +333,7 @@ function deArrowify(items) {
     if (item.adSlotRenderer) { items.splice(i, 1); continue; }
     if (!item.tileRenderer) continue;
     if (!configRead('enableDeArrow')) continue;
-    const capturedItem = item;
-    const videoID = String(capturedItem.tileRenderer.contentId || capturedItem.tileRenderer.onSelectCommand?.watchEndpoint?.videoId || '');
+    const videoID = String(item.tileRenderer.contentId || item.tileRenderer.onSelectCommand?.watchEndpoint?.videoId || '');
     if (!videoID || videoID.length !== 11) continue;
     _deArrowEnqueue(() =>
       fetch(`https://sponsor.ajay.app/api/branding?videoID=${videoID}`)
@@ -343,13 +342,17 @@ function deArrowify(items) {
           if (!data) return;
           if (Array.isArray(data.titles) && data.titles.length > 0) {
             const mostVoted = data.titles.reduce((max, title) => max.votes > title.votes ? max : title);
-            capturedItem.tileRenderer.metadata.tileMetadataRenderer.title.simpleText = mostVoted.title;
+            item.tileRenderer.metadata.tileMetadataRenderer.title.simpleText = mostVoted.title;
           }
           if (Array.isArray(data.thumbnails) && data.thumbnails.length > 0 && configRead('enableDeArrowThumbnails')) {
             const mostVotedThumbnail = data.thumbnails.reduce((max, thumbnail) => max.votes > thumbnail.votes ? max : thumbnail);
             if (mostVotedThumbnail.timestamp !== null && mostVotedThumbnail.timestamp !== undefined) {
-              capturedItem.tileRenderer.header.tileHeaderRenderer.thumbnail.thumbnails = [
-                { url: `https://dearrow-thumb.ajay.app/api/v1/getThumbnail?videoID=${videoID}&time=${mostVotedThumbnail.timestamp}`, width: 1280, height: 640 }
+              item.tileRenderer.header.tileHeaderRenderer.thumbnail.thumbnails = [
+                {
+                  url: `https://dearrow-thumb.ajay.app/api/v1/getThumbnail?videoID=${videoID}&time=${mostVotedThumbnail.timestamp}`,
+                  width: 1280,
+                  height: 640
+                }
               ];
             }
           }
