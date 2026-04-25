@@ -20,6 +20,11 @@ JSON.parse = function () {
   const adBlockEnabled = configRead('enableAdBlock');
   const signinReminderEnabled = configRead('enableSigninReminder');
 
+  // Music Video Detection
+  if (r.videoDetails) {
+    window.musicVideoType = r.videoDetails.musicVideoType || null;
+  }
+
   if (r.adPlacements && adBlockEnabled) {
     r.adPlacements = [];
   }
