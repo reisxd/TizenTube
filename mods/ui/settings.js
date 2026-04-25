@@ -320,12 +320,6 @@ export default function modernUI(update, parameters) {
                 {
                     name: t('settings.options.subtitles.options.showHiddenSubtitles'),
                     value: 'enableShowOtherLanguages'
-                },
-                {
-                    name: 'Default Speed for Music Videos',
-                    icon: 'MUSIC_NOTE',
-                    value: 'force1xForMusic',
-                    subtitle: 'Force 1x speed for music videos'
                 }
             ]
         },
@@ -418,6 +412,12 @@ export default function modernUI(update, parameters) {
                             value: codec
                         }
                     })
+                },
+                {
+                    name: 'Default Speed for Music Videos',
+                    icon: 'MUSIC_NOTE',
+                    value: 'force1xForMusic',
+                    subtitle: 'Force 1x speed for music videos'
                 },
                 window.h5vcc && window.h5vcc.tizentube && window.h5vcc.tizentube.SetFrameRate ? {
                     name: t('settings.options.videoPlayer.options.afr'),
