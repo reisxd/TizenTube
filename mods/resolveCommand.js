@@ -197,5 +197,26 @@ function customAction(action, parameters) {
         case 'CHECK_FOR_UPDATES':
             checkForUpdates(true);
             break;
-    }
+    }                // --- TizenTube: Ana Sayfa Reklam Engelleyici ---
+                // Eğer reklam engelleme aktifse ve şu an bir video başlatılmıyorsa temizlik yap.
+                if (configRead('enableAdBlock') && !cmd?.watchEndpoint) {
+                    setTimeout(() => {
+                        const targets = [
+                            'ytm-statement-banner-renderer', // Mercedes banner'ı
+                            'ytm-merchandise-shelf-renderer', // Ürün rafları
+                            'ytm-promoted-item-renderer',    // Sponsorlu içerikler
+                            '#masthead-ad'                   // Tepe reklam alanı
+                        ];
+
+                        targets.forEach(selector => {
+                            const element = document.querySelector(selector);
+                            if (element) {
+                                element.style.setProperty('display', 'none', 'important');
+                                console.info('[TizenTube] Reklam gizlendi:', selector);
+                            }
+                        });
+                    }, 1500); // YouTube arayüzünün yüklenmesi için bekleme süresi
+                }
+                // ----------------------------------------------
+
 }
