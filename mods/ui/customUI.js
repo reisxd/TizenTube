@@ -1,7 +1,7 @@
 // Custom UI for video player
 
 import { extractAssignedFunctions } from "../utils/ASTParser.js";
-import { configRead } from "../config.js";
+import { configRead, configChangeEmitter } from "../config.js";
 import { ButtonRenderer } from "./ytUI.js";
 
 function applyPatches() {
@@ -66,10 +66,31 @@ function applyPatches() {
 
         if (!settingActionGroup) return inst;
 
+        const turnOffScreenCommand = {
+            "type": "TRANSPORT_CONTROLS_BUTTON_TYPE_TURN_OFF_SCREEN",
+            "button": {
+                "buttonRenderer": ButtonRenderer(
+                    false,
+                    'Turn off screen',
+                    'VISIBILITY_OFF',
+                    {
+                        customAction: {
+                            action: 'TURN_OFF_SCREEN'
+                        }
+                    }
+                )
+            }
+        }
+
         const origSettingActionGroup = inst[settingActionGroup];
         inst[settingActionGroup] = function () {
             const res = origSettingActionGroup.apply(this, arguments);
-            res.find(item => item.type === 'TRANSPORT_CONTROLS_BUTTON_TYPE_PIP') || res.splice(1, 0, pipCommand);
+            if (configRead('enablePipButton')) {
+                res.find(item => item.type === 'TRANSPORT_CONTROLS_BUTTON_TYPE_PIP') || res.splice(1, 0, pipCommand);
+            }
+            if (configRead('enableTurnOffScreenButton')) {
+                res.find(item => item.type === 'TRANSPORT_CONTROLS_BUTTON_TYPE_TURN_OFF_SCREEN') || res.splice(1, 0, turnOffScreenCommand);
+            }
             return res;
         };
 
@@ -174,3 +195,18 @@ if (document.readyState === 'complete' || document.readyState === 'interactive')
 } else {
     window.addEventListener('DOMContentLoaded', applyPatches);
 }
+
+const playerConfigKeys = [
+    'enablePatchingVideoPlayer',
+    'enablePreviousNextButtons',
+    'enableSuperThanksButton',
+    'enableSpeedControlsButton',
+    'enablePipButton',
+    'enableTurnOffScreenButton',
+];
+
+configChangeEmitter.addEventListener('configChange', (e) => {
+    if (playerConfigKeys.includes(e.detail.key)) {
+        applyPatches();
+    }
+});

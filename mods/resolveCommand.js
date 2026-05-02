@@ -197,5 +197,30 @@ function customAction(action, parameters) {
         case 'CHECK_FOR_UPDATES':
             checkForUpdates(true);
             break;
+        case 'TURN_OFF_SCREEN': {
+            const container = document.getElementById('container');
+            const captionWindow = document.getElementById('ytp-caption-window-container');
+            container.style.setProperty('opacity', '0', 'important');
+            container.style.setProperty('pointer-events', 'none', 'important');
+            if (captionWindow) {
+                captionWindow.style.setProperty('opacity', '0', 'important');
+                captionWindow.style.setProperty('pointer-events', 'none', 'important');
+            }
+            const restoreScreen = (evt) => {
+                evt.preventDefault();
+                evt.stopPropagation();
+                const c = document.getElementById('container');
+                const cw = document.getElementById('ytp-caption-window-container');
+                c.style.removeProperty('opacity');
+                c.style.removeProperty('pointer-events');
+                if (cw) {
+                    cw.style.removeProperty('opacity');
+                    cw.style.removeProperty('pointer-events');
+                }
+                document.removeEventListener('keydown', restoreScreen, true);
+            };
+            document.addEventListener('keydown', restoreScreen, true);
+            break;
+        }
     }
 }

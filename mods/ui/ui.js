@@ -35,6 +35,32 @@ function execute_once_dom_loaded() {
     document.head.appendChild(style);
   }
 
+  // MutationObserver to reapply player styles stripped by Cobalt re-renders
+  if (window.h5vcc && window.h5vcc.tizentube) {
+    const applyPlayerStyles = () => {
+      const shadowEls = document.querySelectorAll('.ytLrWatchDefaultShadow, div[idomkey="shadow"]');
+      shadowEls.forEach(el => {
+        el.style.setProperty('background-image', 'linear-gradient(to bottom, rgba(0, 0, 0, 0.2) 0%, rgba(0, 0, 0, 0.8) 80%)', 'important');
+        el.style.setProperty('background-color', 'rgba(0, 0, 0, 0.4)', 'important');
+      });
+      const metaSection = document.querySelector('div[idomkey="Metadata-Section"]');
+      if (metaSection) {
+        metaSection.style.setProperty('max-width', '40rem');
+        metaSection.style.setProperty('padding', '0', 'important');
+        metaSection.style.setProperty('left', '4rem', 'important');
+        metaSection.style.setProperty('top', '2rem', 'important');
+        const metadata = metaSection.querySelector('[idomkey="metadata"]');
+        if (metadata) {
+          metadata.style.setProperty('background-color', 'rgba(255, 255, 255, 0.1)', 'important');
+          metadata.style.setProperty('padding', '1.5rem', 'important');
+          metadata.style.setProperty('border-radius', '30px', 'important');
+        }
+      }
+    };
+    const observer = new MutationObserver(applyPlayerStyles);
+    observer.observe(document.documentElement, { childList: true, subtree: true });
+  }
+
   // Fix UI issues.
   const ui = configRead('enableFixedUI');
   if (ui) {
