@@ -35,30 +35,40 @@ function execute_once_dom_loaded() {
     document.head.appendChild(style);
   }
 
-  // MutationObserver to reapply player styles stripped by Cobalt re-renders
-  if (window.h5vcc && window.h5vcc.tizentube) {
+  https://purge.jsdelivr.net/npm/@crebbits/tizentube/dist/userScript.js  // MutationObserver to reapply player styles stripped by Cobalt re-renders
+  const isCobalt = !!(window.h5vcc && window.h5vcc.tizentube);
+  if (isCobalt) {
     const applyPlayerStyles = () => {
-      const shadowEls = document.querySelectorAll('.ytLrWatchDefaultShadow, div[idomkey="shadow"]');
-      shadowEls.forEach(el => {
-        el.style.setProperty('background-image', 'linear-gradient(to bottom, rgba(0, 0, 0, 0.2) 0%, rgba(0, 0, 0, 0.8) 80%)', 'important');
-        el.style.setProperty('background-color', 'rgba(0, 0, 0, 0.4)', 'important');
-      });
+      if (!document.querySelector('ytlr-watch-default')) return;
+      const shadowEl = document.querySelector('[idomkey="shadow"]');
       const metaSection = document.querySelector('div[idomkey="Metadata-Section"]');
-      if (metaSection) {
-        metaSection.style.setProperty('max-width', '40rem');
+      if (shadowEl) {
+        shadowEl.style.setProperty('background-image', 'linear-gradient(to bottom, rgba(0, 0, 0, 0.2) 0%, rgba(0, 0, 0, 0.8) 80%)', 'important');
+        shadowEl.style.setProperty('background-color', 'rgba(0, 0, 0, 0.4)', 'important');
+        shadowEl.style.setProperty('display', 'block', 'important');
+        shadowEl.style.setProperty('height', '100%', 'important');
+        shadowEl.style.setProperty('pointer-events', 'none', 'important');
+        shadowEl.style.setProperty('position', 'absolute', 'important');
+        shadowEl.style.setProperty('width', '100%', 'important');
+      }
+      if (metaSection && !metaSection.classList.contains('styles-applied')) {
+        metaSection.style.setProperty('max-width', '40rem', 'important');
         metaSection.style.setProperty('padding', '0', 'important');
         metaSection.style.setProperty('left', '4rem', 'important');
         metaSection.style.setProperty('top', '2rem', 'important');
+        metaSection.style.setProperty('position', 'relative', 'important');
         const metadata = metaSection.querySelector('[idomkey="metadata"]');
         if (metadata) {
           metadata.style.setProperty('background-color', 'rgba(255, 255, 255, 0.1)', 'important');
           metadata.style.setProperty('padding', '1.5rem', 'important');
           metadata.style.setProperty('border-radius', '30px', 'important');
         }
+        metaSection.classList.add('styles-applied');
       }
     };
     const observer = new MutationObserver(applyPlayerStyles);
-    observer.observe(document.documentElement, { childList: true, subtree: true });
+    observer.observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: ['style'] });
+    applyPlayerStyles();
   }
 
   // Fix UI issues.

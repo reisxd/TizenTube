@@ -89,6 +89,7 @@ div[idomkey="Metadata-Section"] {
   padding: 0 !important;
   left: 4rem !important;
   top: 2rem !important;
+  position: relative !important;
 }
 
 div[idomkey="Metadata-Section"] [idomkey="metadata"] {
