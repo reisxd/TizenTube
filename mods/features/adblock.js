@@ -191,38 +191,38 @@ JSON.parse = function () {
     });
   }*/
 
-  // Manual SponsorBlock Skips
+  // Clear timelyActionRenderers (removes shopping QR overlays, etc.)
+  if (adBlockEnabled && r?.playerOverlays?.playerOverlayRenderer) {
+    r.playerOverlays.playerOverlayRenderer.timelyActionRenderers = [];
+  }
 
-  if (configRead('sponsorBlockManualSkips').length > 0 && r?.playerOverlays?.playerOverlayRenderer) {
+  // Manual SponsorBlock Skips
+  if (configRead('sponsorBlockManualSkips').length > 0 && r?.playerOverlays?.playerOverlayRenderer && window?.sponsorblock?.segments) {
     const manualSkippedSegments = configRead('sponsorBlockManualSkips');
     let timelyActions = [];
-    if (window?.sponsorblock?.segments) {
-      for (const segment of window.sponsorblock.segments) {
-        if (manualSkippedSegments.includes(segment.category)) {
-          const timelyActionData = timelyAction(
-            t('sponsorblock.toasts.skip', { segment: segment.category }),
-            'SKIP_NEXT',
-            {
-              clickTrackingParams: null,
-              showEngagementPanelEndpoint: {
-                customAction: {
-                  action: 'SKIP',
-                  parameters: {
-                    time: segment.segment[1]
-                  }
+    for (const segment of window.sponsorblock.segments) {
+      if (manualSkippedSegments.includes(segment.category)) {
+        const timelyActionData = timelyAction(
+          t('sponsorblock.toasts.skip', { segment: segment.category }),
+          'SKIP_NEXT',
+          {
+            clickTrackingParams: null,
+            showEngagementPanelEndpoint: {
+              customAction: {
+                action: 'SKIP',
+                parameters: {
+                  time: segment.segment[1]
                 }
               }
-            },
-            segment.segment[0] * 1000,
-            segment.segment[1] * 1000 - segment.segment[0] * 1000
-          );
-          timelyActions.push(timelyActionData);
-        }
+            }
+          },
+          segment.segment[0] * 1000,
+          segment.segment[1] * 1000 - segment.segment[0] * 1000
+        );
+        timelyActions.push(timelyActionData);
       }
-      r.playerOverlays.playerOverlayRenderer.timelyActionRenderers = timelyActions;
     }
-  } else if (r?.playerOverlays?.playerOverlayRenderer) {
-    r.playerOverlays.playerOverlayRenderer.timelyActionRenderers = [];
+    r.playerOverlays.playerOverlayRenderer.timelyActionRenderers = timelyActions;
   }
 
   if (r?.transportControls?.transportControlsRenderer?.promotedActions && configRead('enableSponsorBlockHighlight')) {
