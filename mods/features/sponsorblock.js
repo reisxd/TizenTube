@@ -107,11 +107,13 @@ class SponsorBlockHandler {
     this.skippableCategories = this.getSkippableCategories();
 
     this.scheduleSkipHandler = () => {
-      const slider = document.querySelector('div[idomkey="slider"]');
-      const sliderRect = slider?.getBoundingClientRect();
-      const isOldUI = !document.querySelector('div[idomkey="Metadata-Section"]');
-      if (isOldUI) {
-        this.segmentsoverlay.style.setProperty('top', `${sliderRect.top}px`, 'important');
+      if (this.segmentsoverlay) {
+        const slider = document.querySelector('div[idomkey="slider"]');
+        const sliderRect = slider?.getBoundingClientRect();
+        const isOldUI = !document.querySelector('div[idomkey="Metadata-Section"]');
+        if (isOldUI && sliderRect) {
+          this.segmentsoverlay.style.setProperty('top', `${sliderRect.top}px`, 'important');
+        }
       }
       this.scheduleSkip();
     }
@@ -266,13 +268,14 @@ class SponsorBlockHandler {
       return;
     }
 
-    // Sometimes timeupdate event (that calls scheduleSkip) gets fired right before
-    // already scheduled skip routine below. Let's just look back a little bit
-    // and, in worst case, perform a skip at negative interval (immediately)...
+    // Include segments that are upcoming (start still ahead, with 0.3s lookback
+    // for timing jitter) OR that we're currently inside (start in past but end
+    // still ahead). This handles overlapping segments where skipping one lands
+    // us inside the next.
     const nextSegments = this.segments.filter(
       (seg) =>
-        seg.segment[0] > this.video.currentTime - 0.3 &&
-        seg.segment[1] > this.video.currentTime - 0.3
+        seg.segment[0] > this.video.currentTime - 0.3 ||
+        seg.segment[1] > this.video.currentTime
     );
     nextSegments.sort((s1, s2) => s1.segment[0] - s2.segment[0]);
 

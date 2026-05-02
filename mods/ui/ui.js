@@ -35,7 +35,7 @@ function execute_once_dom_loaded() {
     document.head.appendChild(style);
   }
 
-  https://purge.jsdelivr.net/npm/@crebbits/tizentube/dist/userScript.js  // MutationObserver to reapply player styles stripped by Cobalt re-renders
+  // MutationObserver to reapply player styles stripped by Cobalt re-renders
   const isCobalt = !!(window.h5vcc && window.h5vcc.tizentube);
   if (isCobalt) {
     const applyPlayerStyles = () => {
