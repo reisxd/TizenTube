@@ -266,16 +266,6 @@ class SponsorBlockHandler {
 
   executeSkip(segment) {
     const [, end] = segment.segment;
-
-    if (!this.skippableCategories.includes(segment.category)) {
-      console.info(this.videoID, 'Segment', segment.category, 'is not skippable, ignoring...');
-      return;
-    }
-
-    if (this.manualSkippableCategories.includes(segment.category)) {
-      return;
-    }
-
     const skipName = barTypes[segment.category]?.name || segment.category;
     console.info(this.videoID, 'Skipping', segment);
 
@@ -285,16 +275,15 @@ class SponsorBlockHandler {
       showToast('SponsorBlock', t('sponsorblock.toasts.skipping', { segment: skipName }));
     }
 
-    if (this.video.duration - end < 1) {
-      this.video.currentTime = end - 1;
-    } else {
-      this.video.currentTime = end;
-    }
+    const targetTime = (this.video.duration - end < 1) ? end - 1 : end;
+    this.video.currentTime = targetTime;
 
-    this.scheduleSkip();
+    // Pass the target time explicitly — video.currentTime getter may not
+    // reflect the new position immediately on all platforms.
+    this.scheduleSkip(targetTime);
   }
 
-  scheduleSkip() {
+  scheduleSkip(fromTime) {
     clearTimeout(this.nextSkipTimeout);
     this.nextSkipTimeout = null;
 
@@ -313,13 +302,16 @@ class SponsorBlockHandler {
       return;
     }
 
-    const currentTime = this.video.currentTime;
+    const currentTime = fromTime ?? this.video.currentTime;
 
     // Exclude segments already completed (skipped). Include segments that are
-    // upcoming OR that we're currently inside.
+    // upcoming OR that we're currently inside. Only consider segments that are
+    // both skippable and not manual-skip-only.
     const nextSegments = this.segments.filter(
       (seg) =>
         !this.completedSegments.has(seg.UUID) &&
+        this.skippableCategories.includes(seg.category) &&
+        !this.manualSkippableCategories.includes(seg.category) &&
         (seg.segment[0] > currentTime - 0.3 ||
         seg.segment[1] > currentTime)
     );
