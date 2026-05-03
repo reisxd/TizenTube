@@ -68,7 +68,7 @@ class SponsorBlockHandler {
   segments = null;
   skippableCategories = [];
   manualSkippableCategories = [];
-  skippedCategories = new Map();
+  completedSegments = new Set();
 
   constructor(videoID) {
     this.videoID = videoID;
@@ -242,7 +242,7 @@ class SponsorBlockHandler {
           }
         }
 
-        if (document.querySelector('ytlr-progress-bar').getAttribute('hybridnavfocusable') === 'false') {
+        if (this.video?.ended || document.querySelector('ytlr-progress-bar').getAttribute('hybridnavfocusable') === 'false') {
           this.segmentsoverlay.style.setProperty('display', 'none', 'important');
         } else {
           this.segmentsoverlay.style.setProperty('display', 'block', 'important');
@@ -264,6 +264,36 @@ class SponsorBlockHandler {
     }, 500);
   }
 
+  executeSkip(segment) {
+    const [, end] = segment.segment;
+
+    if (!this.skippableCategories.includes(segment.category)) {
+      console.info(this.videoID, 'Segment', segment.category, 'is not skippable, ignoring...');
+      return;
+    }
+
+    if (this.manualSkippableCategories.includes(segment.category)) {
+      return;
+    }
+
+    const skipName = barTypes[segment.category]?.name || segment.category;
+    console.info(this.videoID, 'Skipping', segment);
+
+    this.completedSegments.add(segment.UUID);
+
+    if (configRead('enableSponsorBlockToasts')) {
+      showToast('SponsorBlock', t('sponsorblock.toasts.skipping', { segment: skipName }));
+    }
+
+    if (this.video.duration - end < 1) {
+      this.video.currentTime = end - 1;
+    } else {
+      this.video.currentTime = end;
+    }
+
+    this.scheduleSkip();
+  }
+
   scheduleSkip() {
     clearTimeout(this.nextSkipTimeout);
     this.nextSkipTimeout = null;
@@ -278,83 +308,57 @@ class SponsorBlockHandler {
       return;
     }
 
-    // Include segments that are upcoming (start still ahead, with 0.3s lookback
-    // for timing jitter) OR that we're currently inside (start in past but end
-    // still ahead). This handles overlapping segments where skipping one lands
-    // us inside the next.
+    if (this.video.ended) {
+      console.info(this.videoID, 'Video ended, ignoring...');
+      return;
+    }
+
+    const currentTime = this.video.currentTime;
+
+    // Exclude segments already completed (skipped). Include segments that are
+    // upcoming OR that we're currently inside.
     const nextSegments = this.segments.filter(
       (seg) =>
-        seg.segment[0] > this.video.currentTime - 0.3 ||
-        seg.segment[1] > this.video.currentTime
+        !this.completedSegments.has(seg.UUID) &&
+        (seg.segment[0] > currentTime - 0.3 ||
+        seg.segment[1] > currentTime)
     );
-    nextSegments.sort((s1, s2) => s1.segment[0] - s2.segment[0]);
 
     if (!nextSegments.length) {
       console.info(this.videoID, 'No more segments');
       return;
     }
 
+    // Prefer a segment we're currently inside over a future one.
+    const insideSegment = nextSegments.find(
+      (seg) => currentTime >= seg.segment[0] - 0.3 && currentTime < seg.segment[1]
+    );
+
+    if (insideSegment) {
+      // Skip synchronously — avoids race with timeupdate clearing the timeout.
+      this.executeSkip(insideSegment);
+      return;
+    }
+
+    // Schedule future segment skip.
+    nextSegments.sort((s1, s2) => s1.segment[0] - s2.segment[0]);
     const [segment] = nextSegments;
-    const [start, end] = segment.segment;
+    const [start] = segment.segment;
     console.info(
       this.videoID,
       'Scheduling skip of',
       segment,
       'in',
-      start - this.video.currentTime
+      start - currentTime
     );
 
     this.nextSkipTimeout = setTimeout(() => {
-      if (this.video.paused) {
-        console.info(this.videoID, 'Currently paused, ignoring...');
+      if (!this.active || this.video.paused || this.video.ended) {
+        console.info(this.videoID, 'Inactive, paused, or ended, ignoring...');
         return;
       }
-      if (!this.skippableCategories.includes(segment.category)) {
-        console.info(
-          this.videoID,
-          'Segment',
-          segment.category,
-          'is not skippable, ignoring...'
-        );
-        return;
-      }
-
-      const skipName = barTypes[segment.category]?.name || segment.category;
-      console.info(this.videoID, 'Skipping', segment);
-      if (!this.manualSkippableCategories.includes(segment.category)) {
-        const wasSkippedBefore = this.skippedCategories.get(segment.UUID)
-        if (wasSkippedBefore) {
-          wasSkippedBefore.count++;
-          wasSkippedBefore.lastSkipped = Date.now();
-          this.skippedCategories.set(segment.UUID, wasSkippedBefore);
-
-          if (wasSkippedBefore.lastSkipped - wasSkippedBefore.firstSkipped < 1000) {
-            if (!wasSkippedBefore.hasShownToast) {
-              if (configRead('enableSponsorBlockToasts')) {
-                showToast('SponsorBlock', t('sponsorblock.toasts.notSkipping', { segment: skipName, count: wasSkippedBefore.count }));
-              }
-              wasSkippedBefore.hasShownToast = true;
-              this.skippedCategories.set(segment.UUID, wasSkippedBefore);
-            }
-            return;
-          }
-        } else {
-          this.skippedCategories.set(segment.UUID, {
-            count: 1,
-            firstSkipped: Date.now(),
-            lastSkipped: Date.now(),
-            hasShownToast: false
-          });
-        }
-        if (configRead('enableSponsorBlockToasts')) {
-          showToast('SponsorBlock', t('sponsorblock.toasts.skipping', { segment: skipName }));
-        }
-        if (this.video.duration - end < 1) {
-          this.video.currentTime = end - 1;
-        } else this.video.currentTime = end;
-        this.scheduleSkip();
-      }
-    }, (start - this.video.currentTime) * 1000);
+      this.executeSkip(segment);
+    }, (start - currentTime) * 1000);
   }
 
   destroy() {
@@ -398,7 +402,7 @@ class SponsorBlockHandler {
       );
     }
 
-    this.skippedCategories.clear();
+    this.completedSegments.clear();
   }
 }
 
