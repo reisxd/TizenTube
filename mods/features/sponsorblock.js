@@ -108,6 +108,10 @@ class SponsorBlockHandler {
 
     this.scheduleSkipHandler = () => {
       if (this.segmentsoverlay) {
+        // Show overlay again when video resumes playing
+        if (!this.video.ended) {
+          this.segmentsoverlay.style.setProperty('display', 'block', 'important');
+        }
         const slider = document.querySelector('div[idomkey="slider"]');
         const sliderRect = slider?.getBoundingClientRect();
         const isOldUI = !document.querySelector('div[idomkey="Metadata-Section"]');
@@ -117,6 +121,11 @@ class SponsorBlockHandler {
       }
       this.scheduleSkip();
     }
+    this.endedHandler = () => {
+      if (this.segmentsoverlay) {
+        this.segmentsoverlay.style.setProperty('display', 'none', 'important');
+      }
+    };
     this.durationChangeHandler = () => this.buildOverlay();
 
     this.attachVideo();
@@ -168,6 +177,7 @@ class SponsorBlockHandler {
     this.video.addEventListener('play', this.scheduleSkipHandler);
     this.video.addEventListener('pause', this.scheduleSkipHandler);
     this.video.addEventListener('timeupdate', this.scheduleSkipHandler);
+    this.video.addEventListener('ended', this.endedHandler);
     this.video.addEventListener('durationchange', this.durationChangeHandler);
   }
 
@@ -381,6 +391,7 @@ class SponsorBlockHandler {
       this.video.removeEventListener('play', this.scheduleSkipHandler);
       this.video.removeEventListener('pause', this.scheduleSkipHandler);
       this.video.removeEventListener('timeupdate', this.scheduleSkipHandler);
+      this.video.removeEventListener('ended', this.endedHandler);
       this.video.removeEventListener(
         'durationchange',
         this.durationChangeHandler

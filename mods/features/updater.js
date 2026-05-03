@@ -12,7 +12,7 @@ if (window.h5vcc && window.h5vcc.tizentube && configRead('enableUpdater')) {
 }
 
 function getLatestRelease() {
-    return fetch('https://api.github.com/repos/reisxd/TizenTubeCobalt/releases/latest')
+    return fetch('https://api.github.com/repos/Crebbits/TizenTubeCobalt/releases/latest')
         .then(response => {
             if (!response.ok) {
                 throw new Error('Network response was not ok');
