@@ -7,3 +7,4 @@ package-lock.json
 .DS_Store
 jackiedo_userscript.js
 .gitignore
+original/
