@@ -136,7 +136,8 @@
                         "title": "Açılışta Başlatılacak Sayfa",
                         "subtitle": "TizenTube'un açılışta varsayılan olarak açacağı sayfayı seçin"
                     },
-                    "sortSubscriptionsByAlphabet": "Abonelikleri Alfabetik Sırala"
+                    "sortSubscriptionsByAlphabet": "Abonelikleri Alfabetik Sırala",
+                    "disableChannelsOnSidebar": "Kenar Çubuğunda Kanalları Devre Dışı Bırak"
                 }
             },
             "updater": {

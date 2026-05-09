@@ -69,7 +69,8 @@ function applyPatches() {
         const origSettingActionGroup = inst[settingActionGroup];
         inst[settingActionGroup] = function () {
             const res = origSettingActionGroup.apply(this, arguments);
-            res.find(item => item.type === 'TRANSPORT_CONTROLS_BUTTON_TYPE_PIP') || res.splice(1, 0, pipCommand);
+            const idx = res.findIndex(item => item.type === 'TRANSPORT_CONTROLS_BUTTON_TYPE_PLAYBACK_SETTINGS');
+            res.find(item => item.type === 'TRANSPORT_CONTROLS_BUTTON_TYPE_PIP') || res.splice(idx, 0, pipCommand);
             return res;
         };
 
