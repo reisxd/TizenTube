@@ -77,7 +77,9 @@
                             "enableVPUIPatching": "Омогући закрпе за УИ плејера",
                             "previousNextBtns": "Омогући дугмад Претходно и Следеће",
                             "showSuperThxBtn": "Прикажи дугме 'Super Thanks'",
-                            "showSpeedCtrlBtn": "Прикажи контроле брзине"
+                            "showSpeedCtrlBtn": "Прикажи контроле брзине",
+                            "showPipBtn": "Прикажи дугме Мини плејер",
+                            "showTurnOffScreenBtn": "Прикажи дугме за искључивање екрана"
                         }
                     },
                     "preferredVideoQuality": {

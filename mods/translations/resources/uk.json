@@ -77,7 +77,9 @@
                             "enableVPUIPatching": "Увімкнути патч інтерфейсу відеоплеєра",
                             "previousNextBtns": "Кнопки «Попереднє/Наступне»",
                             "showSuperThxBtn": "Кнопка Super Thanks",
-                            "showSpeedCtrlBtn": "Кнопка швидкості"
+                            "showSpeedCtrlBtn": "Кнопка швидкості",
+                            "showPipBtn": "Кнопка мініплеєра",
+                            "showTurnOffScreenBtn": "Кнопка вимкнення екрана"
                         }
                     },
                     "preferredVideoQuality": {

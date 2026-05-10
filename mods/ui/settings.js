@@ -359,12 +359,12 @@ export default function modernUI(update, parameters) {
                             value: 'enableSpeedControlsButton'
                         },
                         {
-                            name: 'Mini Player button',
+                            name: t('settings.options.videoPlayer.options.patching.options.showPipBtn'),
                             icon: 'CLEAR_COOKIES',
                             value: 'enablePipButton'
                         },
                         {
-                            name: 'Turn Off Screen button',
+                            name: t('settings.options.videoPlayer.options.patching.options.showTurnOffScreenBtn'),
                             icon: 'VISIBILITY_OFF',
                             value: 'enableTurnOffScreenButton'
                         }

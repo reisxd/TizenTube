@@ -77,7 +77,9 @@
                             "enableVPUIPatching": "Ativar Correção da Interface do Reprodutor de Vídeo",
                             "previousNextBtns": "Ativar Botões de Avançar/Retroceder",
                             "showSuperThxBtn": "Mostrar Botão de Valeu Demais",
-                            "showSpeedCtrlBtn": "Mostrar Botão de Controle de Velocidade"
+                            "showSpeedCtrlBtn": "Mostrar Botão de Controle de Velocidade",
+                            "showPipBtn": "Mostrar Botão de Mini Player",
+                            "showTurnOffScreenBtn": "Mostrar Botão de Desligar Tela"
                         }
                     },
                     "preferredVideoQuality": {

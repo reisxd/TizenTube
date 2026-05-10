@@ -77,7 +77,9 @@
                             "enableVPUIPatching": "Omogući zakrpe za UI playera",
                             "previousNextBtns": "Omogući tipke Prethodno i Sljedeće",
                             "showSuperThxBtn": "Prikaži tipku 'Super hvala'",
-                            "showSpeedCtrlBtn": "Prikaži kontrole brzine"
+                            "showSpeedCtrlBtn": "Prikaži kontrole brzine",
+                            "showPipBtn": "Prikaži tipku Mini player",
+                            "showTurnOffScreenBtn": "Prikaži tipku za isključivanje zaslona"
                         }
                     },
                     "preferredVideoQuality": {

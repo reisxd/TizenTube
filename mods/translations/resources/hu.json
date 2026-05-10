@@ -75,7 +75,9 @@
                             "enableVPUIPatching": "Videólejátszó UI módosítás engedélyezése",
                             "previousNextBtns": "Előző és következő gombok engedélyezése",
                             "showSuperThxBtn": "Super Thanks gomb megjelenítése",
-                            "showSpeedCtrlBtn": "Sebességszabályzó gomb megjelenítése"
+                            "showSpeedCtrlBtn": "Sebességszabályzó gomb megjelenítése",
+                            "showPipBtn": "Mini lejátszó gomb megjelenítése",
+                            "showTurnOffScreenBtn": "Képernyő kikapcsolása gomb megjelenítése"
                         }
                     },
                     "preferredVideoQuality": {

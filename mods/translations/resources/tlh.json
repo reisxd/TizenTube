@@ -77,7 +77,9 @@
                             "enableVPUIPatching": "video pat UI yIchu'",
                             "previousNextBtns": "meryaq yIchu'",
                             "showSuperThxBtn": "Super Thanks meryaq yIcha'",
-                            "showSpeedCtrlBtn": "Do' choHmeH meryaq yIcha'"
+                            "showSpeedCtrlBtn": "Do' choHmeH meryaq yIcha'",
+                            "showPipBtn": "mach DujwI' meryaq yIcha'",
+                            "showTurnOffScreenBtn": "HaSta yIchIjmeH meryaq yIcha'"
                         }
                     },
                     "preferredVideoQuality": {

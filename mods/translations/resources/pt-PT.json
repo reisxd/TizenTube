@@ -77,7 +77,9 @@
                             "enableVPUIPatching": "Ativar modificação da interface do reprodutor",
                             "previousNextBtns": "Ativar botões Anterior e Seguinte",
                             "showSuperThxBtn": "Mostrar botão 'Super Thanks'",
-                            "showSpeedCtrlBtn": "Mostrar botão de controlo de velocidade"
+                            "showSpeedCtrlBtn": "Mostrar botão de controlo de velocidade",
+                            "showPipBtn": "Mostrar botão de mini leitor",
+                            "showTurnOffScreenBtn": "Mostrar botão para desligar ecrã"
                         }
                     },
                     "preferredVideoQuality": {

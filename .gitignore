@@ -5,6 +5,6 @@ dist/
 .sign
 package-lock.json
 .DS_Store
-jackiedo_userscript.js
+avutv_userScript.js
 .gitignore
 original/
