@@ -78,6 +78,8 @@
                             "previousNextBtns": "Кнопки «Предыдущее/Следующее»",
                             "showSuperThxBtn": "Кнопка Super Thanks",
                             "showSpeedCtrlBtn": "Кнопка скорости"
+                            "addMPBtn": "Отображать мини-плеер",
+                            "swapMPWithPIP": "Замена кнопки мини-плеер на PiP".
                         }
                     },
                     "preferredVideoQuality": {
