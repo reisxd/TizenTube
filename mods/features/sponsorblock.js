@@ -240,7 +240,7 @@ class SponsorBlockHandler {
 
     this.sliderInterval = setInterval(() => {
       this.slider = document.querySelector('ytlr-redux-connect-ytlr-progress-bar');
-      if (this.slider) {
+      if (this.slider && this.slider.isConnected) {  // add isConnected check
         clearInterval(this.sliderInterval);
         this.sliderInterval = null;
         this.observer.observe(this.slider, {

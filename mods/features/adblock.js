@@ -343,7 +343,6 @@ function deArrowify(items) {
   }
 }
 
-
 function hqify(items) {
   for (const item of items) {
     if (!item.tileRenderer) continue;

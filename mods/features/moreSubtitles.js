@@ -358,11 +358,12 @@ function patchSubtitleMenu() {
     isPatched = true;
 }
 
-// Wait for the YouTube TV app to be ready
+// Wait for the YouTube TV app to be ready, keep retrying until patch succeeds
 const interval = setInterval(() => {
     if (window._yttv && Object.keys(window._yttv).length > 0) {
         patchSubtitleMenu();
-        clearInterval(interval);
+        // Only clear the interval if patching actually succeeded
+        if (isPatched) clearInterval(interval);
     }
 }, 1000);
 
