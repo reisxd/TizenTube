@@ -1,7 +1,7 @@
 // Custom UI for video player
 
 import { extractAssignedFunctions } from "../utils/ASTParser.js";
-import { configRead } from "../config.js";
+import { configRead, configChangeEmitter } from "../config.js";
 import { ButtonRenderer } from "./ytUI.js";
 
 function applyPatches() {
@@ -66,15 +66,34 @@ function applyPatches() {
 
         if (!settingActionGroup) return inst;
 
-        const origSettingActionGroup = inst[settingActionGroup];
-        if (configRead('enableMPButton')) {
-            inst[settingActionGroup] = function () {
-                const res = origSettingActionGroup.apply(this, arguments);
-                const idx = res.findIndex(item => item.type === 'TRANSPORT_CONTROLS_BUTTON_TYPE_PLAYBACK_SETTINGS');
-                res.find(item => item.type === 'TRANSPORT_CONTROLS_BUTTON_TYPE_PIP') || res.splice(idx, 0, pipCommand);
-                return res;
-            };
+        const turnOffScreenCommand = {
+            "type": "TRANSPORT_CONTROLS_BUTTON_TYPE_TURN_OFF_SCREEN",
+            "button": {
+                "buttonRenderer": ButtonRenderer(
+                    false,
+                    'Turn off screen',
+                    'VISIBILITY_OFF',
+                    {
+                        customAction: {
+                            action: 'TURN_OFF_SCREEN'
+                        }
+                    }
+                )
+            }
         }
+
+        const origSettingActionGroup = inst[settingActionGroup];
+        inst[settingActionGroup] = function () {
+            const res = origSettingActionGroup.apply(this, arguments);
+            const idx = res.findIndex(item => item.type === 'TRANSPORT_CONTROLS_BUTTON_TYPE_PLAYBACK_SETTINGS');
+            if (configRead('enableMPButton')) {
+                res.find(item => item.type === 'TRANSPORT_CONTROLS_BUTTON_TYPE_PIP') || res.splice(idx, 0, pipCommand);
+            }
+            if (configRead('enableTurnOffScreenButton')) {
+                res.find(item => item.type === 'TRANSPORT_CONTROLS_BUTTON_TYPE_TURN_OFF_SCREEN') || res.splice(idx, 0, turnOffScreenCommand);
+            }
+            return res;
+        };
 
         const previousButtonName = functions.find(func => {
             if (func.rhs.includes('skipNextButton')) {
@@ -177,3 +196,19 @@ if (document.readyState === 'complete' || document.readyState === 'interactive')
 } else {
     window.addEventListener('DOMContentLoaded', applyPatches);
 }
+
+const playerConfigKeys = [
+    'enablePatchingVideoPlayer',
+    'enablePreviousNextButtons',
+    'enableSuperThanksButton',
+    'enableSpeedControlsButton',
+    'enableMPButton',
+    'enableSwapMPWithPIP',
+    'enableTurnOffScreenButton',
+];
+
+configChangeEmitter.addEventListener('configChange', (e) => {
+    if (playerConfigKeys.includes(e.detail.key)) {
+        applyPatches();
+    }
+});

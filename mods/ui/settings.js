@@ -367,6 +367,11 @@ export default function modernUI(update, parameters) {
                             name: t('settings.options.videoPlayer.options.patching.options.swapMPWithPIP'),
                             icon: 'CLEAR_COOKIES',
                             value: 'enableSwapMPWithPIP'
+                        },
+                        {
+                            name: t('settings.options.videoPlayer.options.patching.options.showTurnOffScreenBtn'),
+                            icon: 'VISIBILITY_OFF',
+                            value: 'enableTurnOffScreenButton'
                         }
                     ]
                 },

@@ -77,7 +77,8 @@
                             "enableVPUIPatching": "Iespējot video atskaņotāja UI ielāpus",
                             "previousNextBtns": "Iespējot pogas 'Iepriekšējais' un 'Nākamais'",
                             "showSuperThxBtn": "Rādīt 'Super Thanks' pogu",
-                            "showSpeedCtrlBtn": "Rādīt ātruma kontroles pogu"
+                            "showSpeedCtrlBtn": "Rādīt ātruma kontroles pogu",
+                            "showTurnOffScreenBtn": "Rādīt ekrāna izslēgšanas pogu"
                         }
                     },
                     "preferredVideoQuality": {

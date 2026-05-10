@@ -79,7 +79,8 @@
                             "showSuperThxBtn": "Süper Teşekkür Düğmesini Göster",
                             "showSpeedCtrlBtn": "Hız Kontrol Düğmesini Göster",
                             "addMPBtn": "Mini Oynatıcı Düğmesini Göster",
-                            "swapMPWithPIP": "Mini Oynatıcı Düğmesini PiP Düğmesi ile Değiştir"
+                            "swapMPWithPIP": "Mini Oynatıcı Düğmesini PiP Düğmesi ile Değiştir",
+                            "showTurnOffScreenBtn": "Ekranı Kapat Düğmesini Göster"
                         }
                     },
                     "preferredVideoQuality": {

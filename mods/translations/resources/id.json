@@ -77,7 +77,8 @@
                             "enableVPUIPatching": "Aktifkan Patch UI Pemutar Video",
                             "previousNextBtns": "Aktifkan Tombol Sebelumnya dan Berikutnya",
                             "showSuperThxBtn": "Tampilkan Tombol Super Thanks",
-                            "showSpeedCtrlBtn": "Tampilkan Tombol Kontrol Kecepatan"
+                            "showSpeedCtrlBtn": "Tampilkan Tombol Kontrol Kecepatan",
+                            "showTurnOffScreenBtn": "Tampilkan Tombol Matikan Layar"
                         }
                     },
                     "preferredVideoQuality": {

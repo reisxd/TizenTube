@@ -68,7 +68,7 @@ class SponsorBlockHandler {
   segments = null;
   skippableCategories = [];
   manualSkippableCategories = [];
-  skippedCategories = new Map();
+  completedSegments = new Set();
 
   constructor(videoID) {
     this.videoID = videoID;
@@ -107,14 +107,26 @@ class SponsorBlockHandler {
     this.skippableCategories = this.getSkippableCategories();
 
     this.scheduleSkipHandler = () => {
-      const slider = document.querySelector('div[idomkey="slider"]');
-      const sliderRect = slider?.getBoundingClientRect();
-      const isOldUI = !document.querySelector('div[idomkey="Metadata-Section"]');
-      if (isOldUI) {
-        this.segmentsoverlay.style.setProperty('top', `${sliderRect.top}px`, 'important');
+      if (this.segmentsoverlay) {
+        if (!this.video.ended && !this.video.paused) {
+          this._overlayHidden = false;
+          this.segmentsoverlay.style.setProperty('display', 'block', 'important');
+        }
+        const slider = document.querySelector('div[idomkey="slider"]');
+        const sliderRect = slider?.getBoundingClientRect();
+        const isOldUI = !document.querySelector('div[idomkey="Metadata-Section"]');
+        if (isOldUI && sliderRect) {
+          this.segmentsoverlay.style.setProperty('top', `${sliderRect.top}px`, 'important');
+        }
       }
       this.scheduleSkip();
     }
+    this.endedHandler = () => {
+      this._overlayHidden = true;
+      if (this.segmentsoverlay) {
+        this.segmentsoverlay.style.setProperty('display', 'none', 'important');
+      }
+    };
     this.durationChangeHandler = () => this.buildOverlay();
 
     this.attachVideo();
@@ -166,6 +178,7 @@ class SponsorBlockHandler {
     this.video.addEventListener('play', this.scheduleSkipHandler);
     this.video.addEventListener('pause', this.scheduleSkipHandler);
     this.video.addEventListener('timeupdate', this.scheduleSkipHandler);
+    this.video.addEventListener('ended', this.endedHandler);
     this.video.addEventListener('durationchange', this.durationChangeHandler);
   }
 
@@ -230,7 +243,7 @@ class SponsorBlockHandler {
           }
         }
 
-        if (document.querySelector('ytlr-progress-bar').getAttribute('hybridnavfocusable') === 'false') {
+        if (this._overlayHidden || this.video?.ended || document.querySelector('ytlr-progress-bar').getAttribute('hybridnavfocusable') === 'false') {
           this.segmentsoverlay.style.setProperty('display', 'none', 'important');
         } else {
           this.segmentsoverlay.style.setProperty('display', 'block', 'important');
@@ -252,7 +265,7 @@ class SponsorBlockHandler {
     }, 500);
   }
 
-  scheduleSkip() {
+  scheduleSkip(fromTime) {
     clearTimeout(this.nextSkipTimeout);
     this.nextSkipTimeout = null;
 
@@ -266,82 +279,73 @@ class SponsorBlockHandler {
       return;
     }
 
-    // Sometimes timeupdate event (that calls scheduleSkip) gets fired right before
-    // already scheduled skip routine below. Let's just look back a little bit
-    // and, in worst case, perform a skip at negative interval (immediately)...
+    if (this.video.ended) {
+      console.info(this.videoID, 'Video ended, ignoring...');
+      return;
+    }
+
+    const currentTime = fromTime ?? this.video.currentTime;
+
     const nextSegments = this.segments.filter(
       (seg) =>
-        seg.segment[0] > this.video.currentTime - 0.3 &&
-        seg.segment[1] > this.video.currentTime - 0.3
+        !this.completedSegments.has(seg.UUID) &&
+        this.skippableCategories.includes(seg.category) &&
+        !this.manualSkippableCategories.includes(seg.category) &&
+        (seg.segment[0] > currentTime - 0.3 ||
+        seg.segment[1] > currentTime)
     );
-    nextSegments.sort((s1, s2) => s1.segment[0] - s2.segment[0]);
 
     if (!nextSegments.length) {
       console.info(this.videoID, 'No more segments');
       return;
     }
 
+    const doSkip = (seg) => {
+      const [, end] = seg.segment;
+      const skipName = barTypes[seg.category]?.name || seg.category;
+      console.info(this.videoID, 'Skipping', seg);
+
+      this.completedSegments.add(seg.UUID);
+
+      if (configRead('enableSponsorBlockToasts')) {
+        showToast('SponsorBlock', t('sponsorblock.toasts.skipping', { segment: skipName }));
+      }
+
+      const targetTime = (this.video.duration - end < 1) ? end - 1 : end;
+      this.video.currentTime = targetTime;
+      this.scheduleSkip(targetTime);
+    };
+
+    // If we're currently inside a segment, skip it synchronously to avoid
+    // the race where rapid timeupdate events cancel pending setTimeout skips.
+    const insideSegment = nextSegments.find(
+      (seg) => currentTime >= seg.segment[0] - 0.3 && currentTime < seg.segment[1]
+    );
+
+    if (insideSegment) {
+      doSkip(insideSegment);
+      return;
+    }
+
+    // Schedule future segment skip.
+    nextSegments.sort((s1, s2) => s1.segment[0] - s2.segment[0]);
     const [segment] = nextSegments;
-    const [start, end] = segment.segment;
+    const [start] = segment.segment;
     console.info(
       this.videoID,
       'Scheduling skip of',
       segment,
       'in',
-      start - this.video.currentTime
+      start - currentTime
     );
 
     this.nextSkipTimeout = setTimeout(() => {
-      if (this.video.paused) {
-        console.info(this.videoID, 'Currently paused, ignoring...');
+      if (!this.active || this.video.paused || this.video.ended) {
+        console.info(this.videoID, 'Inactive, paused, or ended, ignoring...');
         return;
       }
-      if (!this.skippableCategories.includes(segment.category)) {
-        console.info(
-          this.videoID,
-          'Segment',
-          segment.category,
-          'is not skippable, ignoring...'
-        );
-        return;
-      }
-
-      const skipName = barTypes[segment.category]?.name || segment.category;
-      console.info(this.videoID, 'Skipping', segment);
-      if (!this.manualSkippableCategories.includes(segment.category)) {
-        const wasSkippedBefore = this.skippedCategories.get(segment.UUID)
-        if (wasSkippedBefore) {
-          wasSkippedBefore.count++;
-          wasSkippedBefore.lastSkipped = Date.now();
-          this.skippedCategories.set(segment.UUID, wasSkippedBefore);
-
-          if (wasSkippedBefore.lastSkipped - wasSkippedBefore.firstSkipped < 1000) {
-            if (!wasSkippedBefore.hasShownToast) {
-              if (configRead('enableSponsorBlockToasts')) {
-                showToast('SponsorBlock', t('sponsorblock.toasts.notSkipping', { segment: skipName, count: wasSkippedBefore.count }));
-              }
-              wasSkippedBefore.hasShownToast = true;
-              this.skippedCategories.set(segment.UUID, wasSkippedBefore);
-            }
-            return;
-          }
-        } else {
-          this.skippedCategories.set(segment.UUID, {
-            count: 1,
-            firstSkipped: Date.now(),
-            lastSkipped: Date.now(),
-            hasShownToast: false
-          });
-        }
-        if (configRead('enableSponsorBlockToasts')) {
-          showToast('SponsorBlock', t('sponsorblock.toasts.skipping', { segment: skipName }));
-        }
-        if (this.video.duration - end < 1) {
-          this.video.currentTime = end - 1;
-        } else this.video.currentTime = end;
-        this.scheduleSkip();
-      }
-    }, (start - this.video.currentTime) * 1000);
+      doSkip(segment);
+    }, (start - currentTime) * 1000);
   }
 
   destroy() {
@@ -378,13 +382,14 @@ class SponsorBlockHandler {
       this.video.removeEventListener('play', this.scheduleSkipHandler);
       this.video.removeEventListener('pause', this.scheduleSkipHandler);
       this.video.removeEventListener('timeupdate', this.scheduleSkipHandler);
+      this.video.removeEventListener('ended', this.endedHandler);
       this.video.removeEventListener(
         'durationchange',
         this.durationChangeHandler
       );
     }
 
-    this.skippedCategories.clear();
+    this.completedSegments.clear();
   }
 }
 

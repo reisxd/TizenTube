@@ -77,7 +77,8 @@
                             "enableVPUIPatching": "Activer la correction de l'UI du lecteur vidéo",
                             "previousNextBtns": "Activer les boutons Précédents et Suivants",
                             "showSuperThxBtn": "Montrer le bouton 'Super Thanks'",
-                            "showSpeedCtrlBtn": "Montrer les boutons de contrôle de la vitesse de lecture"
+                            "showSpeedCtrlBtn": "Montrer les boutons de contrôle de la vitesse de lecture",
+                            "showTurnOffScreenBtn": "Montrer le bouton Éteindre l'écran"
                         }
                     },
                     "preferredVideoQuality": {

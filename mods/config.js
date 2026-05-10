@@ -34,6 +34,7 @@ const defaultConfig = {
   enablePreviousNextButtons: true,
   enableSuperThanksButton: false,
   enableSpeedControlsButton: true,
+  enableTurnOffScreenButton: true,
   enablePatchingVideoPlayer: true,
   enableMPButton: true,
   enableSwapMPWithPIP: false,

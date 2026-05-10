@@ -77,7 +77,8 @@
                             "enableVPUIPatching": "Abilita Patching Interfaccia Video Player",
                             "previousNextBtns": "Abilita Pulsanti Precedente e Successivo",
                             "showSuperThxBtn": "Mostra Pulsante Super Grazie",
-                            "showSpeedCtrlBtn": "Mostra Pulsante Controllo Velocità"
+                            "showSpeedCtrlBtn": "Mostra Pulsante Controllo Velocità",
+                            "showTurnOffScreenBtn": "Mostra Pulsante Spegni Schermo"
                         }
                     },
                     "preferredVideoQuality": {

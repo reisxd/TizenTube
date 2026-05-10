@@ -77,7 +77,8 @@
                             "enableVPUIPatching": "Videoplayer-UI-Patching aktivieren",
                             "previousNextBtns": "Vorheriger-/Nächster-Buttons aktivieren",
                             "showSuperThxBtn": "Super-Thanks-Button anzeigen",
-                            "showSpeedCtrlBtn": "Geschwindigkeitssteuerungs-Button anzeigen"
+                            "showSpeedCtrlBtn": "Geschwindigkeitssteuerungs-Button anzeigen",
+                            "showTurnOffScreenBtn": "Bildschirm-ausschalten-Button anzeigen"
                         }
                     },
                     "preferredVideoQuality": {

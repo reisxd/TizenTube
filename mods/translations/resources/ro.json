@@ -79,7 +79,8 @@
                             "enableVPUIPatching": "Activează corectarea interfeței player-ului video",
                             "previousNextBtns": "Activează butoanele Anterior și Următor",
                             "showSuperThxBtn": "Afișează butonul Super Thanks",
-                            "showSpeedCtrlBtn": "Afișează butonul de control al vitezei"
+                            "showSpeedCtrlBtn": "Afișează butonul de control al vitezei",
+                            "showTurnOffScreenBtn": "Afișează butonul de oprire a ecranului"
                         }
                     },
                     "preferredVideoQuality": {

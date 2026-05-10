@@ -1,5 +1,6 @@
 import { configWrite, configRead } from './config.js';
 import { enablePip } from './features/pictureInPicture.js';
+import { turnOffScreen } from './features/turnOffScreen.js';
 import modernUI, { optionShow } from './ui/settings.js';
 import { speedSettings } from './ui/speedUI.js';
 import { showToast, buttonItem } from './ui/ytUI.js';
@@ -218,6 +219,9 @@ function customAction(action, parameters) {
             break;
         case 'CHECK_FOR_UPDATES':
             checkForUpdates(true);
+            break;
+        case 'TURN_OFF_SCREEN':
+            turnOffScreen();
             break;
     }
 }

@@ -77,7 +77,8 @@
                             "enableVPUIPatching": "Omogući zakrpe za UI plejera",
                             "previousNextBtns": "Omogući dugmad Prethodno i Sledeće",
                             "showSuperThxBtn": "Prikaži dugme 'Super Thanks'",
-                            "showSpeedCtrlBtn": "Prikaži kontrole brzine"
+                            "showSpeedCtrlBtn": "Prikaži kontrole brzine",
+                            "showTurnOffScreenBtn": "Prikaži dugme za isključivanje ekrana"
                         }
                     },
                     "preferredVideoQuality": {

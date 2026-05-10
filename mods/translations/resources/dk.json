@@ -77,7 +77,8 @@
                             "enableVPUIPatching": "Aktivér Patchning af Videoafspiller-UI",
                             "previousNextBtns": "Aktivér Forrige- og Næste-knapper",
                             "showSuperThxBtn": "Vis Super Tak-knap",
-                            "showSpeedCtrlBtn": "Vis Knap til Hastighedskontrol"
+                            "showSpeedCtrlBtn": "Vis Knap til Hastighedskontrol",
+                            "showTurnOffScreenBtn": "Vis Sluk Skærm-knap"
                         }
                     },
                     "preferredVideoQuality": {

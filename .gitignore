@@ -4,3 +4,7 @@ node_modules/
 dist/
 .sign
 package-lock.json
+.DS_Store
+avutv_userScript.js
+.gitignore
+original/

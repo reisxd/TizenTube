@@ -77,7 +77,8 @@
                             "enableVPUIPatching": "Habilitar parcheo de la interfaz del reproductor de video",
                             "previousNextBtns": "Habilitar botones de anterior y siguiente",
                             "showSuperThxBtn": "Mostrar botón de Súper Gracias",
-                            "showSpeedCtrlBtn": "Mostrar botón de control de velocidad"
+                            "showSpeedCtrlBtn": "Mostrar botón de control de velocidad",
+                            "showTurnOffScreenBtn": "Mostrar botón para apagar la pantalla"
                         }
                     },
                     "preferredVideoQuality": {

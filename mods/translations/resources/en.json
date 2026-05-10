@@ -79,7 +79,8 @@
                             "showSuperThxBtn": "Show Super Thanks Button",
                             "showSpeedCtrlBtn": "Show Speed Controls Button",
                             "addMPBtn": "Show Mini Player Button",
-                            "swapMPWithPIP": "Swap Mini Player Button with PiP Button"
+                            "swapMPWithPIP": "Swap Mini Player Button with PiP Button",
+                            "showTurnOffScreenBtn": "Show Turn Off Screen Button"
                         }
                     },
                     "preferredVideoQuality": {

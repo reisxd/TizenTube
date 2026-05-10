@@ -77,7 +77,8 @@
                             "enableVPUIPatching": "Bật vá giao diện trình phát video",
                             "previousNextBtns": "Bật nút Trước và Tiếp theo",
                             "showSuperThxBtn": "Hiển thị nút Super Thanks",
-                            "showSpeedCtrlBtn": "Hiển thị nút Điều khiển tốc độ"
+                            "showSpeedCtrlBtn": "Hiển thị nút Điều khiển tốc độ",
+                            "showTurnOffScreenBtn": "Hiển thị nút Tắt màn hình"
                         }
                     },
                     "preferredVideoQuality": {
