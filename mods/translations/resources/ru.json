@@ -138,7 +138,7 @@
                         "title": "Открыть при запуске",
                         "subtitle": "Выберите страницу, которая будет открываться при запуске TizenTube"
                     },
-                    "sortSubscriptionsByAlphabet": "Сортировать подписки по алфавиту"
+                    "sortSubscriptionsByAlphabet": "Сортировать подписки по алфавиту",
                     "disableChannelsOnSidebar": "Отключить каналы в боковой панели"
                 }
             },
