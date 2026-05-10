@@ -357,6 +357,16 @@ export default function modernUI(update, parameters) {
                             name: t('settings.options.videoPlayer.options.patching.options.showSpeedCtrlBtn'),
                             icon: 'SLOW_MOTION_VIDEO',
                             value: 'enableSpeedControlsButton'
+                        },
+                        {
+                            name: t('settings.options.videoPlayer.options.patching.options.addMPBtn'),
+                            icon: 'CLEAR_COOKIES',
+                            value: 'enableMPButton'
+                        },
+                        {
+                            name: t('settings.options.videoPlayer.options.patching.options.swapMPWithPIP'),
+                            icon: 'CLEAR_COOKIES',
+                            value: 'enableSwapMPWithPIP'
                         }
                     ]
                 },

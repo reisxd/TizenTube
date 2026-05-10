@@ -49,11 +49,11 @@ function applyPatches() {
             "button": {
                 "buttonRenderer": ButtonRenderer(
                     false,
-                    'Mini Player',
+                    configRead('enableSwapMPWithPIP') ? 'Picture in Picture' : 'Mini Player',
                     'CLEAR_COOKIES',
                     {
                         customAction: {
-                            action: 'ENTER_PIP'
+                            action: configRead('enableSwapMPWithPIP') ? 'ENTER_PIP' : 'ENTER_MP',
                         }
                     }
                 )
@@ -67,12 +67,14 @@ function applyPatches() {
         if (!settingActionGroup) return inst;
 
         const origSettingActionGroup = inst[settingActionGroup];
-        inst[settingActionGroup] = function () {
-            const res = origSettingActionGroup.apply(this, arguments);
-            const idx = res.findIndex(item => item.type === 'TRANSPORT_CONTROLS_BUTTON_TYPE_PLAYBACK_SETTINGS');
-            res.find(item => item.type === 'TRANSPORT_CONTROLS_BUTTON_TYPE_PIP') || res.splice(idx, 0, pipCommand);
-            return res;
-        };
+        if (configRead('enableMPButton')) {
+            inst[settingActionGroup] = function () {
+                const res = origSettingActionGroup.apply(this, arguments);
+                const idx = res.findIndex(item => item.type === 'TRANSPORT_CONTROLS_BUTTON_TYPE_PLAYBACK_SETTINGS');
+                res.find(item => item.type === 'TRANSPORT_CONTROLS_BUTTON_TYPE_PIP') || res.splice(idx, 0, pipCommand);
+                return res;
+            };
+        }
 
         const previousButtonName = functions.find(func => {
             if (func.rhs.includes('skipNextButton')) {
