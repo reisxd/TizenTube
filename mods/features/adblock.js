@@ -378,6 +378,15 @@ function addLongPress(items) {
           }
         }
       }));
+      item.tileRenderer.onLongPressCommand.showMenuCommand.menu.menuRenderer.items.push(MenuServiceItemRenderer('Go to Channel', {
+        clickTrackingParams: null,
+        playlistEditEndpoint: {
+          customAction: {
+            action: 'GO_TO_CHANNEL',
+            parameters: { videoId: item.tileRenderer.contentId }
+          }
+        }
+      }));
       continue;
     }
     if (!configRead('enableLongPress')) continue;
