@@ -1,6 +1,6 @@
 {
     "__contributors": [
-        "Redje"
+        "SonnyT72"
     ],
     "settings": {
         "options": {
@@ -16,14 +16,14 @@
                     "manualSkip": "Sauts manuels de segments SponsorBlock",
                     "segments": "Segments",
                     "categories": {
-                        "sponsor": "Saut des segments sponsorisés",
-                        "intro": "Saut des segments d'intro",
-                        "outro": "Saut des segments d'outro",
-                        "interaction": "Saut des segments de rappel d'interaction",
-                        "selfpromo": "Saut des segments d'auto-promotion",
-                        "preview": "Saut des segments de prévisualisation/récapitulatifs",
-                        "filler": "Sauts des segments humoristiques/sans rapports avec le sujet",
-                        "music_offtopic": "Sauts des segments de musique sans rapports",
+                        "sponsor": "Passer les segments sponsorisés",
+                        "intro": "Passer les segments d'intro",
+                        "outro": "Passer les segments d'outro",
+                        "interaction": "Passer les segments de rappel d'interaction",
+                        "selfpromo": "Passer les segments d'auto-promotion",
+                        "preview": "Passer les segments d'aperçu/de résumé",
+                        "filler": "Passer les segments de digressions et les blagues",
+                        "music_offtopic": "Passer les segments musicaux hors sujet",
                         "highlights": "Autoriser l'affichage des moments forts"
                     },
                     "showSBToasts": "Montrer le Toast SponsorBlock"
@@ -51,13 +51,13 @@
                         }
                     },
                     "fixUI": "Correction de l'UI",
-                    "hqThumbnails": "Activer les miniatures haute qualitée",
-                    "longPress": "Activer les actions 'pression longues'",
+                    "hqThumbnails": "Activer les miniatures haute qualité",
+                    "longPress": "Activer les actions par appui long",
                     "shorts": "Activer les Shorts",
-                    "videoPreviews": "Activer la prévisualisation de vidéos",
-                    "ttWelcomeMsg": "Montrer le message d'acceuil TT",
+                    "videoPreviews": "Activer la prévisualisation des vidéos",
+                    "ttWelcomeMsg": "Montrer le message d'accueil TT",
                     "guestSignInReminder": "Montrer l'alerte de connexion anonyme",
-                    "reloadHomeOnStartup": "Recharger la page d'acceuil au démarrage"
+                    "reloadHomeOnStartup": "Recharger la page d'accueil au démarrage"
                 }
             },
             "subtitles": {
@@ -69,28 +69,30 @@
             },
             "videoPlayer": {
                 "title": "Paramètres du lecteur vidéo",
-                "subtitle": "Customiser les fonctions du lecteur vidéo",
+                "subtitle": "Personnaliser les fonctionnalités du lecteur vidéo",
                 "options": {
                     "patching": {
-                        "title": "Correction de l'UI du lecteur vidéo",
+                        "title": "Modifier l'interface utilisateur du lecteur vidéo",
                         "options": {
-                            "enableVPUIPatching": "Activer la correction de l'UI du lecteur vidéo",
-                            "previousNextBtns": "Activer les boutons Précédents et Suivants",
-                            "showSuperThxBtn": "Montrer le bouton 'Super Thanks'",
-                            "showSpeedCtrlBtn": "Montrer les boutons de contrôle de la vitesse de lecture"
+                            "enableVPUIPatching": "Activer la modification de l'interface utilisateur du lecteur vidéo",
+                            "previousNextBtns": "Activer les boutons Précédent et Suivant",
+                            "showSuperThxBtn": "Afficher le bouton 'Super Thanks'",
+                            "showSpeedCtrlBtn": "Afficher les boutons de contrôle de la vitesse de lecture",
+                            "addMPBtn": "Afficher le bouton Mini Player",
+                            "swapMPWithPIP": "Remplacer le bouton Mini Player par le bouton PiP"
                         }
                     },
                     "preferredVideoQuality": {
                         "title": "Qualité vidéo préférée",
-                        "subtitle": "Imposer une qualité de vidéo ou la qualité la plus proche au moment où la vidéo commence"
+                        "subtitle": "Choisir la qualité vidéo préférée ou la meilleure alternative à appliquer au début de la lecture"
                     },
                     "speedSettings": {
                         "title": "Paramètres d'incréments de la vitesse",
-                        "subtitle": "Paramètrer les incréments d'ajustement de la vitesse de lecture de la vidéo"
+                        "subtitle": "Paramétrer les incréments d'ajustement de la vitesse de lecture de la vidéo"
                     },
                     "preferredVideoCodec": {
                         "title": "Paramètres de Codec",
-                        "subtitle": "Paramètrer le codec vidéo"
+                        "subtitle": "Paramétrer le codec vidéo"
                     },
                     "afr": "Fréquence de trame automatique",
                     "afrPauseDuration": {
@@ -101,7 +103,7 @@
             },
             "uiSettings": {
                 "title": "Paramètres de l'interface utilisateur",
-                "subtitle": "Customisez l'interface utilisateur selon vos préférences",
+                "subtitle": "Personnaliser l'interface utilisateur selon vos préférences",
                 "options": {
                     "hideWatchedVideos": {
                         "title": "Cacher les vidéos regardées",
@@ -111,7 +113,7 @@
                                 "title": "Niveau de vidéos regardées",
                                 "subtitle": "Paramétrer la limite pour cacher les vidéos regardées"
                             },
-                            "setPagesToHideWatchedVideos": "Paraméter les pages pour cacher les vidéos regardées"
+                            "setPagesToHideWatchedVideos": "Paramétrer les pages pour cacher les vidéos regardées"
                         }
                     },
                     "screenDimming": {
@@ -120,23 +122,24 @@
                             "enableScreenDimming": "Activer l'assombrissement de l'écran",
                             "dimmingTimeout": {
                                 "title": "Temporisation de l'assombrissement",
-                                "subtitle": "Paramétrer le temps (en secondes) avant que l'écran s'assombrisse"
+                                "subtitle": "Paramétrer le temps (en secondes) avant que l'écran ne s'assombrisse"
                             },
                             "dimmingOpacity": {
-                                "title": "Opacité d'assombrissement",
-                                "subtitle": "Paraméterer le niveau d'opacité de l'assombrissement"
+                                "title": "Opacité de l'assombrissement",
+                                "subtitle": "Paramétrer le niveau d'opacité de l'assombrissement"
                             }
                         }
                     },
                     "disableSidebarContents": {
-                        "title": "Désactiver le contenu sur le côté",
-                        "subtitle": "Sélectioner le contenu de la barre à désactiver"
+                        "title": "Masquer le contenu de la barre latérale",
+                        "subtitle": "Sélectionner le contenu de la barre latérale à désactiver"
                     },
                     "launchToOnStartup": {
                         "title": "Ouvrir la page au démarrage",
                         "subtitle": "Choisir la page sur laquelle TizenTube démarrera"
                     },
-                    "sortSubscriptionsByAlphabet": "Sort Subscriptions Alphabetically"
+                    "sortSubscriptionsByAlphabet": "Trier les abonnements par ordre alphabétique",
+                    "disableChannelsOnSidebar": "Désactiver les chaînes dans la barre latérale"
                 }
             },
             "updater": {
@@ -144,8 +147,8 @@
                 "menuSubtitle": "Gérer les mises à jour TizenTube Cobalt",
                 "versionSubtitle": "Version actuelle: {{version}}",
                 "options": {
-                    "checkForUpdates": "Vérifier les mises à jours",
-                    "checkForUpdatesOnStartup": "Vérifier les mises à jours au démarrage"
+                    "checkForUpdates": "Vérifier les mises à jour",
+                    "checkForUpdatesOnStartup": "Vérifier les mises à jour au démarrage"
                 }
             }
         },
@@ -158,10 +161,10 @@
             "title": "Soutenir TizenTube",
             "subtitle": "❤️ Soutenir TizenTube et son développement",
             "content": {
-                "1": "Si vous appréciez TizenTube et que vous aimeriez soutenir son développement, vous pouvez:",
+                "1": "Si vous appréciez TizenTube et que vous aimeriez soutenir son développement, vous pouvez :",
                 "2": "1. Ajouter une étoile au dépot Github améliore sa visibilité.",
                 "3": "2. Partager TizenTube.",
-                "4": "IS vous voulez contribuer financièrement:",
+                "4": "Si vous voulez contribuer financièrement:",
                 "5": "- Buy Me A Coffee: https://www.buymeacoffee.com/reisxd (de préférences)",
                 "6": "- GitHub Sponsors: https://github.com/sponsors/reisxd"
             }
@@ -169,14 +172,14 @@
     },
     "welcomeMsg": {
         "title": "Bienvenue sur TizenTube",
-        "subtitle": "Ouvrez les paramètres et séléctionnez les Paramètres TizenTube pour accéder aux paramètres."
+        "subtitle": "Accédez aux paramètres et cliquez sur « Paramètres de TizenTube » pour accéder aux réglages."
     },
     "sponsorblock": {
         "segments": {
             "sponsor": "segment sponsorisé",
             "intro": "intro",
             "outro": "outro",
-            "interaction": "rappel d'intéraction",
+            "interaction": "rappel d'interaction",
             "selfpromo": "auto-promotion",
             "preview": "récapitulatif ou revue",
             "filler": "pas de rapports avec le sujet",
