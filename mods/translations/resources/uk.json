@@ -1,6 +1,6 @@
 {
     "__contributors": [
-        "BlackFlux"
+        "Wolfolion"
     ],
     "settings": {
         "options": {
@@ -77,7 +77,9 @@
                             "enableVPUIPatching": "Увімкнути патч інтерфейсу відеоплеєра",
                             "previousNextBtns": "Кнопки «Попереднє/Наступне»",
                             "showSuperThxBtn": "Кнопка Super Thanks",
-                            "showSpeedCtrlBtn": "Кнопка швидкості"
+                            "showSpeedCtrlBtn": "Кнопка швидкості",
+                            "addMPBtn": "Кнопка мініплеєра",
+                            "swapMPWithPIP": "Замінити кнопку мініплеєра на кнопку PiP"
                         }
                     },
                     "preferredVideoQuality": {
@@ -109,7 +111,7 @@
                             "enableHideWatchedVideos": "Увімкнути приховування переглянутих відео",
                             "watchedVideosThreshold": {
                                 "title": "Поріг приховування відео",
-                                "subtitle": "Оберіть відсоток перегляду, після якого відео приховуватиметься"
+                                "subtitle": "Виберіть відсоток перегляду, після якого відео приховуватиметься"
                             },
                             "setPagesToHideWatchedVideos": "Де приховувати переглянуті відео"
                         }
@@ -129,14 +131,15 @@
                         }
                     },
                     "disableSidebarContents": {
-                        "title": "Вимкнути розділи бокового меню",
-                        "subtitle": "Оберіть розділи бокового меню, які потрібно вимкнути"
+                        "title": "Приховати розділи бокового меню",
+                        "subtitle": "Виберіть розділи бокового меню, які потрібно приховати"
                     },
                     "launchToOnStartup": {
                         "title": "Відкривати при запуску",
-                        "subtitle": "Оберіть сторінку, яка відкриватиметься під час запуску TizenTube"
+                        "subtitle": "Виберіть сторінку, яка відкриватиметься під час запуску TizenTube"
                     },
-                    "sortSubscriptionsByAlphabet": "Сортувати підписки в алфавітному порядку"
+                    "sortSubscriptionsByAlphabet": "Сортувати підписки в алфавітному порядку",
+                    "disableChannelsOnSidebar": "Приховати канали в боковому меню"
                 }
             },
             "updater": {
@@ -184,7 +187,7 @@
             "poi_highlight": "ключовий момент"
         },
         "toasts": {
-            "skipping": "Пропуск {{segment}}",
+            "skipping": "Пропускається {{segment}}",
             "notSkipping": "{{segment}} не пропускається (вже пропущено {{count}} разів)",
             "skip": "Пропустити {{segment}}",
             "skipToHighlight": "Перейти до ключового моменту"
