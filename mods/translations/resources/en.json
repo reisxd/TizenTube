@@ -77,7 +77,9 @@
                             "enableVPUIPatching": "Enable Video Player UI Patching",
                             "previousNextBtns": "Enable Previous and Next Buttons",
                             "showSuperThxBtn": "Show Super Thanks Button",
-                            "showSpeedCtrlBtn": "Show Speed Controls Button"
+                            "showSpeedCtrlBtn": "Show Speed Controls Button",
+                            "addMPBtn": "Show Mini Player Button",
+                            "swapMPWithPIP": "Swap Mini Player Button with PiP Button"
                         }
                     },
                     "preferredVideoQuality": {
@@ -136,7 +138,8 @@
                         "title": "Launch To on Startup",
                         "subtitle": "Choose the default page TizenTube opens to on startup"
                     },
-                    "sortSubscriptionsByAlphabet": "Sort Subscriptions Alphabetically"
+                    "sortSubscriptionsByAlphabet": "Sort Subscriptions Alphabetically",
+                    "disableChannelsOnSidebar": "Disable Channels on Sidebar"
                 }
             },
             "updater": {

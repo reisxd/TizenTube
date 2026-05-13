@@ -6,13 +6,15 @@ JSON.parse = function () {
     const r = origParse.apply(this, arguments);
 
     const disabledSidebarContents = configRead('disabledSidebarContents');
+    const disableChannelsOnSidebar = configRead('disableChannelsOnSidebar');
     if (r.items && Array.isArray(r.items) && r.items[0].guideSectionRenderer) {
         for (let i = 0; i < r.items.length; i++) {
             const section = r.items[i].guideSectionRenderer;
             for (let j = 0; j < section.items.length; j++) {
                 const item = section.items[j].guideEntryRenderer;
                 if (!item) continue;
-                if (disabledSidebarContents.includes(item.icon.iconType)) {
+                if ((disabledSidebarContents?.length && disabledSidebarContents.includes(item.icon?.iconType))
+                    || (disableChannelsOnSidebar && item?.thumbnail)) {
                     section.items.splice(j, 1);
                     j--;
                 }
@@ -24,7 +26,7 @@ JSON.parse = function () {
 }
 
 configChangeEmitter.addEventListener('configChange', (e) => {
-    if (e.detail.key === 'disabledSidebarContents') {
+    if (e.detail.key === 'disabledSidebarContents' || e.detail.key === 'disableChannelsOnSidebar') {
         const commandExecutor = getCommandExecutor();
         if (commandExecutor) {
             commandExecutor.executeFunction(new commandExecutor.commandFunction('reloadGuideAction'));

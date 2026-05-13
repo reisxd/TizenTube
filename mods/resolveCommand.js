@@ -98,11 +98,30 @@ export function patchResolveCommand() {
                             { icon: 'CLEAR_COOKIES' }, [
                             {
                                 customAction: {
-                                    action: 'ENTER_PIP'
+                                    action: 'ENTER_MP'
                                 }
                             }
                         ])
                     );
+
+                    if (window.h5vcc && window.h5vcc.tizentube && window.h5vcc.tizentube?.HasSystemFeature('android.software.picture_in_picture')) {
+                        cmd.openPopupAction.popup.overlaySectionRenderer.overlay.overlayTwoPanelRenderer.actionPanel.overlayPanelRenderer.content.overlayPanelItemListRenderer.items.splice(3, 0,
+                            buttonItem(
+                                { title: 'Picture in Picture' },
+                                { icon: 'PIP' }, [
+                                {
+                                    customAction: {
+                                        action: 'ENTER_PIP'
+                                    }
+                                },
+                                {
+                                    signalAction: {
+                                         signal: 'POPUP_BACK'
+                                    }
+                                }
+                            ])
+                        );
+                    }
                 } else if (cmd?.watchEndpoint?.videoId) {
                     window.isPipPlaying = false;
                     const ytlrPlayerContainer = document.querySelector('ytlr-player-container');
@@ -128,7 +147,7 @@ export function patchResolveCommand() {
                     return true;
                 }
 
-                if (cmd?.requestAccountSelectorCommand 
+                if (cmd?.requestAccountSelectorCommand
                     && cmd.requestAccountSelectorCommand?.identityActionContext?.eventTrigger === 'ACCOUNT_EVENT_TRIGGER_ON_EXIT') {
                     if (!configRead('enableWhosWatchingMenuOnAppExit')) {
                         ogResolve.call(this, {
@@ -180,8 +199,11 @@ function customAction(action, parameters) {
             const speed = Number(parameters);
             document.querySelector('video').playbackRate = speed;
             break;
-        case 'ENTER_PIP':
+        case 'ENTER_MP':
             enablePip();
+            break;
+        case 'ENTER_PIP':
+            window.h5vcc.tizentube.EnterPIP();
             break;
         case 'SHOW_TOAST':
             showToast('TizenTube', parameters);

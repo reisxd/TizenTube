@@ -8,6 +8,7 @@ import PortuguesePortugalResource from './resources/pt-PT.json';
 import SpanishResource from './resources/es.json';
 import SpanishLatinAmericaResource from './resources/es-419.json';
 import IndonesianResource from './resources/id.json';
+import FinnishResource from './resources/fi-FI.json';
 import FrenchResource from './resources/fr.json'
 import RomanianResource from './resources/ro.json';
 import BosnianResource from './resources/bs.json';
@@ -18,6 +19,9 @@ import KlingonResource from './resources/tlh.json';
 import BrazilianPortugueseResource from './resources/pt-BR.json';
 import RussianResource from './resources/ru.json';
 import LithuanianResource from './resources/lt.json';
+import HungarianResource from './resources/hu.json';
+import ItalianResource from './resources/it.json';
+import UkrainianResource from './resources/uk.json';
 
 export default {
     da: {
@@ -50,6 +54,9 @@ export default {
     id: {
         translation: IndonesianResource
     },
+    "fi-FI": {
+        translation: FinnishResource
+    },
     fr: {
         translation: FrenchResource
     },
@@ -79,5 +86,14 @@ export default {
     },
     lt: {
         translation: LithuanianResource
+    },
+    hu: {
+        translation: HungarianResource
+    },
+    it: {
+        translation: ItalianResource
+    },
+    uk: {
+        translation: UkrainianResource
     }
 };
