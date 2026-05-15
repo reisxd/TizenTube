@@ -1,0 +1,193 @@
+{
+    "__contributors": [
+        "loui771w"
+    ],
+    "settings": {
+        "options": {
+            "socialMedia": {
+                "title": "Links til Sociale Medier",
+                "qrCodeScanMessage": "Du kan besøge {{name}} siden ved at scanne QR-koden nedenfor."
+            },
+            "adBlock": "Reklameblokering",
+            "sponsorblock": {
+                "title": "SponsorBlock-indstillinger",
+                "options": {
+                    "enableSB": "Aktivér SponsorBlock",
+                    "manualSkip": "Spring SponsorBlock Segmenter Over Manuelt",
+                    "segments": "Segmenter",
+                    "categories": {
+                        "sponsor": "Spring Sponsorsegmenter Over",
+                        "intro": "Spring Introsegmenter Over",
+                        "outro": "Spring Outrosegmenter Over",
+                        "interaction": "Spring Segmenter med Interaktionspåmindelser Over",
+                        "selfpromo": "Spring Selvpromoveringssegmenter Over",
+                        "preview": "Spring Preview-/Opsummeringssegmenter Over",
+                        "filler": "Spring Sidespor/Jokes Over",
+                        "music_offtopic": "Spring Segmenter uden Musik Over (gælder kun musikvideoer)",
+                        "highlights": "Aktivér Højdepunkter"
+                    },
+                    "showSBToasts": "Vis SponsorBlock-beskeder"
+                }
+            },
+            "dearrow": {
+                "title": "DeArrow-indstillinger",
+                "options": {
+                    "enableDA": "Aktivér DeArrow",
+                    "enableDAThumbnails": "Aktivér DeArrow Thumbnails"
+                }
+            },
+            "misc": {
+                "title": "Diverse Indstillinger",
+                "options": {
+                    "endScreenCards": "Skjul Slutskærmskort",
+                    "youThereRenderer": "Aktivér 'Ser du stadig med?'-renderer",
+                    "paidPromoOverlay": "Aktivér 'Indeholder betalt promovering'-overlay",
+                    "whosWatching": {
+                        "title": "Hvem Ser Med-menu",
+                        "options": {
+                            "enableWW": "Aktivér Hvem Ser Med-menu",
+                            "permaEnableWW": "Aktivér Hvem Ser Med-menu Permanent",
+                            "enableWWOnExit": "Aktivér Hvem Ser Med-menu ved Afslutning af App"
+                        }
+                    },
+                    "fixUI": "Reparér UI",
+                    "hqThumbnails": "Aktivér Højkvalitets-thumbnails",
+                    "longPress": "Aktivér handlinger ved langt tryk",
+                    "shorts": "Aktivér Shorts",
+                    "videoPreviews": "Aktivér Videoforhåndsvisninger",
+                    "ttWelcomeMsg": "Vis TT-velkomstbesked",
+                    "guestSignInReminder": "Vis Gæstelogin-påmindelse",
+                    "reloadHomeOnStartup": "Genindlæs Hjem ved Opstart"
+                }
+            },
+            "subtitles": {
+                "title": "Undertekstindstillinger",
+                "options": {
+                    "showLocalSubtitle": "Vis Lokale Undertekster",
+                    "showHiddenSubtitles": "Vis Skjulte Undertekster"
+                }
+            },
+            "videoPlayer": {
+                "title": "Videoafspillerindstillinger",
+                "subtitle": "Tilpas funktioner i videoafspilleren",
+                "options": {
+                    "patching": {
+                        "title": "Patch Videoafspiller-UI",
+                        "options": {
+                            "enableVPUIPatching": "Aktivér Patchning af Videoafspiller-UI",
+                            "previousNextBtns": "Aktivér Forrige- og Næste-knapper",
+                            "showSuperThxBtn": "Vis Super Tak-knap",
+                            "showSpeedCtrlBtn": "Vis Knap til Hastighedskontrol"
+                        }
+                    },
+                    "preferredVideoQuality": {
+                        "title": "Foretrukken Videokvalitet",
+                        "subtitle": "Vælg den foretrukne eller næstbedste videokvalitet, der bruges ved afspilningsstart"
+                    },
+                    "speedSettings": {
+                        "title": "Intervaller for Hastighedsindstillinger",
+                        "subtitle": "Angiv intervallerne for justering af videoafspilningshastighed"
+                    },
+                    "preferredVideoCodec": {
+                        "title": "Foretrukken Videocodec",
+                        "subtitle": "Vælg den foretrukne videocodec til afspilning"
+                    },
+                    "afr": "Automatisk Billedfrekvens",
+                    "afrPauseDuration": {
+                        "title": "Pausevarighed for Automatisk Billedfrekvens",
+                        "subtitle": "Angiv varigheden (i sekunder) for at sætte videoafspilning på pause ved justering af billedfrekvens"
+                    }
+                }
+            },
+            "uiSettings": {
+                "title": "Brugerfladeindstillinger",
+                "subtitle": "Tilpas brugerfladen efter dine præferencer",
+                "options": {
+                    "hideWatchedVideos": {
+                        "title": "Skjul Sete Videoer",
+                        "options": {
+                            "enableHideWatchedVideos": "Aktivér Skjulning af Sete Videoer",
+                            "watchedVideosThreshold": {
+                                "title": "Grænse for Sete Videoer",
+                                "subtitle": "Angiv procentgrænsen, hvor sete videoer skjules"
+                            },
+                            "setPagesToHideWatchedVideos": "Vælg Sider, Hvor Sete Videoer Skal Skjules"
+                        }
+                    },
+                    "screenDimming": {
+                        "title": "Skærmdæmpning",
+                        "options": {
+                            "enableScreenDimming": "Aktivér Skærmdæmpning",
+                            "dimmingTimeout": {
+                                "title": "Timeout for Skærmdæmpning",
+                                "subtitle": "Angiv inaktivitetstimeout (i sekunder), før skærmen dæmpes"
+                            },
+                            "dimmingOpacity": {
+                                "title": "Opacitet for Skærmdæmpning",
+                                "subtitle": "Angiv opacitetsniveauet for skærmdæmpning"
+                            }
+                        }
+                    },
+                    "disableSidebarContents": {
+                        "title": "Deaktivér Sidepanelindhold",
+                        "subtitle": "Vælg sidepanelindhold, der skal deaktiveres"
+                    },
+                    "launchToOnStartup": {
+                        "title": "Startside ved Opstart",
+                        "subtitle": "Vælg den standardside, TizenTube åbner ved opstart"
+                    },
+                    "sortSubscriptionsByAlphabet": "Sort Subscriptions Alphabetically"
+                }
+            },
+            "updater": {
+                "title": "TizenTube Cobalt Updater",
+                "menuSubtitle": "Administrér TizenTube Cobalt-opdateringer",
+                "versionSubtitle": "Nuværende version: {{version}}",
+                "options": {
+                    "checkForUpdates": "Søg efter opdateringer",
+                    "checkForUpdatesOnStartup": "Søg efter opdateringer ved opstart"
+                }
+            }
+        },
+        "ttSettings": {
+            "title": "TizenTube-indstillinger",
+            "madeByText": "Lavet af Reis Can (reisxd) med ❤️",
+            "summary": "Åbn TizenTube-indstillinger"
+        },
+        "supportTT": {
+            "title": "Støt TizenTube",
+            "subtitle": "❤️ Vis støtte til TizenTube og dets udvikling",
+            "content": {
+                "1": "Hvis du nyder at bruge TizenTube og gerne vil støtte dets udvikling, kan du overveje følgende:",
+                "2": "1. Giv GitHub-repositoriet en stjerne for at hjælpe med at øge dets synlighed.",
+                "3": "2. Del TizenTube med andre.",
+                "4": "Hvis du gerne vil bidrage økonomisk, kan du overveje at donere:",
+                "5": "- Buy Me A Coffee: https://www.buymeacoffee.com/reisxd (helst)",
+                "6": "- GitHub Sponsors: https://github.com/sponsors/reisxd"
+            }
+        }
+    },
+    "welcomeMsg": {
+        "title": "Velkommen til TizenTube",
+        "subtitle": "Gå til indstillinger, og klik på TizenTube-indstillinger for at åbne indstillingerne."
+    },
+    "sponsorblock": {
+        "segments": {
+            "sponsor": "sponsoreret segment",
+            "intro": "intro",
+            "outro": "outro",
+            "interaction": "interaktionspåmindelse",
+            "selfpromo": "selvpromovering",
+            "preview": "opsummering eller preview",
+            "filler": "sidespor",
+            "music_offtopic": "segment uden musik",
+            "poi_highlight": "højdepunkt"
+        },
+        "toasts": {
+            "skipping": "Springer {{segment}} over",
+            "notSkipping": "Springer ikke {{segment}} over (blev sprunget over {{count}} gange)",
+            "skip": "Spring {{segment}} over",
+            "skipToHighlight": "Spring til højdepunkt"
+        }
+    }
+}

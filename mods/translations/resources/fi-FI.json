@@ -1,0 +1,190 @@
+{
+    "__contributors": ["Mikxus"],
+    "settings": {
+        "options": {
+            "socialMedia": {
+                "title": "Sosiaalisen median linkit",
+                "qrCodeScanMessage": "Voit vierailla sivulla {{name}} skannaamalla alla olevan QR-koodin."
+            },
+            "adBlock": "Mainosten esto",
+            "sponsorblock": {
+                "title": "SponsorBlock-asetukset",
+                "options": {
+                    "enableSB": "Ota SponsorBlock käyttöön",
+                    "manualSkip": "SponsorBlock-osioiden manuaalinen ohitus",
+                    "segments": "Osiot",
+                    "categories": {
+                        "sponsor": "Ohita sponsoriosiot",
+                        "intro": "Ohita aloitusosiot",
+                        "outro": "Ohita lopetusosiot",
+                        "interaction": "Ohita vuorovaikutusmuistutusosiot",
+                        "selfpromo": "Ohita itsemainososiot",
+                        "preview": "Ohita ennakko-/kertausosiot",
+                        "filler": "Ohita tangentti-/vitsiosiot",
+                        "music_offtopic": "Ohita musiikin ulkopuoliset osiot",
+                        "highlights": "Ota kohokohdat käyttöön"
+                    },
+                    "showSBToasts": "Näytä SponsorBlock-ilmoitukset"
+                }
+            },
+            "dearrow": {
+                "title": "DeArrow-asetukset",
+                "options": {
+                    "enableDA": "Ota DeArrow käyttöön",
+                    "enableDAThumbnails": "Ota DeArrow-pikkukuvat käyttöön"
+                }
+            },
+            "misc": {
+                "title": "Muut asetukset",
+                "options": {
+                    "endScreenCards": "Piilota loppuruudun kortit",
+                    "youThereRenderer": "Ota 'Katseletko yhä?' -näkymä käyttöön",
+                    "paidPromoOverlay": "Ota 'Sisältää maksettua mainontaa' -ilmoitus käyttöön",
+                    "whosWatching": {
+                        "title": "Kuka katsoo -valikko",
+                        "options": {
+                            "enableWW": "Ota Kuka katsoo -valikko käyttöön",
+                            "permaEnableWW": "Ota Kuka katsoo -valikko pysyvästi käyttöön",
+                            "enableWWOnExit": "Ota Kuka katsoo -valikko käyttöön sovelluksesta poistuttaessa"
+                        }
+                    },
+                    "fixUI": "Korjaa käyttöliittymä",
+                    "hqThumbnails": "Ota korkealaatuiset pikkukuvat käyttöön",
+                    "longPress": "Ota pitkän painalluksen toiminnot käyttöön",
+                    "shorts": "Ota Shorts käyttöön",
+                    "videoPreviews": "Ota videon esikatselut käyttöön",
+                    "ttWelcomeMsg": "Näytä TT-tervetuloviesti",
+                    "guestSignInReminder": "Näytä vieraskirjautumisen muistutus",
+                    "reloadHomeOnStartup": "Lataa etusivu uudelleen käynnistyksessä"
+                }
+            },
+            "subtitles": {
+                "title": "Tekstitysasetukset",
+                "options": {
+                    "showLocalSubtitle": "Näytä paikallinen tekstitys",
+                    "showHiddenSubtitles": "Näytä piilotetut tekstitykset"
+                }
+            },
+            "videoPlayer": {
+                "title": "Videosoittimen asetukset",
+                "subtitle": "Mukauta videosoittimen ominaisuuksia",
+                "options": {
+                    "patching": {
+                        "title": "Muokkaa videosoittimen käyttöliittymää",
+                        "options": {
+                            "enableVPUIPatching": "Ota videosoittimen käyttöliittymän muokkaus käyttöön",
+                            "previousNextBtns": "Ota Edellinen- ja Seuraava-painikkeet käyttöön",
+                            "showSuperThxBtn": "Näytä Super Thanks -painike",
+                            "showSpeedCtrlBtn": "Näytä nopeudensäätöpainike"
+                        }
+                    },
+                    "preferredVideoQuality": {
+                        "title": "Ensisijainen videonlaatu",
+                        "subtitle": "Valitse ensisijainen tai seuraavaksi paras videonlaatu, jota käytetään toiston alkaessa"
+                    },
+                    "speedSettings": {
+                        "title": "Nopeusasetusten portaat",
+                        "subtitle": "Aseta videon toistonopeuden säätöaskeleet"
+                    },
+                    "preferredVideoCodec": {
+                        "title": "Ensisijainen videokoodekki",
+                        "subtitle": "Valitse toistolle ensisijainen videokoodekki"
+                    },
+                    "afr": "Automaattinen kuvataajuus",
+                    "afrPauseDuration": {
+                        "title": "Automaattisen kuvataajuuden tauon kesto",
+                        "subtitle": "Aseta kesto (sekunteina), jonka ajaksi videon toisto keskeytetään kuvataajuutta säädettäessä"
+                    }
+                }
+            },
+            "uiSettings": {
+                "title": "Käyttöliittymäasetukset",
+                "subtitle": "Mukauta käyttöliittymää mieleiseksesi",
+                "options": {
+                    "hideWatchedVideos": {
+                        "title": "Piilota katsotut videot",
+                        "options": {
+                            "enableHideWatchedVideos": "Ota katsottujen videoiden piilotus käyttöön",
+                            "watchedVideosThreshold": {
+                                "title": "Katsottujen videoiden raja-arvo",
+                                "subtitle": "Aseta prosenttiraja, jonka jälkeen katsotut videot piilotetaan"
+                            },
+                            "setPagesToHideWatchedVideos": "Valitse sivut, joilla katsotut videot piilotetaan"
+                        }
+                    },
+                    "screenDimming": {
+                        "title": "Näytön himmennys",
+                        "options": {
+                            "enableScreenDimming": "Ota näytön himmennys käyttöön",
+                            "dimmingTimeout": {
+                                "title": "Himmennyksen aikakatkaisu",
+                                "subtitle": "Aseta toimettomuuden aikakatkaisu (sekunteina), jonka jälkeen näyttö himmennetään"
+                            },
+                            "dimmingOpacity": {
+                                "title": "Himmennyksen peittävyys",
+                                "subtitle": "Aseta näytön himmennyksen peittävyystaso"
+                            }
+                        }
+                    },
+                    "disableSidebarContents": {
+                        "title": "Poista sivupalkin sisältöjä käytöstä",
+                        "subtitle": "Valitse sivupalkin sisällöt, jotka poistetaan käytöstä"
+                    },
+                    "launchToOnStartup": {
+                        "title": "Aloitussivu käynnistyksessä",
+                        "subtitle": "Valitse oletussivu, johon TizenTube avautuu käynnistyksessä"
+                    }
+                },
+                "updater": {
+                    "title": "TizenTube Cobalt -päivittäjä",
+                    "menuSubtitle": "Hallitse TizenTube Cobaltin päivityksiä",
+                    "versionSubtitle": "Nykyinen versio: {{version}}",
+                    "options": {
+                        "checkForUpdates": "Tarkista päivitykset",
+                        "checkForUpdatesOnStartup": "Tarkista päivitykset käynnistyksessä"
+                    }
+                }
+            }
+        },
+        "ttSettings": {
+            "title": "TizenTube-asetukset",
+            "madeByText": "Tekijä Reis Can (reisxd) ❤️",
+            "summary": "Avaa TizenTube-asetukset"
+        },
+        "supportTT": {
+            "title": "Tue TizenTubea",
+            "subtitle": "❤️ Tue TizenTubea ja sen kehitystä",
+            "content": {
+                "1": "Jos pidät TizenTuben käytöstä ja haluat tukea sen kehitystä, harkitse seuraavaa:",
+                "2": "1. Anna GitHub-repositorioon tähti, jotta sen näkyvyys kasvaa.",
+                "3": "2. Jaa TizenTubea muille.",
+                "4": "Jos haluat tukea taloudellisesti, harkitse lahjoittamista:",
+                "5": "- Buy Me A Coffee: https://www.buymeacoffee.com/reisxd (mieluiten)",
+                "6": "- GitHub Sponsors: https://github.com/sponsors/reisxd"
+            }
+        }
+    },
+    "welcomeMsg": {
+        "title": "Tervetuloa TizenTubeen",
+        "subtitle": "Siirry asetuksiin ja avaa TizenTube-asetukset."
+    },
+    "sponsorblock": {
+        "segments": {
+            "sponsor": "sponsoriosio",
+            "intro": "intro",
+            "outro": "outro",
+            "interaction": "vuorovaikutusmuistutus",
+            "selfpromo": "itsemainonta",
+            "preview": "kertaus tai ennakko",
+            "filler": "tangentit",
+            "music_offtopic": "ei-musiikkiosio",
+            "poi_highlight": "kohokohta"
+        },
+        "toasts": {
+            "skipping": "Ohitetaan {{segment}}",
+            "notSkipping": "Ei ohiteta: {{segment}} (ohitettu {{count}} kertaa)",
+            "skip": "Ohita {{segment}}",
+            "skipToHighlight": "Ohita kohokohtaan"
+        }
+    }
+}

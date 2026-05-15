@@ -2,6 +2,7 @@ const CONFIG_KEY = 'ytaf-configuration';
 const defaultConfig = {
   enableAdBlock: true,
   enableSponsorBlock: true,
+  enableSponsorBlockToasts: true,
   sponsorBlockManualSkips: ['intro', 'outro', 'filler'],
   enableSponsorBlockSponsor: true,
   enableSponsorBlockIntro: true,
@@ -25,6 +26,8 @@ const defaultConfig = {
   enableShorts: true,
   dontCheckUpdateUntil: 0,
   enableWhoIsWatchingMenu: false,
+  permanentlyEnableWhoIsWatchingMenu: false,
+  enableWhosWatchingMenuOnAppExit: false,
   enableShowUserLanguage: true,
   enableShowOtherLanguages: false,
   showWelcomeToast: true,
@@ -32,6 +35,8 @@ const defaultConfig = {
   enableSuperThanksButton: false,
   enableSpeedControlsButton: true,
   enablePatchingVideoPlayer: true,
+  enableMPButton: true,
+  enableSwapMPWithPIP: false,
   enablePreviews: true,
   enableHideWatchedVideos: false,
   hideWatchedVideosThreshold: 80,
@@ -46,6 +51,7 @@ const defaultConfig = {
   speedSettingsIncrement: 0.25,
   videoPreferredCodec: 'any',
   launchToOnStartup: null,
+  reloadHomeOnStartup: true,
   disabledSidebarContents: [],
   disable60fps: false,
   disableAV1: false,
@@ -53,9 +59,12 @@ const defaultConfig = {
   disableAVC: false,
   disableVP8: false,
   disableHEVC: false,
+  disableChannelsOnSidebar: false,
   enableUpdater: true,
   autoFrameRate: false,
-  autoFrameRatePauseVideoFor: 0
+  autoFrameRatePauseVideoFor: 0,
+  enableSigninReminder: false,
+  sortSubscriptionsByAlphabet: false,
 };
 
 let localConfig;

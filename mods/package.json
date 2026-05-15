@@ -12,14 +12,12 @@
   "license": "GPL-3.0-only",
   "dependencies": {
     "@babel/preset-env": "^7.22.9",
-    "@formatjs/intl-displaynames": "^6.8.13",
-    "@formatjs/intl-getcanonicallocales": "^2.5.6",
-    "@formatjs/intl-locale": "^4.2.13",
     "@rollup/plugin-babel": "^6.0.3",
     "@rollup/plugin-terser": "^0.4.3",
     "core-js": "^3.46.0",
     "esprima": "^4.0.1",
     "estraverse": "^5.3.0",
+    "i18next": "^25.8.18",
     "qrcode-npm": "^0.0.3",
     "rollup": "^3.26.2",
     "rollup-plugin-string": "^3.0.0",
@@ -28,6 +26,8 @@
   },
   "devDependencies": {
     "@rollup/plugin-commonjs": "^29.0.0",
-    "@rollup/plugin-node-resolve": "^16.0.3"
+    "@rollup/plugin-json": "^6.1.0",
+    "@rollup/plugin-node-resolve": "^16.0.3",
+    "@rollup/plugin-replace": "^6.0.3"
   }
 }
