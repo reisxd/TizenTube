@@ -4,6 +4,18 @@ import { extractAssignedFunctions } from "../utils/ASTParser.js";
 import { configRead, configChangeEmitter } from "../config.js";
 import { ButtonRenderer } from "./ytUI.js";
 
+// Returns the second segment of a found `function.left` (e.g. "X.Y.Z" -> "Y"),
+// or null + a console warning when the AST search came up empty. Without this
+// guard a renamed YT identifier turns into `undefined.left` and tears down the
+// whole player constructor.
+function pickProp(label, hit) {
+    if (!hit) {
+        console.warn('TizenTube customUI: AST identifier not found for', label, '- patch skipped.');
+        return null;
+    }
+    return hit.left.split('.')[1];
+}
+
 function applyPatches() {
     if (!window._yttv) return setTimeout(applyPatches, 250);
     if (!document.querySelector('video')) return setTimeout(applyPatches, 250);
@@ -60,9 +72,9 @@ function applyPatches() {
             }
         }
 
-        const settingActionGroup = functions.find(func => {
+        const settingActionGroup = pickProp('settingActionGroup', functions.find(func => {
             return func.rhs.includes('TRANSPORT_CONTROLS_BUTTON_TYPE_PLAYBACK_SETTINGS');
-        }).left.split('.')[1];
+        }));
 
         if (!settingActionGroup) return inst;
 
@@ -95,7 +107,7 @@ function applyPatches() {
             return res;
         };
 
-        const previousButtonName = functions.find(func => {
+        const previousButtonName = pickProp('previousButtonName', functions.find(func => {
             if (func.rhs.includes('skipNextButton')) {
                 const skipNextButtonIndex = func.rhs.indexOf('skipNextButton');
                 const skipPreviousButtonIndex = func.rhs.indexOf('skipPreviousButton');
@@ -103,9 +115,9 @@ function applyPatches() {
                     return true;
                 }
             }
-        }).left.split('.')[1];
+        }));
 
-        const nextButtonName = functions.find(func => {
+        const nextButtonName = pickProp('nextButtonName', functions.find(func => {
             if (func.rhs.includes('skipPreviousButton')) {
                 const skipNextButtonIndex = func.rhs.indexOf('skipNextButton');
                 const skipPreviousButtonIndex = func.rhs.indexOf('skipPreviousButton');
@@ -113,9 +125,10 @@ function applyPatches() {
                     return true;
                 }
             }
-        }).left.split('.')[1];
+        }));
 
-        const engagementActionButton = functions.find(func => func.rhs.includes('props.data.engagementActions')).left.split('.')[1];
+        const engagementActionButton = pickProp('engagementActionButton',
+            functions.find(func => func.rhs.includes('props.data.engagementActions')));
 
         if (engagementActionButton && configRead('enableSpeedControlsButton')) {
             const origEngagementActionButton = inst[engagementActionButton];
