@@ -14,6 +14,9 @@ function toggleClock(value) {
     if (!value && existingClock) {
         existingClock.remove();
         return;
+    }
+    if (!value && !existingClock) {
+        return;
     } else {
         const clock = document.createElement('div');
  
