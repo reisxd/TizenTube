@@ -22,6 +22,7 @@ import LithuanianResource from './resources/lt.json';
 import HungarianResource from './resources/hu.json';
 import ItalianResource from './resources/it.json';
 import UkrainianResource from './resources/uk.json';
+import JapaneseResource from './resources/ja.json';
 
 export default {
     da: {
@@ -95,5 +96,7 @@ export default {
     },
     uk: {
         translation: UkrainianResource
-    }
+    },
+    ja: {
+        translation: JapaneseResource
 };
