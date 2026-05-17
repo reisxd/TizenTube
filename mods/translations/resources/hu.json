@@ -1,67 +1,67 @@
 {
-    "__contributors": ["bazdmag"],
+    "__contributors": ["reisxd"],
     "settings": {
         "options": {
             "socialMedia": {
-                "title": "Közösségi média linkek",
-                "qrCodeScanMessage": "A(z) {{name}} oldalt az alábbi QR-kód beolvasásával látogathatod meg."
+                "title": "Közösségi Média Linkek",
+                "qrCodeScanMessage": "Nyisd meg a(z) {{name}} oldalt a QR kód szkennelésével!"
             },
-            "adBlock": "Reklámblokkoló",
+            "adBlock": "Hirdetésblokkolás",
             "sponsorblock": {
                 "title": "SponsorBlock beállítások",
                 "options": {
-                    "enableSB": "SponsorBlock engedélyezése",
-                    "manualSkip": "SponsorBlock szegmensek manuális átugrása",
+                    "enableSB": "SponsorBlock bekapcsolása",
+                    "manualSkip": "SponsorBlock szegmens manuális átugrása",
                     "segments": "Szegmensek",
                     "categories": {
-                        "sponsor": "Szponzor szegmensek átugrása",
-                        "intro": "Intro átugrása",
-                        "outro": "Outro átugrása",
-                        "interaction": "Interakciós emlékeztetők átugrása",
-                        "selfpromo": "Önpromóciós szegmensek átugrása",
-                        "preview": "Előzetes/összefoglaló szegmensek átugrása",
-                        "filler": "Kitérők/viccek átugrása",
-                        "music_offtopic": "Nem a zenéhez tartozó részek átugrása",
-                        "highlights": "Kiemelések engedélyezése"
+                        "sponsor": "Szponzor átugrása",
+                        "intro": "Bevezető (intró) átugrása",
+                        "outro": "Lezárás (outró) átugrása",
+                        "interaction": "Interakció átugrása",
+                        "selfpromo": "Önpromó átugrása",
+                        "preview": "Ízelítő/visszatekintő átugrása",
+                        "filler": "Filler/kitekintő rész átugrása",
+                        "music_offtopic": "Nem kapcsolódó, zenés rész átugrása",
+                        "highlights": "Kiemelt részek bekapcsolása"
                     },
-                    "showSBToasts": "SponsorBlock értesítések megjelenítése"
+                    "showSBToasts": "SponsorBlock Toast-ok megjelenítése"
                 }
             },
             "dearrow": {
                 "title": "DeArrow beállítások",
                 "options": {
-                    "enableDA": "DeArrow engedélyezése",
-                    "enableDAThumbnails": "DeArrow bélyegképek engedélyezése"
+                    "enableDA": "DeArrow bekapcsolása",
+                    "enableDAThumbnails": "DeArrow indexképek bekapcsolása"
                 }
             },
             "misc": {
                 "title": "Egyéb beállítások",
                 "options": {
-                    "endScreenCards": "Videó végi kártyák elrejtése",
-                    "youThereRenderer": "'Még nézed?' üzenet engedélyezése",
-                    "paidPromoOverlay": "'Fizetett promóciót tartalmaz' felirat engedélyezése",
+                    "endScreenCards": "Videó végi ajánlások (záróképernyő) elrejtése",
+                    "youThereRenderer": "'Még nézed?...' megjelenítő bekapcsolása",
+                    "paidPromoOverlay": "'Fizetett promóciót tartalmaz' üzenet bekapcsolása",
                     "whosWatching": {
-                        "title": "Ki nézi? menü",
+                        "title": "'Ki nézi?' menü",
                         "options": {
-                            "enableWW": "„Ki nézi?” menü engedélyezése",
-                            "permaEnableWW": "„Ki nézi?” menü mindig aktív",
-                            "enableWWOnExit": "„Ki nézi?” menü megjelenítése kilépéskor"
+                            "enableWW": "'Ki nézi?' menü bekapcsolása",
+                            "permaEnableWW": "'Ki nézi?' menü végleges bekapcsolása",
+                            "enableWWOnExit": "'Ki nézi?' menü bekapcsolása kilépéskor"
                         }
                     },
                     "fixUI": "Felhasználói felület javítása",
-                    "hqThumbnails": "Magas minőségű bélyegképek engedélyezése",
-                    "longPress": "Hosszú nyomás műveletek engedélyezése",
-                    "shorts": "Shorts engedélyezése",
-                    "videoPreviews": "Videó előnézetek engedélyezése",
-                    "ttWelcomeMsg": "TT üdvözlő üzenet megjelenítése",
-                    "guestSignInReminder": "Vendég bejelentkezési emlékeztető megjelenítése",
-                    "reloadHomeOnStartup": "Főoldal újratöltése indításkor"
+                    "hqThumbnails": "Magas minőségű indexképek bekapcsolása",
+                    "longPress": "Hosszan lenyomva tartott funkciók",
+                    "shorts": "Short-ok bekapcsolása",
+                    "videoPreviews": "Videó előnézet kapcsolása",
+                    "ttWelcomeMsg": "TizenTube indítóüzenet megjelenítése",
+                    "guestSignInReminder": "Vendég fiók bejelentkezés emlékeztető megjelenítése",
+                    "reloadHomeOnStartup": "Kezdőképernyő újratöltése indításkor"
                 }
             },
             "subtitles": {
                 "title": "Felirat beállítások",
                 "options": {
-                    "showLocalSubtitle": "Helyi felirat megjelenítése",
+                    "showLocalSubtitle": "Helyi feliratok megjelenítése",
                     "showHiddenSubtitles": "Rejtett feliratok megjelenítése"
                 }
             },
@@ -70,69 +70,69 @@
                 "subtitle": "A videólejátszó funkcióinak testreszabása",
                 "options": {
                     "patching": {
-                        "title": "Videólejátszó UI módosítása",
+                        "title": "Kezelőfelület javítása",
                         "options": {
-                            "enableVPUIPatching": "Videólejátszó UI módosítás engedélyezése",
-                            "previousNextBtns": "Előző és következő gombok engedélyezése",
-                            "showSuperThxBtn": "Super Thanks gomb megjelenítése",
-                            "showSpeedCtrlBtn": "Sebességszabályzó gomb megjelenítése"
+                            "enableVPUIPatching": "Videólejátszó kezelőfelület javításának bekapcsolása",
+                            "previousNextBtns": "Előző és Következő gombok bekapcsolása",
+                            "showSuperThxBtn": "Szuperköszönet gomb megjelenítése",
+                            "showSpeedCtrlBtn": "Lejátszási sebesség megjelenítése"
                         }
                     },
                     "preferredVideoQuality": {
-                        "title": "Preferált videóminőség",
-                        "subtitle": "Válaszd ki a lejátszás indításakor alkalmazott preferált vagy legjobb elérhető videóminőséget"
+                        "title": "Preferált minőség",
+                        "subtitle": "Válaszd ki a kívánt videóminőséget, ami a lejátszás indításánál lesz alkalmazva (ha elérhető)"
                     },
                     "speedSettings": {
-                        "title": "Lejátszási sebesség lépések",
-                        "subtitle": "Állítsd be a lejátszási sebesség módosításának lépésközeit"
+                        "title": "Sebesség lépésközei",
+                        "subtitle": "Adja meg az videólejátszási sebesség választható értékeit"
                     },
                     "preferredVideoCodec": {
-                        "title": "Preferált videó codec",
-                        "subtitle": "Válaszd ki a lejátszáshoz használt videó codecet"
+                        "title": "Preferált videó kódek",
+                        "subtitle": "Válaszd ki a preferált kódeket a lejásztáshoz"
                     },
-                    "afr": "Automatikus képkockasebesség",
+                    "afr": "Autómatikus képkockasebesség",
                     "afrPauseDuration": {
-                        "title": "Automatikus képkockasebesség szünet ideje",
-                        "subtitle": "Add meg hány másodpercre álljon meg a videó a képkockasebesség módosításakor"
+                        "title": "Képkockasebesség váltási szünet időtartalma",
+                        "subtitle": "Állítsa be a videó lejátszásának szüneteltetési idejét (másodpercben) a képkockasebesség módosításakor"
                     }
                 }
             },
             "uiSettings": {
-                "title": "Felhasználói felület beállítások",
-                "subtitle": "Szabd testre a felületet ízlésed szerint",
+                "title": "Felhasználói felület beállításai",
+                "subtitle": "Felület testreszabása",
                 "options": {
                     "hideWatchedVideos": {
-                        "title": "Megnézett videók elrejtése",
+                        "title": "Megtekintett videók elrejtése",
                         "options": {
-                            "enableHideWatchedVideos": "Megnézett videók elrejtésének engedélyezése",
+                            "enableHideWatchedVideos": "Megtekintett videók elrejtésének bekapcsolása",
                             "watchedVideosThreshold": {
-                                "title": "Megnézettségi küszöb",
-                                "subtitle": "Add meg hány százaléktól számítson egy videó megtekintettnek"
+                                "title": "Megtekintés határérték",
+                                "subtitle": "Állítsd be azt az értéket, hogy hány százaléktól számít megtekintettnek a videó"
                             },
-                            "setPagesToHideWatchedVideos": "Oldalak kiválasztása ahol a megnézett videók rejtve legyenek"
+                            "setPagesToHideWatchedVideos": "Oldalak beállítása a megtekintett videók elrejtéséhez"
                         }
                     },
                     "screenDimming": {
-                        "title": "Képernyő halványítás",
+                        "title": "Képernyő sötétítése",
                         "options": {
-                            "enableScreenDimming": "Képernyő halványítás engedélyezése",
+                            "enableScreenDimming": "Képernyő sötétítésének bekapcsolása",
                             "dimmingTimeout": {
-                                "title": "Halványítás időzítése",
-                                "subtitle": "Add meg mennyi inaktivitás után halványodjon a képernyő (másodperc)"
+                                "title": "Sötétítés időtúllépése",
+                                "subtitle": "Állítsd be inaktivitási időkorlátot (másodpercben), mielőtt a képernyő elsötétül"
                             },
                             "dimmingOpacity": {
-                                "title": "Halványítás átlátszósága",
-                                "subtitle": "Állítsd be a halványítás erősségét"
+                                "title": "Sötétítés mértéke",
+                                "subtitle": "Állítsd be áttetszőség erősségét"
                             }
                         }
                     },
                     "disableSidebarContents": {
-                        "title": "Oldalsáv elemek kikapcsolása",
-                        "subtitle": "Válaszd ki mely oldalsáv elemek legyenek kikapcsolva"
+                        "title": "Oldalsáv tartalmának letiltása",
+                        "subtitle": "Válaszd ki az oldalsáv elemeit a letiltásukhoz"
                     },
                     "launchToOnStartup": {
-                        "title": "Indításkor megnyíló oldal",
-                        "subtitle": "Válaszd ki melyik oldal nyíljon meg induláskor"
+                        "title": "Kiválasztott kezdőoldal indításkor",
+                        "subtitle": "Válaszd ki azt az oldalt, amit a TizenTube nyit meg indításkor"
                     }
                 },
                 "updater": {
@@ -148,43 +148,43 @@
         },
         "ttSettings": {
             "title": "TizenTube beállítások",
-            "madeByText": "Készítette: Reis Can (reisxd) ❤️",
-            "summary": "TizenTube beállítások megnyitása"
+            "madeByText": "Készítette: Reis Can (reisxd) csupa ❤️-vel",
+            "summary": "Nyisd meg a TizenTube beállításokat"
         },
         "supportTT": {
-            "title": "TizenTube támogatása",
-            "subtitle": "❤️ Támogasd a TizenTube fejlesztését",
+            "title": "Támogasd a TizenTube-ot",
+            "subtitle": "❤️ Fejezd ki a köszöneted a TizenTube és azok fejlesztései felé",
             "content": {
-                "1": "Ha szereted a TizenTube-ot és szeretnéd támogatni a fejlesztését, fontold meg a következőket:",
-                "2": "1. Adj egy csillagot a GitHub repositorynak, hogy többen megtalálják.",
-                "3": "2. Oszd meg a TizenTube-ot másokkal.",
-                "4": "Ha pénzügyileg is támogatnád:",
-                "5": "- Buy Me A Coffee: https://www.buymeacoffee.com/reisxd (ajánlott)",
-                "6": "- GitHub Sponsors: https://github.com/sponsors/reisxd"
+                "1": "Ha tetszik a TizenTube és támogatnád a fejlesztését:",
+                "2": "1. Csillagozd be a GitHub-on, hogy többekhez eljusson",
+                "3": "2. Oszd meg a TizenTube-ot másokkal",
+                "4": "Ha anyagilag is szeretnéd támogatni, a következő linkeken megteheted:",
+                "5": "- Hívj meg egy kávéra: https://www.buymeacoffee.com/reisxd (inkább ezen)",
+                "6": "- GitHub szponzorok: https://github.com/sponsors/reisxd"
             }
         }
     },
     "welcomeMsg": {
-        "title": "Üdvözlünk a TizenTube-ban",
-        "subtitle": "Menj a beállításokhoz és kattints a TizenTube beállításokra."
+        "title": "Üdvözöl a TizenTube!",
+        "subtitle": "A testreszabáshoz navigálj a TizenTube beállításokra"
     },
     "sponsorblock": {
         "segments": {
-            "sponsor": "szponzor szegmens",
-            "intro": "intro",
-            "outro": "outro",
-            "interaction": "interakciós emlékeztető",
-            "selfpromo": "önpromóció",
-            "preview": "összefoglaló vagy előzetes",
-            "filler": "kitérő",
-            "music_offtopic": "nem zenei rész",
-            "poi_highlight": "kiemelés"
+            "sponsor": "szponzorált szegmens",
+            "intro": "intró",
+            "outro": "outró",
+            "interaction": "interakció emlékeztető",
+            "selfpromo": "önpromó",
+            "preview": "visszatekintő/ízelítő",
+            "filler": "kitekintő/filler",
+            "music_offtopic": "nem-zenei rész",
+            "poi_highlight": "kiemelt rész"
         },
         "toasts": {
-            "skipping": "{{segment}} átugrása",
-            "notSkipping": "{{segment}} nem kerül átugrásra ({{count}} alkalommal átugorva)",
+            "skipping": "{{segment}} átugorva",
+            "notSkipping": "{{segment}} nincs átugorva ({{count}} alkalommal átugrova)",
             "skip": "{{segment}} átugrása",
-            "skipToHighlight": "Ugrás a kiemeléshez"
+            "skipToHighlight": "Ugrás a kiemelt részhez"
         }
     }
 }
