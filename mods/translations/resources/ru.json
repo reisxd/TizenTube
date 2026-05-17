@@ -77,7 +77,9 @@
                             "enableVPUIPatching": "Включить патч интерфейса видеоплеера",
                             "previousNextBtns": "Кнопки «Предыдущее/Следующее»",
                             "showSuperThxBtn": "Кнопка Super Thanks",
-                            "showSpeedCtrlBtn": "Кнопка скорости"
+                            "showSpeedCtrlBtn": "Кнопка скорости", 
+                            "addMPBtn": "Отображать мини-плеер",
+                            "swapMPWithPIP": "Замена кнопки мини-плеер на PiP"
                         }
                     },
                     "preferredVideoQuality": {
@@ -136,7 +138,8 @@
                         "title": "Открыть при запуске",
                         "subtitle": "Выберите страницу, которая будет открываться при запуске TizenTube"
                     },
-                    "sortSubscriptionsByAlphabet": "Sort Subscriptions Alphabetically"
+                    "sortSubscriptionsByAlphabet": "Сортировать подписки по алфавиту",
+                    "disableChannelsOnSidebar": "Отключить каналы в боковой панели"
                 }
             },
             "updater": {

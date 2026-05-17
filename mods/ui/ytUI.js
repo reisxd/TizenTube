@@ -344,11 +344,15 @@ function SettingActionRenderer(title, itemId, serviceEndpoint, summary, thumbnai
 function scrollPaneRenderer(items) {
     return {
         scrollPaneRenderer: {
-            content: {
-                scrollPaneItemListRenderer: {
-                    items
-                }
-            }
+            content: scrollPaneItemListRenderer(items)
+        }
+    }
+}
+
+function scrollPaneItemListRenderer(items) {
+    return {
+        scrollPaneItemListRenderer: {
+            items
         }
     }
 }
@@ -444,6 +448,7 @@ export {
     overlayMessageRenderer,
     timelyAction,
     scrollPaneRenderer,
+    scrollPaneItemListRenderer,
     longPressData,
     MenuServiceItemRenderer,
     SettingsCategory,

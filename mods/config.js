@@ -35,6 +35,8 @@ const defaultConfig = {
   enableSuperThanksButton: false,
   enableSpeedControlsButton: true,
   enablePatchingVideoPlayer: true,
+  enableMPButton: true,
+  enableSwapMPWithPIP: false,
   enablePreviews: true,
   enableHideWatchedVideos: false,
   hideWatchedVideosThreshold: 80,
@@ -51,11 +53,15 @@ const defaultConfig = {
   launchToOnStartup: null,
   reloadHomeOnStartup: true,
   disabledSidebarContents: [],
+  disableChannelsOnSidebar: false,
   enableUpdater: true,
   autoFrameRate: false,
   autoFrameRatePauseVideoFor: 0,
   enableSigninReminder: false,
   sortSubscriptionsByAlphabet: false,
+  enableClock: false,
+  isClock12HourFormat: false,
+  clockShowSeconds: false,
 };
 
 let localConfig;
