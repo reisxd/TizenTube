@@ -1,6 +1,5 @@
 import DanishResource from './resources/dk.json';
 import EnglishResource from './resources/en.json';
-import GreekResource from './resources/el.json';
 import TurkishResource from './resources/tr.json';
 import VietnameseResource from './resources/vi.json';
 import GermanResource from './resources/de.json';
@@ -24,6 +23,8 @@ import HungarianResource from './resources/hu.json';
 import ItalianResource from './resources/it.json';
 import UkrainianResource from './resources/uk.json';
 import JapaneseResource from './resources/ja.json';
+import GreekResource from './resources/el.json';
+import TaiwaneseResource from './resources/zh-TW.json';
 
 export default {
     da: {
@@ -31,9 +32,6 @@ export default {
     },
     en: {
         translation: EnglishResource
-    },
-    el: {
-        translation: GreekResource
     },
     tr: {
         translation: TurkishResource
@@ -103,4 +101,11 @@ export default {
     },
     ja: {
         translation: JapaneseResource
+    },
+    el: {
+        translation: GreekResource
+    },
+    "zh-TW": {
+        translation: TaiwaneseResource
+    }
 };
