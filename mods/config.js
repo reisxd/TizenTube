@@ -59,7 +59,7 @@ const defaultConfig = {
   autoFrameRatePauseVideoFor: 0,
   enableSigninReminder: false,
   sortSubscriptionsByAlphabet: false,
-  enableClock: true,
+  enableClock: false,
   isClock12HourFormat: false,
   clockShowSeconds: false,
 };
