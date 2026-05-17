@@ -59,6 +59,9 @@ const defaultConfig = {
   autoFrameRatePauseVideoFor: 0,
   enableSigninReminder: false,
   sortSubscriptionsByAlphabet: false,
+  enableClock: true,
+  isClock12HourFormat: false,
+  clockShowSeconds: false,
 };
 
 let localConfig;

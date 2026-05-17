@@ -104,7 +104,8 @@ export function patchResolveCommand() {
                         ])
                     );
 
-                    if (window.h5vcc && window.h5vcc.tizentube && window.h5vcc.tizentube?.HasSystemFeature('android.software.picture_in_picture')) {
+                    if (window.h5vcc && window.h5vcc.tizentube && window.h5vvc.tizentube.HasSystemFeature && 
+                        window.h5vcc.tizentube.HasSystemFeature('android.software.picture_in_picture')) {
                         cmd.openPopupAction.popup.overlaySectionRenderer.overlay.overlayTwoPanelRenderer.actionPanel.overlayPanelRenderer.content.overlayPanelItemListRenderer.items.splice(3, 0,
                             buttonItem(
                                 { title: 'Picture in Picture' },
