@@ -140,6 +140,15 @@
                     },
                     "sortSubscriptionsByAlphabet": "Сортувати підписки в алфавітному порядку",
                     "disableChannelsOnSidebar": "Приховати канали в боковому меню"
+                    "clock": {
+                        "title": "Годинник",
+                        "subtitle": "Показувати годинник на екрані",
+                        "options": {
+                            "enableClock": "Увімкнути годинник",
+                            "isClock12HourFormat": "Використовувати 12-годинний формат",
+                            "clockShowSeconds": "Показувати секунди"
+                        }
+                    }
                 }
             },
             "updater": {
