@@ -8,7 +8,7 @@
                 "title": "ソーシャルメディアのリンク",
                 "qrCodeScanMessage": "以下の QR コードをスキャンすると {{name}} のページにアクセスできます。"
             },
-            "adBlock": "広告のブロック",
+            "adBlock": "広告をブロックする",
             "sponsorblock": {
                 "title": "SponsorBlock の設定",
                 "options": {
@@ -74,10 +74,12 @@
                     "patching": {
                         "title": "動画プレーヤー UI のパッチ",
                         "options": {
-                            "enableVPUIPatching": "動画プレーヤー UI のパッチを有効化します",
+                            "enableVPUIPatching": "動画プレーヤー UI のパッチを有効化する",
                             "previousNextBtns": "「前へ」と「次へ」のボタンを有効化する",
                             "showSuperThxBtn": "Super Thanks ボタンを表示する",
                             "showSpeedCtrlBtn": "速度制御ボタンを表示する"
+                            "addMPBtn": "ミニプレーヤーボタンを表示する",
+                            "swapMPWithPIP": "ミニプレーヤーボタンを PiP ボタンに入れ替える"
                         }
                     },
                     "preferredVideoQuality": {
@@ -106,7 +108,7 @@
                     "hideWatchedVideos": {
                         "title": "視聴した動画を非表示にする",
                         "options": {
-                            "enableHideWatchedVideos": "視聴した動画の非表示を有効化します",
+                            "enableHideWatchedVideos": "視聴した動画の非表示を有効化する",
                             "watchedVideosThreshold": {
                                 "title": "視聴した動画と判定するしきい値",
                                 "subtitle": "視聴した動画を非表示にする割合のしきい値を設定します"
@@ -137,6 +139,16 @@
                         "subtitle": "TizenTube の起動時にデフォルトで表示するページを選択してください"
                     },
                     "sortSubscriptionsByAlphabet": "登録しているチャンネルをアルファベット順に並べ替える"
+                    "disableChannelsOnSidebar": "サイドバーのチャンネルを無効化する",
+                    "clock": {
+                        "title": "時計",
+                        "subtitle": "画面に時計を表示します",
+                        "options": {
+                            "enableClock": "時計を有効化する",
+                            "isClock12HourFormat": "12 時間制の時計を使用する",
+                            "clockShowSeconds": "時計に秒数を表示する"
+                        }
+                    }
                 }
             },
             "updater": {
@@ -145,7 +157,7 @@
                 "versionSubtitle": "現在のバージョン: {{version}}",
                 "options": {
                     "checkForUpdates": "更新を確認する",
-                    "checkForUpdatesOnStartup": "起動時に更新を確認します"
+                    "checkForUpdatesOnStartup": "起動時に更新を確認する"
                 }
             }
         },
