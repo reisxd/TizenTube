@@ -74,7 +74,7 @@
                     "patching": {
                         "title": "動画プレーヤー UI のパッチ",
                         "options": {
-                            "enableVPUIPatching": "動画プレーヤー UI のパッチを有効化します",
+                            "enableVPUIPatching": "動画プレーヤー UI のパッチを有効化する",
                             "previousNextBtns": "「前へ」と「次へ」のボタンを有効化する",
                             "showSuperThxBtn": "Super Thanks ボタンを表示する",
                             "showSpeedCtrlBtn": "速度制御ボタンを表示する"
@@ -108,7 +108,7 @@
                     "hideWatchedVideos": {
                         "title": "視聴した動画を非表示にする",
                         "options": {
-                            "enableHideWatchedVideos": "視聴した動画の非表示を有効化します",
+                            "enableHideWatchedVideos": "視聴した動画の非表示を有効化する",
                             "watchedVideosThreshold": {
                                 "title": "視聴した動画と判定するしきい値",
                                 "subtitle": "視聴した動画を非表示にする割合のしきい値を設定します"
