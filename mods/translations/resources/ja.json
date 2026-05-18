@@ -79,7 +79,7 @@
                             "showSuperThxBtn": "Super Thanks ボタンを表示する",
                             "showSpeedCtrlBtn": "速度制御ボタンを表示する"
                             "addMPBtn": "ミニプレーヤーボタンを表示する",
-                            "swapMPWithPIP": "PiP ボタンをミニプレーヤーボタンに置き換える"
+                            "swapMPWithPIP": "ミニプレーヤーボタンを PiP ボタンに置き換える"
                         }
                     },
                     "preferredVideoQuality": {
