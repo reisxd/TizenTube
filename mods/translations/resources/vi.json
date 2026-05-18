@@ -77,7 +77,9 @@
                             "enableVPUIPatching": "Bật vá giao diện trình phát video",
                             "previousNextBtns": "Bật nút Trước và Tiếp theo",
                             "showSuperThxBtn": "Hiển thị nút Super Thanks",
-                            "showSpeedCtrlBtn": "Hiển thị nút Điều khiển tốc độ"
+                            "showSpeedCtrlBtn": "Hiển thị nút Điều khiển tốc độ",
+                            "addMPBtn": "Hiện nút trình phát nhỏ",
+                            "swapMPWithPIP": "Đổi nút trình phát nhỏ thành Picture-In-Picture"
                         }
                     },
                     "preferredVideoQuality": {
@@ -136,7 +138,17 @@
                         "title": "Trang khởi động",
                         "subtitle": "Chọn trang mặc định mà TizenTube sẽ mở khi khởi động"
                     },
-                    "sortSubscriptionsByAlphabet": "Sắp xếp các kênh đăng ký theo bảng chữ cái"
+                    "sortSubscriptionsByAlphabet": "Sắp xếp các kênh đăng ký theo bảng chữ cái",
+                    "disableChannelsOnSidebar": "Ẩn kênh khỏi thanh điều hướng",
+                    "clock": {
+                        "title": "Đồng hồ",
+                        "subtitle": "Hiện thị đồng hồ trên màn hình",
+                        "options": {
+                            "enableClock": "Hiện đồng hồ",
+                            "isClock12HourFormat": "Sử dụng dịnh dạng đồng hồ 12H",
+                            "clockShowSeconds": "Hiện số giây"
+                        }
+                    }
                 }
             },
             "updater": {
