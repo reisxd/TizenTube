@@ -196,10 +196,10 @@
             "poi_highlight": "ハイライト"
         },
         "toasts": {
-            "skipping": "{{segment}}をスキップします",
+            "skipping": "{{segment}}をスキップしました",
             "notSkipping": "{{segment}}をスキップしません ({{count}} 回スキップ済み)",
             "skip": "{{segment}}をスキップ",
-            "skipToHighlight": "ハイライトへスキップ"
+            "skipToHighlight": "ハイライトへ移動"
         }
     }
 }
