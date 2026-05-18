@@ -1,5 +1,6 @@
 {
     "__contributors": [
+        "Redje",
         "SonnyT72"
     ],
     "settings": {
@@ -164,7 +165,7 @@
                 "1": "Si vous appréciez TizenTube et que vous aimeriez soutenir son développement, vous pouvez :",
                 "2": "1. Ajouter une étoile au dépot Github améliore sa visibilité.",
                 "3": "2. Partager TizenTube.",
-                "4": "Si vous voulez contribuer financièrement:",
+                "4": "Si vous voulez contribuer financièrement :",
                 "5": "- Buy Me A Coffee: https://www.buymeacoffee.com/reisxd (de préférences)",
                 "6": "- GitHub Sponsors: https://github.com/sponsors/reisxd"
             }
@@ -182,7 +183,7 @@
             "interaction": "rappel d'interaction",
             "selfpromo": "auto-promotion",
             "preview": "récapitulatif ou revue",
-            "filler": "pas de rapports avec le sujet",
+            "filler": "pas de rapport avec le sujet",
             "music_offtopic": "partie sans musique",
             "poi_highlight": "moment fort"
         },
