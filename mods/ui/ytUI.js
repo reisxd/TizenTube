@@ -235,6 +235,15 @@ function longPressData(data) {
                                 }
                             }
                         }),
+                        MenuServiceItemRenderer('Go to Channel', {
+                            clickTrackingParams: null,
+                            playlistEditEndpoint: {
+                                customAction: {
+                                    action: 'GO_TO_CHANNEL',
+                                    parameters: { videoId: data.videoId }
+                                }
+                            }
+                        }),
                     ],
                     trackingParams: null,
                     accessibility: {
