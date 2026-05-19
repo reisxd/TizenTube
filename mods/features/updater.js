@@ -1,15 +1,18 @@
 // TizenTube Cobalt Update Checker
 
-import { buttonItem, showModal, showToast, overlayPanelItemListRenderer } from '../ui/ytUI.js';
+import { buttonItem, showModal, showToast, overlayPanelItemListRenderer, scrollPaneRenderer, overlayMessageRenderer } from '../ui/ytUI.js';
 import { configRead } from '../config.js';
 
 // If TizenTube is not running on Cobalt, do nothing
-if (window.h5vcc && window.h5vcc.tizentube && configRead('enableUpdater')) {
-    const currentEpoch = Math.floor(Date.now() / 1000);
-    if (configRead('dontCheckUpdateUntil') > currentEpoch) {
-        console.info('Skipping update check until', new Date(configRead('dontCheckUpdateUntil') * 1000).toLocaleString());
-    } else checkForUpdates();
-}
+// Add a timeout since reloading the home page while the updater pop up is shown causes the pop up to instantly disappear.
+setTimeout(() => {
+    if (window.h5vcc && window.h5vcc.tizentube && configRead('enableUpdater')) {
+        const currentEpoch = Math.floor(Date.now() / 1000);
+        if (configRead('dontCheckUpdateUntil') > currentEpoch) {
+            console.info('Skipping update check until', new Date(configRead('dontCheckUpdateUntil') * 1000).toLocaleString());
+        } else checkForUpdates();
+    }
+}, 2500);
 
 function getLatestRelease() {
     return fetch('https://api.github.com/repos/Crebbits/TizenTubeCobalt/releases/latest')
@@ -44,50 +47,58 @@ function checkForUpdates(showNoUpdateToast) {
                     downloadUrl = release.assets.find(asset => asset.name.includes('arm.apk')).browser_download_url;
                 }
             } else downloadUrl = release.assets[0].browser_download_url;
-            
+
             if (latestVersion !== currentAppVersion) {
                 console.info(`New version available: ${latestVersion} (current: ${currentAppVersion})`);
+                const msg = `Release Date: ${new Date(releaseDate * 1000).toLocaleString()}\n${release.body}`.replace(/#/g, '').replace(/\*/g, '').trim();
+
+                const buttons = [
+                    buttonItem(
+                        { title: 'Update Now', subtitle: 'Click to download the latest version.' },
+                        { icon: 'DOWN_ARROW' },
+                        [
+                            {
+                                customAction: {
+                                    action: 'UPDATE_DOWNLOAD',
+                                    parameters: downloadUrl
+                                }
+                            },
+                            {
+                                signalAction: {
+                                    signal: 'POPUP_BACK'
+                                }
+                            }
+                        ]
+                    ),
+                    buttonItem(
+                        { title: 'Remind Me Later', subtitle: 'Check for updates later.' },
+                        { icon: 'SEARCH_HISTORY' },
+                        [
+                            {
+                                customAction: {
+                                    action: 'UPDATE_REMIND_LATER',
+                                    parameters: currentEpoch + 86400
+                                }
+                            },
+                            {
+                                signalAction: {
+                                    signal: 'POPUP_BACK'
+                                }
+                            }
+                        ]
+                    )
+                ];
+
+                // Add an empty message so the CSS doesn't get screwed after user input
+                buttons.push(overlayMessageRenderer(' '));
+                buttons.push(overlayMessageRenderer(msg));
+
                 showModal(
                     {
                         title: 'Update Available',
-                        subtitle: `A new version of TizenTube Cobalt is available: ${latestVersion}\nCurrent version: ${currentAppVersion}\nRelease Date: ${new Date(releaseDate * 1000).toLocaleString()}\nRelease Notes:\n${release.body}`,
+                        subtitle: `A new version of TizenTube Cobalt is available: ${latestVersion}, current: ${currentAppVersion}`
                     },
-                    overlayPanelItemListRenderer([
-                        buttonItem(
-                            { title: 'Update Now', subtitle: 'Click to download the latest version.' },
-                            { icon: 'DOWN_ARROW' },
-                            [
-                                {
-                                    customAction: {
-                                        action: 'UPDATE_DOWNLOAD',
-                                        parameters: downloadUrl
-                                    }
-                                },
-                                {
-                                    signalAction: {
-                                        signal: 'POPUP_BACK'
-                                    }
-                                }
-                            ]
-                        ),
-                        buttonItem(
-                            { title: 'Remind Me Later', subtitle: 'Check for updates later.' },
-                            { icon: 'SEARCH_HISTORY' },
-                            [
-                                {
-                                    customAction: {
-                                        action: 'UPDATE_REMIND_LATER',
-                                        parameters: currentEpoch + 86400
-                                    }
-                                },
-                                {
-                                    signalAction: {
-                                        signal: 'POPUP_BACK'
-                                    }
-                                }
-                            ]
-                        )
-                    ]),
+                    overlayPanelItemListRenderer(buttons),
                     'tt-update-modal',
                     false
                 )

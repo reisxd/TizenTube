@@ -76,68 +76,53 @@ export function patchResolveCommand() {
                     customAction(cmd.playlistEditEndpoint.customAction.action, cmd.playlistEditEndpoint.customAction.parameters);
                     return true;
                 } else if (cmd?.openPopupAction?.uniqueId === 'playback-settings') {
-                    // Patch the playback settings popup to use TizenTube speed settings.
-                    // YouTube has shipped both a two-panel and a single-panel layout for this popup,
-                    // so locate the items array defensively instead of drilling a hardcoded path.
-                    // The try/catch is load-bearing: any unexpected throw here would otherwise
-                    // prevent the native popup from opening at all.
-                    try {
-                        const oldPath = cmd?.openPopupAction?.popup?.overlaySectionRenderer?.overlay
-                            ?.overlayTwoPanelRenderer?.actionPanel?.overlayPanelRenderer?.content
-                            ?.overlayPanelItemListRenderer?.items;
-                        const items = Array.isArray(oldPath)
-                            ? oldPath
-                            : findItemListItems(cmd?.openPopupAction?.popup);
+                    // Patch the playback settings popup to use TizenTube speed settings
+                    const items = cmd.openPopupAction.popup.overlaySectionRenderer.overlay.overlayTwoPanelRenderer.actionPanel.overlayPanelRenderer.content.overlayPanelItemListRenderer.items;
+                    for (const item of items) {
+                        if (item?.compactLinkRenderer?.icon?.iconType === 'SLOW_MOTION_VIDEO') {
+                            item.compactLinkRenderer.subtitle && (item.compactLinkRenderer.subtitle.simpleText = 'with TizenTube');
+                            item.compactLinkRenderer.serviceEndpoint = {
+                                clickTrackingParams: "null",
+                                signalAction: {
+                                    customAction: {
+                                        action: 'TT_SPEED_SETTINGS_SHOW',
+                                        parameters: []
+                                    }
+                                }
+                            };
+                        }
+                    }
 
-                        if (Array.isArray(items)) {
-                            for (const item of items) {
-                                if (item?.compactLinkRenderer?.icon?.iconType === 'SLOW_MOTION_VIDEO') {
-                                    item.compactLinkRenderer.subtitle && (item.compactLinkRenderer.subtitle.simpleText = 'with TizenTube');
-                                    item.compactLinkRenderer.serviceEndpoint = {
-                                        clickTrackingParams: "null",
-                                        signalAction: {
-                                            customAction: {
-                                                action: 'TT_SPEED_SETTINGS_SHOW',
-                                                parameters: []
-                                            }
-                                        }
-                                    };
+                    cmd.openPopupAction.popup.overlaySectionRenderer.overlay.overlayTwoPanelRenderer.actionPanel.overlayPanelRenderer.content.overlayPanelItemListRenderer.items.splice(2, 0,
+                        buttonItem(
+                            { title: 'Mini Player' },
+                            { icon: 'CLEAR_COOKIES' }, [
+                            {
+                                customAction: {
+                                    action: 'ENTER_MP'
                                 }
                             }
+                        ])
+                    );
 
-                            items.splice(2, 0,
-                                buttonItem(
-                                    { title: 'Mini Player' },
-                                    { icon: 'CLEAR_COOKIES' }, [
-                                    {
-                                        customAction: {
-                                            action: 'ENTER_MP'
-                                        }
+                    if (window.h5vcc && window.h5vcc.tizentube && window.h5vcc.tizentube.HasSystemFeature && 
+                        window.h5vcc.tizentube.HasSystemFeature('android.software.picture_in_picture')) {
+                        cmd.openPopupAction.popup.overlaySectionRenderer.overlay.overlayTwoPanelRenderer.actionPanel.overlayPanelRenderer.content.overlayPanelItemListRenderer.items.splice(3, 0,
+                            buttonItem(
+                                { title: 'Picture in Picture' },
+                                { icon: 'PIP' }, [
+                                {
+                                    customAction: {
+                                        action: 'ENTER_PIP'
                                     }
-                                ])
-                            );
-
-                            if (window.h5vcc && window.h5vcc.tizentube && window.h5vcc.tizentube?.HasSystemFeature('android.software.picture_in_picture')) {
-                                items.splice(3, 0,
-                                    buttonItem(
-                                        { title: 'Picture in Picture' },
-                                        { icon: 'PIP' }, [
-                                        {
-                                            customAction: {
-                                                action: 'ENTER_PIP'
-                                            }
-                                        },
-                                        {
-                                            signalAction: {
-                                                 signal: 'POPUP_BACK'
-                                            }
-                                        }
-                                    ])
-                                );
-                            }
-                        }
-                    } catch (err) {
-                        console.warn('TizenTube: playback-settings patch threw, falling through to native handler:', err && err.message);
+                                },
+                                {
+                                    signalAction: {
+                                         signal: 'POPUP_BACK'
+                                    }
+                                }
+                            ])
+                        );
                     }
                 } else if (cmd?.watchEndpoint?.videoId) {
                     window.isPipPlaying = false;
@@ -180,31 +165,6 @@ export function patchResolveCommand() {
             }
         }
     }
-}
-
-// BFS-walk the popup payload looking for the first overlayPanelItemListRenderer.items
-// array. Depth-limited so a malformed payload can't trigger runaway traversal.
-function findItemListItems(root) {
-    if (!root || typeof root !== 'object') return null;
-    const queue = [{ node: root, depth: 0 }];
-    const seen = new Set();
-    const MAX_DEPTH = 12;
-    const MAX_NODES = 500;
-    let visited = 0;
-    while (queue.length && visited < MAX_NODES) {
-        const { node, depth } = queue.shift();
-        if (!node || typeof node !== 'object' || seen.has(node)) continue;
-        seen.add(node);
-        visited++;
-        const items = node.overlayPanelItemListRenderer?.items;
-        if (Array.isArray(items)) return items;
-        if (depth >= MAX_DEPTH) continue;
-        for (const key in node) {
-            const child = node[key];
-            if (child && typeof child === 'object') queue.push({ node: child, depth: depth + 1 });
-        }
-    }
-    return null;
 }
 
 function customAction(action, parameters) {

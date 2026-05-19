@@ -57,7 +57,7 @@
                     "videoPreviews": "Bật tính năng xem trước video",
                     "ttWelcomeMsg": "Hiển thị thông báo chào mừng TizenTube",
                     "guestSignInReminder": "Hiển thị nhắc nhở đăng nhập cho chế độ khách",
-                    "reloadHomeOnStartup": "Tải lại Trang chủ khi khởi động"
+                    "reloadHomeOnStartup": "Tải lại trang chủ khi khởi động"
                 }
             },
             "subtitles": {
@@ -78,12 +78,14 @@
                             "previousNextBtns": "Bật nút Trước và Tiếp theo",
                             "showSuperThxBtn": "Hiển thị nút Super Thanks",
                             "showSpeedCtrlBtn": "Hiển thị nút Điều khiển tốc độ",
-                            "showTurnOffScreenBtn": "Hiển thị nút Tắt màn hình"
+                            "showTurnOffScreenBtn": "Hiển thị nút Tắt màn hình",
+                            "addMPBtn": "Hiện nút trình phát nhỏ",
+                            "swapMPWithPIP": "Đổi nút trình phát nhỏ thành Picture-In-Picture"
                         }
                     },
                     "preferredVideoQuality": {
                         "title": "Chất lượng video ưu tiên",
-                        "subtitle": "Chọn chất lượng video ưu tiên hoặc tốt nhất tiếp theo được áp dụng khi bắt đầu phát"
+                        "subtitle": "Chọn chất lượng video được áp dụng khi bắt đầu phát"
                     },
                     "speedSettings": {
                         "title": "Mức tăng cài đặt tốc độ",
@@ -91,7 +93,7 @@
                     },
                     "preferredVideoCodec": {
                         "title": "Bộ giải mã video ưu tiên",
-                        "subtitle": "Chọn bộ giải mã video ưu tiên để phát"
+                        "subtitle": "Chọn bộ giải mã video để phát"
                     },
                     "afr": "Tốc độ khung hình tự động (AFR)",
                     "afrPauseDuration": {
@@ -130,14 +132,24 @@
                         }
                     },
                     "disableSidebarContents": {
-                        "title": "Tắt nội dung thanh bên",
-                        "subtitle": "Chọn các nội dung trên thanh bên để tắt"
+                        "title": "Ẩn mục trên thanh điều hướng",
+                        "subtitle": "Chọn các mục dưới đây để ẩn ở trên thanh điều hướng"
                     },
                     "launchToOnStartup": {
                         "title": "Trang khởi động",
                         "subtitle": "Chọn trang mặc định mà TizenTube sẽ mở khi khởi động"
                     },
-                    "sortSubscriptionsByAlphabet": "Sắp xếp các kênh đăng ký theo bảng chữ cái"
+                    "sortSubscriptionsByAlphabet": "Sắp xếp các kênh đăng ký theo bảng chữ cái",
+                    "disableChannelsOnSidebar": "Ẩn kênh khỏi thanh điều hướng",
+                    "clock": {
+                        "title": "Đồng hồ",
+                        "subtitle": "Hiện thị đồng hồ trên màn hình",
+                        "options": {
+                            "enableClock": "Hiện đồng hồ",
+                            "isClock12HourFormat": "Sử dụng dịnh dạng đồng hồ 12H",
+                            "clockShowSeconds": "Hiện số giây"
+                        }
+                    }
                 }
             },
             "updater": {

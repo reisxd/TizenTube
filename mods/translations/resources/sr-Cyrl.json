@@ -41,7 +41,7 @@
                 "options": {
                     "endScreenCards": "Сакриј завршне картице на екрану",
                     "youThereRenderer": "Омогући прозор 'Да ли сте још увек ту?'",
-                    "paidPromoOverlay": "Омогуći sloj 'Укључује плаћену промоцију'",
+                    "paidPromoOverlay": "Омогући слој 'Укључује плаћену промоцију'",
                     "whosWatching": {
                         "title": "Мени 'Ко гледа?'",
                         "options": {
@@ -78,7 +78,9 @@
                             "previousNextBtns": "Омогући дугмад Претходно и Следеће",
                             "showSuperThxBtn": "Прикажи дугме 'Super Thanks'",
                             "showSpeedCtrlBtn": "Прикажи контроле брзине",
-                            "showTurnOffScreenBtn": "Прикажи дугме за искључивање екрана"
+                            "showTurnOffScreenBtn": "Прикажи дугме за искључивање екрана",
+                            "addMPBtn": "Прикажи дугме за мини плејер",
+                            "swapMPWithPIP": "Замени дугме мини плејера са ПиП дугметом"
                         }
                     },
                     "preferredVideoQuality": {
@@ -102,7 +104,7 @@
             },
             "uiSettings": {
                 "title": "Подешавања корисничког интерфејса",
-                "subtitle": "Прилагодите интерфеjs својим жељама",
+                "subtitle": "Прилагодите интерфејс својим жељама",
                 "options": {
                     "hideWatchedVideos": {
                         "title": "Сакриј одгледане видео снимке",
@@ -137,7 +139,17 @@
                         "title": "Почетна страница при покретању",
                         "subtitle": "Изаберите подразумевану страницу која се отвара при покретању ТизенТубе-а"
                     },
-                    "sortSubscriptionsByAlphabet": "Сортирај претплате по азбуци"
+                    "sortSubscriptionsByAlphabet": "Сортирај претплате по азбуци",
+                    "disableChannelsOnSidebar": "Онемогући канале на бочној траци",
+                    "clock": {
+                        "title": "Сат",
+                        "subtitle": "Прикажи сат на екрану",
+                        "options": {
+                            "enableClock": "Омогући сат",
+                            "isClock12HourFormat": "Користи 12-часовни формат за сат",
+                            "clockShowSeconds": "Прикажи секунде на сату"
+                        }
+                    }
                 }
             },
             "updater": {
@@ -170,7 +182,7 @@
     },
     "welcomeMsg": {
         "title": "Добродошли у ТизенТубе",
-        "subtitle": "Идите u подешавања и кликните на 'ТизенТубе подешавања' за конфигурацију."
+        "subtitle": "Идите у подешавања и кликните на 'ТизенТубе подешавања' за конфигурацију."
     },
     "sponsorblock": {
         "segments": {
@@ -179,7 +191,7 @@
             "outro": "одјава (оутро)",
             "interaction": "подсетник за интеракцију",
             "selfpromo": "самопромоција",
-            "preview": "најава или саžетак",
+            "preview": "најава или сажетак",
             "filler": "скретање са теме",
             "music_offtopic": "немузички део",
             "poi_highlight": "истакнуто"

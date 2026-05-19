@@ -140,7 +140,16 @@
                         "subtitle": "TizenTube'un açılışta varsayılan olarak açacağı sayfayı seçin"
                     },
                     "sortSubscriptionsByAlphabet": "Abonelikleri Alfabetik Sırala",
-                    "disableChannelsOnSidebar": "Kenar Çubuğunda Kanalları Devre Dışı Bırak"
+                    "disableChannelsOnSidebar": "Kenar Çubuğunda Kanalları Devre Dışı Bırak",
+                    "clock": {
+                        "title": "Saat",
+                        "subtitle": "Ekranda saat göster",
+                        "options": {
+                            "enableClock": "Saati Etkinleştir",
+                            "isClock12HourFormat": "Saat için 12 Saat Formatını Kullan",
+                            "clockShowSeconds": "Saatte Saniyeleri Göster"
+                        }
+                    }
                 }
             },
             "updater": {

@@ -78,7 +78,9 @@
                             "previousNextBtns": "Omogući dugmad Prethodno i Sledeće",
                             "showSuperThxBtn": "Prikaži dugme 'Super Thanks'",
                             "showSpeedCtrlBtn": "Prikaži kontrole brzine",
-                            "showTurnOffScreenBtn": "Prikaži dugme za isključivanje ekrana"
+                            "showTurnOffScreenBtn": "Prikaži dugme za isključivanje ekrana",
+                            "addMPBtn": "Prikaži dugme za mini plejer",
+                            "swapMPWithPIP": "Zameni dugme mini plejera sa PiP dugmetom"
                         }
                     },
                     "preferredVideoQuality": {
@@ -118,14 +120,14 @@
                     "screenDimming": {
                         "title": "Zatamnjivanje ekrana",
                         "options": {
-                            "enableScreenDimming": "Omogući zatamnjivanje ekrana",
+                            "enableScreenDimming": "Omogući zatamnjenje ekrana",
                             "dimmingTimeout": {
-                                "title": "Vreme do zatamnjivanja",
-                                "subtitle": "Postavite vreme neaktivnosti (u sekundama) pre zatamnjivanja ekrana"
+                                "title": "Vreme do zatamnjenja",
+                                "subtitle": "Postavite vreme neaktivnosti (u sekundama) pre zatamnjenja ekrana"
                             },
                             "dimmingOpacity": {
                                 "title": "Nivo zatamnjenja",
-                                "subtitle": "Postavite nivo prozirnosti za zatamnjivanje ekrana"
+                                "subtitle": "Postavite nivo prozirnosti za zatamnjenje ekrana"
                             }
                         }
                     },
@@ -137,7 +139,17 @@
                         "title": "Početna stranica pri pokretanju",
                         "subtitle": "Izaberite podrazumevanu stranicu koja se otvara pri pokretanju TizenTube-a"
                     },
-                    "sortSubscriptionsByAlphabet": "Sortiraj pretplate po azbuci"
+                    "sortSubscriptionsByAlphabet": "Sortiraj pretplate po azbuci",
+                    "disableChannelsOnSidebar": "Onemogući kanale na bočnoj traci",
+                    "clock": {
+                        "title": "Sat",
+                        "subtitle": "Prikaži sat na ekranu",
+                        "options": {
+                            "enableClock": "Omogući sat",
+                            "isClock12HourFormat": "Koristi 12-časovni format za sat",
+                            "clockShowSeconds": "Prikaži sekunde na satu"
+                        }
+                    }
                 }
             },
             "updater": {
@@ -159,10 +171,10 @@
             "title": "Podrži TizenTube",
             "subtitle": "❤️ Podržite razvoj TizenTube projekta",
             "content": {
-                "1": "Ako uživate u korišćenju TizenTube-a i želite da podržite njegov razvoj, razmotrite sledeće:",
+                "1": "Ako uživate u korišćenju TizenTube-a i želite da podržite njegov razvoj, razmislite o sledeće:",
                 "2": "1. Označite repozitorijum zvezdicom (Star) na GitHub-u radi bolje vidljivosti.",
                 "3": "2. Podelite TizenTube sa drugima.",
-                "4": "Ako želite da pomognete finansijski, razmotrite donaciju:",
+                "4": "Ako želite da pomognete finansijski, razmislite o donaciji:",
                 "5": "- Buy Me A Coffee: https://www.buymeacoffee.com/reisxd (preporučeno)",
                 "6": "- GitHub Sponsors: https://github.com/sponsors/reisxd"
             }

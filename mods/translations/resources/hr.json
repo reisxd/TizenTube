@@ -78,7 +78,9 @@
                             "previousNextBtns": "Omogući tipke Prethodno i Sljedeće",
                             "showSuperThxBtn": "Prikaži tipku 'Super hvala'",
                             "showSpeedCtrlBtn": "Prikaži kontrole brzine",
-                            "showTurnOffScreenBtn": "Prikaži tipku za isključivanje zaslona"
+                            "showTurnOffScreenBtn": "Prikaži tipku za isključivanje zaslona",
+                            "addMPBtn": "Prikaži tipku za mini player",
+                            "swapMPWithPIP": "Zamijeni tipku mini playera s PiP tipkom"
                         }
                     },
                     "preferredVideoQuality": {
@@ -137,7 +139,17 @@
                         "title": "Početna stranica pri pokretanju",
                         "subtitle": "Odaberite zadanu stranicu koja se otvara pri pokretanju TizenTubea"
                     },
-                    "sortSubscriptionsByAlphabet": "Poredaj pretplate abecedno"
+                    "sortSubscriptionsByAlphabet": "Poredaj pretplate abecedno",
+                    "disableChannelsOnSidebar": "Onemogući kanale na bočnoj traci",
+                    "clock": {
+                        "title": "Sat",
+                        "subtitle": "Prikaži sat na zaslonu",
+                        "options": {
+                            "enableClock": "Omogući sat",
+                            "isClock12HourFormat": "Koristi 12-satni format za sat",
+                            "clockShowSeconds": "Prikaži sekunde na satu"
+                        }
+                    }
                 }
             },
             "updater": {

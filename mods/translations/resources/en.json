@@ -140,7 +140,16 @@
                         "subtitle": "Choose the default page TizenTube opens to on startup"
                     },
                     "sortSubscriptionsByAlphabet": "Sort Subscriptions Alphabetically",
-                    "disableChannelsOnSidebar": "Disable Channels on Sidebar"
+                    "disableChannelsOnSidebar": "Disable Channels on Sidebar",
+                    "clock": {
+                        "title": "Clock",
+                        "subtitle": "Display a clock on the screen",
+                        "options": {
+                            "enableClock": "Enable Clock",
+                            "isClock12HourFormat": "Use 12-Hour Format for Clock",
+                            "clockShowSeconds": "Show Seconds on Clock"
+                        }
+                    }
                 }
             },
             "updater": {
