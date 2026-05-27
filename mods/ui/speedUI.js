@@ -1,6 +1,13 @@
 import { configRead } from '../config.js';
 import { showModal, buttonItem, overlayPanelItemListRenderer } from './ytUI.js';
 
+function isMusicVideoType(musicType) {
+    return typeof musicType === 'string' &&
+        musicType.startsWith('MUSIC_VIDEO_TYPE_') &&
+        musicType !== 'MUSIC_VIDEO_TYPE_NONE' &&
+        musicType !== 'MUSIC_VIDEO_TYPE_OMV_NONE';
+}
+
 const interval = setInterval(() => {
     const videoElement = document.querySelector('video');
     if (videoElement) {
@@ -11,7 +18,17 @@ const interval = setInterval(() => {
 
 function execute_once_dom_loaded_speed() {
     document.querySelector('video').addEventListener('canplay', () => {
-        document.getElementsByTagName('video')[0].playbackRate = configRead('videoSpeed');;
+        const video = document.getElementsByTagName('video')[0];
+        const defaultSpeed = configRead('videoSpeed');
+        video.playbackRate = defaultSpeed;
+
+        if (!configRead('force1xForMusic')) return;
+
+        setTimeout(() => {
+            if (isMusicVideoType(window.musicVideoType)) {
+                video.playbackRate = 1;
+            }
+        }, 25);
     });
 
     const eventHandler = (evt) => {
