@@ -12,6 +12,7 @@ const defaultConfig = {
   enableSponsorBlockPreview: true,
   enableSponsorBlockMusicOfftopic: true,
   enableSponsorBlockFiller: false,
+  sponsorBlockAutoSkip: true,
   enableSponsorBlockHighlight: true,
   videoSpeed: 1,
   preferredVideoQuality: 'auto',

@@ -105,6 +105,7 @@ class SponsorBlockHandler {
     this.segments = result.segments;
     this.manualSkippableCategories = configRead('sponsorBlockManualSkips');
     this.skippableCategories = this.getSkippableCategories();
+    this.autoSkip = configRead('sponsorBlockAutoSkip');
 
     this.scheduleSkipHandler = () => {
       const slider = document.querySelector('div[idomkey="slider"]');
