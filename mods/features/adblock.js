@@ -97,9 +97,9 @@ JSON.parse = function () {
     );
   }
 
-  // Patch settings
-
-  if (r?.title?.runs) {
+  // Patch settings, only when we detect items related to settings
+  
+  if (isSettingsResponse(r)) {
     PatchSettings(r);
   }
 
@@ -262,6 +262,11 @@ for (const key in window._yttv) {
   }
 }
 
+function isSettingsResponse(r) {
+  return r?.title?.runs && Array.isArray(r.items) && r.items.some(
+    (item) => item.settingCategoryCollectionRenderer || item.settingActionRenderer
+  );
+}
 
 function processShelves(shelves, shouldAddPreviews = true) {
   for (const shelve of shelves) {
