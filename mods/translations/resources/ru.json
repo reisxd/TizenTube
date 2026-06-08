@@ -145,7 +145,7 @@
                         "subtitle": "Отображать часы на экране",
                         "options": {
                             "enableClock": "Включить часы",
-                            "isClock12HourFormat": "12-часовой формат ",
+                            "isClock12HourFormat": "12-часовой формат",
                             "clockShowSeconds": "Показывать секунды"
                         }
                     }
