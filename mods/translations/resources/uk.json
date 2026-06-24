@@ -139,7 +139,7 @@
                         "subtitle": "Виберіть сторінку, яка відкриватиметься під час запуску TizenTube"
                     },
                     "sortSubscriptionsByAlphabet": "Сортувати підписки в алфавітному порядку",
-                    "disableChannelsOnSidebar": "Приховати канали в боковому меню"
+                    "disableChannelsOnSidebar": "Приховати канали в боковому меню",
                     "clock": {
                         "title": "Годинник",
                         "subtitle": "Показувати годинник на екрані",
