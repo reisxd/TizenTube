@@ -1,0 +1,205 @@
+{
+    "__contributors": [
+        "RobusTetus"
+    ],
+    "settings": {
+        "options": {
+            "socialMedia": {
+                "title": "Odkazy sociálních sítí",
+                "qrCodeScanMessage": "Můžete navštívit stránku {{name}} naskenováním QR kódu níže."
+            },
+            "adBlock": "Blokovač reklam",
+            "sponsorblock": {
+                "title": "Nastavení SponsorBlock",
+                "options": {
+                    "enableSB": "Povolit SponsorBlock",
+                    "manualSkip": "Ručně Přeskakovat SponsorBlock Segmenty",
+                    "segments": "Segmenty",
+                    "categories": {
+                        "sponsor": "Překakovat Segmenty Se Sponzory",
+                        "intro": "Překakovat Úvodní Segmenty",
+                        "outro": "Přeskakovat Koncové Segmenty",
+                        "interaction": "Přeskakovat Segmenty S Připomenutími Interakce",
+                        "selfpromo": "Přeskakovat Segmenty Se Sebepropagací",
+                        "preview": "Přeskakovat Segmenty S Rekapitulací/Ukázkami",
+                        "filler": "Přeskakovat Segmenty S Vtipy/Výplněmi",
+                        "music_offtopic": "Přeskakovat Segmenty s Hudbou Mimo Téma",
+                        "highlights": "Povolit Zvýraznění"
+                    },
+                    "showSBToasts": "Zobrazovat SponsorBlock Oznámení"
+                }
+            },
+            "dearrow": {
+                "title": "Nastavení DeArrow",
+                "options": {
+                    "enableDA": "Povolit DeArrow",
+                    "enableDAThumbnails": "Povolit Miniatury Videí DeArrow"
+                }
+            },
+            "misc": {
+                "title": "Ostatní Nastavení",
+                "options": {
+                    "endScreenCards": "Skrývat karty na konci videí",
+                    "youThereRenderer": "Povolit obrazovku 'Stále se díváte?'",
+                    "paidPromoOverlay": "Zobrazovat zprávu 'Obsahuje placenou propagaci'",
+                    "whosWatching": {
+                        "title": "Nabídka 'Kdo se dívá?'",
+                        "options": {
+                            "enableWW": "Povolit Nabídku 'Kdo se dívá?'",
+                            "permaEnableWW": "Trvale Povolit Nabídku 'Kdo se dívá?'",
+                            "enableWWOnExit": "Povolit Nabídku 'Kdo se dívá?' při Ukončení Aplikace"
+                        }
+                    },
+                    "fixUI": "Opravit UI",
+                    "hqThumbnails": "Povolit Miniatury Videí Ve Vysoké Kvalitě",
+                    "longPress": "Povolit Akce Dlouhého Stisknutí",
+                    "shorts": "Povolit Shorts",
+                    "videoPreviews": "Povolit Náhledy Videí",
+                    "ttWelcomeMsg": "Zobrazovat Uvítací Zprávu TT",
+                    "guestSignInReminder": "Zobrazovat Připomenutí Přihlášení Hosta",
+                    "reloadHomeOnStartup": "Znovu Načíst Domovskou Stránku při Spuštění"
+                }
+            },
+            "subtitles": {
+                "title": "Nastavení Titulků",
+                "options": {
+                    "showLocalSubtitle": "Zobrazovat Lokální Titulky",
+                    "showHiddenSubtitles": "Zobrazovat Skryté Titulky"
+                }
+            },
+            "videoPlayer": {
+                "title": "Nastavení Přehrávače",
+                "subtitle": "Přizpůsobit funkce přehrávače",
+                "options": {
+                    "patching": {
+                        "title": "Opravy UI Přehrávače",
+                        "options": {
+                            "enableVPUIPatching": "Povolit Opravy UI Přehrávače",
+                            "previousNextBtns": "Povolit Tlačítka Předchozí a Další",
+                            "showSuperThxBtn": "Zobrazovat Tlačítko Super Thanks",
+                            "showSpeedCtrlBtn": "Zobrazovat Tlačítko Ovládání Rychlosti",
+                            "addMPBtn": "Zobrazovat Tlačítko Mini Přehrávače",
+                            "swapMPWithPIP": "Zaměnit Tlačítko Mini Přehrávače za Tlačítko PiP"
+                        }
+                    },
+                    "preferredVideoQuality": {
+                        "title": "Preferovaná Kvalita Videa",
+                        "subtitle": "Zvolte preferovanou nebo nejlepší dostupnou kvalitu videa při spuštění přehrávání"
+                    },
+                    "speedSettings": {
+                        "title": "Kroky Nastavení Rychlosti",
+                        "subtitle": "Nastavte kroky pro úpravy rychlosti přehrávání videa"
+                    },
+                    "preferredVideoCodec": {
+                        "title": "Preferovaný Kodek Videa",
+                        "subtitle": "Zvolte preferovaný kodek videa pro přehrávání"
+                    },
+                    "afr": "Automatická Frekvence Snímků",
+                    "afrPauseDuration": {
+                        "title": "Doba Pauzy při Automatické Frekvenci Snímků",
+                        "subtitle": "Nastavte dobu (v sekundách) pro pozastavení přehrávání videa při úpravě frekvence snímků"
+                    }
+                }
+            },
+            "uiSettings": {
+                "title": "Nastavení Uživatelského Rozhraní",
+                "subtitle": "Přizpůsobte si UI podle svého vkusu",
+                "options": {
+                    "hideWatchedVideos": {
+                        "title": "Skrýt Zhlédnutá Videa",
+                        "options": {
+                            "enableHideWatchedVideos": "Povolit Skrývání Zhlédnutých Videí",
+                            "watchedVideosThreshold": {
+                                "title": "Práh Zhlédnutých Videí",
+                                "subtitle": "Nastavte procentuální práh pro skrývání zhlédnutých videí"
+                            },
+                            "setPagesToHideWatchedVideos": "Nastavit Stránky pro Skrývání Zhlédnutých Videí"
+                        }
+                    },
+                    "screenDimming": {
+                        "title": "Stmívání Obrazovky",
+                        "options": {
+                            "enableScreenDimming": "Povolit Stmívání Obrazovky",
+                            "dimmingTimeout": {
+                                "title": "Prodleva Stmívání",
+                                "subtitle": "Nastavte prodlevu nečinnosti (v sekundách) před ztmavením obrazovky"
+                            },
+                            "dimmingOpacity": {
+                                "title": "Průhlednost Stmívání",
+                                "subtitle": "Nastavte úroveň průhlednosti pro stmívání obrazovky"
+                            }
+                        }
+                    },
+                    "disableSidebarContents": {
+                        "title": "Zakázat Obsah Postranního Panelu",
+                        "subtitle": "Vyberte obsah postranního panelu k zakázání"
+                    },
+                    "launchToOnStartup": {
+                        "title": "Spustit Na při Startu",
+                        "subtitle": "Zvolte výchozí stránku, na kterou TizenTube přejde při spuštění"
+                    },
+                    "sortSubscriptionsByAlphabet": "Seřadit Odběry Abecedně",
+                    "disableChannelsOnSidebar": "Zakázat Kanály v Postranním Panelu",
+                    "clock": {
+                        "title": "Hodiny",
+                        "subtitle": "Zobrazovat hodiny na obrazovce",
+                        "options": {
+                            "enableClock": "Povolit hodiny",
+                            "isClock12HourFormat": "Použít 12-ti hodinový formát hodin",
+                            "clockShowSeconds": "Zobrazovat sekundy na hodinách"
+                        }
+                    }
+                }
+            },
+            "updater": {
+                "title": "Aktualizátor TizenTube Cobalt",
+                "menuSubtitle": "Správa aktualizací TizenTube Cobalt",
+                "versionSubtitle": "Aktuální verze: {{version}}",
+                "options": {
+                    "checkForUpdates": "Zkontrolovat aktualizace",
+                    "checkForUpdatesOnStartup": "Zkontrolovat aktualizace při spuštění"
+                }
+            }
+        },
+        "ttSettings": {
+            "title": "Nastavení TizenTube",
+            "madeByText": "Vytvořil Reis Can (reisxd) s ❤️",
+            "summary": "Otevřít TizenTube Nastavení"
+        },
+        "supportTT": {
+            "title": "Podpořte TizenTube",
+            "subtitle": "❤️ Vyjádřete podporu TizenTube a přispějte k jeho vývoji",
+            "content": {
+                "1": "Pokud se vám líbí TizenTube a chcete podpořit vývoj, zvažte následující:",
+                "2": "1. Dejte hvězdičku repozitáři na Githubu, aby se mu zvýšila viditelnost.",
+                "3": "2. Sdílejte TizenTube s ostatními.",
+                "4": "Pokud chcete přispět finančně, zvažte dar; přes:",
+                "5": "- Buy Me A Coffee: https://www.buymeacoffee.com/reisxd (preferováno)",
+                "6": "- Sponzoři GitHub: https://github.com/sponsors/reisxd"
+            }
+        }
+    },
+    "welcomeMsg": {
+        "title": "Vítejte v TizenTube",
+        "subtitle": "Pro nastavení přejděte na sekci nastavení a klikněte na Nastavení TizenTube."
+    },
+    "sponsorblock": {
+        "segments": {
+            "sponsor": "segment se sponzorem",
+            "intro": "úvod",
+            "outro": "konec",
+            "interaction": "připomenutí interakce",
+            "selfpromo": "sebepropagace",
+            "preview": "rekapitulace nebo úkázka",
+            "filler": "výplň",
+            "music_offtopic": "část bez hudby",
+            "poi_highlight": "zvýraznění"
+        },
+        "toasts": {
+            "skipping": "Přeskakuje se {{segment}}",
+            "notSkipping": "Nepřeskakuje se {{segment}} (přeskočeno {{count}} krát)",
+            "skip": "Přeskočeno přes {{segment}}",
+            "skipToHighlight": "Přeskočeno na zvýraznění"
+        }
+    }
+}
