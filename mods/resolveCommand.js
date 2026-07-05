@@ -4,6 +4,7 @@ import modernUI, { optionShow } from './ui/settings.js';
 import { speedSettings } from './ui/speedUI.js';
 import { showToast, buttonItem } from './ui/ytUI.js';
 import checkForUpdates from './features/updater.js';
+import { setLiveChatVisible, isLiveChatVisible } from './features/liveChat.js';
 
 export default function resolveCommand(cmd, _) {
     // resolveCommand function is pretty OP, it can do from opening modals, changing client settings and way more.
@@ -220,5 +221,12 @@ function customAction(action, parameters) {
         case 'CHECK_FOR_UPDATES':
             checkForUpdates(true);
             break;
+        case 'TT_TOGGLE_CHAT': {
+            const nowVisible = !isLiveChatVisible();
+            setLiveChatVisible(nowVisible);
+            const btn = document.querySelector('yt-button-container[aria-label="Toggle Chat"]');
+            if (btn) btn.setAttribute('aria-pressed', String(nowVisible));
+            break;
+        }
     }
 }
