@@ -40,7 +40,7 @@ jobs:
           echo "RELEASE_VERSION=$TAG" >> $GITHUB_ENV
 
       - name: Install modules, transpile service and build service
-        working-directory: standalone/services
+        working-directory: standalone/service
         run: |
           npm install
           npm install -g @vercel/ncc https://github.com/reisxd/tizen.js/tarball/main
