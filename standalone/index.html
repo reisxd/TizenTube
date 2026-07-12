@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+
+<head>
+    <style>
+        body {
+            background-color: #0f0f0f;
+        }
+    </style>
+    <script>
+        "use strict";
+        tizen.tvinputdevice.registerKey("ColorF0Red");
+        tizen.tvinputdevice.registerKey("ColorF1Green");
+        tizen.tvinputdevice.registerKey("ColorF2Yellow");
+        tizen.tvinputdevice.registerKey("ColorF3Blue");
+
+        const keys = [
+            "MediaPlayPause",
+            "MediaPlay",
+            "MediaPause",
+            "MediaStop",
+            "MediaFastForward",
+            "MediaRewind",
+            "MediaTrackNext",
+            "MediaTrackPrevious"
+        ];
+
+        for (let i = 0; i < keys.length; i++) {
+            tizen.tvinputdevice.registerKey(keys[i]);
+        }
+
+        const pkgId = tizen.application.getCurrentApplication().appInfo.packageId;
+
+        const serviceId = pkgId + ".StandaloneService";
+
+        tizen.application.launchAppControl(
+            new tizen.ApplicationControl("http://tizen.org/appcontrol/operation/service"),
+            serviceId,
+            function () {
+                fetch('http://localhost:8099/tv').then(a => {
+                    location.href = 'http://localhost:8099/tv';
+                }).catch(b => {
+                    window.location.reload();
+                })
+            },
+            function (e) {
+                alert("Launch Service failed: " + e.message);
+            }
+        );
+    </script>
+</head>
+
+<body>
+
+</body>
+
+</html>

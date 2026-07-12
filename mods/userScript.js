@@ -1,6 +1,10 @@
+import initPatches from "./features/standaloneUserscript.js";
+if (window.location.hostname === 'localhost') {
+    initPatches();
+}
 import "./features/userAgentSpoofing.js";
 import "whatwg-fetch";
-import 'core-js/proposals/object-getownpropertydescriptors';
+import "core-js/proposals/object-getownpropertydescriptors";
 
 import './translations/index.js'
 import "./domrect-polyfill";

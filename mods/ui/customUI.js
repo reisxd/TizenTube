@@ -131,6 +131,16 @@ function applyPatches() {
                 return shoppingFiltered;
             }
         }
+        
+        if (!configRead('enableAIAskButton')) {
+            const origEngagementActionButton = inst[engagementActionButton];
+            inst[engagementActionButton] = function () {
+                const res = origEngagementActionButton.apply(this, arguments);
+                const superThanksFiltered = res.filter(item => item.type !== 'TRANSPORT_CONTROLS_BUTTON_TYPE_YOUCHAT_BUTTON');
+                const shoppingFiltered = superThanksFiltered.filter(item => item.type !== 'TRANSPORT_CONTROLS_BUTTON_TYPE_YOUCHAT_BUTTON');
+                return shoppingFiltered;
+            }
+        }
 
         if (configRead('enablePreviousNextButtons')) {
             if (!previousButtonName || !nextButtonName) return inst;

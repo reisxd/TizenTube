@@ -1,0 +1,72 @@
+name: Build TizenTube Standalone and Release
+
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clone repo with full history and tags
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # fetch full history for tags
+          fetch-tags: true
+      
+      - name: Fetch tags (safety)
+        run: |
+          git fetch --tags --force --prune
+      - name: Determine release tag
+        id: version
+        run: |
+          TAG=$(git describe --tags --abbrev=0 2>/dev/null || true)
+          if [ -z "$TAG" ]; then
+            echo "No tags found; deriving from config.xml or fallback"
+            if [ -f standalone/config.xml ]; then
+              # Extract version from config.xml's version attribute
+              CFG_VER=$(sed -n 's/.*version="\([^"]*\)".*/\1/p' standalone/config.xml | head -n1)
+              if [ -n "$CFG_VER" ]; then
+                TAG=v$CFG_VER
+              else
+                TAG=v0.0.0-${GITHUB_SHA:0:7}
+              fi
+            else
+              TAG=v0.0.0-${GITHUB_SHA:0:7}
+            fi
+          fi
+          echo "RELEASE_VERSION=$TAG" >> $GITHUB_ENV
+
+      - name: Install modules, transpile service and build service
+        working-directory: standalone/services
+        run: |
+          npm install
+          npm install -g @vercel/ncc https://github.com/reisxd/tizen.js/tarball/main
+          npm run build
+          rm -rf node_modules
+
+      - name: Prepare Tizen Certificate
+        run: |
+          echo "${{ secrets.TIZEN_AUTHOR_KEY }}" | base64 -d > "${GITHUB_WORKSPACE}/TizenTube-author.p12"
+
+      - name: Build TizenTube
+        working-directory: standalone
+        run: |
+          mkdir release
+          tizenjs build . -t wgt -o release/TizenTube.wgt --author "${GITHUB_WORKSPACE}/TizenTube-author.p12" --authorPwd '${{ secrets.TIZEN_AUTHOR_KEY_PW }}' -p public --ignore node_modules,/.*\.wgt$/,/userwidget/,/release/
+
+      - name: Upload TizenTube package artifact for Old Tizen
+        uses: actions/upload-artifact@v4
+        with:
+            name: app-${{ github.sha }}-old.wgt
+            path: standalone/release/TizenTube.wgt
+      
+      - name: Release TizenTube Build Results
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ env.RELEASE_VERSION }}
+          target_commitish: ${{ github.sha }}
+          files: |
+            standalone/release/*
