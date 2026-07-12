@@ -1,0 +1,205 @@
+{
+    "__contributors": [
+        "reisxd"
+    ],
+    "settings": {
+        "options": {
+            "socialMedia": {
+                "title": "روابط وسائل التواصل الاجتماعي",
+                "qrCodeScanMessage": "يمكنك زيارة صفحة {{name}} عبر مسح رمز QR أدناه."
+            },
+            "adBlock": "حجب الإعلانات",
+            "sponsorblock": {
+                "title": "إعدادات SponsorBlock",
+                "options": {
+                    "enableSB": "تمكين SponsorBlock",
+                    "manualSkip": "تخطي مقاطع SponsorBlock يدويًا",
+                    "segments": "المقاطع",
+                    "categories": {
+                        "sponsor": "تخطي مقاطع الراعي",
+                        "intro": "تخطي مقاطع المقدمة",
+                        "outro": "تخطي مقاطع الخاتمة",
+                        "interaction": "تخطي مقاطع تذكير التفاعل",
+                        "selfpromo": "تخطي مقاطع الترويج الشخصي",
+                        "preview": "تخطي مقاطع المعاينة/الملخص",
+                        "filler": "تخطي مقاطع جانبية/نكات",
+                        "music_offtopic": "تخطي مقاطع غير الموسيقى",
+                        "highlights": "تمكين أبرز اللقطات"
+                    },
+                    "showSBToasts": "عرض إشعارات SponsorBlock"
+                }
+            },
+            "dearrow": {
+                "title": "إعدادات DeArrow",
+                "options": {
+                    "enableDA": "تمكين DeArrow",
+                    "enableDAThumbnails": "تمكين صور DeArrow المصغّرة"
+                }
+            },
+            "misc": {
+                "title": "إعدادات متنوعة",
+                "options": {
+                    "endScreenCards": "إخفاء بطاقات شاشة نهاية الفيديو",
+                    "youThereRenderer": "تمكين خاصية 'هل مازلت تشاهد؟'",
+                    "paidPromoOverlay": "تمكين إشعار 'يتضمن إعلانًا ترويجيًا مدفوعًا'",
+                    "whosWatching": {
+                        "title": "قائمة من يشاهد المحتوى؟",
+                        "options": {
+                            "enableWW": "تمكين قائمة من يشاهد المحتوى",
+                            "permaEnableWW": "تمكين قائمة من يشاهد المحتوى بشكل دائم",
+                            "enableWWOnExit": "تمكين قائمة من يشاهد المحتوى عند الخروج من التطبيق"
+                        }
+                    },
+                    "fixUI": "إصلاح الواجهة",
+                    "hqThumbnails": "تمكين الصور المصغّرة عالية الجودة",
+                    "longPress": "تمكين إجراءات الضغط المطوّل",
+                    "shorts": "تمكين Shorts",
+                    "videoPreviews": "تمكين معاينات الفيديو",
+                    "ttWelcomeMsg": "عرض رسالة الترحيب",
+                    "guestSignInReminder": "عرض تذكير تسجيل الدخول للضيف",
+                    "reloadHomeOnStartup": "إعادة تحميل الصفحة الرئيسية عند بدء التشغيل"
+                }
+            },
+            "subtitles": {
+                "title": "إعدادات الترجمة",
+                "options": {
+                    "showLocalSubtitle": "عرض الترجمات المحلية",
+                    "showHiddenSubtitles": "عرض الترجمات المخفية"
+                }
+            },
+            "videoPlayer": {
+                "title": "إعدادات مشغل الفيديو",
+                "subtitle": "تخصيص ميزات مشغل الفيديو",
+                "options": {
+                    "patching": {
+                        "title": "Patch Video Player UI",
+                        "options": {
+                            "enableVPUIPatching": "تمكين تعديل واجهة مشغل الفيديو",
+                            "previousNextBtns": "تمكين أزرار السابق والتالي",
+                            "showSuperThxBtn": "عرض زر SuperThanks",
+                            "showSpeedCtrlBtn": "عرض زر التحكم بالسرعة",
+                            "addMPBtn": "عرض زر مشغل الفيديو المصغر",
+                            "swapMPWithPIP": "استبدال زر المشغل المصغر بزر صورة داخل صورة"
+                        }
+                    },
+                    "preferredVideoQuality": {
+                        "title": "جودة الفيديو المفضلة",
+                        "subtitle": "اختر الجودة المفضلة أو الأقرب عند بدء التشغيل"
+                    },
+                    "speedSettings": {
+                        "title": "إعدادات سرعة التشغيل",
+                        "subtitle": "تحديد درجات تغيير سرعة تشغيل الفيديو"
+                    },
+                    "preferredVideoCodec": {
+                        "title": "ترميز الفيديو المفضل",
+                        "subtitle": "اختر ترميز الفيديو المفضل للتشغيل"
+                    },
+                    "afr": "معدل الإطارات التلقائي",
+                    "afrPauseDuration": {
+                        "title": "مدة الإيقاف لمعدل الإطارات التلقائي",
+                        "subtitle": "تحديد مدة التوقف (بالثواني) عند ضبط معدل الإطارات"
+                    }
+                }
+            },
+            "uiSettings": {
+                "title": "إعدادات واجهة المستخدم",
+                "subtitle": "تخصيص واجهة المستخدم حسب رغبتك",
+                "options": {
+                    "hideWatchedVideos": {
+                        "title": "إخفاء الفيديوهات التي تمت مشاهدتها",
+                        "options": {
+                            "enableHideWatchedVideos": "تمكين إخفاء الفيديوهات المُشاهدة",
+                            "watchedVideosThreshold": {
+                                "title": "حد الفيديوهات المُشاهدة",
+                                "subtitle": "تحديد الصفحات لإخفاء الفيديوهات المُشاهدة"
+                            },
+                            "setPagesToHideWatchedVideos": "تحديد الصفحات لإخفاء الفيديوهات المُشاهدة"
+                        }
+                    },
+                    "screenDimming": {
+                        "title": "تعتيم الشاشة",
+                        "options": {
+                            "enableScreenDimming": "تمكين تعتيم الشاشة",
+                            "dimmingTimeout": {
+                                "title": "وقت التعتيم",
+                                "subtitle": "تحديد وقت عدم النشاط (بالثواني) قبل التعتيم"
+                            },
+                            "dimmingOpacity": {
+                                "title": "شفافية التعتيم",
+                                "subtitle": "تحديد مستوى شفافية التعتيم"
+                            }
+                        }
+                    },
+                    "disableSidebarContents": {
+                        "title": "تعطيل محتويات الشريط الجانبي",
+                        "subtitle": "اختر العناصر لتعطيلها"
+                    },
+                    "launchToOnStartup": {
+                        "title": "الصفحة عند التشغيل",
+                        "subtitle": "اختر الصفحة الافتراضية عند بدء التطبيق"
+                    },
+                    "sortSubscriptionsByAlphabet": "ترتيب الاشتراكات أبجديًا",
+                    "disableChannelsOnSidebar": "تعطيل القنوات في الشريط الجانبي",
+                    "clock": {
+                        "title": "الساعة",
+                        "subtitle": "عرض الساعة على الشاشة",
+                        "options": {
+                            "enableClock": "تمكين الساعة",
+                            "isClock12HourFormat": "استخدام نظام 12 ساعة",
+                            "clockShowSeconds": "عرض الثواني على الساعة"
+                        }
+                    }
+                }
+            },
+            "updater": {
+                "title": "أداة تحديث TizenTube Cobalt",
+                "menuSubtitle": "إدارة تحديثات TizenTube Cobalt",
+                "versionSubtitle": "الإصدار الحالي: {{version}}",
+                "options": {
+                    "checkForUpdates": "التحقق من التحديثات",
+                    "checkForUpdatesOnStartup": "التحقق من التحديثات عند بدء التشغيل"
+                }
+            }
+        },
+        "ttSettings": {
+            "title": "TizenTube إعدادات",
+            "madeByText": "تم تطويره بواسطة Reis Can (reisxd) مع ❤️",
+            "summary": "فتح إعدادات TizenTube"
+        },
+        "supportTT": {
+            "title": "دعم TizenTube",
+            "subtitle": "❤️ أظهر دعمك لـ TizenTube وتطويره",
+            "content": {
+                "1": "إذا كنت تستمتع باستخدام TizenTube وترغب في دعم تطويره، يمكنك القيام بما يلي:",
+                "2": "1. وضع نجمة على مستودع GitHub لزيادة ظهوره.",
+                "3": "2. مشاركة TizenTube مع الآخرين.",
+                "4": "إذا كنت ترغب في المساهمة ماليًا:",
+                "5": "- Buy Me A Coffee: https://www.buymeacoffee.com/reisxd (يُفضّل)",
+                "6": "- GitHub Sponsors: https://github.com/sponsors/reisxd"
+            }
+        }
+    },
+    "welcomeMsg": {
+        "title": "مرحبًا بك في TizenTube",
+        "subtitle": "انتقل إلى الإعدادات واضغط على إعدادات TizenTube."
+    },
+    "sponsorblock": {
+        "segments": {
+            "sponsor": "مقطع دعائي",
+            "intro": "مقدمة",
+            "outro": "خاتمة",
+            "interaction": "تذكير بالتفاعل",
+            "selfpromo": "ترويج شخصي",
+            "preview": "ملخص أو معاينة",
+            "filler": "مقاطع جانبية",
+            "music_offtopic": "جزء غير موسيقي",
+            "poi_highlight": "أبرز لقطة"
+        },
+        "toasts": {
+            "skipping": "جارٍ تخطي {{segment}}",
+            "notSkipping": "لن يتم تخطي {{segment}} (تم تخطيه {{count}} مرة)",
+            "skip": "تخطي {{segment}}",
+            "skipToHighlight": "الإنتقال إلى ابرز لقطة"
+        }
+    }
+}
