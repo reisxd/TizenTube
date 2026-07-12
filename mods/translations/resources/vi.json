@@ -77,9 +77,10 @@
                             "enableVPUIPatching": "Bật vá giao diện trình phát video",
                             "previousNextBtns": "Bật nút Trước và Tiếp theo",
                             "showSuperThxBtn": "Hiển thị nút Super Thanks",
+                            "showAIAskBtn": "Hiển thị nút Đặt câu hỏi",
                             "showSpeedCtrlBtn": "Hiển thị nút Điều khiển tốc độ",
-                            "addMPBtn": "Hiện nút trình phát nhỏ",
-                            "swapMPWithPIP": "Đổi nút trình phát nhỏ thành Picture-In-Picture"
+                            "addMPBtn": "Hiển thị nút Trình phát nhỏ",
+                            "swapMPWithPIP": "Đổi nút Trình phát nhỏ thành Picture-In-Picture"
                         }
                     },
                     "preferredVideoQuality": {
@@ -142,11 +143,11 @@
                     "disableChannelsOnSidebar": "Ẩn kênh khỏi thanh điều hướng",
                     "clock": {
                         "title": "Đồng hồ",
-                        "subtitle": "Hiện thị đồng hồ trên màn hình",
+                        "subtitle": "Hiển thị đồng hồ trên màn hình",
                         "options": {
-                            "enableClock": "Hiện đồng hồ",
+                            "enableClock": "Hiển thị đồng hồ",
                             "isClock12HourFormat": "Sử dụng dịnh dạng đồng hồ 12H",
-                            "clockShowSeconds": "Hiện số giây"
+                            "clockShowSeconds": "Hiển thị số giây"
                         }
                     }
                 }
