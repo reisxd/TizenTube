@@ -77,6 +77,7 @@
                             "enableVPUIPatching": "動画プレーヤー UI のパッチを有効化する",
                             "previousNextBtns": "「前へ」と「次へ」のボタンを有効化する",
                             "showSuperThxBtn": "Super Thanks ボタンを表示する",
+                            "showAIAskBtn": "質問するボタンを表示する",
                             "showSpeedCtrlBtn": "速度制御ボタンを表示する",
                             "addMPBtn": "ミニプレーヤーボタンを表示する",
                             "swapMPWithPIP": "ミニプレーヤーボタンを PiP ボタンに置き換える"
@@ -199,7 +200,7 @@
             "skipping": "{{segment}}をスキップしました",
             "notSkipping": "{{segment}}をスキップしません ({{count}} 回スキップ済み)",
             "skip": "{{segment}}をスキップ",
-            "skipToHighlight": "ハイライトへ移動"
+            "skipToHighlight": "ハイライトへスキップ"
         }
     }
 }
