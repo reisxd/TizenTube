@@ -198,8 +198,8 @@
         "toasts": {
             "skipping": "Přeskakuje se {{segment}}",
             "notSkipping": "Nepřeskakuje se {{segment}} (přeskočeno {{count}} krát)",
-            "skip": "Přeskočeno přes {{segment}}",
-            "skipToHighlight": "Přeskočeno na zvýraznění"
+            "skip": "Přeskočit přes {{segment}}",
+            "skipToHighlight": "Přeskočit na zvýraznění"
         }
     }
 }
