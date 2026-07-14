@@ -77,7 +77,7 @@
                             "enableVPUIPatching": "動画プレーヤー UI のパッチを有効化する",
                             "previousNextBtns": "「前へ」と「次へ」のボタンを有効化する",
                             "showSuperThxBtn": "Super Thanks ボタンを表示する",
-                            "showSpeedCtrlBtn": "速度制御ボタンを表示する"
+                            "showSpeedCtrlBtn": "速度制御ボタンを表示する",
                             "addMPBtn": "ミニプレーヤーボタンを表示する",
                             "swapMPWithPIP": "ミニプレーヤーボタンを PiP ボタンに置き換える"
                         }
@@ -138,7 +138,7 @@
                         "title": "起動時に開くページ",
                         "subtitle": "TizenTube の起動時にデフォルトで表示するページを選択してください"
                     },
-                    "sortSubscriptionsByAlphabet": "登録しているチャンネルをアルファベット順に並べ替える"
+                    "sortSubscriptionsByAlphabet": "登録しているチャンネルをアルファベット順に並べ替える",
                     "disableChannelsOnSidebar": "サイドバーのチャンネルを無効化する",
                     "clock": {
                         "title": "時計",

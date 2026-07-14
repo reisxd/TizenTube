@@ -354,6 +354,11 @@ export default function modernUI(update, parameters) {
                             value: 'enableSuperThanksButton'
                         },
                         {
+                            name: t('settings.options.videoPlayer.options.patching.options.showAIAskBtn'),
+                            icon: 'SPARK',
+                            value: 'enableAIAskButton'
+                        },
+                        {
                             name: t('settings.options.videoPlayer.options.patching.options.showSpeedCtrlBtn'),
                             icon: 'SLOW_MOTION_VIDEO',
                             value: 'enableSpeedControlsButton'
@@ -639,6 +644,11 @@ export default function modernUI(update, parameters) {
                             name: 'More',
                             icon: 'TAB_MORE',
                             value: 'TAB_MORE'
+                        },
+                        {
+                            name: 'Shorts',
+                            icon: 'YOUTUBE_SHORTS_FILL_24',
+                            value: 'YOUTUBE_SHORTS_FILL_24'
                         }
                     ]
                 },

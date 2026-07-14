@@ -110,7 +110,7 @@ class SponsorBlockHandler {
       const slider = document.querySelector('div[idomkey="slider"]');
       const sliderRect = slider?.getBoundingClientRect();
       const isOldUI = !document.querySelector('div[idomkey="Metadata-Section"]');
-      if (isOldUI) {
+      if (isOldUI && sliderRect) {
         this.segmentsoverlay.style.setProperty('top', `${sliderRect.top}px`, 'important');
       }
       this.scheduleSkip();
@@ -182,6 +182,7 @@ class SponsorBlockHandler {
 
     const videoDuration = this.video.duration;
     const slider = document.querySelector('div[idomkey="slider"]');
+    if (!slider) return setTimeout(() => this.buildOverlay(), 100);
 
     this.segmentsoverlay = document.createElement('div');
 

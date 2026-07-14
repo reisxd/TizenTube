@@ -77,6 +77,7 @@
                             "enableVPUIPatching": "Enable Video Player UI Patching",
                             "previousNextBtns": "Enable Previous and Next Buttons",
                             "showSuperThxBtn": "Show Super Thanks Button",
+                            "showAIAskBtn": "Show Ask Button",
                             "showSpeedCtrlBtn": "Show Speed Controls Button",
                             "addMPBtn": "Show Mini Player Button",
                             "swapMPWithPIP": "Swap Mini Player Button with PiP Button"
