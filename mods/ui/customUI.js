@@ -122,6 +122,34 @@ function applyPatches() {
             }
         }
 
+        if (engagementActionButton && configRead('enableChatToggleButton')) {
+            const origEngagementActionButton = inst[engagementActionButton];
+            inst[engagementActionButton] = function () {
+                const res = origEngagementActionButton.apply(this, arguments);
+                // Find the comments button index to insert after it
+                const commentsIndex = res.findIndex(item => item.type === 'TRANSPORT_CONTROLS_BUTTON_TYPE_COMMENTS');
+                if (commentsIndex !== -1 && !res.find(item => item.type === 'TRANSPORT_CONTROLS_BUTTON_TYPE_CHAT_TOGGLE')) {
+                    res.splice(commentsIndex + 1, 0, {
+                        type: 'TRANSPORT_CONTROLS_BUTTON_TYPE_CHAT_TOGGLE',
+                        button: {
+                            buttonRenderer: ButtonRenderer(
+                                false,
+                                "Toggle Chat",
+                                'COMMENT',
+                                {
+                                    customAction:
+                                    {
+                                        action: 'TT_TOGGLE_CHAT',
+                                    }
+                                }
+                            )
+                        }
+                    });
+                }
+                return res;
+            }
+        }
+
         if (!configRead('enableSuperThanksButton')) {
             const origEngagementActionButton = inst[engagementActionButton];
             inst[engagementActionButton] = function () {

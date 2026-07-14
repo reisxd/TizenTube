@@ -35,6 +35,8 @@ const defaultConfig = {
   enableSuperThanksButton: false,
   enableAIAskButton: false,
   enableSpeedControlsButton: true,
+  liveChatEnabled: true,
+  enableChatToggleButton: true,
   enablePatchingVideoPlayer: true,
   enableMPButton: true,
   enableSwapMPWithPIP: false,
