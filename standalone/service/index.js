@@ -5,9 +5,50 @@
 const express = require('express');
 const app = express();
 const PORT = 8099;
-const fetch = require('node-fetch');
 const http = require('http');
+const https = require('https');
+const zlib = require('zlib');
 const URL = require('url');
+
+// node-fetch has no way to raise the HTTP client's header-size limit, and the Node
+// runtime Tizen ships defaults to a small one. YouTube's /tv responses carry enough
+// Set-Cookie headers to blow past it, which aborts the request before a single byte
+// of body is read ("Parse Error: Header overflow"). Every page load fails the same
+// way, so the app never renders anything and the user just sees a black screen.
+// Making the request with the raw http/https module lets us pass maxHeaderSize
+// explicitly, which node-fetch's fetch() has no option for.
+function rawRequest(targetUrl, options) {
+    return new Promise((resolve, reject) => {
+        const lib = targetUrl.indexOf('https:') === 0 ? https : http;
+        const req = lib.request(targetUrl, {
+            method: options.method,
+            headers: options.headers,
+            maxHeaderSize: 1024 * 1024
+        }, (res) => resolve(res));
+        req.on('error', reject);
+        if (options.bodyStream) {
+            options.bodyStream.pipe(req);
+        } else {
+            req.end();
+        }
+    });
+}
+
+function decompressStream(rawRes) {
+    const encoding = (rawRes.headers['content-encoding'] || '').toLowerCase();
+    if (encoding.indexOf('gzip') !== -1) return rawRes.pipe(zlib.createGunzip());
+    if (encoding.indexOf('deflate') !== -1) return rawRes.pipe(zlib.createInflate());
+    if (encoding.indexOf('br') !== -1) return rawRes.pipe(zlib.createBrotliDecompress());
+    return rawRes;
+}
+
+function getHeaderCaseInsensitive(rawRes, name) {
+    const lower = name.toLowerCase();
+    for (const key in rawRes.headers) {
+        if (key.toLowerCase() === lower) return rawRes.headers[key];
+    }
+    return undefined;
+}
 
 app.use((req, res, next) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
@@ -58,22 +99,20 @@ app.all('*', (req, res) => {
     headers['accept-encoding'] = 'gzip, deflate';
 
     const hasBody = ['POST', 'PUT', 'PATCH'].indexOf(req.method) !== -1;
-    const fetchOptions = {
+
+    rawRequest(targetUrl, {
         method: req.method,
         headers: headers,
-        body: hasBody ? req : undefined,
-        redirect: 'manual'
-    };
-
-    fetch(targetUrl, fetchOptions)
-        .then((response) => {
+        bodyStream: hasBody ? req : undefined
+    })
+        .then((rawRes) => {
             if (req.method === 'OPTIONS') {
                 res.status(200);
             } else {
-                res.status(response.status);
+                res.status(rawRes.statusCode);
             }
 
-            const headerKeys = response.headers.raw();
+            const headerKeys = rawRes.headers;
             for (const key in headerKeys) {
                 if (Object.prototype.hasOwnProperty.call(headerKeys, key)) {
                     const lowerKey = key.toLowerCase();
@@ -82,23 +121,21 @@ app.all('*', (req, res) => {
 
                     if (skipHeaders.indexOf(lowerKey) !== -1) continue;
 
-                    const value = response.headers.get(key);
+                    const value = headerKeys[key];
                     if (lowerKey === 'set-cookie') {
-                        const rawCookies = headerKeys[key];
-                        if (Array.isArray(rawCookies)) {
-                            const modifiedCookies = rawCookies.map(cookieStr => {
-                                return cookieStr
-                                    .replace(/^__Secure-/i, '__LocalSecure-')
-                                    .replace(/^__Host-/i, '__LocalHost-')
-                                    .replace(/Domain=[^;]+/i, 'Domain=localhost')
-                                    .replace(/;\s*Secure/i, '')
-                                    .replace(/;\s*SameSite=None/i, '')
-                                    .replace(/;\s*;/g, ';')
-                                    .replace(/;\s*$/, '');
-                            });
-                            res.setHeader('Set-Cookie', modifiedCookies);
-                            continue;
-                        }
+                        const rawCookies = Array.isArray(value) ? value : [value];
+                        const modifiedCookies = rawCookies.map(cookieStr => {
+                            return cookieStr
+                                .replace(/^__Secure-/i, '__LocalSecure-')
+                                .replace(/^__Host-/i, '__LocalHost-')
+                                .replace(/Domain=[^;]+/i, 'Domain=localhost')
+                                .replace(/;\s*Secure/i, '')
+                                .replace(/;\s*SameSite=None/i, '')
+                                .replace(/;\s*;/g, ';')
+                                .replace(/;\s*$/, '');
+                        });
+                        res.setHeader('Set-Cookie', modifiedCookies);
+                        continue;
                     }
 
                     res.setHeader(key, value);
@@ -107,14 +144,25 @@ app.all('*', (req, res) => {
 
             res.setHeader('Access-Control-Allow-Origin', '*');
 
-            const contentType = response.headers.get('content-type') || '';
+            const contentType = getHeaderCaseInsensitive(rawRes, 'content-type') || '';
+            const bodyStream = decompressStream(rawRes);
 
             if (contentType.indexOf('text/html') !== -1 ||
                 contentType.indexOf('application/json') !== -1 ||
                 contentType.indexOf('javascript') !== -1 ||
                 contentType.indexOf('text/css') !== -1) {
 
-                return response.text().then((text) => {
+                const chunks = [];
+                bodyStream.on('data', (chunk) => chunks.push(chunk));
+                bodyStream.on('error', (error) => {
+                    console.error(`Proxy body error for [${targetUrl}]: ${error}`);
+                    if (!res.headersSent) {
+                        res.status(500).send('Proxy Connection Broken');
+                    }
+                });
+                bodyStream.on('end', () => {
+                    let text = Buffer.concat(chunks).toString('utf8');
+
                     if (req.url.indexOf('/tv') === 0) {
                         // Insert the userscript for TizenTube
                         text += `<script src="https://cdn.jsdelivr.net/npm/@foxreis/tizentube/dist/userScript.js?ver=${Date.now()}"></script>`;
@@ -151,11 +199,7 @@ app.all('*', (req, res) => {
                     res.send(text);
                 });
             } else {
-                if (response.body) {
-                    response.body.pipe(res);
-                } else {
-                    res.end();
-                }
+                bodyStream.pipe(res);
             }
         })
         .catch((error) => {
