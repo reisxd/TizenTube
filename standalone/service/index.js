@@ -10,9 +10,6 @@ const https = require('https');
 const zlib = require('zlib');
 const URL = require('url');
 
-// maxHeaderSize can only be set per-request on http.request; node-fetch forwards
-// neither it nor an agent's copy of it, so YouTube's /tv response headers overflow
-// the 16 KB default and the page never loads.
 function rawRequest(targetUrl, options) {
     return new Promise((resolve, reject) => {
         const lib = targetUrl.indexOf('https:') === 0 ? https : http;
