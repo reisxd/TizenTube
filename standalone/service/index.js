@@ -8,6 +8,9 @@ const PORT = 8099;
 const fetch = require('node-fetch');
 const http = require('http');
 const URL = require('url');
+const cdp = require('./cdp.js');
+
+const USERSCRIPT_URL = 'https://cdn.jsdelivr.net/npm/@foxreis/tizentube/dist/userScript.js';
 
 app.use((req, res, next) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
@@ -17,6 +20,23 @@ app.use((req, res, next) => {
         return res.status(200).end();
     }
     next();
+});
+
+// Progress of the CDP handover, polled by index.html so it can show a loading screen and
+// fall back to the proxy if direct mode never comes up. Registered before the catch-all
+// so it isn't forwarded to YouTube.
+app.get('/tizentube/cdp-status', (req, res) => {
+    res.json({
+        phase: cdp.state.phase,
+        action: cdp.state.action,
+        attached: cdp.state.attached,
+        navigated: cdp.state.navigated,
+        port: cdp.state.port,
+        error: cdp.state.error,
+        bypassedCsp: cdp.state.bypassedCsp,
+        injectedVia: cdp.state.injectedVia,
+        log: cdp.state.log
+    });
 });
 
 app.all('*', (req, res) => {
@@ -167,4 +187,9 @@ app.all('*', (req, res) => {
         });
 });
 
-app.listen(PORT, "127.0.0.1");
+app.listen(PORT, "127.0.0.1", () => {
+    // Serve the real youtube.com over CDP instead of proxying it. If any step fails the
+    // proxy above is still running and index.html falls back to it, so a TV without a
+    // usable loopback debug connection keeps the previous behaviour rather than breaking.
+    cdp.start({ userScriptUrl: USERSCRIPT_URL });
+});

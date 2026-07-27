@@ -4,6 +4,34 @@
     <style>
         body {
             background-color: #0f0f0f;
+            color: #cfcfcf;
+            font-family: Arial, Helvetica, sans-serif;
+            margin: 0;
+        }
+
+        #boot {
+            padding: 48px 64px;
+        }
+
+        #boot h1 {
+            font-size: 34px;
+            font-weight: normal;
+            color: #ffffff;
+            margin: 0 0 18px 0;
+        }
+
+        #phase {
+            font-size: 24px;
+            color: #9ecbff;
+        }
+
+        #detail {
+            font-size: 15px;
+            line-height: 1.45;
+            color: #8a8a8a;
+            margin-top: 14px;
+            white-space: pre-wrap;
+            font-family: "Courier New", monospace;
         }
     </style>
     <script>
@@ -28,6 +56,124 @@
             tizen.tvinputdevice.registerKey(keys[i]);
         }
 
+        const PROXY_BASE = 'http://localhost:8099';
+        const PROXY_FALLBACK_URL = PROXY_BASE + '/tv';
+
+        // The service tries to take over via CDP and navigate this page to the real
+        // https://www.youtube.com/tv, which is the only way YouTube hands over a valid
+        // PO token and actually serves video (see standalone/service/cdp.js).
+        //
+        // Progress is reported on screen because the loopback ADB connection the takeover
+        // needs requires developer mode's Host PC IP to be 127.0.0.1, and with that set
+        // there is no sdb access left to read logs over.
+        //
+        // Deliberately no reload loop: the previous version reloaded whenever the proxy
+        // was not answering, which is what presented as an endless black screen.
+        // The handover plus its one retry can run for roughly 40s, so do not give up
+        // before it has had a chance to finish.
+        const FALLBACK_AFTER_MS = 60000;
+        const EXIT_MARKER = 'tt-exit-for-debug-at';
+        const startedAt = Date.now();
+        let fellBack = false;
+        let exiting = false;
+
+        function show(phase, detail) {
+            const phaseEl = document.getElementById('phase');
+            const detailEl = document.getElementById('detail');
+            if (phaseEl) phaseEl.textContent = phase;
+            if (detailEl) detailEl.textContent = detail || '';
+        }
+
+        // Deliberately slow: when direct mode fails this screen is the only diagnostic
+        // channel available, because the loopback ADB connection needs Host PC IP set to
+        // 127.0.0.1 and that leaves no sdb access from a PC. Give a real chance to read
+        // (or photograph) the trace before the page navigates away.
+        function fallBackToProxy(why, tail) {
+            if (fellBack) return;
+            fellBack = true;
+
+            let left = 25;
+            const tick = function () {
+                show('Starting in proxy mode in ' + left + 's',
+                    why + '\n\n' + (tail || '') +
+                    '\n\nBrowsing works; video playback may fail.');
+                if (left <= 0) return location.href = PROXY_FALLBACK_URL;
+                left--;
+                setTimeout(tick, 1000);
+            };
+            tick();
+        }
+
+        function poll() {
+            fetch(PROXY_BASE + '/tizentube/cdp-status')
+                .then(function (res) { return res.json(); })
+                .then(function (status) {
+                    const tail = (status.log || []).slice(-14).join('\n');
+
+                    if (status.phase === 'ready' || status.navigated) {
+                        // The service has issued the navigation, so this document is
+                        // about to be replaced. Nothing left to do beyond clearing the
+                        // loop-breaker, since the restart demonstrably completed.
+                        try { localStorage.removeItem(EXIT_MARKER); } catch (e) { }
+                        show('Loading YouTube…', '');
+                        return;
+                    }
+
+                    // sdbd will not relaunch this app with debugging while it is sitting
+                    // in the foreground -- the stream opens and then goes silent. Step
+                    // out of the way so the service can relaunch us properly; the very
+                    // next thing that happens is this app starting again, in debug mode.
+                    // Normal path shows nothing but the splash. The handover replaces
+                    // this app with a debug-enabled one, and the replacement shows the
+                    // same screen, so it reads as one continuous load rather than a
+                    // crash-and-reopen. Diagnostics are kept for the failure path only.
+                    if (status.action === 'exit-for-debug' && !exiting) {
+                        // Loop-breaker: if closing the app also tears the service down,
+                        // the relaunched app would be asked to close again immediately
+                        // and the TV would sit in a self-closing loop. Only honour this
+                        // once in any two minute window.
+                        let lastExit = 0;
+                        try { lastExit = Number(localStorage.getItem(EXIT_MARKER) || 0); } catch (e) { }
+
+                        if (Date.now() - lastExit < 120000) {
+                            return fallBackToProxy(
+                                'Direct mode needs the app to restart, but the last restart ' +
+                                'did not complete. Skipping to avoid a restart loop.', tail);
+                        }
+
+                        exiting = true;
+                        try { localStorage.setItem(EXIT_MARKER, String(Date.now())); } catch (e) { }
+                        show('Loading…', '');
+                        return setTimeout(function () {
+                            try {
+                                tizen.application.getCurrentApplication().exit();
+                            } catch (e) {
+                                show('Could not close for restart', String(e));
+                            }
+                        }, 700);
+                    }
+
+                    if (status.phase === 'failed') {
+                        return fallBackToProxy('Direct mode unavailable: ' + status.error, tail);
+                    }
+
+                    show('Loading…', '');
+
+                    if (Date.now() - startedAt > FALLBACK_AFTER_MS) {
+                        return fallBackToProxy('Direct mode timed out at stage: ' + status.phase, tail);
+                    }
+                    setTimeout(poll, 600);
+                })
+                .catch(function () {
+                    // Service not up yet, or an older build without CDP support.
+                    if (Date.now() - startedAt > FALLBACK_AFTER_MS) {
+                        return fallBackToProxy('Service did not report status.');
+                    }
+                    show('Loading…', '');
+                    setTimeout(poll, 600);
+                });
+        }
+
         const pkgId = tizen.application.getCurrentApplication().appInfo.packageId;
 
         const serviceId = pkgId + ".StandaloneService";
@@ -35,22 +181,20 @@
         tizen.application.launchAppControl(
             new tizen.ApplicationControl("http://tizen.org/appcontrol/operation/service"),
             serviceId,
-            function () {
-                fetch('http://localhost:8099/tv').then(a => {
-                    location.href = 'http://localhost:8099/tv';
-                }).catch(b => {
-                    window.location.reload();
-                })
-            },
+            function () { poll(); },
             function (e) {
-                alert("Launch Service failed: " + e.message);
+                show('Could not start the TizenTube service', e.message);
             }
         );
     </script>
 </head>
 
 <body>
-
+    <div id="boot">
+        <h1>TizenTube</h1>
+        <div id="phase">Starting service&hellip;</div>
+        <div id="detail"></div>
+    </div>
 </body>
 
 </html>

@@ -11,6 +11,7 @@
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
+    "chrome-remote-interface": "^0.25.7",
     "express": "^4.22.2",
     "node-fetch": "^2.7.0"
   },
