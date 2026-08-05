@@ -126,6 +126,10 @@ JSON.parse = function () {
       r.continuationContents.horizontalListContinuation.items = hideVideo(r.continuationContents.horizontalListContinuation.items);
     }
 
+    if (r?.continuationContents?.gridContinuation?.items) {
+      addLongPress(r.continuationContents.gridContinuation.items);
+    }
+
     if (r?.contents?.tvBrowseRenderer?.content?.tvSecondaryNavRenderer?.sections) {
       for (let i = 0; i < r.contents.tvBrowseRenderer.content.tvSecondaryNavRenderer.sections.length; i++) {
         const section = r.contents.tvBrowseRenderer.content.tvSecondaryNavRenderer.sections[i].tvSecondaryNavSectionRenderer;
@@ -141,11 +145,15 @@ JSON.parse = function () {
 
         for (let j = 0; j < section.tabs.length; j++) {
           const tab = section.tabs[j];
-          if (tab.tabRenderer.content?.tvSurfaceContentRenderer?.content?.sectionListRenderer?.contents) {
+          const content = tab.tabRenderer.content?.tvSurfaceContentRenderer?.content;
+          if (content?.sectionListRenderer?.contents) {
             const index = section.tabs.indexOf(tab);
-            const clone = tab.tabRenderer.content.tvSurfaceContentRenderer.content.sectionListRenderer.contents;
+            const clone = content.sectionListRenderer.contents;
             processShelves(clone);
             section.tabs[index].tabRenderer.content.tvSurfaceContentRenderer.content.sectionListRenderer.contents = clone;
+          }
+          if (content?.gridRenderer?.items) {
+            addLongPress(content.gridRenderer.items);
           }
         }
       }

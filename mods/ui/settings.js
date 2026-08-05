@@ -966,7 +966,7 @@ export function optionShow(parameters, update) {
                 continue;
             }
             const isRadioChoice = option.key !== null && option.key !== undefined;
-            const currentVal = configRead(isRadioChoice ? option.key : option.value);
+            const currentVal = option.value === null ? undefined : configRead(isRadioChoice ? option.key : option.value);
             buttons.push(
                 buttonItem(
                     { title: option.name, subtitle: option.subtitle },
