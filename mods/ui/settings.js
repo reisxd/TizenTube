@@ -3,10 +3,16 @@ import { showModal, buttonItem, overlayPanelItemListRenderer, scrollPaneRenderer
 import qrcode from 'qrcode-npm';
 import { t } from 'i18next';
 import { getComprehensiveLanguageList } from '../features/moreSubtitles.js';
+import { getStandaloneVersion, moduleVersion } from '../version.js';
 
 const qrcodes = {};
 
 export default function modernUI(update, parameters) {
+    const standaloneVersion = getStandaloneVersion();
+    const versionText = standaloneVersion
+        ? t('settings.ttSettings.versionInfo.standalone', { standaloneVersion, moduleVersion })
+        : t('settings.ttSettings.versionInfo.module', { moduleVersion });
+
     const settings = [
         {
             name: t('settings.supportTT.title'),
@@ -887,7 +893,7 @@ export default function modernUI(update, parameters) {
     showModal(
         {
             title: t('settings.ttSettings.title'),
-            subtitle: t('settings.ttSettings.madeByText')
+            subtitle: `${versionText}\n${t('settings.ttSettings.madeByText')}`
         },
         overlayPanelItemListRenderer(buttons, parameters && parameters.length > 0 ? parameters[0] : 0),
         'tt-settings',

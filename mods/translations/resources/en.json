@@ -165,6 +165,10 @@
         "ttSettings": {
             "title": "TizenTube Settings",
             "madeByText": "Made by Reis Can (reisxd) with ❤️",
+            "versionInfo": {
+                "standalone": "Standalone {{standaloneVersion}} · Module {{moduleVersion}}",
+                "module": "Module {{moduleVersion}}"
+            },
             "summary": "Open TizenTube Settings"
         },
         "supportTT": {
