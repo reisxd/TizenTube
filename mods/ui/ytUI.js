@@ -191,7 +191,7 @@ function longPressData(data) {
     const isWatchLaterItem = data.watchEndpointData.playlistId === 'WL';
     const watchLaterAction = isWatchLaterItem ? {
         removedVideoId: data.videoId,
-        action: 'ACTION_REMOVE_VIDEO'
+        action: 'ACTION_REMOVE_VIDEO_BY_VIDEO_ID'
     } : {
         addedVideoId: data.videoId,
         action: 'ACTION_ADD_VIDEO'
@@ -219,6 +219,12 @@ function longPressData(data) {
                         }),
                         MenuServiceItemRenderer(isWatchLaterItem ? 'Remove from Watch Later' : 'Save to Watch Later', {
                             clickTrackingParams: null,
+                            commandMetadata: {
+                                webCommandMetadata: {
+                                    sendPost: true,
+                                    apiUrl: '/youtubei/v1/browse/edit_playlist'
+                                }
+                            },
                             playlistEditEndpoint: {
                                 playlistId: 'WL',
                                 actions: [watchLaterAction]
