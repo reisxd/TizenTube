@@ -86,6 +86,13 @@ JSON.parse = function () {
       processShelves(r.contents.tvBrowseRenderer.content.tvSurfaceContentRenderer.content.sectionListRenderer.contents);
     }
 
+    if (
+      r?.contents?.tvBrowseRenderer?.content?.tvSurfaceContentRenderer?.content
+        ?.gridRenderer?.items
+    ) {
+      addLongPress(r.contents.tvBrowseRenderer.content.tvSurfaceContentRenderer.content.gridRenderer.items);
+    }
+
     if (r.endscreen && configRead('enableHideEndScreenCards')) {
       r.endscreen = null;
     }
