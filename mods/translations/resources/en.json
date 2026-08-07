@@ -91,6 +91,10 @@
                         "title": "Speed Settings Increments",
                         "subtitle": "Set the speed increments for video playback speed adjustments"
                     },
+                    "holdToSpeed": {
+                        "title": "Hold OK Playback Speed",
+                        "subtitle": "Choose the temporary speed while holding the OK button during playback"
+                    },
                     "preferredVideoCodec": {
                         "title": "Preferred Video Codec",
                         "subtitle": "Choose the preferred video codec for playback"
