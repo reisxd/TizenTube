@@ -91,6 +91,10 @@
                         "title": "Speed Settings Increments",
                         "subtitle": "Set the speed increments for video playback speed adjustments"
                     },
+                    "seekInterval": {
+                        "title": "Seek Interval",
+                        "subtitle": "Choose how many seconds the Left and Right buttons seek during playback"
+                    },
                     "preferredVideoCodec": {
                         "title": "Preferred Video Codec",
                         "subtitle": "Choose the preferred video codec for playback"

@@ -50,6 +50,7 @@ const defaultConfig = {
   dimmingOpacity: 0.5,
   enablePaidPromotionOverlay: true,
   speedSettingsIncrement: 0.25,
+  seekInterval: 10,
   videoPreferredCodec: 'any',
   launchToOnStartup: null,
   reloadHomeOnStartup: true,
