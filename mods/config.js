@@ -1,6 +1,23 @@
 const CONFIG_KEY = 'ytaf-configuration';
 const defaultConfig = {
   enableAdBlock: true,
+  contentFilterKeywords: [
+    'AI generated',
+    'AI-generated',
+    'AI voice',
+    'AI story',
+    'AI animation',
+    'AI movie',
+    'AI video',
+    'cung đấu',
+    'cung dau',
+    'tổng tài',
+    'tong tai',
+    'chủ tịch',
+    'chu tich',
+    'tieu thu',
+    'tiểu thư'
+],
   enableSponsorBlock: true,
   enableSponsorBlockToasts: true,
   sponsorBlockManualSkips: ['intro', 'outro', 'filler'],
