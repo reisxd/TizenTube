@@ -6,7 +6,11 @@
         "options": {
             "socialMedia": {
                 "title": "Linki do mediów społecznościowych",
-                "qrCodeScanMessage": "Możesz odwiedzić stronę {{name}}, skanując kod QR."
+                "qrCodeScanMessage": "Możesz odwiedzić stronę {{name}}, skanując poniższy kod QR.",
+                "announcements": "Ogłoszenia",
+                "group": "Grupa",
+                "website": "Strona internetowa",
+                "githubSponsors": "GitHub Sponsors"
             },
             "adBlock": "Blokada reklam",
             "sponsorblock": {
@@ -225,7 +229,7 @@
                 "3": "2. Poleć TizenTube znajomym.",
                 "4": "Jeśli chcesz wesprzeć projekt finansowo, możesz przekazać darowiznę:",
                 "5": "- Buy Me A Coffee: https://www.buymeacoffee.com/reisxd (Preferowane)",
-                "6": "- Sponsorzy GitHub: https://github.com/sponsors/reisxd"
+                "6": "- GitHub Sponsors: https://github.com/sponsors/reisxd"
             }
         }
     },
@@ -249,13 +253,14 @@
             "skipping": "Pomijanie: {{segment}}",
             "notSkipping": "Nie pominięto: {{segment}} (pominięto {{count}} razy)",
             "skip": "Pomiń: {{segment}}",
-            "skipToHighlight": "Do wyróżnionego momentu"
+            "skipToHighlight": "Wyróżniony moment"
         }
     },
     "player": {
         "playbackSpeed": {
-            "title": "Prędkość odtwarzania",
-            "button": "Prędkość"
+            "title": "Szybkość odtwarzania",
+            "button": "Szybkość",
+            "fixStuttering": "Napraw zacinanie się (1.0001x)"
         },
         "miniPlayer": "Miniodtwarzacz",
         "pictureInPicture": "Obraz w obrazie (PiP)",

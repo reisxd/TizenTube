@@ -43,15 +43,15 @@ export default function modernUI(update, parameters) {
                     link: 'https://discord.gg/m2P7v8Y2qR',
                 },
                 {
-                    name: 'Telegram (Announcements)',
+                    name: `Telegram (${t('settings.options.socialMedia.announcements')})`,
                     link: 'https://t.me/tizentubecobaltofficial',
                 },
                 {
-                    name: 'Telegram (Group)',
+                    name: `Telegram (${t('settings.options.socialMedia.group')})`,
                     link: 'https://t.me/tizentubeofficial',
                 },
                 {
-                    name: 'Website',
+                    name: t('settings.options.socialMedia.website'),
                     link: 'https://tizentube.6513006.xyz',
                 },
                 {
@@ -59,8 +59,8 @@ export default function modernUI(update, parameters) {
                     link: 'https://www.buymeacoffee.com/reisxd',
                 },
                 {
-                    name: 'GitHub Sponsors',
-                    link: 'https:///github.com/sponsors/reisxd',
+                    name: t('settings.options.socialMedia.githubSponsors'),
+                    link: 'https://github.com/sponsors/reisxd',
                 }
             ].map((option) => {
                 if (!qrcodes[option.name]) {

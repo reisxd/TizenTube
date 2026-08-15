@@ -6,7 +6,11 @@
         "options": {
             "socialMedia": {
                 "title": "Social Media Links",
-                "qrCodeScanMessage": "You can visit the {{name}} page by scanning the QR code below."
+                "qrCodeScanMessage": "You can visit the {{name}} page by scanning the QR code below.",
+                "announcements": "Announcements",
+                "group": "Group",
+                "website": "Website",
+                "githubSponsors": "GitHub Sponsors"
             },
             "adBlock": "Ad Block",
             "sponsorblock": {
@@ -255,7 +259,8 @@
     "player": {
         "playbackSpeed": {
             "title": "Playback Speed",
-            "button": "Speed Controls"
+            "button": "Speed Controls",
+            "fixStuttering": "Fix stuttering (1.0001x)"
         },
         "miniPlayer": "Mini Player",
         "pictureInPicture": "Picture in Picture",

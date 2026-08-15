@@ -81,7 +81,7 @@ function speedSettings() {
 
     buttons.push(
         buttonItem(
-            { title: `Fix stuttering (1.0001x)` },
+            { title: t('player.playbackSpeed.fixStuttering') },
             null,
             [
                 {

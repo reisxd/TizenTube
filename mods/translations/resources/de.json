@@ -6,7 +6,11 @@
         "options": {
             "socialMedia": {
                 "title": "Social-Media-Links",
-                "qrCodeScanMessage": "Du kannst die {{name}}-Seite besuchen, indem du den untenstehenden QR-Code scannst."
+                "qrCodeScanMessage": "Du kannst die {{name}}-Seite besuchen, indem du den untenstehenden QR-Code scannst.",
+                "announcements": "Anzeigen",
+                "group": "Gruppe",
+                "website": "Website",
+                "githubSponsors": "GitHub Sponsoren"
             },
             "adBlock": "Werbeblocker",
             "sponsorblock": {
@@ -225,7 +229,7 @@
                 "3": "2. Teile TizenTube mit anderen.",
                 "4": "Wenn du finanziell beitragen möchtest, kannst du spenden:",
                 "5": "- Buy Me A Coffee: https://www.buymeacoffee.com/reisxd (bevorzugt)",
-                "6": "- GitHub Sponsors: https://github.com/sponsors/reisxd"
+                "6": "- GitHub Sponsoren: https://github.com/sponsors/reisxd"
             }
         }
     },
@@ -255,7 +259,8 @@
     "player": {
         "playbackSpeed": {
             "title": "Wiedergabegeschwindigkeit",
-            "button": "Geschwindigkeit"
+            "button": "Geschwindigkeit",
+            "fixStuttering": "Ruckeln beheben (1.0001x)"
         },
         "miniPlayer": "MiniPlayer",
         "pictureInPicture": "Bild-in-Bild",	  
