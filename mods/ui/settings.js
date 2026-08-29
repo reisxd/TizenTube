@@ -324,6 +324,10 @@ export default function modernUI(update, parameters) {
                 {
                     name: t('settings.options.subtitles.options.persistCaptionStyle'),
                     value: 'enableCaptionStylePersistence'
+                },
+                {
+                    name: t('settings.options.subtitles.options.persistCaptionToggle'),
+                    value: 'enableCaptionTogglePersistence'
                 }
             ]
         },

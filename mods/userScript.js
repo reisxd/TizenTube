@@ -17,6 +17,7 @@ import "./ui/settings.js";
 import "./ui/disableWhosWatching.js";
 import "./features/moreSubtitles.js";
 import "./features/captionStylePersistence.js";
+import "./features/captionTogglePersistence.js";
 import "./features/updater.js";
 import "./features/pictureInPicture.js";
 import "./features/preferredVideoQuality.js";
