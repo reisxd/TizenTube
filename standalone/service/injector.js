@@ -4,6 +4,7 @@ const adbhost = require('adbhost');
 const CDP = require('chrome-remote-interface');
 const fetch = require('node-fetch');
 
+const standaloneVersion = tizen.application.getAppInfo().version;
 
 var isConnecting = false;
 const isTizen3 = tizen.systeminfo.getCapability('http://tizen.org/feature/platform.version').startsWith('3.0');
@@ -17,7 +18,10 @@ function connectToDebugger(host, port, args) {
 
             client.on('Runtime.executionContextCreated', m => {
                 fetch('https://cdn.jsdelivr.net/npm/@foxreis/tizentube/dist/userScript.js').then(res => res.text()).then(modFile => {
-                    client.Runtime.evaluate({ expression: modFile, contextId: m.context.id });
+                    client.Runtime.evaluate({
+                        expression: `window.__tizenTubeStandaloneVersion = ${JSON.stringify(standaloneVersion)};\n${modFile}`,
+                        contextId: m.context.id
+                    });
                 }).catch(e => {
                     client.Runtime.evaluate({ expression: 'alert("Failed to request to JSDelivr CDN.")', contextId: m.context.id });
                 });

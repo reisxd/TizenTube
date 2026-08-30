@@ -10,6 +10,7 @@ const http = require('http');
 const https = require('https');
 const URL = require('url');
 const injector = require('./injector.js');
+const standaloneVersion = tizen.application.getAppInfo().version;
 
 app.use((req, res, next) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
@@ -139,6 +140,7 @@ app.all('*', (req, res) => {
                 return response.text().then((text) => {
                     if (req.url.indexOf('/tv') === 0 && req.url.indexOf('/tv_config') === -1) {
                         // Insert the userscript for TizenTube
+                        text += `<script>window.__tizenTubeStandaloneVersion = ${JSON.stringify(standaloneVersion)};</script>`;
                         text += `<script src="https://cdn.jsdelivr.net/npm/@foxreis/tizentube/dist/userScript.js?ver=${Date.now()}"></script>`;
                     }
 
