@@ -412,6 +412,23 @@ export default function modernUI(update, parameters) {
                     })
                 },
                 {
+                    name: t('settings.options.videoPlayer.options.seekInterval.title'),
+                    icon: 'SKIP_NEXT',
+                    value: null,
+                    menuId: 'tt-seek-interval',
+                    menuHeader: {
+                        title: t('settings.options.videoPlayer.options.seekInterval.title'),
+                        subtitle: t('settings.options.videoPlayer.options.seekInterval.subtitle')
+                    },
+                    options: [5, 10, 15, 20, 30, 60].map((seconds) => {
+                        return {
+                            name: `${seconds} s`,
+                            key: 'seekInterval',
+                            value: seconds
+                        }
+                    })
+                },
+                {
                     name: t('settings.options.videoPlayer.options.preferredVideoCodec.title'),
                     icon: 'VIDEO_QUALITY',
                     value: null,
