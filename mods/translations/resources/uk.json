@@ -6,7 +6,11 @@
         "options": {
             "socialMedia": {
                 "title": "Посилання",
-                "qrCodeScanMessage": "Ви можете перейти на сторінку {{name}}, відсканувавши QR-код нижче."
+                "qrCodeScanMessage": "Ви можете перейти на сторінку {{name}}, відсканувавши QR-код нижче.",
+                "announcements": "Оголошення",
+                "group": "Група",
+                "website": "Вебсайт",
+                "githubSponsors": "GitHub Sponsors"
             },
             "adBlock": "Блокування реклами",
             "sponsorblock": {
@@ -77,6 +81,7 @@
                             "enableVPUIPatching": "Увімкнути патч інтерфейсу відеоплеєра",
                             "previousNextBtns": "Кнопки «Попереднє/Наступне»",
                             "showSuperThxBtn": "Кнопка Super Thanks",
+                            "showAIAskBtn": "Показувати кнопку «Запитати ШІ»",
                             "showSpeedCtrlBtn": "Кнопка швидкості",
                             "addMPBtn": "Кнопка мініплеєра",
                             "swapMPWithPIP": "Замінити кнопку мініплеєра на кнопку PiP"
@@ -98,8 +103,16 @@
                     "afrPauseDuration": {
                         "title": "Тривалість паузи Auto Frame Rate",
                         "subtitle": "Встановіть тривалість паузи відтворення (у секундах) під час зміни частоти кадрів"
-                    }
+                    },
+                    "codecAny": "Будь-який",
+                    "qualityAuto": "Авто"
                 }
+            },
+            "time": {
+                "second": "{{count}} сек",
+                "seconds": "{{count}} сек",
+                "minute": "{{count}} хв",
+                "minutes": "{{count}} хв"
             },
             "uiSettings": {
                 "title": "Налаштування інтерфейсу",
@@ -138,8 +151,24 @@
                         "title": "Відкривати при запуску",
                         "subtitle": "Виберіть сторінку, яка відкриватиметься під час запуску TizenTube"
                     },
+                    "categories": {
+                        "search": "Пошук",
+                        "home": "Головна",
+                        "sports": "Спорт",
+                        "news": "Новини",
+                        "music": "Музика",
+                        "podcasts": "Подкасти",
+                        "moviesAndTv": "Фільми й телебачення",
+                        "live": "Наживо",
+                        "gaming": "Ігри",
+                        "subscriptions": "Підписки",
+                        "library": "Бібліотека",
+                        "more": "Більше",
+                        "shorts": "Shorts",
+                        "searchResults": "Результати пошуку"
+                    },
                     "sortSubscriptionsByAlphabet": "Сортувати підписки в алфавітному порядку",
-                    "disableChannelsOnSidebar": "Приховати канали в боковому меню"
+                    "disableChannelsOnSidebar": "Приховати канали в боковому меню",
                     "clock": {
                         "title": "Годинник",
                         "subtitle": "Показувати годинник на екрані",
@@ -158,6 +187,31 @@
                 "options": {
                     "checkForUpdates": "Перевірити оновлення",
                     "checkForUpdatesOnStartup": "Перевіряти оновлення під час запуску"
+                },
+                "updateAvailable": {
+                    "title": "Доступне оновлення",
+                    "subtitle": "Доступна нова версія TizenTube Cobalt: {{latestVersion}}, поточна версія: {{currentVersion}}"
+                },
+                "releaseDate": "Дата випуску: {{date}}",
+                "updateNow": {
+                    "title": "Оновити зараз",
+                    "subtitle": "Натисніть, щоб завантажити найновішу версію."
+                },
+                "remindLater": {
+                    "title": "Нагадати пізніше",
+                    "subtitle": "Перевірити наявність оновлень пізніше."
+                },
+                "upToDate": {
+                    "title": "TizenTube оновлено",
+                    "subtitle": "Ви використовуєте найновішу версію TizenTube Cobalt ({{version}})."
+                },
+                "checkFailed": {
+                    "title": "Не вдалося перевірити оновлення TizenTube",
+                    "subtitle": "Не вдалося перевірити наявність оновлень."
+                },
+                "downloading": {
+                    "title": "Оновлення TizenTube",
+                    "subtitle": "Завантаження оновлення, зачекайте..."
                 }
             }
         },
@@ -201,5 +255,21 @@
             "skip": "Пропустити {{segment}}",
             "skipToHighlight": "Перейти до ключового моменту"
         }
+    },
+    "player": {
+        "playbackSpeed": {
+            "title": "Швидкість відтворення",
+            "button": "Керування швидкістю",
+            "fixStuttering": "Усунути підгальмовування (1.0001x)"
+        },
+        "miniPlayer": "Мініплеєр",
+        "pictureInPicture": "Картинка в картинці (PiP)",
+        "previous": "Попереднє",
+        "next": "Наступне",
+        "withTizenTube": "з TizenTube"
+    },
+    "toasts": {
+        "videoAddedToQueue": "Відео додано до черги.",
+        "videoQueueCleared": "Чергу відео очищено."
     }
 }
