@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+
+<head>
+    <style>
+        @keyframes indeterminate-bar {
+            0% {
+                left: 0%;
+                width: 0;
+            }
+
+            50% {
+                left: 0%;
+                width: 100%;
+            }
+
+            100% {
+                left: 100%;
+                width: 0;
+            }
+        }
+
+        .progress-container {
+            position: relative;
+            width: 300px;
+            height: 4px;
+            margin-top: 40px;
+            background-color: rgba(25, 118, 210, 0.3);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            background-color: #1976D2;
+            animation: indeterminate-bar 1.5s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+        }
+    </style>
+    <script>
+        "use strict";
+        tizen.tvinputdevice.registerKey("ColorF0Red");
+        tizen.tvinputdevice.registerKey("ColorF1Green");
+        tizen.tvinputdevice.registerKey("ColorF2Yellow");
+        tizen.tvinputdevice.registerKey("ColorF3Blue");
+
+        const keys = [
+            "MediaPlayPause",
+            "MediaPlay",
+            "MediaPause",
+            "MediaStop",
+            "MediaFastForward",
+            "MediaRewind",
+            "MediaTrackNext",
+            "MediaTrackPrevious"
+        ];
+
+        for (let i = 0; i < keys.length; i++) {
+            tizen.tvinputdevice.registerKey(keys[i]);
+        }
+
+        const pkgId = tizen.application.getCurrentApplication().appInfo.packageId;
+
+        const serviceId = pkgId + ".StandaloneService";
+
+        function useInjectorOrProxy() {
+            const data = tizen.application.getCurrentApplication().getRequestedAppControl().appControl.data;
+            let args;
+            try {
+                const parsedData = JSON.parse(data[0].value[0]);
+                args = parsedData.args;
+            } catch (e) {
+                // Do nothing.
+            }
+            fetch('http://localhost:8099/tizentube/getState')
+                .then(r => r.json())
+                .then(res => {
+                    if (res.canConnectToDaemon && !res.isConnecting) {
+                        fetch(`http://localhost:8099/tizentube/debugger${args ? `?${args}` : ''}`);
+                        tizen.application.getCurrentApplication().exit();
+                    } else if (!res.canConnectToDaemon) location.href = `http://localhost:8099/tv?additionalDataUrl=http%3A%2F%2Flocalhost%3A8095%2Fdial%2Fapps%2FYouTube${args ? `&${args}` : ''}`
+                }).catch(() => window.location.reload());
+        }
+
+        tizen.application.launchAppControl(
+            new tizen.ApplicationControl("http://tizen.org/appcontrol/operation/service"),
+            serviceId,
+            function () {
+                useInjectorOrProxy();
+            },
+            function (e) {
+                alert("Launch Service failed: " + e.message);
+            }
+        );
+    </script>
+</head>
+
+<body
+    style="background-color: #0f0f0f; display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100vh; margin: 0;">
+    <h1
+        style="color: #FFFFFF; font-size: 80px; font-family: Roboto,Noto Sans CJK ZH-HK,Noto Sans Thai,Arial,Helvetica,sans-serif; margin: 0;">
+        TizenTube
+    </h1>
+    <div class="progress-container">
+        <div class="progress-bar"></div>
+    </div>
+</body>
+
+</html>

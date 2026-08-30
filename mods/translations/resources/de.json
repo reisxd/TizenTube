@@ -6,7 +6,11 @@
         "options": {
             "socialMedia": {
                 "title": "Social-Media-Links",
-                "qrCodeScanMessage": "Du kannst die {{name}}-Seite besuchen, indem du den untenstehenden QR-Code scannst."
+                "qrCodeScanMessage": "Du kannst die {{name}}-Seite besuchen, indem du den untenstehenden QR-Code scannst.",
+                "announcements": "Anzeigen",
+                "group": "Gruppe",
+                "website": "Website",
+                "githubSponsors": "GitHub Sponsoren"
             },
             "adBlock": "Werbeblocker",
             "sponsorblock": {
@@ -75,9 +79,12 @@
                         "title": "Videoplayer-UI patchen",
                         "options": {
                             "enableVPUIPatching": "Videoplayer-UI-Patching aktivieren",
-                            "previousNextBtns": "Vorheriger-/Nächster-Buttons aktivieren",
+                            "previousNextBtns": "Zurück-/Weiter-Buttons aktivieren",
                             "showSuperThxBtn": "Super-Thanks-Button anzeigen",
-                            "showSpeedCtrlBtn": "Geschwindigkeitssteuerungs-Button anzeigen"
+                            "showAIAskBtn": "KI-Frage-Button anzeigen",
+                            "showSpeedCtrlBtn": "Geschwindigkeitssteuerungs-Button anzeigen",
+                            "addMPBtn": "Miniplayer-Schaltfläche anzeigen",
+                            "swapMPWithPIP": "Miniplayer-Schaltfläche durch PiP ersetzen"
                         }
                     },
                     "preferredVideoQuality": {
@@ -96,8 +103,16 @@
                     "afrPauseDuration": {
                         "title": "Pause bei automatischer Bildrate",
                         "subtitle": "Lege fest, wie lange (in Sekunden) das Video pausiert wird, wenn die Bildrate angepasst wird"
-                    }
+                    },
+                    "codecAny": "Beliebig",
+                    "qualityAuto": "Automatisch"
                 }
+            },
+            "time": {
+                "second": "{{count}} Sekunde",
+                "seconds": "{{count}} Sekunden",
+                "minute": "{{count}} Minute",
+                "minutes": "{{count}} Minuten"
             },
             "uiSettings": {
                 "title": "Benutzeroberflächen-Einstellungen",
@@ -136,7 +151,33 @@
                         "title": "Startseite beim Start",
                         "subtitle": "Wähle die Standardseite, die TizenTube beim Start öffnet"
                     },
-                    "sortSubscriptionsByAlphabet": "Abonnements alphabetisch sortieren"
+                    "categories": {
+                        "search": "Suchen",
+                        "home": "Startseite",
+                        "sports": "Sport",
+                        "news": "Nachrichten",
+                        "music": "Musik",
+                        "podcasts": "Podcasts",
+                        "moviesAndTv": "Filme",
+                        "live": "Live",
+                        "gaming": "Gaming",
+                        "subscriptions": "Abos",
+                        "library": "Mediathek",
+                        "more": "Mehr",
+                        "shorts": "Shorts",
+                        "searchResults": "Suchergebnisse"
+                    },
+                    "sortSubscriptionsByAlphabet": "Abonnements alphabetisch sortieren",
+                    "disableChannelsOnSidebar": "Kanäle in der Seitenleiste deaktivieren",
+                    "clock": {
+                        "title": "Uhr",
+                        "subtitle": "Die Uhr auf dem Bildschirm anzeigen",
+                        "options": {
+                            "enableClock": "Uhr aktivieren",
+                            "isClock12HourFormat": "12-Stunden-Format",
+                            "clockShowSeconds": "Sekunden anzeigen"
+                        }
+                    }
                 }
             },
             "updater": {
@@ -146,6 +187,31 @@
                 "options": {
                     "checkForUpdates": "Nach Updates suchen",
                     "checkForUpdatesOnStartup": "Beim Start nach Updates suchen"
+                },
+                "updateAvailable": {
+                    "title": "Update verfügbar",
+                    "subtitle": "Eine neue Version von TizenTube Cobalt ist verfügbar: {{latestVersion}}, installiert: {{currentVersion}}"
+                },
+                "releaseDate": "Veröffentlichungsdatum: {{date}}",
+                "updateNow": {
+                    "title": "Jetzt aktualisieren",
+                    "subtitle": "Klicken Sie hier, um die neueste Version herunterzuladen"
+                },
+                "remindLater": {
+                    "title": "Später daran erinnern",
+                    "subtitle": "Später nach Updates suchen."
+                },
+                "upToDate": {
+                    "title": "TizenTube ist auf dem neuesten Stand",
+                    "subtitle": "Sie verwenden die neueste Version ({{version}}) von TizenTube Cobalt."
+                },
+                "checkFailed": {
+                    "title": "Überprüfung auf TizenTube-Updates fehlgeschlagen",
+                    "subtitle": "Es konnten keine Updates gefunden werden."
+                },
+                "downloading": {
+                    "title": "TizenTube-Update",
+                    "subtitle": "Update wird heruntergeladen, bitte warten..."
                 }
             }
         },
@@ -163,7 +229,7 @@
                 "3": "2. Teile TizenTube mit anderen.",
                 "4": "Wenn du finanziell beitragen möchtest, kannst du spenden:",
                 "5": "- Buy Me A Coffee: https://www.buymeacoffee.com/reisxd (bevorzugt)",
-                "6": "- GitHub Sponsors: https://github.com/sponsors/reisxd"
+                "6": "- GitHub Sponsoren: https://github.com/sponsors/reisxd"
             }
         }
     },
@@ -189,5 +255,21 @@
             "skip": "{{segment}} überspringen",
             "skipToHighlight": "Zum Highlight springen"
         }
+    },
+    "player": {
+        "playbackSpeed": {
+            "title": "Wiedergabegeschwindigkeit",
+            "button": "Geschwindigkeit",
+            "fixStuttering": "Ruckeln beheben (1.0001x)"
+        },
+        "miniPlayer": "MiniPlayer",
+        "pictureInPicture": "Bild-in-Bild",	  
+        "previous": "Zurück",
+        "next": "Weiter",
+        "withTizenTube": "mit TizenTube"
+    },
+    "toasts": {
+        "videoAddedToQueue": "Video wurde zur Warteschlange hinzugefügt",
+        "videoQueueCleared": "Die Warteschlange wurde geleert."
     }
 }

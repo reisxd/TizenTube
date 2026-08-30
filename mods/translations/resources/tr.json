@@ -77,6 +77,7 @@
                             "enableVPUIPatching": "Video Oynatıcı Arayüzü Yamasını Etkinleştir",
                             "previousNextBtns": "Önceki ve Sonraki Düğmelerini Etkinleştir",
                             "showSuperThxBtn": "Süper Teşekkür Düğmesini Göster",
+                            "showAIAskBtn": "Soru Düğmesini Göster",
                             "showSpeedCtrlBtn": "Hız Kontrol Düğmesini Göster",
                             "addMPBtn": "Mini Oynatıcı Düğmesini Göster",
                             "swapMPWithPIP": "Mini Oynatıcı Düğmesini PiP Düğmesi ile Değiştir"

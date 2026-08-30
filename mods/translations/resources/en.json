@@ -6,7 +6,11 @@
         "options": {
             "socialMedia": {
                 "title": "Social Media Links",
-                "qrCodeScanMessage": "You can visit the {{name}} page by scanning the QR code below."
+                "qrCodeScanMessage": "You can visit the {{name}} page by scanning the QR code below.",
+                "announcements": "Announcements",
+                "group": "Group",
+                "website": "Website",
+                "githubSponsors": "GitHub Sponsors"
             },
             "adBlock": "Ad Block",
             "sponsorblock": {
@@ -77,6 +81,7 @@
                             "enableVPUIPatching": "Enable Video Player UI Patching",
                             "previousNextBtns": "Enable Previous and Next Buttons",
                             "showSuperThxBtn": "Show Super Thanks Button",
+                            "showAIAskBtn": "Show Ask Button",
                             "showSpeedCtrlBtn": "Show Speed Controls Button",
                             "addMPBtn": "Show Mini Player Button",
                             "swapMPWithPIP": "Swap Mini Player Button with PiP Button"
@@ -98,8 +103,16 @@
                     "afrPauseDuration": {
                         "title": "Auto Frame Rate Pause Duration",
                         "subtitle": "Set the duration (in seconds) to pause video playback when adjusting frame rate"
-                    }
+                    },
+                    "codecAny": "Any",
+                    "qualityAuto": "Auto"
                 }
+            },
+            "time": {
+                "second": "{{count}} second",
+                "seconds": "{{count}} seconds",
+                "minute": "{{count}} minute",
+                "minutes": "{{count}} minutes"
             },
             "uiSettings": {
                 "title": "User Interface Settings",
@@ -138,6 +151,22 @@
                         "title": "Launch To on Startup",
                         "subtitle": "Choose the default page TizenTube opens to on startup"
                     },
+                    "categories": {
+                        "search": "Search",
+                        "home": "Home",
+                        "sports": "Sports",
+                        "news": "News",
+                        "music": "Music",
+                        "podcasts": "Podcasts",
+                        "moviesAndTv": "Movies & TV",
+                        "live": "Live",
+                        "gaming": "Gaming",
+                        "subscriptions": "Subscriptions",
+                        "library": "Library",
+                        "more": "More",
+                        "shorts": "Shorts",
+                        "searchResults": "Search Results"
+                    },
                     "sortSubscriptionsByAlphabet": "Sort Subscriptions Alphabetically",
                     "disableChannelsOnSidebar": "Disable Channels on Sidebar",
                     "clock": {
@@ -158,6 +187,31 @@
                 "options": {
                     "checkForUpdates": "Check for updates",
                     "checkForUpdatesOnStartup": "Check for updates on startup"
+                },
+                "updateAvailable": {
+                    "title": "Update Available",
+                    "subtitle": "A new version of TizenTube Cobalt is available: {{latestVersion}}, current: {{currentVersion}}"
+                },
+                "releaseDate": "Release Date: {{date}}",
+                "updateNow": {
+                    "title": "Update Now",
+                    "subtitle": "Click to download the latest version."
+                },
+                "remindLater": {
+                    "title": "Remind Me Later",
+                    "subtitle": "Check for updates later."
+                },
+                "upToDate": {
+                    "title": "TizenTube is up to date",
+                    "subtitle": "You are using the latest version ({{version}}) of TizenTube Cobalt."
+                },
+                "checkFailed": {
+                    "title": "TizenTube update check failed",
+                    "subtitle": "Could not check for updates."
+                },
+                "downloading": {
+                    "title": "TizenTube Update",
+                    "subtitle": "Downloading update, please wait..."
                 }
             }
         },
@@ -201,5 +255,21 @@
             "skip": "Skip {{segment}}",
             "skipToHighlight": "Skip to highlight"
         }
+    },
+    "player": {
+        "playbackSpeed": {
+            "title": "Playback Speed",
+            "button": "Speed Controls",
+            "fixStuttering": "Fix stuttering (1.0001x)"
+        },
+        "miniPlayer": "Mini Player",
+        "pictureInPicture": "Picture in Picture",
+        "previous": "Previous",
+        "next": "Next",
+        "withTizenTube": "with TizenTube"
+    },
+    "toasts": {
+        "videoAddedToQueue": "Video added to queue.",
+        "videoQueueCleared": "Video queue cleared."
     }
 }

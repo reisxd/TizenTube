@@ -4,6 +4,7 @@ import modernUI, { optionShow } from './ui/settings.js';
 import { speedSettings } from './ui/speedUI.js';
 import { showToast, buttonItem } from './ui/ytUI.js';
 import checkForUpdates from './features/updater.js';
+import { t } from 'i18next';
 
 export default function resolveCommand(cmd, _) {
     // resolveCommand function is pretty OP, it can do from opening modals, changing client settings and way more.
@@ -79,7 +80,7 @@ export function patchResolveCommand() {
                     const items = cmd.openPopupAction.popup.overlaySectionRenderer.overlay.overlayTwoPanelRenderer.actionPanel.overlayPanelRenderer.content.overlayPanelItemListRenderer.items;
                     for (const item of items) {
                         if (item?.compactLinkRenderer?.icon?.iconType === 'SLOW_MOTION_VIDEO') {
-                            item.compactLinkRenderer.subtitle && (item.compactLinkRenderer.subtitle.simpleText = 'with TizenTube');
+                            item.compactLinkRenderer.subtitle && (item.compactLinkRenderer.subtitle.simpleText = t('player.withTizenTube'));
                             item.compactLinkRenderer.serviceEndpoint = {
                                 clickTrackingParams: "null",
                                 signalAction: {
@@ -94,7 +95,7 @@ export function patchResolveCommand() {
 
                     cmd.openPopupAction.popup.overlaySectionRenderer.overlay.overlayTwoPanelRenderer.actionPanel.overlayPanelRenderer.content.overlayPanelItemListRenderer.items.splice(2, 0,
                         buttonItem(
-                            { title: 'Mini Player' },
+                            { title: t('player.miniPlayer') },
                             { icon: 'CLEAR_COOKIES' }, [
                             {
                                 customAction: {
@@ -108,8 +109,8 @@ export function patchResolveCommand() {
                         window.h5vcc.tizentube.HasSystemFeature('android.software.picture_in_picture')) {
                         cmd.openPopupAction.popup.overlaySectionRenderer.overlay.overlayTwoPanelRenderer.actionPanel.overlayPanelRenderer.content.overlayPanelItemListRenderer.items.splice(3, 0,
                             buttonItem(
-                                { title: 'Picture in Picture' },
-                                { icon: 'PIP' }, [
+                                { title: t('player.pictureInPicture') },
+                                { icon: 'TV' }, [
                                 {
                                     customAction: {
                                         action: 'ENTER_PIP'
@@ -194,7 +195,7 @@ function customAction(action, parameters) {
             break;
         case 'UPDATE_DOWNLOAD':
             window.h5vcc.tizentube.InstallAppFromURL(parameters);
-            showToast('TizenTube Update', 'Downloading update, please wait...');
+            showToast(t('settings.options.updater.downloading.title'), t('settings.options.updater.downloading.subtitle'));
             break;
         case 'SET_PLAYER_SPEED':
             const speed = Number(parameters);
@@ -211,11 +212,11 @@ function customAction(action, parameters) {
             break;
         case 'ADD_TO_QUEUE':
             window.queuedVideos.videos.push(parameters);
-            showToast('TizenTube', 'Video added to queue.');
+            showToast('TizenTube', t('toasts.videoAddedToQueue'));
             break;
         case 'CLEAR_QUEUE':
             window.queuedVideos.videos = [];
-            showToast('TizenTube', 'Video queue cleared.');
+            showToast('TizenTube', t('toasts.videoQueueCleared'));
             break;
         case 'CHECK_FOR_UPDATES':
             checkForUpdates(true);

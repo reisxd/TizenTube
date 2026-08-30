@@ -2,6 +2,7 @@
 
 import { buttonItem, showModal, showToast, overlayPanelItemListRenderer, scrollPaneRenderer, overlayMessageRenderer } from '../ui/ytUI.js';
 import { configRead } from '../config.js';
+import { t } from 'i18next';
 
 // If TizenTube is not running on Cobalt, do nothing
 // Add a timeout since reloading the home page while the updater pop up is shown causes the pop up to instantly disappear.
@@ -50,11 +51,11 @@ function checkForUpdates(showNoUpdateToast) {
 
             if (latestVersion !== currentAppVersion) {
                 console.info(`New version available: ${latestVersion} (current: ${currentAppVersion})`);
-                const msg = `Release Date: ${new Date(releaseDate * 1000).toLocaleString()}\n${release.body}`.replace(/#/g, '').replace(/\*/g, '').trim();
+                const msg = `${t('settings.options.updater.releaseDate', { date: new Date(releaseDate * 1000).toLocaleString() })}\n${release.body}`.replace(/#/g, '').replace(/\*/g, '').trim();
 
                 const buttons = [
                     buttonItem(
-                        { title: 'Update Now', subtitle: 'Click to download the latest version.' },
+                        { title: t('settings.options.updater.updateNow.title'), subtitle: t('settings.options.updater.updateNow.subtitle') },
                         { icon: 'DOWN_ARROW' },
                         [
                             {
@@ -71,7 +72,7 @@ function checkForUpdates(showNoUpdateToast) {
                         ]
                     ),
                     buttonItem(
-                        { title: 'Remind Me Later', subtitle: 'Check for updates later.' },
+                        { title: t('settings.options.updater.remindLater.title'), subtitle: t('settings.options.updater.remindLater.subtitle') },
                         { icon: 'SEARCH_HISTORY' },
                         [
                             {
@@ -95,8 +96,8 @@ function checkForUpdates(showNoUpdateToast) {
 
                 showModal(
                     {
-                        title: 'Update Available',
-                        subtitle: `A new version of TizenTube Cobalt is available: ${latestVersion}, current: ${currentAppVersion}`
+                        title: t('settings.options.updater.updateAvailable.title'),
+                        subtitle: t('settings.options.updater.updateAvailable.subtitle', { latestVersion, currentVersion: currentAppVersion })
                     },
                     overlayPanelItemListRenderer(buttons),
                     'tt-update-modal',
@@ -105,13 +106,13 @@ function checkForUpdates(showNoUpdateToast) {
             } else {
                 console.info('You are using the latest version of TizenTube.');
                 if (showNoUpdateToast) {
-                    showToast('TizenTube is up to date', `You are using the latest version (${currentAppVersion}) of TizenTube Cobalt.`, null);
+                    showToast(t('settings.options.updater.upToDate.title'), t('settings.options.updater.upToDate.subtitle', { version: currentAppVersion }), null);
                 }
             }
         })
         .catch(error => {
             console.error('Error fetching the latest release:', error);
-            showToast('TizenTube update check failed', 'Could not check for updates.', null);
+            showToast(t('settings.options.updater.checkFailed.title'), t('settings.options.updater.checkFailed.subtitle'), null);
         });
 }
 

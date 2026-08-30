@@ -188,6 +188,15 @@ function timelyAction(text, icon, command, triggerTimeMs, timeoutMs) {
 }
 
 function longPressData(data) {
+    const isWatchLaterItem = data.watchEndpointData.playlistId === 'WL';
+    const watchLaterAction = isWatchLaterItem ? {
+        removedVideoId: data.videoId,
+        action: 'ACTION_REMOVE_VIDEO_BY_VIDEO_ID'
+    } : {
+        addedVideoId: data.videoId,
+        action: 'ACTION_ADD_VIDEO'
+    };
+
     return {
         clickTrackingParams: null,
         showMenuCommand: {
@@ -208,16 +217,17 @@ function longPressData(data) {
                             clickTrackingParams: null,
                             watchEndpoint: data.watchEndpointData
                         }),
-                        MenuServiceItemRenderer('Save to Watch Later', {
+                        MenuServiceItemRenderer(isWatchLaterItem ? 'Remove from Watch Later' : 'Save to Watch Later', {
                             clickTrackingParams: null,
+                            commandMetadata: {
+                                webCommandMetadata: {
+                                    sendPost: true,
+                                    apiUrl: '/youtubei/v1/browse/edit_playlist'
+                                }
+                            },
                             playlistEditEndpoint: {
                                 playlistId: 'WL',
-                                actions: [
-                                    {
-                                        addedVideoId: data.videoId,
-                                        action: 'ACTION_ADD_VIDEO'
-                                    }
-                                ]
+                                actions: [watchLaterAction]
                             }
                         }),
                         MenuNavigationItemRenderer('Save to Playlist', {

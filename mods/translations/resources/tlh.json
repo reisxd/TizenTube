@@ -77,7 +77,9 @@
                             "enableVPUIPatching": "video pat UI yIchu'",
                             "previousNextBtns": "meryaq yIchu'",
                             "showSuperThxBtn": "Super Thanks meryaq yIcha'",
-                            "showSpeedCtrlBtn": "Do' choHmeH meryaq yIcha'"
+                            "showSpeedCtrlBtn": "Do' choHmeH meryaq yIcha'",
+                            "addMPBtn": "Mini Player meryaq yIcha'",
+                            "swapMPWithPIP": "Mini Player meryaq choH PiP meryaq"
                         }
                     },
                     "preferredVideoQuality": {
@@ -136,7 +138,17 @@
                         "title": "tagh Page",
                         "subtitle": "tagh Page yInuqlI'"
                     },
-                    "sortSubscriptionsByAlphabet": "pIqaD nI'ghachmo' lIghghachmey chu"
+                    "sortSubscriptionsByAlphabet": "pIqaD nI'ghachmo' lIghghachmey chu",
+                    "disableChannelsOnSidebar": "Sidebar ghommey yImev",
+                    "clock": {
+                        "title": "pI' rIn",
+                        "subtitle": "pI' rIn yIcha'",
+                        "options": {
+                            "enableClock": "pI' rIn yIchu'",
+                            "isClock12HourFormat": "12-Hour pI' rIn yIlo'",
+                            "clockShowSeconds": "Seconds pI' rIn yIcha'"
+                        }
+                    }
                 }
             },
             "updater": {

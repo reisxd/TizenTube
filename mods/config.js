@@ -33,6 +33,7 @@ const defaultConfig = {
   showWelcomeToast: true,
   enablePreviousNextButtons: true,
   enableSuperThanksButton: false,
+  enableAIAskButton: false,
   enableSpeedControlsButton: true,
   enablePatchingVideoPlayer: true,
   enableMPButton: true,

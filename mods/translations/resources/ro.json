@@ -79,7 +79,9 @@
                             "enableVPUIPatching": "Activează corectarea interfeței player-ului video",
                             "previousNextBtns": "Activează butoanele Anterior și Următor",
                             "showSuperThxBtn": "Afișează butonul Super Thanks",
-                            "showSpeedCtrlBtn": "Afișează butonul de control al vitezei"
+                            "showSpeedCtrlBtn": "Afișează butonul de control al vitezei",
+                            "addMPBtn": "Afișează butonul pentru Mini Player",
+                            "swapMPWithPIP": "Schimbă butonul Mini Player cu butonul PiP"
                         }
                     },
                     "preferredVideoQuality": {
@@ -138,7 +140,17 @@
                         "title": "Deschidere la pornire",
                         "subtitle": "Alege pagina implicită pe care TizenTube o deschide la pornire"
                     },
-                    "sortSubscriptionsByAlphabet": "Sortează abonamentele în ordine alfabetică"
+                    "sortSubscriptionsByAlphabet": "Sortează abonamentele în ordine alfabetică",
+                    "disableChannelsOnSidebar": "Dezactivează canalele din bara laterală",
+                    "clock": {
+                        "title": "Ceas",
+                        "subtitle": "Afișează un ceas pe ecran",
+                        "options": {
+                            "enableClock": "Activează ceasul",
+                            "isClock12HourFormat": "Folosește formatul de 12 ore pentru ceas",
+                            "clockShowSeconds": "Afișează secundele la ceas"
+                        }
+                    }
                 }
             },
             "updater": {
@@ -181,7 +193,7 @@
             "interaction": "Reamintire de interacțiune",
             "selfpromo": "Auto-promovare",
             "preview": "Rezumat sau previzualizare",
-            "filler": "Umplutură",
+            "filler": "Tangențe",
             "music_offtopic": "Secțiune non-muzicală",
             "poi_highlight": "Moment de interes"
         },

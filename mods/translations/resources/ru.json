@@ -77,7 +77,8 @@
                             "enableVPUIPatching": "Включить патч интерфейса видеоплеера",
                             "previousNextBtns": "Кнопки «Предыдущее/Следующее»",
                             "showSuperThxBtn": "Кнопка Super Thanks",
-                            "showSpeedCtrlBtn": "Кнопка скорости", 
+                            "showAIAskBtn": "Показать кнопку Спросить ИИ",
+                            "showSpeedCtrlBtn": "Кнопка скорости",
                             "addMPBtn": "Отображать мини-плеер",
                             "swapMPWithPIP": "Замена кнопки мини-плеер на PiP"
                         }
@@ -139,7 +140,16 @@
                         "subtitle": "Выберите страницу, которая будет открываться при запуске TizenTube"
                     },
                     "sortSubscriptionsByAlphabet": "Сортировать подписки по алфавиту",
-                    "disableChannelsOnSidebar": "Отключить каналы в боковой панели"
+                    "disableChannelsOnSidebar": "Отключить каналы в боковой панели",
+                    "clock": {
+                        "title": "Часы",
+                        "subtitle": "Отображать часы на экране",
+                        "options": {
+                            "enableClock": "Включить часы",
+                            "isClock12HourFormat": "12-часовой формат",
+                            "clockShowSeconds": "Показывать секунды"
+                        }
+                    }
                 }
             },
             "updater": {
