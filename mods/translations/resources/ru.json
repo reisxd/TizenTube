@@ -7,10 +7,10 @@
             "socialMedia": {
                 "title": "Ссылки",
                 "qrCodeScanMessage": "Вы можете перейти на страницу {{name}} отсканировав QR-код ниже.",
-                "announcements": "Announcements",
-                "group": "Group",
-                "website": "Website",
-                "githubSponsors": "GitHub Sponsors"
+                "announcements": "Объявления",
+                "group": "Группа",
+                "website": "Вебсайт",
+                "githubSponsors": "Спонсоры GitHub"
             },
             "adBlock": "Блокировка рекламы",
             "sponsorblock": {
@@ -81,7 +81,7 @@
                             "enableVPUIPatching": "Включить патч интерфейса видеоплеера",
                             "previousNextBtns": "Кнопки «Предыдущее/Следующее»",
                             "showSuperThxBtn": "Кнопка Super Thanks",
-                            "showAIAskBtn": "Показать кнопку Спросить ИИ",
+                            "showAIAskBtn": "Показать кнопку Gemini",
                             "showSpeedCtrlBtn": "Кнопка скорости",
                             "addMPBtn": "Отображать мини-плеер",
                             "swapMPWithPIP": "Замена кнопки мини-плеер на PiP"
@@ -104,8 +104,8 @@
                         "title": "Длительность паузы Auto Frame Rate",
                         "subtitle": "Установите длительность (в секундах) паузы воспроизведения при изменении частоты кадров"
                     },
-                    "codecAny": "Any",
-                    "qualityAuto": "Auto"
+                    "codecAny": "Любой",
+                    "qualityAuto": "Авто"
                 }
             },
             "uiSettings": {
@@ -157,23 +157,23 @@
                         }
                     },
                     "categories": {
-                        "search": "Search",
-                        "home": "Home",
-                        "sports": "Sports",
-                        "news": "News",
-                        "music": "Music",
-                        "podcasts": "Podcasts",
-                        "moviesAndTv": "Movies & TV",
-                        "live": "Live",
-                        "gaming": "Gaming",
-                        "subscriptions": "Subscriptions",
-                        "library": "Library",
-                        "more": "More",
+                        "search": "Поиск",
+                        "home": "Главная",
+                        "sports": "Спорт",
+                        "news": "Новости",
+                        "music": "Музыка",
+                        "podcasts": "Подкасты",
+                        "moviesAndTv": "Фильмы и ТВ",
+                        "live": "Прямые трансляции",
+                        "gaming": "Игры",
+                        "subscriptions": "Подписки",
+                        "library": "Библиотека",
+                        "more": "Ещё",
                         "shorts": "Shorts",
-                        "searchResults": "Search Results"
+                        "searchResults": "Результаты поиска"
                     },
-                    "disableEnlargingThumbnails": "Disable Enlarged Thumbnails",
-                    "enableShrinkingThumbnails": "Enable Shrinked Thumbnails"
+                    "disableEnlargingThumbnails": "Отключить увеличение миниатюр",
+                    "enableShrinkingThumbnails": "Включить уменьшение миниатюр"
                 }
             },
             "updater": {
@@ -185,41 +185,41 @@
                     "checkForUpdatesOnStartup": "Проверять обновления при запуске"
                 },
                 "updateAvailable": {
-                    "title": "Update Available",
-                    "subtitle": "A new version of TizenTube Cobalt is available: {{latestVersion}}, current: {{currentVersion}}"
+                    "title": "Доступно обновление",
+                    "subtitle": "Доступна новая версия TizenTube Cobalt: {{latestVersion}}, текущая: {{currentVersion}}"
                 },
-                "releaseDate": "Release Date: {{date}}",
+                "releaseDate": "Дата выпуска: {{date}}",
                 "updateNow": {
-                    "title": "Update Now",
-                    "subtitle": "Click to download the latest version."
+                    "title": "Обновить сейчас",
+                    "subtitle": "Нажмите, чтобы скачать последнюю версию."
                 },
                 "remindLater": {
-                    "title": "Remind Me Later",
-                    "subtitle": "Check for updates later."
+                    "title": "Напомнить позже",
+                    "subtitle": "Проверить обновления позже."
                 },
                 "upToDate": {
-                    "title": "TizenTube is up to date",
-                    "subtitle": "You are using the latest version ({{version}}) of TizenTube Cobalt."
+                    "title": "TizenTube обновлён до последней версии",
+                    "subtitle": "Вы используете последнюю версию TizenTube Cobalt. ({{version}})"
                 },
                 "checkFailed": {
-                    "title": "TizenTube update check failed",
-                    "subtitle": "Could not check for updates."
+                    "title": "Не удалось проверить обновления TizenTube",
+                    "subtitle": "Не удалось проверить наличие обновлений."
                 },
                 "downloading": {
-                    "title": "TizenTube Update",
-                    "subtitle": "Downloading update, please wait..."
+                    "title": "Обновление TizenTube",
+                    "subtitle": "Загрузка обновления, пожалуйста, подождите..."
                 }
             },
             "time": {
-                "second": "{{count}} second",
-                "seconds": "{{count}} seconds",
-                "minute": "{{count}} minute",
-                "minutes": "{{count}} minutes"
+                "second": "{{count}} секунда",
+                "seconds": "{{count}} секунды",
+                "minute": "{{count}} минута",
+                "minutes": "{{count}} минуты"
             }
         },
         "ttSettings": {
             "title": "Настройки TizenTube",
-            "madeByText": "Сделано Reis Can (reisxd) с ❤️",
+            "madeByText": "Сделано Reis Can, перевод BlackFlux (reisxd) с ❤️",
             "summary": "Открыть настройки TizenTube"
         },
         "supportTT": {
@@ -230,8 +230,8 @@
                 "2": "1. Поставьте звезду репозиторию на GitHub, чтобы повысить его видимость.",
                 "3": "2. Поделитесь TizenTube с другими.",
                 "4": "Если вы хотите поддержать проект финансово, рассмотрите возможность пожертвования:",
-                "5": "- Buy Me A Coffee: https://www.buymeacoffee.com/reisxd (preferably)",
-                "6": "- GitHub Sponsors: https://github.com/sponsors/reisxd"
+                "5": "- Buy Me A Coffee: https://www.buymeacoffee.com/reisxd (предпочтительно)",
+                "6": "- Спонсоры GitHub: https://github.com/sponsors/reisxd"
             }
         }
     },
@@ -260,18 +260,18 @@
     },
     "player": {
         "playbackSpeed": {
-            "title": "Playback Speed",
-            "button": "Speed Controls",
-            "fixStuttering": "Fix stuttering (1.0001x)"
+            "title": "Скорость воспроизведения",
+            "button": "Управление скоростью",
+            "fixStuttering": "Устранить рывки (1.0001x)"
         },
-        "miniPlayer": "Mini Player",
-        "pictureInPicture": "Picture in Picture",
-        "previous": "Previous",
-        "next": "Next",
-        "withTizenTube": "with TizenTube"
+        "miniPlayer": "Мини-плеер",
+        "pictureInPicture": "Картинка в картинке",
+        "previous": "Предыдущее",
+        "next": "Следующее",
+        "withTizenTube": "с TizenTube"
     },
     "toasts": {
-        "videoAddedToQueue": "Video added to queue.",
-        "videoQueueCleared": "Video queue cleared."
+        "videoAddedToQueue": "Видео добавлено в очередь.",
+        "videoQueueCleared": "Очередь видео очищена."
     }
 }
