@@ -48,13 +48,20 @@ app.all('*', (req, res) => {
     if (isCorsBypass) {
         const rawTarget = req.url.substring('/cors-bypass/'.length);
         targetUrl = rawTarget.indexOf('http') === 0 ? rawTarget : `https://${rawTarget}`;
+
+        const allowedHosts = /(^|\.)(youtube\.com|googlevideo\.com|gstatic\.com|ggpht\.com|google\.com|googleapis\.com|googleusercontent\.com)$/i;
+        const targetHostname = URL.parse(targetUrl).hostname || '';
+        if (!allowedHosts.test(targetHostname)) {
+            return res.status(403).send('Forbidden target host');
+        }
     } else {
         targetUrl = `https://www.youtube.com${req.url}`;
     }
 
-    const headers = {};
+    const headers = Object.create(null);
     for (const key in req.headers) {
         if (Object.prototype.hasOwnProperty.call(req.headers, key)) {
+            if (key === '__proto__' || key === 'constructor' || key === 'prototype') continue;
             if (key === 'cookie') {
                 headers[key] = req.headers[key]
                     .replace(/__LocalSecure-/g, '__Secure-')
