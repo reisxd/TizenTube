@@ -44,8 +44,8 @@ JSON.parse = function () {
       r.paidContentOverlay = null;
     }
 
-    if (r?.streamingData?.adaptiveFormats && configRead('videoPreferredCodec') !== 'any') {
-      const preferredCodec = configRead('videoPreferredCodec');
+    if (r?.streamingData?.adaptiveFormats && configRead('preferredVideoCodec') !== 'any') {
+      const preferredCodec = configRead('preferredVideoCodec');
       const hasPreferredCodec = r.streamingData.adaptiveFormats.find(format => format.mimeType.includes(preferredCodec));
       if (hasPreferredCodec) {
         r.streamingData.adaptiveFormats = r.streamingData.adaptiveFormats.filter(format => {

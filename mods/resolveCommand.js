@@ -5,6 +5,7 @@ import { speedSettings } from './ui/speedUI.js';
 import { showToast, buttonItem } from './ui/ytUI.js';
 import checkForUpdates from './features/updater.js';
 import { t } from 'i18next';
+import { requestNextAndNavigateChannel } from './utils/innerTubeCalls.js';
 
 export default function resolveCommand(cmd, _) {
     // resolveCommand function is pretty OP, it can do from opening modals, changing client settings and way more.
@@ -220,6 +221,9 @@ function customAction(action, parameters) {
             break;
         case 'CHECK_FOR_UPDATES':
             checkForUpdates(true);
+            break;
+        case 'GO_TO_CHANNEL':
+            requestNextAndNavigateChannel(parameters);
             break;
     }
 }
