@@ -269,7 +269,12 @@
         "pictureInPicture": "Картинка в картинке",
         "previous": "Предыдущее",
         "next": "Следующее",
-        "withTizenTube": "с TizenTube"
+        "withTizenTube": "с TizenTube",
+        "share": {
+            "title": "Share",
+            "button": "Share",
+            "qrCodeScanMessage": "Scan the QR code below to share this video."
+        }
     },
     "toasts": {
         "videoAddedToQueue": "Видео добавлено в очередь.",

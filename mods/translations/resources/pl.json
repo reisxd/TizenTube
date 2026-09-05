@@ -269,7 +269,12 @@
         "pictureInPicture": "Obraz w obrazie (PiP)",
         "previous": "Poprzedni",
         "next": "Następny",
-        "withTizenTube": "Za pomocą TizenTube"
+        "withTizenTube": "Za pomocą TizenTube",
+        "share": {
+            "title": "Share",
+            "button": "Share",
+            "qrCodeScanMessage": "Scan the QR code below to share this video."
+        }
     },
     "toasts": {
         "videoAddedToQueue": "Dodano film do kolejki",

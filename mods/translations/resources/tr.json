@@ -269,7 +269,12 @@
         "pictureInPicture": "Resim İçinde Resim",
         "previous": "Önceki",
         "next": "Sonraki",
-        "withTizenTube": "TizenTube ile"
+        "withTizenTube": "TizenTube ile",
+        "share": {
+            "title": "Paylaş",
+            "button": "Paylaş",
+            "qrCodeScanMessage": "Bu videoyu paylaşmak için aşağıdaki QR kodunu tarayın."
+        }
     },
     "toasts": {
         "videoAddedToQueue": "Video kuyruğa eklendi.",

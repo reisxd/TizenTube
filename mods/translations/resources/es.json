@@ -269,7 +269,12 @@
         "pictureInPicture": "Picture in Picture",
         "previous": "Previous",
         "next": "Next",
-        "withTizenTube": "with TizenTube"
+        "withTizenTube": "with TizenTube",
+        "share": {
+            "title": "Share",
+            "button": "Share",
+            "qrCodeScanMessage": "Scan the QR code below to share this video."
+        }
     },
     "toasts": {
         "videoAddedToQueue": "Video added to queue.",

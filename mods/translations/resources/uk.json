@@ -269,7 +269,12 @@
         "pictureInPicture": "Картинка в картинці (PiP)",
         "previous": "Попереднє",
         "next": "Наступне",
-        "withTizenTube": "з TizenTube"
+        "withTizenTube": "з TizenTube",
+        "share": {
+            "title": "Share",
+            "button": "Share",
+            "qrCodeScanMessage": "Scan the QR code below to share this video."
+        }
     },
     "toasts": {
         "videoAddedToQueue": "Відео додано до черги.",
