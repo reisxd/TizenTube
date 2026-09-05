@@ -106,7 +106,8 @@
                         "subtitle": "Définir le temps de pause (en secondes) pendant l'ajustement de la fréquence de trame"
                     },
                     "codecAny": "Any",
-                    "qualityAuto": "Auto"
+                    "qualityAuto": "Auto",
+                    "hideRelatedVideosPlayer": "Hide Related Videos"
                 }
             },
             "uiSettings": {

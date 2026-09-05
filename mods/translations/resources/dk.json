@@ -105,7 +105,8 @@
                         "subtitle": "Angiv varigheden (i sekunder) for at sætte videoafspilning på pause ved justering af billedfrekvens"
                     },
                     "codecAny": "Any",
-                    "qualityAuto": "Auto"
+                    "qualityAuto": "Auto",
+                    "hideRelatedVideosPlayer": "Hide Related Videos"
                 }
             },
             "uiSettings": {

@@ -105,7 +105,8 @@
                         "subtitle": "Defina a duração (em segundos) da pausa na reprodução do vídeo ao ajustar a taxa de quadros"
                     },
                     "codecAny": "Any",
-                    "qualityAuto": "Auto"
+                    "qualityAuto": "Auto",
+                    "hideRelatedVideosPlayer": "Hide Related Videos"
                 }
             },
             "uiSettings": {

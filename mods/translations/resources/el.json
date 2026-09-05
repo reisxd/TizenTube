@@ -105,7 +105,8 @@
                         "subtitle": "Ρυθμίστε τη διάρκεια παύσης του βίντεο (σε δευτερόλεπτα) κατά την προσαρμογή του ρυθμού καρέ"
                     },
                     "codecAny": "Any",
-                    "qualityAuto": "Auto"
+                    "qualityAuto": "Auto",
+                    "hideRelatedVideosPlayer": "Hide Related Videos"
                 }
             },
             "uiSettings": {

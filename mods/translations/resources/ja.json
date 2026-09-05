@@ -105,7 +105,8 @@
                         "subtitle": "フレームレートの調整時で動画再生を一時停止する時間 (秒単位) を設定します"
                     },
                     "codecAny": "Any",
-                    "qualityAuto": "Auto"
+                    "qualityAuto": "Auto",
+                    "hideRelatedVideosPlayer": "Hide Related Videos"
                 }
             },
             "uiSettings": {

@@ -105,7 +105,8 @@
                         "subtitle": "Nustatykite trukmę (sekundėmis), kuriai vaizdo įrašo atkūrimas bus pristabdytas, kai keičiate kadrų dažnį"
                     },
                     "codecAny": "Any",
-                    "qualityAuto": "Auto"
+                    "qualityAuto": "Auto",
+                    "hideRelatedVideosPlayer": "Hide Related Videos"
                 }
             },
             "uiSettings": {

@@ -105,7 +105,8 @@
                         "subtitle": "Đặt thời gian (tính bằng giây) để tạm dừng phát video khi điều chỉnh tốc độ khung hình"
                     },
                     "codecAny": "Any",
-                    "qualityAuto": "Auto"
+                    "qualityAuto": "Auto",
+                    "hideRelatedVideosPlayer": "Hide Related Videos"
                 }
             },
             "uiSettings": {

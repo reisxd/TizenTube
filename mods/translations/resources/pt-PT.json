@@ -105,7 +105,8 @@
                         "subtitle": "Define a duração (em segundos) da pausa do vídeo ao ajustar a taxa de fotogramas"
                     },
                     "codecAny": "Any",
-                    "qualityAuto": "Auto"
+                    "qualityAuto": "Auto",
+                    "hideRelatedVideosPlayer": "Hide Related Videos"
                 }
             },
             "uiSettings": {

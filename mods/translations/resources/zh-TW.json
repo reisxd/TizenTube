@@ -105,7 +105,8 @@
                         "subtitle": "設定調整幀率時，影片暫停的秒數"
                     },
                     "codecAny": "Any",
-                    "qualityAuto": "Auto"
+                    "qualityAuto": "Auto",
+                    "hideRelatedVideosPlayer": "Hide Related Videos"
                 }
             },
             "uiSettings": {

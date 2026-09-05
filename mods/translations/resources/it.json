@@ -105,7 +105,8 @@
                         "subtitle": "Imposta la durata (in secondi) della pausa mentre viene corretto il frame rate"
                     },
                     "codecAny": "Any",
-                    "qualityAuto": "Auto"
+                    "qualityAuto": "Auto",
+                    "hideRelatedVideosPlayer": "Hide Related Videos"
                 }
             },
             "uiSettings": {

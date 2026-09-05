@@ -105,7 +105,8 @@
                         "subtitle": "تحديد مدة التوقف (بالثواني) عند ضبط معدل الإطارات"
                     },
                     "codecAny": "Any",
-                    "qualityAuto": "Auto"
+                    "qualityAuto": "Auto",
+                    "hideRelatedVideosPlayer": "Hide Related Videos"
                 }
             },
             "uiSettings": {

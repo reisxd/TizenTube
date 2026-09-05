@@ -107,7 +107,8 @@
                         "subtitle": "Setează durata (în secunde) pentru pauza redării video la ajustarea ratei de cadre"
                     },
                     "codecAny": "Any",
-                    "qualityAuto": "Auto"
+                    "qualityAuto": "Auto",
+                    "hideRelatedVideosPlayer": "Hide Related Videos"
                 }
             },
             "uiSettings": {

@@ -105,7 +105,8 @@
                         "subtitle": "Aseta kesto (sekunteina), jonka ajaksi videon toisto keskeytetään kuvataajuutta säädettäessä"
                     },
                     "codecAny": "Any",
-                    "qualityAuto": "Auto"
+                    "qualityAuto": "Auto",
+                    "hideRelatedVideosPlayer": "Hide Related Videos"
                 }
             },
             "uiSettings": {

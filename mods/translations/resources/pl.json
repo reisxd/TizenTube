@@ -105,7 +105,8 @@
                         "subtitle": "Ustaw czas trwania (w sekundach) pauzy odtwarzania wideo podczas dostosowywania liczby klatek na sekundę"
                     },
                     "codecAny": "Dowolny",
-                    "qualityAuto": "Automatyczna"
+                    "qualityAuto": "Automatyczna",
+                    "hideRelatedVideosPlayer": "Hide Related Videos"
                 }
             },
             "time": {

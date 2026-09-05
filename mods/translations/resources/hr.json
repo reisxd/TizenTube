@@ -105,7 +105,8 @@
                         "subtitle": "Postavite trajanje pauze (u sekundama) pri prilagodbi frekvencije osvježavanja"
                     },
                     "codecAny": "Any",
-                    "qualityAuto": "Auto"
+                    "qualityAuto": "Auto",
+                    "hideRelatedVideosPlayer": "Hide Related Videos"
                 }
             },
             "uiSettings": {

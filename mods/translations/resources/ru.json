@@ -105,7 +105,8 @@
                         "subtitle": "Установите длительность (в секундах) паузы воспроизведения при изменении частоты кадров"
                     },
                     "codecAny": "Любой",
-                    "qualityAuto": "Авто"
+                    "qualityAuto": "Авто",
+                    "hideRelatedVideosPlayer": "Hide Related Videos"
                 }
             },
             "uiSettings": {

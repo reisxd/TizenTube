@@ -105,7 +105,8 @@
                         "subtitle": "Atur durasi (dalam detik) untuk menjeda pemutaran video saat menyesuaikan frame rate"
                     },
                     "codecAny": "Any",
-                    "qualityAuto": "Auto"
+                    "qualityAuto": "Auto",
+                    "hideRelatedVideosPlayer": "Hide Related Videos"
                 }
             },
             "uiSettings": {

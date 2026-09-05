@@ -66,6 +66,7 @@ const defaultConfig = {
   clockHideWhenVideoPlaying: false,
   disableEnlargingThumbnails: false,
   enableShrinkingThumbnails: false,
+  hideRelatedVideosPlayer: false,
 };
 
 let localConfig;

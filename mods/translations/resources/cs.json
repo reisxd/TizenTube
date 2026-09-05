@@ -105,7 +105,8 @@
                         "subtitle": "Nastavte dobu (v sekundách) pro pozastavení přehrávání videa při úpravě frekvence snímků"
                     },
                     "codecAny": "Any",
-                    "qualityAuto": "Auto"
+                    "qualityAuto": "Auto",
+                    "hideRelatedVideosPlayer": "Hide Related Videos"
                 }
             },
             "uiSettings": {

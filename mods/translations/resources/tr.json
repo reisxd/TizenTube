@@ -105,7 +105,8 @@
                         "subtitle": "Kare hızı ayarlanırken video oynatmayı duraklatma süresini (saniye) ayarlayın"
                     },
                     "codecAny": "Herhangi",
-                    "qualityAuto": "Otomatik"
+                    "qualityAuto": "Otomatik",
+                    "hideRelatedVideosPlayer": "Benzer Videoları Gizle"
                 }
             },
             "uiSettings": {

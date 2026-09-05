@@ -105,7 +105,8 @@
                         "subtitle": "Állítsa be a videó lejátszásának szüneteltetési idejét (másodpercben) a képkockasebesség módosításakor"
                     },
                     "codecAny": "Any",
-                    "qualityAuto": "Auto"
+                    "qualityAuto": "Auto",
+                    "hideRelatedVideosPlayer": "Hide Related Videos"
                 }
             },
             "uiSettings": {

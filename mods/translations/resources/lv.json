@@ -105,7 +105,8 @@
                         "subtitle": "Iestatiet ilgumu (sekundēs), uz kādu apturēt atskaņošanu, pielāgojot kadru nomaiņas ātrumu"
                     },
                     "codecAny": "Any",
-                    "qualityAuto": "Auto"
+                    "qualityAuto": "Auto",
+                    "hideRelatedVideosPlayer": "Hide Related Videos"
                 }
             },
             "uiSettings": {

@@ -105,7 +105,8 @@
                         "subtitle": "Lege fest, wie lange (in Sekunden) das Video pausiert wird, wenn die Bildrate angepasst wird"
                     },
                     "codecAny": "Beliebig",
-                    "qualityAuto": "Automatisch"
+                    "qualityAuto": "Automatisch",
+                    "hideRelatedVideosPlayer": "Hide Related Videos"
                 }
             },
             "time": {

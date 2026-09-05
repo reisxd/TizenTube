@@ -105,7 +105,8 @@
                         "subtitle": "Set the duration (in seconds) to pause video playback when adjusting frame rate"
                     },
                     "codecAny": "Any",
-                    "qualityAuto": "Auto"
+                    "qualityAuto": "Auto",
+                    "hideRelatedVideosPlayer": "Hide Related Videos"
                 }
             },
             "time": {

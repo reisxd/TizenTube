@@ -411,6 +411,11 @@ export default function modernUI(update, parameters) {
                     })
                 },
                 {
+                    name: t('settings.options.videoPlayer.options.hideRelatedVideosPlayer'),
+                    icon: 'VISIBILITY_OFF',
+                    value: 'hideRelatedVideosPlayer'
+                },
+                {
                     name: t('settings.options.videoPlayer.options.preferredVideoCodec.title'),
                     icon: 'VIDEO_QUALITY',
                     value: null,
