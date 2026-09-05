@@ -5,6 +5,23 @@ import { t } from 'i18next';
 
 const qrcodes = {};
 
+function playbackSpeedOptions(key) {
+    const maxSpeed = 5;
+    const increment = configRead('speedSettingsIncrement') || 0.25;
+    const options = [];
+
+    for (let speed = increment; speed <= maxSpeed; speed += increment) {
+        const fixedSpeed = Math.round(speed * 100) / 100;
+        options.push({
+            name: `${fixedSpeed}x`,
+            key,
+            value: fixedSpeed
+        });
+    }
+
+    return options;
+}
+
 export default function modernUI(update, parameters) {
     const settings = [
         {
@@ -409,6 +426,17 @@ export default function modernUI(update, parameters) {
                             value: increment
                         }
                     })
+                },
+                {
+                    name: t('settings.options.videoPlayer.options.holdToSpeed.title'),
+                    icon: 'SLOW_MOTION_VIDEO',
+                    value: null,
+                    menuId: 'tt-hold-to-speed',
+                    menuHeader: {
+                        title: t('settings.options.videoPlayer.options.holdToSpeed.title'),
+                        subtitle: t('settings.options.videoPlayer.options.holdToSpeed.subtitle')
+                    },
+                    options: playbackSpeedOptions('holdToSpeed')
                 },
                 {
                     name: t('settings.options.videoPlayer.options.preferredVideoCodec.title'),
