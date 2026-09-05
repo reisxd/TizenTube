@@ -175,7 +175,8 @@
                         "options": {
                             "enableClock": "Uhr aktivieren",
                             "isClock12HourFormat": "12-Stunden-Format",
-                            "clockShowSeconds": "Sekunden anzeigen"
+                            "clockShowSeconds": "Sekunden anzeigen",
+                            "clockHideWhenVideoPlaying": "Hide Clock While Video is Playing"
                         }
                     },
                     "disableEnlargingThumbnails": "Disable Enlarged Thumbnails",

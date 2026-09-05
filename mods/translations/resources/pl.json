@@ -175,7 +175,8 @@
                         "options": {
                             "enableClock": "Włącz zegar",
                             "isClock12HourFormat": "Format 12-godzinny",
-                            "clockShowSeconds": "Pokaż sekundy"
+                            "clockShowSeconds": "Pokaż sekundy",
+                            "clockHideWhenVideoPlaying": "Hide Clock While Video is Playing"
                         }
                     },
                     "disableEnlargingThumbnails": "Disable Enlarged Thumbnails",

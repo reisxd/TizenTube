@@ -175,7 +175,8 @@
                         "options": {
                             "enableClock": "Увімкнути годинник",
                             "isClock12HourFormat": "Використовувати 12-годинний формат",
-                            "clockShowSeconds": "Показувати секунди"
+                            "clockShowSeconds": "Показувати секунди",
+                            "clockHideWhenVideoPlaying": "Hide Clock While Video is Playing"
                         }
                     },
                     "disableEnlargingThumbnails": "Disable Enlarged Thumbnails",

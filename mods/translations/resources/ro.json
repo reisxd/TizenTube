@@ -155,7 +155,8 @@
                         "options": {
                             "enableClock": "Activează ceasul",
                             "isClock12HourFormat": "Folosește formatul de 12 ore pentru ceas",
-                            "clockShowSeconds": "Afișează secundele la ceas"
+                            "clockShowSeconds": "Afișează secundele la ceas",
+                            "clockHideWhenVideoPlaying": "Hide Clock While Video is Playing"
                         }
                     },
                     "categories": {

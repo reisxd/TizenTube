@@ -153,7 +153,8 @@
                         "options": {
                             "enableClock": "Saati Etkinleştir",
                             "isClock12HourFormat": "Saat için 12 Saat Formatını Kullan",
-                            "clockShowSeconds": "Saatte Saniyeleri Göster"
+                            "clockShowSeconds": "Saatte Saniyeleri Göster",
+                            "clockHideWhenVideoPlaying": "Video Oynatılırken Saati Gizle"
                         }
                     },
                     "categories": {

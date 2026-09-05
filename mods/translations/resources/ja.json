@@ -153,7 +153,8 @@
                         "options": {
                             "enableClock": "時計を有効化する",
                             "isClock12HourFormat": "12 時間制の時計を使用する",
-                            "clockShowSeconds": "時計に秒数を表示する"
+                            "clockShowSeconds": "時計に秒数を表示する",
+                            "clockHideWhenVideoPlaying": "Hide Clock While Video is Playing"
                         }
                     },
                     "categories": {

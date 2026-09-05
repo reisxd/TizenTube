@@ -153,7 +153,8 @@
                         "options": {
                             "enableClock": "pI' rIn yIchu'",
                             "isClock12HourFormat": "12-Hour pI' rIn yIlo'",
-                            "clockShowSeconds": "Seconds pI' rIn yIcha'"
+                            "clockShowSeconds": "Seconds pI' rIn yIcha'",
+                            "clockHideWhenVideoPlaying": "Hide Clock While Video is Playing"
                         }
                     },
                     "categories": {

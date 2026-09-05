@@ -792,6 +792,11 @@ export default function modernUI(update, parameters) {
                             name: t('settings.options.uiSettings.options.clock.options.clockShowSeconds'),
                             icon: 'TIMER',
                             value: 'clockShowSeconds'
+                        },
+                        {
+                            name: t('settings.options.uiSettings.options.clock.options.clockHideWhenVideoPlaying'),
+                            icon: 'EYE_OFF',
+                            value: 'clockHideWhenVideoPlaying'
                         }
                     ]
                 },

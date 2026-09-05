@@ -153,7 +153,8 @@
                         "options": {
                             "enableClock": "تمكين الساعة",
                             "isClock12HourFormat": "استخدام نظام 12 ساعة",
-                            "clockShowSeconds": "عرض الثواني على الساعة"
+                            "clockShowSeconds": "عرض الثواني على الساعة",
+                            "clockHideWhenVideoPlaying": "Hide Clock While Video is Playing"
                         }
                     },
                     "categories": {

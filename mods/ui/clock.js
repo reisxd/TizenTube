@@ -43,6 +43,14 @@ function toggleClock(value) {
             const now = new Date();
             const is12HourFormat = configRead('isClock12HourFormat');
             const secondsEnabled = configRead('clockShowSeconds');
+            const shouldHideWhenVideoPlaying = configRead('clockHideWhenVideoPlaying');
+            const ytlrWatchDefault = document.querySelector('ytlr-watch-default');
+            
+            if (shouldHideWhenVideoPlaying) {
+                if (ytlrWatchDefault && ytlrWatchDefault.getAttribute('hybridnavfocusable') === 'true')
+                    actualClock.style.display = 'none';
+                else actualClock.style.display = 'block';
+            }
 
             let hours = now.getHours();
             if (is12HourFormat) {

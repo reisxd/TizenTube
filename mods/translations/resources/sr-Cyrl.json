@@ -153,7 +153,8 @@
                         "options": {
                             "enableClock": "Омогући сат",
                             "isClock12HourFormat": "Користи 12-часовни формат за сат",
-                            "clockShowSeconds": "Прикажи секунде на сату"
+                            "clockShowSeconds": "Прикажи секунде на сату",
+                            "clockHideWhenVideoPlaying": "Hide Clock While Video is Playing"
                         }
                     },
                     "categories": {

@@ -153,7 +153,8 @@
                         "options": {
                             "enableClock": "Povolit hodiny",
                             "isClock12HourFormat": "Použít 12-ti hodinový formát hodin",
-                            "clockShowSeconds": "Zobrazovat sekundy na hodinách"
+                            "clockShowSeconds": "Zobrazovat sekundy na hodinách",
+                            "clockHideWhenVideoPlaying": "Hide Clock While Video is Playing"
                         }
                     },
                     "categories": {

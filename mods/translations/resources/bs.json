@@ -153,7 +153,8 @@
                         "options": {
                             "enableClock": "Omogući sat",
                             "isClock12HourFormat": "Koristi 12-satni format za sat",
-                            "clockShowSeconds": "Prikaži sekunde na satu"
+                            "clockShowSeconds": "Prikaži sekunde na satu",
+                            "clockHideWhenVideoPlaying": "Hide Clock While Video is Playing"
                         }
                     },
                     "categories": {
