@@ -192,7 +192,9 @@
                         "moveDown": {
                             "title": "Move Down",
                             "subtitle": "Move this item down in the sidebar"
-                        }
+                        },
+                        "addToSidebar": "Add Channel to Sidebar",
+                        "removeFromSidebar": "Remove Channel from Sidebar"
                     }
                 }
             },
@@ -291,6 +293,10 @@
     },
     "toasts": {
         "videoAddedToQueue": "Відео додано до черги.",
-        "videoQueueCleared": "Чергу відео очищено."
+        "videoQueueCleared": "Чергу відео очищено.",
+        "sidebarContentsUpdated": {
+            "title": "Sidebar Contents Updated",
+            "subtitle": "The sidebar contents have been updated."
+        }
     }
 }

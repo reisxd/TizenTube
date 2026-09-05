@@ -186,16 +186,9 @@
                         "moveDown": {
                             "title": "Move Down",
                             "subtitle": "Move this item down in the sidebar"
-                        }
-                    }
-                },
-                "updater": {
-                    "title": "TizenTube Cobalt -päivittäjä",
-                    "menuSubtitle": "Hallitse TizenTube Cobaltin päivityksiä",
-                    "versionSubtitle": "Nykyinen versio: {{version}}",
-                    "options": {
-                        "checkForUpdates": "Tarkista päivitykset",
-                        "checkForUpdatesOnStartup": "Tarkista päivitykset käynnistyksessä"
+                        },
+                        "addToSidebar": "Add Channel to Sidebar",
+                        "removeFromSidebar": "Remove Channel from Sidebar"
                     }
                 }
             },
@@ -300,6 +293,10 @@
     },
     "toasts": {
         "videoAddedToQueue": "Video added to queue.",
-        "videoQueueCleared": "Video queue cleared."
+        "videoQueueCleared": "Video queue cleared.",
+        "sidebarContentsUpdated": {
+            "title": "Sidebar Contents Updated",
+            "subtitle": "The sidebar contents have been updated."
+        }
     }
 }

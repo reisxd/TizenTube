@@ -27,12 +27,25 @@ function addMissingKeys(enObj, translationObj) {
     }
 }
 
+function removeUnknownKeys(enObj, translationObj) {
+    for (const key in translationObj) {
+        if (!(key in enObj)) {
+            delete translationObj[key];
+        }
+        else if (typeof enObj[key] === 'object' && !Array.isArray(enObj[key])
+            && typeof translationObj[key] === 'object' && !Array.isArray(translationObj[key])) {
+            removeUnknownKeys(enObj[key], translationObj[key]);
+        }
+    }
+}
+
 files.forEach(file => {
     if (file === 'en.json') return;
 
     const translationFile = readFileSync(`translations/resources/${file}`, 'utf-8');
     const translationData = JSON.parse(translationFile);
 
+    removeUnknownKeys(enData, translationData);
     addMissingKeys(enData, translationData);
 
     const updatedTranslationFile = JSON.stringify(translationData, null, 4);

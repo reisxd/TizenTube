@@ -187,7 +187,9 @@
                         "moveDown": {
                             "title": "Move Down",
                             "subtitle": "Move this item down in the sidebar"
-                        }
+                        },
+                        "addToSidebar": "Add Channel to Sidebar",
+                        "removeFromSidebar": "Remove Channel from Sidebar"
                     }
                 }
             },
@@ -292,6 +294,10 @@
     },
     "toasts": {
         "videoAddedToQueue": "Video added to queue.",
-        "videoQueueCleared": "Video queue cleared."
+        "videoQueueCleared": "Video queue cleared.",
+        "sidebarContentsUpdated": {
+            "title": "Sidebar Contents Updated",
+            "subtitle": "The sidebar contents have been updated."
+        }
     }
 }

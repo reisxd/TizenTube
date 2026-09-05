@@ -186,7 +186,9 @@
                         "moveDown": {
                             "title": "Aşağı Taşı",
                             "subtitle": "Bu öğeyi kenar çubuğunda aşağı taşır"
-                        }
+                        },
+                            "addToSidebar": "Kanalı Kenar Çubuğuna Ekle",
+                            "removeFromSidebar": "Kanalı Kenar Çubuğundan Kaldır"
                     }
                 }
             },
@@ -291,6 +293,10 @@
     },
     "toasts": {
         "videoAddedToQueue": "Video kuyruğa eklendi.",
-        "videoQueueCleared": "Video kuyruğu temizlendi."
+        "videoQueueCleared": "Video kuyruğu temizlendi.",
+        "sidebarContentsUpdated": {
+            "title": "Kenar Çubuğu İçerikleri Güncellendi",
+            "subtitle": "Kenar çubuğu içerikleri güncellendi."
+        }
     }
 }

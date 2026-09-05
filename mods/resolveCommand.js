@@ -270,5 +270,19 @@ function customAction(action, parameters) {
         case 'SHOW_GUIDE_SETTINGS':
             showGuideSettings(parameters);
             break;
+        case 'ADD_OR_REMOVE_CHANNEL_TO_SIDEBAR':
+            const sortedSidebarContents = configRead('sidebarContentsOrder');
+
+            if (sortedSidebarContents.find(item => item.browseId === parameters.browseId)) {
+                sortedSidebarContents.splice(sortedSidebarContents.findIndex(item => item.browseId === parameters.browseId), 1);
+            } else {
+                sortedSidebarContents.push({
+                    browseId: parameters.browseId,
+                    title: parameters.title,
+                });
+            }
+            configWrite('sidebarContentsOrder', sortedSidebarContents);
+            showToast(t('toasts.sidebarContentsUpdated.title'), t('toasts.sidebarContentsUpdated.subtitle'));
+            break;
     }
 }

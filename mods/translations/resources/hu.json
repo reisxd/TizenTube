@@ -186,16 +186,9 @@
                         "moveDown": {
                             "title": "Move Down",
                             "subtitle": "Move this item down in the sidebar"
-                        }
-                    }
-                },
-                "updater": {
-                    "title": "TizenTube Cobalt frissítő",
-                    "menuSubtitle": "TizenTube Cobalt frissítések kezelése",
-                    "versionSubtitle": "Jelenlegi verzió: {{version}}",
-                    "options": {
-                        "checkForUpdates": "Frissítések keresése",
-                        "checkForUpdatesOnStartup": "Frissítések keresése indításkor"
+                        },
+                        "addToSidebar": "Add Channel to Sidebar",
+                        "removeFromSidebar": "Remove Channel from Sidebar"
                     }
                 }
             },
@@ -300,6 +293,10 @@
     },
     "toasts": {
         "videoAddedToQueue": "Video added to queue.",
-        "videoQueueCleared": "Video queue cleared."
+        "videoQueueCleared": "Video queue cleared.",
+        "sidebarContentsUpdated": {
+            "title": "Sidebar Contents Updated",
+            "subtitle": "The sidebar contents have been updated."
+        }
     }
 }

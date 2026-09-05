@@ -278,6 +278,40 @@ JSON.parse = function () {
         }
       }
     }
+
+    if (r?.contents?.tvBrowseRenderer?.content?.tvSurfaceContentRenderer?.header?.channelHeaderRenderer?.buttons) {
+      let browseId = null;
+      const title = r.contents.tvBrowseRenderer.content.tvSurfaceContentRenderer.header.channelHeaderRenderer.title.simpleText;
+      for (const service of r.responseContext.serviceTrackingParams) {
+        for (const param of service.params) {
+          if (param.key === 'browse_id') {
+            browseId = param.value;
+            break;
+          }
+        }
+        if (browseId) break;
+      }
+
+      const inSidebar = configRead('sidebarContentsOrder')?.some(orderItem =>
+        (typeof orderItem === 'object' ? orderItem.browseId : orderItem) === browseId);
+
+      r.contents.tvBrowseRenderer.content.tvSurfaceContentRenderer.header.channelHeaderRenderer.buttons.push({
+        buttonRenderer: ButtonRenderer(
+          false,
+          inSidebar ? t('settings.options.uiSettings.options.sortSidebarContents.removeFromSidebar') : t('settings.options.uiSettings.options.sortSidebarContents.addToSidebar'),
+          inSidebar ? 'REMOVE' : 'ADD',
+          {
+            customAction: {
+              action: 'ADD_OR_REMOVE_CHANNEL_TO_SIDEBAR',
+              parameters: {
+                browseId,
+                title
+              }
+            }
+          }
+        )
+      })
+    }
   } catch (e) {
     console.error('An error occured while processing the JSON:', e);
   }
