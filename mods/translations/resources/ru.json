@@ -211,10 +211,10 @@
                 }
             },
             "time": {
-                "second": "{{count}} секунда",
-                "seconds": "{{count}} секунды",
-                "minute": "{{count}} минута",
-                "minutes": "{{count}} минуты"
+                "second": "{{count}} сек",
+                "seconds": "{{count}} сек",
+                "minute": "{{count}} мин",
+                "minutes": "{{count}} мин"
             }
         },
         "ttSettings": {
