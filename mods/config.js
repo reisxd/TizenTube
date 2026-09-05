@@ -54,6 +54,7 @@ const defaultConfig = {
   launchToOnStartup: null,
   reloadHomeOnStartup: true,
   disabledSidebarContents: [],
+  sidebarContentsOrder: [],
   disableChannelsOnSidebar: false,
   enableUpdater: true,
   autoFrameRate: false,
@@ -63,8 +64,10 @@ const defaultConfig = {
   enableClock: false,
   isClock12HourFormat: false,
   clockShowSeconds: false,
+  clockHideWhenVideoPlaying: false,
   disableEnlargingThumbnails: false,
   enableShrinkingThumbnails: false,
+  hideRelatedVideosPlayer: false,
 };
 
 let localConfig;

@@ -22,6 +22,19 @@ const interval = setInterval(() => {
 
 let keyTimeout = null;
 
+const keys = {
+  49: 1,
+  50: 2,
+  51: 3,
+  52: 4,
+  53: 5,
+  54: 6,
+  55: 7,
+  56: 8,
+  57: 9,
+  48: 0
+};
+
 function execute_once_dom_loaded() {
 
   // Add CSS to head.
@@ -138,6 +151,13 @@ function execute_once_dom_loaded() {
       evt.keyCode,
       evt.defaultPrevented
     );
+
+    if (evt.keyCode in keys) {
+      const percentage = keys[evt.keyCode] * 10;
+      const video = document.querySelector('video');
+      video.currentTime = (percentage / 100) * video.duration;
+    }
+
     if (configRead('enableScreenDimming')) {
       if (keyTimeout) {
         clearTimeout(keyTimeout);

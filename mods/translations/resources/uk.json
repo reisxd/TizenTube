@@ -105,7 +105,8 @@
                         "subtitle": "Встановіть тривалість паузи відтворення (у секундах) під час зміни частоти кадрів"
                     },
                     "codecAny": "Будь-який",
-                    "qualityAuto": "Авто"
+                    "qualityAuto": "Авто",
+                    "hideRelatedVideosPlayer": "Hide Related Videos"
                 }
             },
             "time": {
@@ -175,11 +176,26 @@
                         "options": {
                             "enableClock": "Увімкнути годинник",
                             "isClock12HourFormat": "Використовувати 12-годинний формат",
-                            "clockShowSeconds": "Показувати секунди"
+                            "clockShowSeconds": "Показувати секунди",
+                            "clockHideWhenVideoPlaying": "Hide Clock While Video is Playing"
                         }
                     },
                     "disableEnlargingThumbnails": "Disable Enlarged Thumbnails",
-                    "enableShrinkingThumbnails": "Enable Shrinked Thumbnails"
+                    "enableShrinkingThumbnails": "Enable Shrinked Thumbnails",
+                    "sortSidebarContents": {
+                        "title": "Sort Sidebar Contents",
+                        "subtitle": "Reorder sidebar contents to your preference",
+                        "moveUp": {
+                            "title": "Move Up",
+                            "subtitle": "Move this item up in the sidebar"
+                        },
+                        "moveDown": {
+                            "title": "Move Down",
+                            "subtitle": "Move this item down in the sidebar"
+                        },
+                        "addToSidebar": "Add Channel to Sidebar",
+                        "removeFromSidebar": "Remove Channel from Sidebar"
+                    }
                 }
             },
             "updater": {
@@ -268,10 +284,19 @@
         "pictureInPicture": "Картинка в картинці (PiP)",
         "previous": "Попереднє",
         "next": "Наступне",
-        "withTizenTube": "з TizenTube"
+        "withTizenTube": "з TizenTube",
+        "share": {
+            "title": "Share",
+            "button": "Share",
+            "qrCodeScanMessage": "Scan the QR code below to share this video."
+        }
     },
     "toasts": {
         "videoAddedToQueue": "Відео додано до черги.",
-        "videoQueueCleared": "Чергу відео очищено."
+        "videoQueueCleared": "Чергу відео очищено.",
+        "sidebarContentsUpdated": {
+            "title": "Sidebar Contents Updated",
+            "subtitle": "The sidebar contents have been updated."
+        }
     }
 }

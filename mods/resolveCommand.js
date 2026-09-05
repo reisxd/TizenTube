@@ -2,9 +2,12 @@ import { configWrite, configRead } from './config.js';
 import { enablePip } from './features/pictureInPicture.js';
 import modernUI, { optionShow } from './ui/settings.js';
 import { speedSettings } from './ui/speedUI.js';
-import { showToast, buttonItem } from './ui/ytUI.js';
+import { showToast, buttonItem, showModal, QrCodeRenderer, overlayPanelItemListRenderer, overlayMessageRenderer } from './ui/ytUI.js';
 import checkForUpdates from './features/updater.js';
 import { t } from 'i18next';
+import { requestNextAndNavigateChannel } from './utils/innerTubeCalls.js';
+import qrcode from 'qrcode-npm';
+import showGuideSettings from './ui/sidebarModification.js';
 
 export default function resolveCommand(cmd, _) {
     // resolveCommand function is pretty OP, it can do from opening modals, changing client settings and way more.
@@ -104,8 +107,19 @@ export function patchResolveCommand() {
                             }
                         ])
                     );
+                    cmd.openPopupAction.popup.overlaySectionRenderer.overlay.overlayTwoPanelRenderer.actionPanel.overlayPanelRenderer.content.overlayPanelItemListRenderer.items.splice(3, 0,
+                        buttonItem(
+                            { title: t('player.share.button') },
+                            { icon: 'OPEN_IN_NEW' }, [
+                            {
+                                customAction: {
+                                    action: 'SHARE'
+                                }
+                            }
+                        ])
+                    );
 
-                    if (window.h5vcc && window.h5vcc.tizentube && window.h5vcc.tizentube.HasSystemFeature && 
+                    if (window.h5vcc && window.h5vcc.tizentube && window.h5vcc.tizentube.HasSystemFeature &&
                         window.h5vcc.tizentube.HasSystemFeature('android.software.picture_in_picture')) {
                         cmd.openPopupAction.popup.overlaySectionRenderer.overlay.overlayTwoPanelRenderer.actionPanel.overlayPanelRenderer.content.overlayPanelItemListRenderer.items.splice(3, 0,
                             buttonItem(
@@ -118,7 +132,7 @@ export function patchResolveCommand() {
                                 },
                                 {
                                     signalAction: {
-                                         signal: 'POPUP_BACK'
+                                        signal: 'POPUP_BACK'
                                     }
                                 }
                             ])
@@ -220,6 +234,55 @@ function customAction(action, parameters) {
             break;
         case 'CHECK_FOR_UPDATES':
             checkForUpdates(true);
+            break;
+        case 'GO_TO_CHANNEL':
+            requestNextAndNavigateChannel(parameters);
+            break;
+        case 'SHARE':
+            const videoPlayer = document.querySelector('.html5-video-player');
+            const videoData = videoPlayer.getVideoData();
+            const videoId = videoData.video_id;
+            const shareUrl = `https://www.youtube.com/watch?v=${videoId}`;
+
+            const qr = qrcode.qrcode(6, 'H');
+            qr.addData(shareUrl);
+            qr.make();
+
+            const qrDataImgTag = qr.createImgTag(8, 8);
+            const qrDataUrl = qrDataImgTag.match(/src="([^"]+)"/)[1];
+
+            showModal({
+                title: t('player.share.title'),
+            }, overlayPanelItemListRenderer([
+                overlayMessageRenderer(t('player.share.qrCodeScanMessage')),
+                QrCodeRenderer(qrDataUrl)
+            ]), 'tt-share-modal');
+            break;
+        case 'SHOW_GUIDE_BUTTONS':
+            showGuideSettings('SHOW_GUIDE_BUTTONS', parameters);
+            break;
+        case 'RELOAD_GUIDE_OPTIONS':
+            showGuideSettings(parameters.settingType, true);
+            break;
+        case 'MOVE_GUIDE_BUTTON':
+            showGuideSettings('MOVE_GUIDE_BUTTON', parameters);
+            break;
+        case 'SHOW_GUIDE_SETTINGS':
+            showGuideSettings(parameters);
+            break;
+        case 'ADD_OR_REMOVE_CHANNEL_TO_SIDEBAR':
+            const sortedSidebarContents = configRead('sidebarContentsOrder');
+
+            if (sortedSidebarContents.find(item => item.browseId === parameters.browseId)) {
+                sortedSidebarContents.splice(sortedSidebarContents.findIndex(item => item.browseId === parameters.browseId), 1);
+            } else {
+                sortedSidebarContents.push({
+                    browseId: parameters.browseId,
+                    title: parameters.title,
+                });
+            }
+            configWrite('sidebarContentsOrder', sortedSidebarContents);
+            showToast(t('toasts.sidebarContentsUpdated.title'), t('toasts.sidebarContentsUpdated.subtitle'));
             break;
     }
 }

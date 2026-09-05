@@ -105,7 +105,8 @@
                         "subtitle": "Ustaw czas trwania (w sekundach) pauzy odtwarzania wideo podczas dostosowywania liczby klatek na sekundę"
                     },
                     "codecAny": "Dowolny",
-                    "qualityAuto": "Automatyczna"
+                    "qualityAuto": "Automatyczna",
+                    "hideRelatedVideosPlayer": "Hide Related Videos"
                 }
             },
             "time": {
@@ -175,11 +176,26 @@
                         "options": {
                             "enableClock": "Włącz zegar",
                             "isClock12HourFormat": "Format 12-godzinny",
-                            "clockShowSeconds": "Pokaż sekundy"
+                            "clockShowSeconds": "Pokaż sekundy",
+                            "clockHideWhenVideoPlaying": "Hide Clock While Video is Playing"
                         }
                     },
                     "disableEnlargingThumbnails": "Disable Enlarged Thumbnails",
-                    "enableShrinkingThumbnails": "Enable Shrinked Thumbnails"
+                    "enableShrinkingThumbnails": "Enable Shrinked Thumbnails",
+                    "sortSidebarContents": {
+                        "title": "Sort Sidebar Contents",
+                        "subtitle": "Reorder sidebar contents to your preference",
+                        "moveUp": {
+                            "title": "Move Up",
+                            "subtitle": "Move this item up in the sidebar"
+                        },
+                        "moveDown": {
+                            "title": "Move Down",
+                            "subtitle": "Move this item down in the sidebar"
+                        },
+                        "addToSidebar": "Add Channel to Sidebar",
+                        "removeFromSidebar": "Remove Channel from Sidebar"
+                    }
                 }
             },
             "updater": {
@@ -268,10 +284,19 @@
         "pictureInPicture": "Obraz w obrazie (PiP)",
         "previous": "Poprzedni",
         "next": "Następny",
-        "withTizenTube": "Za pomocą TizenTube"
+        "withTizenTube": "Za pomocą TizenTube",
+        "share": {
+            "title": "Share",
+            "button": "Share",
+            "qrCodeScanMessage": "Scan the QR code below to share this video."
+        }
     },
     "toasts": {
         "videoAddedToQueue": "Dodano film do kolejki",
-        "videoQueueCleared": "Kolejka została wyczyszczona."
+        "videoQueueCleared": "Kolejka została wyczyszczona.",
+        "sidebarContentsUpdated": {
+            "title": "Sidebar Contents Updated",
+            "subtitle": "The sidebar contents have been updated."
+        }
     }
 }

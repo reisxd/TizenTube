@@ -105,7 +105,8 @@
                         "subtitle": "Kare hızı ayarlanırken video oynatmayı duraklatma süresini (saniye) ayarlayın"
                     },
                     "codecAny": "Herhangi",
-                    "qualityAuto": "Otomatik"
+                    "qualityAuto": "Otomatik",
+                    "hideRelatedVideosPlayer": "Benzer Videoları Gizle"
                 }
             },
             "uiSettings": {
@@ -153,7 +154,8 @@
                         "options": {
                             "enableClock": "Saati Etkinleştir",
                             "isClock12HourFormat": "Saat için 12 Saat Formatını Kullan",
-                            "clockShowSeconds": "Saatte Saniyeleri Göster"
+                            "clockShowSeconds": "Saatte Saniyeleri Göster",
+                            "clockHideWhenVideoPlaying": "Video Oynatılırken Saati Gizle"
                         }
                     },
                     "categories": {
@@ -173,7 +175,21 @@
                         "searchResults": "Arama Sonuçları"
                     },
                     "disableEnlargingThumbnails": "Büyütülmüş Küçük Resimleri Devre Dışı Bırak",
-                    "enableShrinkingThumbnails": "Küçük Resimleri Küçültmeyi Etkinleştir"
+                    "enableShrinkingThumbnails": "Küçük Resimleri Küçültmeyi Etkinleştir",
+                    "sortSidebarContents": {
+                        "title": "Kenar Çubuğu İçeriklerini Sırala",
+                        "subtitle": "Kenar çubuğu içeriklerini tercihinize göre yeniden sıralayın",
+                        "moveUp": {
+                            "title": "Yukarı Taşı",
+                            "subtitle": "Bu öğeyi kenar çubuğunda yukarı taşır"
+                        },
+                        "moveDown": {
+                            "title": "Aşağı Taşı",
+                            "subtitle": "Bu öğeyi kenar çubuğunda aşağı taşır"
+                        },
+                            "addToSidebar": "Kanalı Kenar Çubuğuna Ekle",
+                            "removeFromSidebar": "Kanalı Kenar Çubuğundan Kaldır"
+                    }
                 }
             },
             "updater": {
@@ -268,10 +284,19 @@
         "pictureInPicture": "Resim İçinde Resim",
         "previous": "Önceki",
         "next": "Sonraki",
-        "withTizenTube": "TizenTube ile"
+        "withTizenTube": "TizenTube ile",
+        "share": {
+            "title": "Paylaş",
+            "button": "Paylaş",
+            "qrCodeScanMessage": "Bu videoyu paylaşmak için aşağıdaki QR kodunu tarayın."
+        }
     },
     "toasts": {
         "videoAddedToQueue": "Video kuyruğa eklendi.",
-        "videoQueueCleared": "Video kuyruğu temizlendi."
+        "videoQueueCleared": "Video kuyruğu temizlendi.",
+        "sidebarContentsUpdated": {
+            "title": "Kenar Çubuğu İçerikleri Güncellendi",
+            "subtitle": "Kenar çubuğu içerikleri güncellendi."
+        }
     }
 }
