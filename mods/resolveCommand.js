@@ -7,6 +7,7 @@ import checkForUpdates from './features/updater.js';
 import { t } from 'i18next';
 import { requestNextAndNavigateChannel } from './utils/innerTubeCalls.js';
 import qrcode from 'qrcode-npm';
+import showGuideSettings from './ui/sidebarModification.js';
 
 export default function resolveCommand(cmd, _) {
     // resolveCommand function is pretty OP, it can do from opening modals, changing client settings and way more.
@@ -256,6 +257,18 @@ function customAction(action, parameters) {
                 overlayMessageRenderer(t('player.share.qrCodeScanMessage')),
                 QrCodeRenderer(qrDataUrl)
             ]), 'tt-share-modal');
+            break;
+        case 'SHOW_GUIDE_BUTTONS':
+            showGuideSettings('SHOW_GUIDE_BUTTONS', parameters);
+            break;
+        case 'RELOAD_GUIDE_OPTIONS':
+            showGuideSettings(parameters.settingType, true);
+            break;
+        case 'MOVE_GUIDE_BUTTON':
+            showGuideSettings('MOVE_GUIDE_BUTTON', parameters);
+            break;
+        case 'SHOW_GUIDE_SETTINGS':
+            showGuideSettings(parameters);
             break;
     }
 }

@@ -54,6 +54,7 @@ const defaultConfig = {
   launchToOnStartup: null,
   reloadHomeOnStartup: true,
   disabledSidebarContents: [],
+  sidebarContentsOrder: [],
   disableChannelsOnSidebar: false,
   enableUpdater: true,
   autoFrameRate: false,

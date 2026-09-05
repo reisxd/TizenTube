@@ -47,6 +47,22 @@ function requestNextAndNavigateChannel(params) {
     });
 }
 
+function getGuide() {
+    const mappings = Object.values(window._yttv).find(a => a && a.mappings);
+    const KabukiInnerTubeClient = mappings.get('KabukiInnerTubeClient');
+
+    const request = {
+        path: '/youtubei/v1/guide'
+    };
+
+    return new Promise((resolve, _) => {
+        KabukiInnerTubeClient.fetch(request).subscribe((response) => {
+           resolve(response);
+        });
+    });
+}
+
 export {
-    requestNextAndNavigateChannel
+    requestNextAndNavigateChannel,
+    getGuide
 }

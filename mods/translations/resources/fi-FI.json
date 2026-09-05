@@ -175,7 +175,19 @@
                         }
                     },
                     "disableEnlargingThumbnails": "Disable Enlarged Thumbnails",
-                    "enableShrinkingThumbnails": "Enable Shrinked Thumbnails"
+                    "enableShrinkingThumbnails": "Enable Shrinked Thumbnails",
+                    "sortSidebarContents": {
+                        "title": "Sort Sidebar Contents",
+                        "subtitle": "Reorder sidebar contents to your preference",
+                        "moveUp": {
+                            "title": "Move Up",
+                            "subtitle": "Move this item up in the sidebar"
+                        },
+                        "moveDown": {
+                            "title": "Move Down",
+                            "subtitle": "Move this item down in the sidebar"
+                        }
+                    }
                 },
                 "updater": {
                     "title": "TizenTube Cobalt -päivittäjä",

@@ -457,6 +457,36 @@ function ButtonRenderer(disabled, text, iconType, command) {
     };
 }
 
+function GuideEntryRenderer(simpleText, navigationEndpoint, icon, thumbnail) {
+    const guideEntryRenderer = {
+        guideEntryRenderer: {
+            navigationEndpoint,
+            trackingParams: null,
+            formattedTitle: {
+                simpleText
+            }
+        }
+    }
+
+    if (icon) {
+        guideEntryRenderer.guideEntryRenderer.icon = {
+            iconType: icon
+        }
+    }
+
+    if (thumbnail) {
+        guideEntryRenderer.guideEntryRenderer.thumbnail = {
+            thumbnails: [
+                {
+                    url: thumbnail
+                }
+            ]
+        }
+    }
+
+    return guideEntryRenderer;
+}
+
 export {
     showToast,
     Modal,
@@ -475,5 +505,6 @@ export {
     ShelfRenderer,
     TileRenderer,
     QrCodeRenderer,
-    ButtonRenderer
+    ButtonRenderer,
+    GuideEntryRenderer
 }

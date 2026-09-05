@@ -168,7 +168,7 @@ JSON.parse = function () {
 
     if (r?.contents?.singleColumnWatchNextResults?.pivot?.sectionListRenderer) {
       if (configRead('hideRelatedVideosPlayer')) {
-        r.contents.singleColumnWatchNextResults.pivot.sectionListRenderer.contents = []
+        r.contents.singleColumnWatchNextResults.pivot.sectionListRenderer.contents = [{}]
         r.contents.singleColumnWatchNextResults.pivot.sectionListRenderer.continuations = []
       }
       if (!signinReminderEnabled) {

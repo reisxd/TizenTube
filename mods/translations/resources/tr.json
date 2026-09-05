@@ -175,7 +175,19 @@
                         "searchResults": "Arama Sonuçları"
                     },
                     "disableEnlargingThumbnails": "Büyütülmüş Küçük Resimleri Devre Dışı Bırak",
-                    "enableShrinkingThumbnails": "Küçük Resimleri Küçültmeyi Etkinleştir"
+                    "enableShrinkingThumbnails": "Küçük Resimleri Küçültmeyi Etkinleştir",
+                    "sortSidebarContents": {
+                        "title": "Kenar Çubuğu İçeriklerini Sırala",
+                        "subtitle": "Kenar çubuğu içeriklerini tercihinize göre yeniden sıralayın",
+                        "moveUp": {
+                            "title": "Yukarı Taşı",
+                            "subtitle": "Bu öğeyi kenar çubuğunda yukarı taşır"
+                        },
+                        "moveDown": {
+                            "title": "Aşağı Taşı",
+                            "subtitle": "Bu öğeyi kenar çubuğunda aşağı taşır"
+                        }
+                    }
                 }
             },
             "updater": {

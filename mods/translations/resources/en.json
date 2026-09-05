@@ -148,6 +148,18 @@
                         "title": "Disable Sidebar Contents",
                         "subtitle": "Select sidebar contents to disable"
                     },
+                    "sortSidebarContents": {
+                        "title": "Sort Sidebar Contents",
+                        "subtitle": "Reorder sidebar contents to your preference",
+                        "moveUp": {
+                            "title": "Move Up",
+                            "subtitle": "Move this item up in the sidebar"
+                        },
+                        "moveDown": {
+                            "title": "Move Down",
+                            "subtitle": "Move this item down in the sidebar"
+                        }
+                    },
                     "launchToOnStartup": {
                         "title": "Launch To on Startup",
                         "subtitle": "Choose the default page TizenTube opens to on startup"

@@ -175,7 +175,19 @@
                         "searchResults": "Результаты поиска"
                     },
                     "disableEnlargingThumbnails": "Отключить увеличение миниатюр",
-                    "enableShrinkingThumbnails": "Включить уменьшение миниатюр"
+                    "enableShrinkingThumbnails": "Включить уменьшение миниатюр",
+                    "sortSidebarContents": {
+                        "title": "Sort Sidebar Contents",
+                        "subtitle": "Reorder sidebar contents to your preference",
+                        "moveUp": {
+                            "title": "Move Up",
+                            "subtitle": "Move this item up in the sidebar"
+                        },
+                        "moveDown": {
+                            "title": "Move Down",
+                            "subtitle": "Move this item down in the sidebar"
+                        }
+                    }
                 }
             },
             "updater": {
