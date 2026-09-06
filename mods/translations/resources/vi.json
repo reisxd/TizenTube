@@ -1,12 +1,13 @@
 {
     "__contributors": [
-        "reisxd"
+        "reisxd",
+        "AppleSang"
     ],
     "settings": {
         "options": {
             "socialMedia": {
                 "title": "Liên kết mạng xã hội",
-                "qrCodeScanMessage": "Bạn có thể truy cập {{name}} bằng cách quét mã QR bên dưới.",
+                "qrCodeScanMessage": "Bạn có thể truy cập {{name}} của TizenTube bằng cách quét mã QR bên dưới.",
                 "announcements": "Thông báo",
                 "group": "Nhóm",
                 "website": "Trang chủ",
@@ -28,7 +29,7 @@
                         "preview": "Bỏ qua đoạn xem trước/tóm tắt",
                         "filler": "Bỏ qua đoạn nói lan man/trò đùa",
                         "music_offtopic": "Bỏ qua đoạn không phải âm nhạc",
-                        "highlights": "Bật các đoạn nổi bật"
+                        "highlights": "Bật đoạn nổi bật"
                     },
                     "showSBToasts": "Hiển thị thông báo SponsorBlock"
                 }
@@ -93,11 +94,11 @@
                     },
                     "speedSettings": {
                         "title": "Mức tăng cài đặt tốc độ",
-                        "subtitle": "Đặt các mức tăng tốc độ để điều chỉnh tốc độ phát video"
+                        "subtitle": "Đặt mức tăng tốc độ để điều chỉnh tốc độ phát video"
                     },
                     "preferredVideoCodec": {
-                        "title": "Bộ giải mã video ưu tiên",
-                        "subtitle": "Chọn bộ giải mã video để phát"
+                        "title": "Bộ giải mã ưu tiên",
+                        "subtitle": "Bộ giải mã sẽ được dùng khi bắt đầu xem video"
                     },
                     "afr": "Tốc độ khung hình tự động (AFR)",
                     "afrPauseDuration": {
@@ -281,7 +282,7 @@
             "fixStuttering": "Sửa lỗi xé ảnh (1.0001x)"
         },
         "miniPlayer": "Trình phát nhỏ",
-        "pictureInPicture": "Picture in Picture",
+        "pictureInPicture": "Picture-in-Picture",
         "previous": "Trước",
         "next": "Tiếp",
         "withTizenTube": "với TizenTube",
@@ -290,7 +291,7 @@
             "button": "Chia sẻ",
             "qrCodeScanMessage": "Quét mã QR ở dưới để chia sẻ video này."
         },
-        "screenOff": "Turn off screen"
+        "screenOff": "Tắt màn hình"
     },
     "toasts": {
         "videoAddedToQueue": "Đã thêm video vào hàng chờ.",
