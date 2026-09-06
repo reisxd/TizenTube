@@ -364,6 +364,7 @@ function processShelves(shelves, shouldAddPreviews = true) {
           continue;
         }
         shelve.shelfRenderer.content.horizontalListRenderer.items = shelve.shelfRenderer.content.horizontalListRenderer.items.filter(item => item.tileRenderer?.tvhtml5ShelfRendererType !== 'TVHTML5_TILE_RENDERER_TYPE_SHORTS');
+        shelve.shelfRenderer.content.horizontalListRenderer.items = shelve.shelfRenderer.content.horizontalListRenderer.items.filter(item => item.lockupViewModel?.contentType !== 'LOCKUP_CONTENT_TYPE_SHORT');
 
         shelve.shelfRenderer.content.horizontalListRenderer.items = shelve.shelfRenderer.content.horizontalListRenderer.items.filter(item => !item.tileRenderer?.onSelectCommand?.reelWatchEndpoint);
       }
@@ -402,25 +403,35 @@ function deArrowify(items) {
       items.splice(index, 1);
       continue;
     }
-    if (!item.tileRenderer) continue;
+    if (!item.tileRenderer && item.lockupViewModel) continue;
+    if (!item?.lockupViewModel?.contentType !== 'LOCKUP_CONTENT_TYPE_VIDEO') continue;
     if (configRead('enableDeArrow')) {
-      const videoID = item.tileRenderer.contentId;
+      const videoID = item.tileRenderer.contentId || item.lockupViewModel.contentId;
       fetch(`https://sponsor.ajay.app/api/branding?videoID=${videoID}`).then(res => res.json()).then(data => {
         if (data.titles.length > 0) {
           const mostVoted = data.titles.reduce((max, title) => max.votes > title.votes ? max : title);
-          item.tileRenderer.metadata.tileMetadataRenderer.title.simpleText = mostVoted.title;
+          item.tileRenderer ?
+            item.tileRenderer.metadata.tileMetadataRenderer.title.simpleText = mostVoted.title
+            : item.lockupViewModel.metadata.lockupMetadataViewModel.title.content = mostVoted.title;
         }
 
         if (data.thumbnails.length > 0 && configRead('enableDeArrowThumbnails')) {
           const mostVotedThumbnail = data.thumbnails.reduce((max, thumbnail) => max.votes > thumbnail.votes ? max : thumbnail);
           if (mostVotedThumbnail.timestamp) {
-            item.tileRenderer.header.tileHeaderRenderer.thumbnail.thumbnails = [
-              {
-                url: `https://dearrow-thumb.ajay.app/api/v1/getThumbnail?videoID=${videoID}&time=${mostVotedThumbnail.timestamp}`,
-                width: 1280,
-                height: 640
-              }
-            ]
+            item.tileRenderer ?
+              item.tileRenderer.header.tileHeaderRenderer.thumbnail.thumbnails = [
+                {
+                  url: `https://dearrow-thumb.ajay.app/api/v1/getThumbnail?videoID=${videoID}&time=${mostVotedThumbnail.timestamp}`,
+                  width: 1280,
+                  height: 640
+                }
+              ] : item.lockupViewModel.contentImage.thumbnailViewModel.image.sources = [
+                {
+                  url: `https://dearrow-thumb.ajay.app/api/v1/getThumbnail?videoID=${videoID}&time=${mostVotedThumbnail.timestamp}`,
+                  width: 1280,
+                  height: 640
+                }
+              ]
           }
         }
       }).catch(() => { });
@@ -431,14 +442,20 @@ function deArrowify(items) {
 
 function hqify(items) {
   for (const item of items) {
-    if (!item.tileRenderer) continue;
-    if (item.tileRenderer.style !== 'TILE_STYLE_YTLR_DEFAULT') continue;
+    if (!item.tileRenderer && !item.lockupViewModel) continue;
+    if (item?.tileRenderer?.style !== 'TILE_STYLE_YTLR_DEFAULT' && item?.lockupViewModel?.contentType !== 'LOCKUP_CONTENT_TYPE_VIDEO') continue;
     if (configRead('enableHqThumbnails')) {
-      if (!item.tileRenderer.onSelectCommand?.watchEndpoint?.videoId) continue;
-      if (!item.tileRenderer.header?.tileHeaderRenderer?.thumbnail?.thumbnails?.[0]?.url) continue;
-      const videoID = item.tileRenderer.onSelectCommand.watchEndpoint.videoId;
-      const queryArgs = item.tileRenderer.header.tileHeaderRenderer.thumbnail.thumbnails[0].url.split('?')[1];
-      item.tileRenderer.header.tileHeaderRenderer.thumbnail.thumbnails = [
+      if (!item?.tileRenderer?.onSelectCommand?.watchEndpoint?.videoId && !item?.lockupViewModel?.contentId) continue;
+      if (!item?.tileRenderer?.header?.tileHeaderRenderer?.thumbnail?.thumbnails?.[0]?.url && !item?.lockupViewModel?.contentImage?.thumbnailViewModel?.image?.sources?.[0]?.url) continue;
+      const videoID = item.tileRenderer ? item.tileRenderer.onSelectCommand.watchEndpoint.videoId : item.lockupViewModel.contentId;
+      const queryArgs = item.tileRenderer ? item.tileRenderer.header.tileHeaderRenderer.thumbnail.thumbnails[0].url.split('?')[1] : item.lockupViewModel.contentImage.thumbnailViewModel.image.sources[0].url.split('?')[1];
+      item.tileRenderer ? item.tileRenderer.header.tileHeaderRenderer.thumbnail.thumbnails = [
+        {
+          url: `https://i.ytimg.com/vi/${videoID}/sddefault.jpg${queryArgs ? `?${queryArgs}` : ''}`,
+          width: 640,
+          height: 480
+        }
+      ] : item.lockupViewModel.contentImage.thumbnailViewModel.image.sources = [
         {
           url: `https://i.ytimg.com/vi/${videoID}/sddefault.jpg${queryArgs ? `?${queryArgs}` : ''}`,
           width: 640,
@@ -451,11 +468,12 @@ function hqify(items) {
 
 function addLongPress(items) {
   for (const item of items) {
-    if (!item.tileRenderer) continue;
-    if (item.tileRenderer.style !== 'TILE_STYLE_YTLR_DEFAULT') continue;
-    if (item.tileRenderer.onLongPressCommand?.showMenuCommand?.menu?.menuRenderer?.items) {
+    if (!item.tileRenderer && !item.lockupViewModel) continue;
+    if (item?.tileRenderer?.style !== 'TILE_STYLE_YTLR_DEFAULT' && item?.lockupViewModel?.contentType !== 'LOCKUP_CONTENT_TYPE_VIDEO') continue;
+    if (item?.tileRenderer?.onLongPressCommand?.showMenuCommand?.menu?.menuRenderer?.items
+      || item?.lockupViewModel?.rendererContext?.commandContext?.onLongPress?.innertubeCommand?.showMenuCommand?.menu?.menuRenderer?.items) {
       const copiedItem = JSON.parse(JSON.stringify(item));
-      item.tileRenderer.onLongPressCommand.showMenuCommand.menu.menuRenderer.items.push(MenuServiceItemRenderer('Add to Queue', {
+      const button = MenuServiceItemRenderer('Add to Queue', {
         clickTrackingParams: null,
         playlistEditEndpoint: {
           customAction: {
@@ -463,33 +481,42 @@ function addLongPress(items) {
             parameters: copiedItem
           }
         }
-      }));
+      })
+      item.tileRenderer ? item.tileRenderer.onLongPressCommand.showMenuCommand.menu.menuRenderer.items.push(button) : item.lockupViewModel.rendererContext.commandContext.onLongPress.innertubeCommand.showMenuCommand.menu.menuRenderer.items.push(button);
       continue;
     }
     if (!configRead('enableLongPress')) continue;
-    if (!item.tileRenderer?.metadata?.tileMetadataRenderer) continue;
-    if (!item.tileRenderer?.header?.tileHeaderRenderer?.thumbnail?.thumbnails) continue;
-    if (!item.tileRenderer.onSelectCommand?.watchEndpoint) continue;
+    if (!item.tileRenderer?.metadata?.tileMetadataRenderer && !item.lockupViewModel?.metadata?.lockupMetadataViewModel) continue;
+    if (!item.tileRenderer?.header?.tileHeaderRenderer?.thumbnail?.thumbnails &&
+      !item.lockupViewModel?.contentImage?.thumbnailViewModel?.image?.sources) continue;
+    if (!item?.tileRenderer?.onSelectCommand?.watchEndpoint &&
+      !item?.lockupViewModel?.rendererContext?.commandContext?.onTap?.innertubeCommand?.watchEndpoint) continue;
     const copiedItem = JSON.parse(JSON.stringify(item));
-    const subtitleNode = copiedItem.tileRenderer.metadata.tileMetadataRenderer.lines?.[0]?.lineRenderer?.items?.[0]?.lineItemRenderer?.text;
+    const subtitleNode = copiedItem?.tileRenderer ? copiedItem.tileRenderer.metadata?.tileMetadataRenderer?.lines?.[0]?.lineRenderer?.items?.[0]?.lineItemRenderer?.text :
+      copiedItem.lockupViewModel.metadata?.lockupMetadataViewModel?.metadata?.contentMetadataViewModel?.metadataRows?.[0]?.metadataParts?.[0]?.text?.content
+    ;
     if (!subtitleNode) continue;
     const subtitle = subtitleNode;
     const data = longPressData({
-      videoId: copiedItem.tileRenderer.contentId,
-      thumbnails: copiedItem.tileRenderer.header.tileHeaderRenderer.thumbnail.thumbnails,
-      title: copiedItem.tileRenderer.metadata.tileMetadataRenderer.title.simpleText,
-      subtitle: subtitle.runs ? subtitle.runs[0].text : subtitle.simpleText,
-      watchEndpointData: copiedItem.tileRenderer.onSelectCommand.watchEndpoint,
+      videoId: copiedItem?.tileRenderer?.contentId || copiedItem?.lockupViewModel?.contentId,
+      thumbnails: copiedItem?.tileRenderer?.header?.tileHeaderRenderer?.thumbnail?.thumbnails || copiedItem?.lockupViewModel?.contentImage?.thumbnailViewModel?.image?.sources,
+      title: copiedItem?.tileRenderer?.metadata?.tileMetadataRenderer?.title?.simpleText || copiedItem?.lockupViewModel?.metadata?.lockupMetadataViewModel?.title?.content,
+      subtitle: subtitle.length && subtitle.length > 0 ? subtitle : subtitle.runs ? subtitle.runs[0].text : subtitle.simpleText,
+      watchEndpointData: copiedItem?.tileRenderer?.onSelectCommand?.watchEndpoint || copiedItem?.lockupViewModel?.rendererContext?.commandContext?.onTap?.innertubeCommand?.watchEndpoint,
       item: copiedItem
     });
-    item.tileRenderer.onLongPressCommand = data;
+    item.tileRenderer ? item.tileRenderer.onLongPressCommand = data
+    : item.lockupViewModel.rendererContext.commandContext.onLongPress = {
+      innertubeCommand: data
+    };
   }
 }
 
 function hideVideo(items) {
   return items.filter(item => {
     if (!item.tileRenderer) return true;
-    const progressBar = item.tileRenderer.header?.tileHeaderRenderer?.thumbnailOverlays?.find(overlay => overlay.thumbnailOverlayResumePlaybackRenderer)?.thumbnailOverlayResumePlaybackRenderer;
+    const progressBar = item?.tileRenderer ? item.tileRenderer.header?.tileHeaderRenderer?.thumbnailOverlays?.find(overlay => overlay.thumbnailOverlayResumePlaybackRenderer)?.thumbnailOverlayResumePlaybackRenderer
+    : item.lockupViewModel?.contentImage?.thumbnailViewModel?.overlays?.find(overlay => overlay.thumbnailBottomOverlayViewModel?.progressBar)?.thumbnailBottomOverlayViewModel?.progressBar. thumbnailOverlayProgressBarViewModel;
     if (!progressBar) return true;
     const pages = configRead('hideWatchedVideosPages');
     if (!pages.length) return true;
@@ -497,7 +524,8 @@ function hideVideo(items) {
     const pageName = hash === '/' ? 'home' : hash.startsWith('/search') ? 'search' : hash.split('?')[1]?.split('&')[0]?.split('=')[1]?.replace('FE', '')?.replace('topics_', '') ?? '';
     if (!pages.includes(pageName)) return true;
 
-    const percentWatched = (progressBar.percentDurationWatched || 0);
+    const percentWatched = (progressBar?.percentDurationWatched ||
+      progressBar?.startPercent || 0);
     return percentWatched <= configRead('hideWatchedVideosThreshold');
   });
 }

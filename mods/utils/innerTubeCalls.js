@@ -4,7 +4,8 @@ function requestNextAndNavigateChannel(params) {
     const mappings = Object.values(window._yttv).find(a => a && a.mappings);
     const CurrentIdentityService = mappings.get('CurrentIdentityService');
     const KabukiInnerTubeClient = mappings.get('KabukiInnerTubeClient');
-    const data = params.tileRenderer;
+    const videoId = params.tileRenderer ? params.tileRenderer.contentId : params.lockupViewModel.contentId;
+    const paramsValue = params.tileRenderer ? params.tileRenderer.onSelectCommand.watchEndpoint.params : params.lockupViewModel.rendererContext.commandContext.onTap.innertubeCommand.watchEndpoint.params;
     const randomDelay = Math.floor(Math.random() * 2000);
 
     CurrentIdentityService.get().then(identity => {
@@ -13,8 +14,8 @@ function requestNextAndNavigateChannel(params) {
             isPrefetch: false,
             path: '/youtubei/v1/next',
             payload: {
-                videoId: data.contentId,
-                params: data.onSelectCommand.watchEndpoint.params,
+                videoId,
+                params: paramsValue,
                 racyCheckOk: true,
                 contentCheckOk: true,
                 playbackContext: {
