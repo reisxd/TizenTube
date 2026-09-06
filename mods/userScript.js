@@ -25,4 +25,3 @@ import "./ui/customUI.js";
 import "./ui/customGuideAction.js";
 import "./features/autoFrameRate.js";
 import "./ui/clock.js";
-import "./ui/sidebarModification.js"

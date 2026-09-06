@@ -187,8 +187,8 @@
                             "title": "Aşağı Taşı",
                             "subtitle": "Bu öğeyi kenar çubuğunda aşağı taşır"
                         },
-                            "addToSidebar": "Kanalı Kenar Çubuğuna Ekle",
-                            "removeFromSidebar": "Kanalı Kenar Çubuğundan Kaldır"
+                        "addToSidebar": "Kanalı Kenar Çubuğuna Ekle",
+                        "removeFromSidebar": "Kanalı Kenar Çubuğundan Kaldır"
                     }
                 }
             },
@@ -289,7 +289,8 @@
             "title": "Paylaş",
             "button": "Paylaş",
             "qrCodeScanMessage": "Bu videoyu paylaşmak için aşağıdaki QR kodunu tarayın."
-        }
+        },
+        "screenOff": "Ekranı Kapat"
     },
     "toasts": {
         "videoAddedToQueue": "Video kuyruğa eklendi.",
