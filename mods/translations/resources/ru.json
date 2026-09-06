@@ -289,7 +289,8 @@
             "title": "Поделиться",
             "button": "Поделиться",
             "qrCodeScanMessage": "Отсканируйте QR-код ниже, чтобы поделиться этим видео."
-        }
+        },
+        "screenOff": "Turn off screen"
     },
     "toasts": {
         "videoAddedToQueue": "Видео добавлено в очередь.",

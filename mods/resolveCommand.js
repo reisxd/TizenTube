@@ -107,6 +107,7 @@ export function patchResolveCommand() {
                             }
                         ])
                     );
+
                     cmd.openPopupAction.popup.overlaySectionRenderer.overlay.overlayTwoPanelRenderer.actionPanel.overlayPanelRenderer.content.overlayPanelItemListRenderer.items.splice(3, 0,
                         buttonItem(
                             { title: t('player.share.button') },
@@ -114,6 +115,18 @@ export function patchResolveCommand() {
                             {
                                 customAction: {
                                     action: 'SHARE'
+                                }
+                            }
+                        ])
+                    );
+
+                    cmd.openPopupAction.popup.overlaySectionRenderer.overlay.overlayTwoPanelRenderer.actionPanel.overlayPanelRenderer.content.overlayPanelItemListRenderer.items.splice(3, 0,
+                        buttonItem(
+                            { title: t('player.screenOff') },
+                            { icon: 'EYE_OFF' }, [
+                            {
+                                customAction: {
+                                    action: 'SCREEN_OFF'
                                 }
                             }
                         ])
@@ -283,6 +296,13 @@ function customAction(action, parameters) {
             }
             configWrite('sidebarContentsOrder', sortedSidebarContents);
             showToast(t('toasts.sidebarContentsUpdated.title'), t('toasts.sidebarContentsUpdated.subtitle'));
+            break;
+        case 'SCREEN_OFF':
+            for (const child of document.body.children) {
+                if (child.tagName.toLowerCase() === 'script' || child.tagName.toLowerCase() === 'svg') continue;
+                child.style.setProperty('display', 'none', 'important');
+            }
+            window.screenTurnedOffAt = Date.now();
             break;
     }
 }

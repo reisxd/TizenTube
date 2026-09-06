@@ -177,5 +177,3 @@ function showSetting(settingType, parameters) {
 }
 
 export default showSetting;
-
-window.showGuideSettings = showSetting;

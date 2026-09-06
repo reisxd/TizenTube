@@ -158,16 +158,27 @@ function execute_once_dom_loaded() {
       video.currentTime = (percentage / 100) * video.duration;
     }
 
+    const container = document.getElementById('container');
+
+    if (window.screenTurnedOffAt && Date.now() - window.screenTurnedOffAt > 1000) {
+      for (const child of document.body.children) {
+        if (child.tagName.toLowerCase() === 'script' || child.tagName.toLowerCase() === 'svg') continue;
+
+        child.style.setProperty('display', 'block', 'important');
+      }
+      window.screenTurnedOffAt = null;
+    }
+
     if (configRead('enableScreenDimming')) {
       if (keyTimeout) {
         clearTimeout(keyTimeout);
       }
-      document.getElementById('container').style.setProperty('opacity', '1', 'important');
+      container.style.setProperty('opacity', '1', 'important');
       keyTimeout = setTimeout(() => {
         const videoPlayer = document.querySelector('.html5-video-player');
         const playerStateObject = videoPlayer.getPlayerStateObject();
         if (playerStateObject.isPlaying) return;
-        document.getElementById('container').style.setProperty('opacity', (1 - configRead('dimmingOpacity')).toString(), 'important');
+        container.style.setProperty('opacity', (1 - configRead('dimmingOpacity')).toString(), 'important');
       }, configRead('dimmingTimeout') * 1000);
     }
     if (evt.keyCode == 403) {

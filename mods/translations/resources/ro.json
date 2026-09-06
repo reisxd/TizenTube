@@ -291,7 +291,8 @@
             "title": "Share",
             "button": "Share",
             "qrCodeScanMessage": "Scan the QR code below to share this video."
-        }
+        },
+        "screenOff": "Turn off screen"
     },
     "toasts": {
         "videoAddedToQueue": "Video added to queue.",

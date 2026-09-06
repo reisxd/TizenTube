@@ -289,7 +289,8 @@
             "title": "Chia sẻ",
             "button": "Chia sẻ",
             "qrCodeScanMessage": "Quét mã QR ở dưới để chia sẻ video này."
-        }
+        },
+        "screenOff": "Turn off screen"
     },
     "toasts": {
         "videoAddedToQueue": "Đã thêm video vào hàng chờ.",
