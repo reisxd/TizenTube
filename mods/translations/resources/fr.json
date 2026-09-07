@@ -181,7 +181,22 @@
                             "isClock12HourFormat": "Utiliser le format 12 heures pour l'horloge",
                             "clockShowSeconds": "Afficher les secondes sur l'horloge"
                             "clockHideWhenVideoPlaying": "Masquer l’horloge pendant la lecture de la vidéo"
-                        }
+                        } 
+                    "disableEnlargingThumbnails": "Désactiver l’agrandissement des miniatures",
+                    "enableShrinkingThumbnails": "Activer la réduction des miniatures",
+                    "sortSidebarContents": {
+                        "title": "Trier le contenu de la barre latérale",
+                        "subtitle": "Réorganiser le contenu de la barre latérale selon vos préférences",
+                        "moveUp": {
+                            "title": "Déplacer vers le haut",
+                            "subtitle": "Déplacer cet élément vers le haut dans la barre latérale"
+                        },
+                        "moveDown": {
+                            "title": "Déplacer vers le bas",
+                            "subtitle": "Déplacer cet élément vers le bas dans la barre latérale"
+                        },
+                        "addToSidebar": "Ajouter la chaîne à la barre latérale",
+                        "removeFromSidebar": "Retirer la chaîne de la barre latérale"
                     }
                 }
             },
@@ -277,10 +292,19 @@
         "pictureInPicture": "Incrustation d'image",
         "previous": "Précédent",
         "next": "Suivant",
-        "withTizenTube": "avec TizenTube"
+        "withTizenTube": "avec TizenTube",
+        "share": {
+            "title": "Partager",
+            "button": "Partager",
+            "qrCodeScanMessage": "Scannez le code QR ci-dessous pour partager cette vidéo."
+        },
+        "screenOff": "Éteindre l’écran"
     },
     "toasts": {
         "videoAddedToQueue": "Vidéo ajoutée à la file d'attente.",
         "videoQueueCleared": "File d'attente vidée."
+        "sidebarContentsUpdated": {
+        "title": "Contenu de la barre latérale mis à jour",
+        "subtitle": "Le contenu de la barre latérale a été mis à jour."
     }
 }
