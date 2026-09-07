@@ -1,6 +1,9 @@
 {
     "__contributors": [
         "reisxd"
+        "SonnyT72"
+        "Redje"
+        "Magictor24"
     ],
     "settings": {
         "options": {
@@ -96,7 +99,7 @@
                         "subtitle": "Définissez les incréments de vitesse pour les ajustements de vitesse de lecture vidéo"
                     },
                     "preferredVideoCodec": {
-                        "title": "Codec vidéo préféré",
+                        "title": "Paramètres Codec",
                         "subtitle": "Choisissez le codec vidéo préféré pour la lecture"
                     },
                     "afr": "Fréquence d'images automatique",
@@ -106,6 +109,7 @@
                     },
                     "codecAny": "Tous",
                     "qualityAuto": "Auto"
+                    "hideRelatedVideosPlayer": "Masquer les vidéos associées"
                 }
             },
             "time": {
@@ -176,6 +180,7 @@
                             "enableClock": "Activer l'horloge",
                             "isClock12HourFormat": "Utiliser le format 12 heures pour l'horloge",
                             "clockShowSeconds": "Afficher les secondes sur l'horloge"
+                            "clockHideWhenVideoPlaying": "Masquer l’horloge pendant la lecture de la vidéo"
                         }
                     }
                 }
