@@ -25,6 +25,7 @@ import UkrainianResource from './resources/uk.json';
 import JapaneseResource from './resources/ja.json';
 import GreekResource from './resources/el.json';
 import TaiwaneseResource from './resources/zh-TW.json';
+import SimplifiedChineseResource from './resources/zh-CN.json';
 import CzechResource from './resources/cs.json';
 import PolishResource from './resources/pl.json';
 import ArabicResource from './resources/ar.json';
@@ -110,6 +111,9 @@ export default {
     },
     "zh-TW": {
         translation: TaiwaneseResource
+    },
+    "zh-CN": {
+        translation: SimplifiedChineseResource
     },
     cs: {
         translation: CzechResource
