@@ -51,7 +51,6 @@ jobs:
           npm install
           npm install -g @vercel/ncc https://github.com/reisxd/tizen.js/tarball/main
           npm run build
-          rm -rf node_modules
 
       - name: Prepare Tizen Certificate
         run: |
