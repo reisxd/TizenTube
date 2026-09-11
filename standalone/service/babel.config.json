@@ -1,0 +1,23 @@
+{
+    "presets": [
+        [
+            "@babel/preset-env",
+            {
+                "targets": {
+                    "node": "4.4.3"
+                }
+            }
+        ]
+    ],
+    "ignore": [
+        "node_modules/@babel/",
+        "node_modules/adbhost/",
+        "node_modules/has-symbols/",
+        "node_modules/node-fetch/",
+        "node_modules/has-tostringtag/",
+        "dist/",
+        "node_modules/@vercel",
+        "node_modules/@types",
+        "node_modules/@jsridgewell"
+    ]
+}

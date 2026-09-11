@@ -57,17 +57,28 @@ jobs:
         run: |
           echo "${{ secrets.TIZEN_AUTHOR_KEY }}" | base64 -d > "${GITHUB_WORKSPACE}/TizenTube-author.p12"
 
-      - name: Build TizenTube
+      - name: Build TizenTube Cobalt
         working-directory: standalone
         run: |
           mkdir release
-          tizenjs build . -t wgt -o release/TizenTube.wgt --author "${GITHUB_WORKSPACE}/TizenTube-author.p12" --authorPwd '${{ secrets.TIZEN_AUTHOR_KEY_PW }}' -p public --ignore node_modules,/.*\.wgt$/,/userwidget/,/release/
+          tizenjs build . -t wgt -o release/TizenTubeCobalt.wgt --author "${GITHUB_WORKSPACE}/TizenTube-author.p12" --authorPwd '${{ secrets.TIZEN_AUTHOR_KEY_PW }}' -p public --ignore node_modules,/.*\.wgt$/,/userwidget/,/release/
+
+      - name: Remove Cobalt flags from config.xml for Old Tizen build
+        working-directory: standalone/service
+        run: |
+          node build-service.js remove-cobalt-flags
+
+      - name: Build TizenTube For Old Tizen (without Cobalt)
+        working-directory: standalone
+        run: |
+          mkdir release
+          tizenjs build . -t wgt -o release/TizenTubeOld.wgt --author "${GITHUB_WORKSPACE}/TizenTube-author.p12" --authorPwd '${{ secrets.TIZEN_AUTHOR_KEY_PW }}' -p public --ignore node_modules,/.*\.wgt$/,/userwidget/,/release/
 
       - name: Upload TizenTube package artifact for Old Tizen
         uses: actions/upload-artifact@v4
         with:
-            name: app-${{ github.sha }}-old.wgt
-            path: standalone/release/TizenTube.wgt
+            name: app-${{ github.sha }}
+            path: standalone/release/*
       
       - name: Release TizenTube Build Results
         uses: softprops/action-gh-release@v1

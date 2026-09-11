@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "node build-service.js"
+    "build": "babel . --out-dir transpiled --copy-files && node build-service.js"
   },
   "keywords": [],
   "author": "",
@@ -14,9 +14,14 @@
     "adbhost": "^0.0.2",
     "chrome-remote-interface": "^0.25.7",
     "express": "^4.22.2",
-    "node-fetch": "^2.7.0"
+    "node-fetch": "^2.7.0",
+    "node-forge": "^1.4.0"
   },
   "devDependencies": {
-    "@vercel/ncc": "^0.44.1"
+    "@babel/cli": "^8.0.4",
+    "@babel/core": "^8.0.1",
+    "@babel/preset-env": "^8.0.2",
+    "@vercel/ncc": "^0.44.1",
+    "fast-xml-parser": "^5.11.1"
   }
 }

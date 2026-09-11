@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<widget xmlns:tizen="http://tizen.org/ns/widgets" xmlns="http://www.w3.org/ns/widgets" id="https://tizentube.app" version="2.0.1" viewmodes="maximized">
+<widget xmlns:tizen="http://tizen.org/ns/widgets" xmlns="http://www.w3.org/ns/widgets" id="https://tizentube.app" version="2.1.0" viewmodes="maximized">
     <access origin="*" subdomains="true"></access>
     <tizen:allow-navigation href="*"/>
     <tizen:application id="xvvl3S1TT1.TizenTubeStandalone" package="xvvl3S1TT1" required_version="3.0"/>
@@ -28,8 +28,11 @@
     <tizen:privilege name="http://tizen.org/privilege/mediacapture"/>
     <tizen:privilege name="http://tizen.org/privilege/unlimitedstorage"/>
     <tizen:privilege name="http://tizen.org/privilege/application.launch"/>
+    <tizen:metadata key="http://samsung.com/tv/metadata/pkgid" value="com.samsung.tv.cobalt"/>
+    <tizen:metadata key="http://samsung.com/tv/metadata/nativeID" value="com.samsung.tv.cobalt-yt"/>
+    <tizen:metadata key="http://samsung.com/tv/metadata/native.userdata" value="--base_url=https://www.youtube.com/tv --proxy=http://127.0.0.2:8101 --content=/home/owner/share/tizentube-content --dial_name=TizenTube --use_eden"/>
     <tizen:profile name="tv-samsung"/>
-    <tizen:service id="xvvl3S1TT1.StandaloneService">
+    <tizen:service id="xvvl3S1TT1.StandaloneService" auto-restart="true" on-boot="true">
         <tizen:content src="service/dist/index.js"/>
         <tizen:name>StandaloneService</tizen:name>
         <tizen:description>StandaloneService</tizen:description>

@@ -73,13 +73,13 @@
             } catch (e) {
                 // Do nothing.
             }
-            fetch('http://localhost:8099/tizentube/getState')
+            fetch('http://localhost:8100/tizentube/getState')
                 .then(r => r.json())
                 .then(res => {
                     if (res.canConnectToDaemon && !res.isConnecting) {
-                        fetch(`http://localhost:8099/tizentube/debugger${args ? `?${args}` : ''}`);
+                        fetch(`http://localhost:8100/tizentube/debugger${args ? `?${args}` : ''}`);
                         tizen.application.getCurrentApplication().exit();
-                    } else if (!res.canConnectToDaemon) location.href = `http://localhost:8099/tv?additionalDataUrl=http%3A%2F%2Flocalhost%3A8095%2Fdial%2Fapps%2FYouTube${args ? `&${args}` : ''}`
+                    } else if (!res.canConnectToDaemon) location.href = `http://localhost:8100/tv?additionalDataUrl=http%3A%2F%2Flocalhost%3A8100%2Fdial%2Fapps%2FYouTube${args ? `&${args}` : ''}`
                 }).catch(() => window.location.reload());
         }
 

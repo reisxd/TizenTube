@@ -22,9 +22,7 @@
 
 ## ❓ How to install
 
-1. Install TizenBrew from [here](https://github.com/reisxd/TizenBrew) and follow the instructions.
-
-2. TizenTube is installed to TizenBrew by default. It should be in the home screen. If not, add `@foxreis/tizentube` as a NPM module in TizenBrew module manager.
+Follow the guide in the [Installation Guide](./docs/README.md).
 
 ## ✨ Features
 - 📺 **Picture-in-Picture Mode**

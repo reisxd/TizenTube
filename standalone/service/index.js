@@ -4,12 +4,13 @@
 
 const express = require('express');
 const app = express();
-const PORT = 8099;
+const PORT = 8100;
 const fetch = require('node-fetch');
-const http = require('http');
-const https = require('https');
+const cobaltSetup = require('./utils/cobaltSetup.js');
+const startServer = require('./utils/cobaltProxyServer.js');
 const URL = require('url');
-const injector = require('./injector.js');
+const path = require('path');
+const injector = require('./utils/injector.js');
 
 app.use((req, res, next) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
@@ -161,8 +162,8 @@ app.all('*', (req, res) => {
                     text = text.replace(/"\/\/clients1\.google\.com/g, `"${proxyPrefix}https://clients1.google.com`);
 
                     text = text.replace('Set(["www.youtube.com","accounts.google.com"]);', 'Set(["www.youtube.com", "accounts.google.com", "localhost"]);');
-                    text = text.replace(/:document\.location\.toString\(\)/g, ':document.location.toString().replace("http://localhost:8099", "https://www.youtube.com")');
-                    text = text.replace(/euri:[^,]+,/g, 'euri:document.location.toString().replace("http://localhost:8099", "https://www.youtube.com"),')
+                    text = text.replace(/:document\.location\.toString\(\)/g, ':document.location.toString().replace("http://localhost:${PORT}", "https://www.youtube.com")');
+                    text = text.replace(/euri:[^,]+,/g, 'euri:document.location.toString().replace("http://localhost:${PORT}", "https://www.youtube.com"),')
                     text = text.replace(/https:\/\/s\.youtube\.com/g, `${proxyPrefix}https://s.youtube.com`);
                     text = text.replace(/redirector.googlevideo.com/g, `${proxyPrefix}https://redirector.googlevideo.com`);
                     text = text.replace(/this.scheme="https"/, 'this.scheme="http"');
@@ -171,8 +172,8 @@ app.all('*', (req, res) => {
                     text = text.replace(/"\/\/yt3\.googleusercontent\.com/g, `"${proxyPrefix}https://yt3.googleusercontent.com`);
 
                     // In order to fix history not working
-                    text = text.replace(/=window\.location\.href;/, '=window.location.href.replace("http://localhost:8099", "https://www.youtube.com");')
-                    text = text.replace(/=document\.location\.href/, '=document.location.href.replace("http://localhost:8099", "https://www.youtube.com")')
+                    text = text.replace(/=window\.location\.href;/, '=window.location.href.replace("http://localhost:${PORT}", "https://www.youtube.com");')
+                    text = text.replace(/=document\.location\.href/, '=document.location.href.replace("http://localhost:${PORT}", "https://www.youtube.com")')
 
                     res.send(text);
                 });
@@ -193,8 +194,20 @@ app.all('*', (req, res) => {
         });
 });
 
-app.listen(PORT, "127.0.0.1");
+app.listen(PORT, '127.0.0.1');
 
-// Start the DIAL server
-global.isTizenTube = true;
-require('../../dist/service.js');
+
+if (cobaltSetup()) {
+    startServer();
+} else {
+    // Start the DIAL server
+    global.isTizenTube = true;
+    require(path.join(__dirname, '../../../dist/service.js'));
+}
+
+// To avoid issues on newer versions of Tizen.
+module.exports = {
+    onStart: () => {},
+    onRequest: () => {},
+    onStop: () => {}
+};
