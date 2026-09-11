@@ -70,7 +70,6 @@ jobs:
       - name: Build TizenTube For Old Tizen (without Cobalt)
         working-directory: standalone
         run: |
-          mkdir release
           tizenjs build . -t wgt -o release/TizenTubeOld.wgt --author "${GITHUB_WORKSPACE}/TizenTube-author.p12" --authorPwd '${{ secrets.TIZEN_AUTHOR_KEY_PW }}' -p public --ignore node_modules,/.*\.wgt$/,/userwidget/,/release/
 
       - name: Upload TizenTube package artifact for Old Tizen
