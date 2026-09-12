@@ -80,13 +80,16 @@ function startServer() {
         clientSocket.on('error', () => targetSocket.destroy());
     }
 
+    const ytCertWWW = createHostCertificate('www.youtube.com');
+    const ytCert = createHostCertificate('youtube.com');
+
     function mitm(hostname, port, clientSocket, initialData) {
         clientSocket.write(
             'HTTP/1.1 200 Connection Established\r\n\r\n'
         );
 
         const tlsServer = new tls.Server(
-            createHostCertificate(hostname)
+            hostname === 'www.youtube.com' ? ytCertWWW : ytCert
         );
 
         tlsServer.on('secureConnection', clientTlsSocket => {
@@ -152,7 +155,7 @@ function startServer() {
                                 ''
                             );
 
-                            body = body.replace("<body>", `<body><script src="https://cdn.jsdelivr.net/npm/@foxreis/tizentube/dist/userScript.js"></script>`);
+                            body = body.replace('</body>', `<script src="https://cdn.jsdelivr.net/npm/@foxreis/tizentube/dist/userScript.js?ver=${Date.now()}"></script></body>`);
 
                             headers['content-length'] = Buffer.byteLength(body, 'utf8');
                             headers['connection'] = 'close';
@@ -233,7 +236,7 @@ function startServer() {
         );
     });
 
-    proxyServer.listen(proxyPort, '127.0.0.2');
+    proxyServer.listen(proxyPort, '0.0.0.0');
 }
 
 module.exports = startServer;
