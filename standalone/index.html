@@ -76,10 +76,17 @@
             fetch('http://localhost:8100/tizentube/getState')
                 .then(r => r.json())
                 .then(res => {
+                    const proxyUrl = `http://localhost:8100/tv?additionalDataUrl=http%3A%2F%2Flocalhost%3A8100%2Fdial%2Fapps%2FYouTube${args ? `&${args}` : ''}`;
                     if (res.canConnectToDaemon && !res.isConnecting) {
                         fetch(`http://localhost:8100/tizentube/debugger${args ? `?${args}` : ''}`);
                         tizen.application.getCurrentApplication().exit();
-                    } else if (!res.canConnectToDaemon) location.href = `http://localhost:8100/tv?additionalDataUrl=http%3A%2F%2Flocalhost%3A8100%2Fdial%2Fapps%2FYouTube${args ? `&${args}` : ''}`
+                    } else {
+                        // Covers both !canConnectToDaemon and the previously unhandled
+                        // (canConnectToDaemon && isConnecting) state, which left the app
+                        // stuck on the splash screen forever. The proxy path injects the
+                        // userscript itself and needs no debugger.
+                        location.href = proxyUrl;
+                    }
                 }).catch(() => window.location.reload());
         }
 
