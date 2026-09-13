@@ -206,7 +206,7 @@
                 },
                 "releaseDate": "リリース日: {{date}}",
                 "updateNow": {
-                    "title": "今すぐ更新",
+                    "title": "今すぐ更新する",
                     "subtitle": "クリックで最新のバージョンをダウンロードします"
                 },
                 "remindLater": {
