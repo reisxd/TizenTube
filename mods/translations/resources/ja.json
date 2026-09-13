@@ -177,7 +177,7 @@
                     "disableEnlargingThumbnails": "サムネイルの拡大表示を無効化する",
                     "enableShrinkingThumbnails": "縮小したサムネイルを有効にする",
                     "sortSidebarContents": {
-                        "title": "ショートのサイドバーコンテンツ",
+                        "title": "サイドバーのコンテンツを並べ替える",
                         "subtitle": "サイドバーのコンテンツを好みに合わせて並べ替えます",
                         "moveUp": {
                             "title": "上に移動",
