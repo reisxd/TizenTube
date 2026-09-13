@@ -7,16 +7,16 @@
             "socialMedia": {
                 "title": "ソーシャルメディアのリンク",
                 "qrCodeScanMessage": "以下の QR コードをスキャンすると {{name}} のページにアクセスできます。",
-                "announcements": "Announcements",
-                "group": "Group",
-                "website": "Website",
+                "announcements": "お知らせ",
+                "group": "グループ",
+                "website": "ウェブサイト",
                 "githubSponsors": "GitHub Sponsors"
             },
             "adBlock": "広告をブロックする",
             "sponsorblock": {
                 "title": "SponsorBlock の設定",
                 "options": {
-                    "enableSB": "SponsorBlock を有効化する",
+                    "enableSB": "SponsorBlock を有効にする",
                     "manualSkip": "SponsorBlock のセグメントスキップを手動にする",
                     "segments": "セグメント",
                     "categories": {
@@ -28,7 +28,7 @@
                         "preview": "プレビュー/ダイジェストをスキップ",
                         "filler": "本筋に関係ない話/ジョークをスキップ",
                         "music_offtopic": "音楽以外をスキップ",
-                        "highlights": "ハイライトを有効化する"
+                        "highlights": "ハイライトを有効にする"
                     },
                     "showSBToasts": "SponsorBlock のトーストを表示"
                 }
@@ -36,29 +36,29 @@
             "dearrow": {
                 "title": "DeArrow の設定",
                 "options": {
-                    "enableDA": "DeArrow を有効化する",
-                    "enableDAThumbnails": "DeArrow のサムネイルを有効化する"
+                    "enableDA": "DeArrow を有効にする",
+                    "enableDAThumbnails": "DeArrow のサムネイルを有効にする"
                 }
             },
             "misc": {
                 "title": "その他の設定",
                 "options": {
                     "endScreenCards": "動画終了時のカードを非表示にする",
-                    "youThereRenderer": "「続きを視聴しますか？」のリマインダーを有効化する",
-                    "paidPromoOverlay": "「プロモーションを含みます」のオーバーレイを有効化する",
+                    "youThereRenderer": "「続きを視聴しますか？」のリマインダーを有効にする",
+                    "paidPromoOverlay": "「プロモーションを含みます」のオーバーレイを有効にする",
                     "whosWatching": {
                         "title": "ユーザー選択メニュー",
                         "options": {
-                            "enableWW": "ユーザー選択メニューを有効化する",
-                            "permaEnableWW": "ユーザー選択メニューを常に有効化する",
-                            "enableWWOnExit": "アプリ終了時にユーザー選択メニューの表示を有効化する"
+                            "enableWW": "ユーザー選択メニューを有効にする",
+                            "permaEnableWW": "ユーザー選択メニューを常に有効にする",
+                            "enableWWOnExit": "アプリ終了時にユーザー選択メニューの表示を有効にする"
                         }
                     },
                     "fixUI": "UI の修正",
-                    "hqThumbnails": "高画質なサムネイルを有効化する",
-                    "longPress": "長押し時のアクションを有効化する",
-                    "shorts": "ショートを有効化する",
-                    "videoPreviews": "動画のプレビューを有効化する",
+                    "hqThumbnails": "高画質なサムネイルを有効にする",
+                    "longPress": "長押し時のアクションを有効にする",
+                    "shorts": "ショートを有効にする",
+                    "videoPreviews": "動画のプレビューを有効にする",
                     "ttWelcomeMsg": "TT のようこそメッセージを表示する",
                     "guestSignInReminder": "ゲストログインのリマインダーを表示する",
                     "reloadHomeOnStartup": "起動時にホームを再読み込みする"
@@ -78,11 +78,11 @@
                     "patching": {
                         "title": "動画プレーヤー UI のパッチ",
                         "options": {
-                            "enableVPUIPatching": "動画プレーヤー UI のパッチを有効化する",
-                            "previousNextBtns": "「前へ」と「次へ」のボタンを有効化する",
+                            "enableVPUIPatching": "動画プレーヤー UI のパッチを有効にする",
+                            "previousNextBtns": "「前へ」と「次へ」のボタンを有効にする",
                             "showSuperThxBtn": "Super Thanks ボタンを表示する",
                             "showAIAskBtn": "質問するボタンを表示する",
-                            "showSpeedCtrlBtn": "速度制御ボタンを表示する",
+                            "showSpeedCtrlBtn": "再生速度ボタンを表示する",
                             "addMPBtn": "ミニプレーヤーボタンを表示する",
                             "swapMPWithPIP": "ミニプレーヤーボタンを PiP ボタンに置き換える"
                         }
@@ -104,9 +104,9 @@
                         "title": "自動フレームレート時の一時停止の長さ",
                         "subtitle": "フレームレートの調整時で動画再生を一時停止する時間 (秒単位) を設定します"
                     },
-                    "codecAny": "Any",
-                    "qualityAuto": "Auto",
-                    "hideRelatedVideosPlayer": "Hide Related Videos"
+                    "codecAny": "選択する",
+                    "qualityAuto": "自動",
+                    "hideRelatedVideosPlayer": "関連動画を非表示にする"
                 }
             },
             "uiSettings": {
@@ -116,7 +116,7 @@
                     "hideWatchedVideos": {
                         "title": "視聴した動画を非表示にする",
                         "options": {
-                            "enableHideWatchedVideos": "視聴した動画の非表示を有効化する",
+                            "enableHideWatchedVideos": "視聴した動画の非表示を有効にする",
                             "watchedVideosThreshold": {
                                 "title": "視聴した動画と判定するしきい値",
                                 "subtitle": "視聴した動画を非表示にする割合のしきい値を設定します"
@@ -127,7 +127,7 @@
                     "screenDimming": {
                         "title": "画面の減光",
                         "options": {
-                            "enableScreenDimming": "画面の減光を有効化する",
+                            "enableScreenDimming": "画面の減光を有効にする",
                             "dimmingTimeout": {
                                 "title": "減光までのタイムアウト",
                                 "subtitle": "画面を減光するまでの無操作時間 (秒単位) を設定します"
@@ -152,43 +152,43 @@
                         "title": "時計",
                         "subtitle": "画面に時計を表示します",
                         "options": {
-                            "enableClock": "時計を有効化する",
+                            "enableClock": "時計を有効にする",
                             "isClock12HourFormat": "12 時間制の時計を使用する",
                             "clockShowSeconds": "時計に秒数を表示する",
-                            "clockHideWhenVideoPlaying": "Hide Clock While Video is Playing"
+                            "clockHideWhenVideoPlaying": "動画再生中に時計を非表示にする"
                         }
                     },
                     "categories": {
-                        "search": "Search",
-                        "home": "Home",
-                        "sports": "Sports",
-                        "news": "News",
-                        "music": "Music",
-                        "podcasts": "Podcasts",
-                        "moviesAndTv": "Movies & TV",
-                        "live": "Live",
-                        "gaming": "Gaming",
-                        "subscriptions": "Subscriptions",
-                        "library": "Library",
-                        "more": "More",
-                        "shorts": "Shorts",
-                        "searchResults": "Search Results"
+                        "search": "検索",
+                        "home": "ホーム",
+                        "sports": "スポーツ",
+                        "news": "ニュース",
+                        "music": "音楽",
+                        "podcasts": "ポッドキャスト",
+                        "moviesAndTv": "映画とテレビ番組",
+                        "live": "ライブ",
+                        "gaming": "ゲーム",
+                        "subscriptions": "チャンネル登録",
+                        "library": "ライブラリ",
+                        "more": "さらに表示",
+                        "shorts": "ショート",
+                        "searchResults": "検索結果"
                     },
-                    "disableEnlargingThumbnails": "Disable Enlarged Thumbnails",
-                    "enableShrinkingThumbnails": "Enable Shrinked Thumbnails",
+                    "disableEnlargingThumbnails": "サムネイルの拡大表示を無効化する",
+                    "enableShrinkingThumbnails": "縮小したサムネイルを有効にする",
                     "sortSidebarContents": {
-                        "title": "Sort Sidebar Contents",
-                        "subtitle": "Reorder sidebar contents to your preference",
+                        "title": "サイドバーのコンテンツを並べ替える",
+                        "subtitle": "サイドバーのコンテンツを好みに合わせて並べ替えます",
                         "moveUp": {
-                            "title": "Move Up",
-                            "subtitle": "Move this item up in the sidebar"
+                            "title": "上に移動",
+                            "subtitle": "サイドバーのこの項目を上に移動します"
                         },
                         "moveDown": {
-                            "title": "Move Down",
-                            "subtitle": "Move this item down in the sidebar"
+                            "title": "下に移動",
+                            "subtitle": "サイドバーのこの項目を下に移動します"
                         },
-                        "addToSidebar": "Add Channel to Sidebar",
-                        "removeFromSidebar": "Remove Channel from Sidebar"
+                        "addToSidebar": "チャンネルをサイドバーに追加",
+                        "removeFromSidebar": "サイドバーからチャンネルを削除"
                     }
                 }
             },
@@ -201,36 +201,36 @@
                     "checkForUpdatesOnStartup": "起動時に更新を確認する"
                 },
                 "updateAvailable": {
-                    "title": "Update Available",
-                    "subtitle": "A new version of TizenTube Cobalt is available: {{latestVersion}}, current: {{currentVersion}}"
+                    "title": "更新が利用可能です",
+                    "subtitle": "TizenTube Cobalt の新しいバージョンが利用可能です: {{latestVersion}}、現在: {{currentVersion}}"
                 },
-                "releaseDate": "Release Date: {{date}}",
+                "releaseDate": "リリース日: {{date}}",
                 "updateNow": {
-                    "title": "Update Now",
-                    "subtitle": "Click to download the latest version."
+                    "title": "今すぐ更新",
+                    "subtitle": "クリックで最新のバージョンをダウンロードします"
                 },
                 "remindLater": {
-                    "title": "Remind Me Later",
-                    "subtitle": "Check for updates later."
+                    "title": "後で確認する",
+                    "subtitle": "後で更新を確認します"
                 },
                 "upToDate": {
-                    "title": "TizenTube is up to date",
-                    "subtitle": "You are using the latest version ({{version}}) of TizenTube Cobalt."
+                    "title": "TizenTube は最新の状態です",
+                    "subtitle": "TizenTube Cobalt の最新のバージョン ({{version}}) を使用しています"
                 },
                 "checkFailed": {
-                    "title": "TizenTube update check failed",
-                    "subtitle": "Could not check for updates."
+                    "title": "TizenTube の更新の確認に失敗しました",
+                    "subtitle": "更新を確認できませんでした"
                 },
                 "downloading": {
-                    "title": "TizenTube Update",
-                    "subtitle": "Downloading update, please wait..."
+                    "title": "TizenTube を更新",
+                    "subtitle": "更新をダウンロード中、しばらくお待ちください..."
                 }
             },
             "time": {
-                "second": "{{count}} second",
-                "seconds": "{{count}} seconds",
-                "minute": "{{count}} minute",
-                "minutes": "{{count}} minutes"
+                "second": "{{count}} 秒",
+                "seconds": "{{count}} 秒",
+                "minute": "{{count}} 分",
+                "minutes": "{{count}} 分"
             }
         },
         "ttSettings": {
@@ -276,28 +276,28 @@
     },
     "player": {
         "playbackSpeed": {
-            "title": "Playback Speed",
-            "button": "Speed Controls",
-            "fixStuttering": "Fix stuttering (1.0001x)"
+            "title": "再生速度",
+            "button": "速度のコントロール",
+            "fixStuttering": "スタッタリングを修正 (1.0001x)"
         },
-        "miniPlayer": "Mini Player",
-        "pictureInPicture": "Picture in Picture",
-        "previous": "Previous",
-        "next": "Next",
+        "miniPlayer": "ミニプレーヤー",
+        "pictureInPicture": "ピクチャーインピクチャー",
+        "previous": "前へ",
+        "next": "次へ",
         "withTizenTube": "with TizenTube",
         "share": {
-            "title": "Share",
-            "button": "Share",
-            "qrCodeScanMessage": "Scan the QR code below to share this video."
+            "title": "共有",
+            "button": "共有",
+            "qrCodeScanMessage": "下の QR コードをスキャンして、この動画を共有します"
         },
-        "screenOff": "Turn off screen"
+        "screenOff": "画面をオフにする"
     },
     "toasts": {
-        "videoAddedToQueue": "Video added to queue.",
-        "videoQueueCleared": "Video queue cleared.",
+        "videoAddedToQueue": "動画をキューに追加しました",
+        "videoQueueCleared": "動画のキューを削除しました",
         "sidebarContentsUpdated": {
-            "title": "Sidebar Contents Updated",
-            "subtitle": "The sidebar contents have been updated."
+            "title": "サイドバーのコンテンツを更新しました",
+            "subtitle": "サイドバーのコンテンツが更新されました"
         }
     }
 }
