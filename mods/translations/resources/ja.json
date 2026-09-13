@@ -109,6 +109,12 @@
                     "hideRelatedVideosPlayer": "関連動画を非表示にする"
                 }
             },
+            "time": {
+                "second": "{{count}} 秒",
+                "seconds": "{{count}} 秒",
+                "minute": "{{count}} 分",
+                "minutes": "{{count}} 分"
+            },
             "uiSettings": {
                 "title": "ユーザーインターフェースの設定",
                 "subtitle": "好みの UI にカスタマイズします",
@@ -142,21 +148,23 @@
                         "title": "サイドバーの項目を無効にする",
                         "subtitle": "無効にするサイドバーの項目を選択してください"
                     },
+                    "sortSidebarContents": {
+                        "title": "サイドバーのコンテンツを並べ替える",
+                        "subtitle": "サイドバーのコンテンツを好みに合わせて並べ替えます",
+                        "moveUp": {
+                            "title": "上に移動",
+                            "subtitle": "サイドバーのこの項目を上に移動します"
+                        },
+                        "moveDown": {
+                            "title": "下に移動",
+                            "subtitle": "サイドバーのこの項目を下に移動します"
+                        },
+                        "addToSidebar": "チャンネルをサイドバーに追加",
+                        "removeFromSidebar": "サイドバーからチャンネルを削除"
+                    },
                     "launchToOnStartup": {
                         "title": "起動時に開くページ",
                         "subtitle": "TizenTube の起動時にデフォルトで表示するページを選択してください"
-                    },
-                    "sortSubscriptionsByAlphabet": "登録しているチャンネルをアルファベット順に並べ替える",
-                    "disableChannelsOnSidebar": "サイドバーのチャンネルを無効にする",
-                    "clock": {
-                        "title": "時計",
-                        "subtitle": "画面に時計を表示します",
-                        "options": {
-                            "enableClock": "時計を有効にする",
-                            "isClock12HourFormat": "12 時間制の時計を使用する",
-                            "clockShowSeconds": "時計に秒数を表示する",
-                            "clockHideWhenVideoPlaying": "動画再生中に時計を非表示にする"
-                        }
                     },
                     "categories": {
                         "search": "検索",
@@ -174,22 +182,20 @@
                         "shorts": "ショート",
                         "searchResults": "検索結果"
                     },
+                    "sortSubscriptionsByAlphabet": "登録しているチャンネルをアルファベット順に並べ替える",
+                    "disableChannelsOnSidebar": "サイドバーのチャンネルを無効にする",
+                    "clock": {
+                        "title": "時計",
+                        "subtitle": "画面に時計を表示します",
+                        "options": {
+                            "enableClock": "時計を有効にする",
+                            "isClock12HourFormat": "12 時間制の時計を使用する",
+                            "clockShowSeconds": "時計に秒数を表示する",
+                            "clockHideWhenVideoPlaying": "動画再生中に時計を非表示にする"
+                        }
+                    },
                     "disableEnlargingThumbnails": "サムネイルの拡大表示を無効にする",
-                    "enableShrinkingThumbnails": "縮小したサムネイルを有効にする",
-                    "sortSidebarContents": {
-                        "title": "サイドバーのコンテンツを並べ替える",
-                        "subtitle": "サイドバーのコンテンツを好みに合わせて並べ替えます",
-                        "moveUp": {
-                            "title": "上に移動",
-                            "subtitle": "サイドバーのこの項目を上に移動します"
-                        },
-                        "moveDown": {
-                            "title": "下に移動",
-                            "subtitle": "サイドバーのこの項目を下に移動します"
-                        },
-                        "addToSidebar": "チャンネルをサイドバーに追加",
-                        "removeFromSidebar": "サイドバーからチャンネルを削除"
-                    }
+                    "enableShrinkingThumbnails": "縮小したサムネイルを有効にする"
                 }
             },
             "updater": {
@@ -207,30 +213,24 @@
                 "releaseDate": "リリース日: {{date}}",
                 "updateNow": {
                     "title": "今すぐ更新する",
-                    "subtitle": "クリックで最新のバージョンをダウンロードします"
+                    "subtitle": "クリックで最新のバージョンをダウンロードします。"
                 },
                 "remindLater": {
                     "title": "後で確認する",
-                    "subtitle": "後で更新を確認します"
+                    "subtitle": "後で更新を確認します。"
                 },
                 "upToDate": {
                     "title": "TizenTube は最新の状態です",
-                    "subtitle": "TizenTube Cobalt の最新のバージョン ({{version}}) を使用しています"
+                    "subtitle": "TizenTube Cobalt の最新のバージョン ({{version}}) を使用しています。"
                 },
                 "checkFailed": {
                     "title": "TizenTube の更新の確認に失敗しました",
-                    "subtitle": "更新を確認できませんでした"
+                    "subtitle": "更新を確認できませんでした。"
                 },
                 "downloading": {
                     "title": "TizenTube を更新",
                     "subtitle": "更新をダウンロード中、しばらくお待ちください..."
                 }
-            },
-            "time": {
-                "second": "{{count}} 秒",
-                "seconds": "{{count}} 秒",
-                "minute": "{{count}} 分",
-                "minutes": "{{count}} 分"
             }
         },
         "ttSettings": {
