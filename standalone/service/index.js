@@ -30,13 +30,16 @@ app.get('/tizentube/getState', (req, res) => {
 
 app.get('/tizentube/debugger', (req, res) => {
     const args = req.originalUrl.split('?')[1] || '';
+    let fired = false;
     const interval = setInterval(() => {
         tizen.application.getAppsContext((appsContext) => {
+            if (fired) return; // getAppsContext is async; guard against overlapping callbacks
             const packageId = tizen.application.getAppInfo().packageId;
             const app = appsContext.find(app => app.appId === `${packageId}.TizenTubeStandalone`);
             if (!app) {
+                fired = true;
+                clearInterval(interval);
                 injector.startDebugger(args);
-                clearInterval(interval)
             }
         });
     }, 50);

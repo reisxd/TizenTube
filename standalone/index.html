@@ -77,15 +77,17 @@
                 .then(r => r.json())
                 .then(res => {
                     const proxyUrl = `http://localhost:8100/tv?additionalDataUrl=http%3A%2F%2Flocalhost%3A8100%2Fdial%2Fapps%2FYouTube${args ? `&${args}` : ''}`;
-                    if (res.canConnectToDaemon && !res.isConnecting) {
+                    if (res.canConnectToDaemon && !res.isConnecting && !res.debuggerFailed) {
+                        // Kick off the debugger, then exit so it can relaunch us in debug mode.
                         fetch(`http://localhost:8100/tizentube/debugger${args ? `?${args}` : ''}`);
                         tizen.application.getCurrentApplication().exit();
-                    } else {
-                        // Covers both !canConnectToDaemon and the previously unhandled
-                        // (canConnectToDaemon && isConnecting) state, which left the app
-                        // stuck on the splash screen forever. The proxy path injects the
-                        // userscript itself and needs no debugger.
+                    } else if (!res.canConnectToDaemon || res.debuggerFailed) {
                         location.href = proxyUrl;
+                    } else {
+                        // We are the instance being launched in debug mode; the service
+                        // attaches CDP and navigates us to youtube.com, replacing this page.
+                        // If that never happens the debug launch failed -> use the proxy.
+                        setTimeout(() => { location.href = proxyUrl; }, 12000);
                     }
                 }).catch(() => window.location.reload());
         }
