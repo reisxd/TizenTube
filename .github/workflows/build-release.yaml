@@ -62,6 +62,16 @@ jobs:
           mkdir release
           tizenjs build . -t wgt -o release/TizenTubeCobalt.wgt --author "${GITHUB_WORKSPACE}/TizenTube-author.p12" --authorPwd '${{ secrets.TIZEN_AUTHOR_KEY_PW }}' -p public --ignore node_modules,/.*\.wgt$/,/userwidget/,/release/
 
+      - name: Change config.xml to use http://tizentube:8101 as the proxy server for Cobalt
+        working-directory: standalone/service
+        run: |
+          node build-service.js set-cobalt-proxy
+
+      - name: Build TizenTube Cobalt with http://tizentube:8101 as the proxy server
+        working-directory: standalone
+        run: |
+          tizenjs build . -t wgt -o release/TizenTubeCobaltTizenTubeProxyAddress.wgt --author "${GITHUB_WORKSPACE}/TizenTube-author.p12" --authorPwd '${{ secrets.TIZEN_AUTHOR_KEY_PW }}' -p public --ignore node_modules,/.*\.wgt$/,/userwidget/,/release/
+
       - name: Remove Cobalt flags from config.xml for Old Tizen build
         working-directory: standalone/service
         run: |

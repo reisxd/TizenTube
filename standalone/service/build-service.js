@@ -4,7 +4,7 @@ const path = require('path');
 const { XMLParser, XMLBuilder } = require('fast-xml-parser');
 
 async function build() {
-    const { code, assets } = await ncc(path.join(__dirname, 'transpiled/index.js'), {
+    const { code } = await ncc(path.join(__dirname, 'transpiled/index.js'), {
         minify: false
     });
 
@@ -78,4 +78,8 @@ if (process.argv[2] === 'remove-cobalt-flags') {
     updatedConfigXml = updatedConfigXml.replace(/^\s*<_blank_line_.*\/>\r?\n/gm, '\n');
 
     fs.writeFileSync(path.join(__dirname, '../config.xml'), updatedConfigXml);
+} else if (process.argv[2] === 'set-cobalt-proxy') {
+    const configXml = fs.readFileSync(path.join(__dirname, '../config.xml'), 'utf8');
+    fs.writeFileSync(path.join(__dirname, '../config.xml.bak'), configXml);
+    fs.writeFileSync(path.join(__dirname, '../config.xml'), configXml.replace('http://127.0.0.2:8101', 'http://tizentube:8101'));
 } else build();
