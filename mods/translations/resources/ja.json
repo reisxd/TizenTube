@@ -139,15 +139,15 @@
                         }
                     },
                     "disableSidebarContents": {
-                        "title": "サイドバーの項目を無効化する",
-                        "subtitle": "無効化するサイドバーの項目を選択してください"
+                        "title": "サイドバーの項目を無効にする",
+                        "subtitle": "無効にするサイドバーの項目を選択してください"
                     },
                     "launchToOnStartup": {
                         "title": "起動時に開くページ",
                         "subtitle": "TizenTube の起動時にデフォルトで表示するページを選択してください"
                     },
                     "sortSubscriptionsByAlphabet": "登録しているチャンネルをアルファベット順に並べ替える",
-                    "disableChannelsOnSidebar": "サイドバーのチャンネルを無効化する",
+                    "disableChannelsOnSidebar": "サイドバーのチャンネルを無効にする",
                     "clock": {
                         "title": "時計",
                         "subtitle": "画面に時計を表示します",
@@ -174,7 +174,7 @@
                         "shorts": "ショート",
                         "searchResults": "検索結果"
                     },
-                    "disableEnlargingThumbnails": "サムネイルの拡大表示を無効化する",
+                    "disableEnlargingThumbnails": "サムネイルの拡大表示を無効にする",
                     "enableShrinkingThumbnails": "縮小したサムネイルを有効にする",
                     "sortSidebarContents": {
                         "title": "サイドバーのコンテンツを並べ替える",
