@@ -10,8 +10,10 @@ JSON.parse = function () {
     if (guideSection && Array.isArray(order)) {
         let orderChanged = false;
         for (const item of guideSection.items) {
-            const itemOrder = item.guideEntryRenderer.navigationEndpoint?.browseEndpoint?.browseId
-                || (item.guideEntryRenderer.navigationEndpoint?.searchEndpoint && 'search');
+            // Not every guide item is a guideEntryRenderer: a throw here would fail
+            // the caller's JSON.parse and lose the whole guide response.
+            const itemOrder = item.guideEntryRenderer?.navigationEndpoint?.browseEndpoint?.browseId
+                || (item.guideEntryRenderer?.navigationEndpoint?.searchEndpoint && 'search');
             if (itemOrder && !order.some(orderItem =>
                 (typeof orderItem === 'object' ? orderItem.browseId : orderItem) === itemOrder)) {
                 order.push(itemOrder);
@@ -25,10 +27,10 @@ JSON.parse = function () {
         if (r.items && Array.isArray(r.items) && r.items[0].guideSectionRenderer) {
             const order = [];
             for (const item of r.items[0].guideSectionRenderer.items) {
-                const browseId = item.guideEntryRenderer.navigationEndpoint?.browseEndpoint?.browseId;
+                const browseId = item.guideEntryRenderer?.navigationEndpoint?.browseEndpoint?.browseId;
                 if (browseId) {
                     order.push(browseId);
-                } else if (item.guideEntryRenderer.navigationEndpoint?.searchEndpoint) {
+                } else if (item.guideEntryRenderer?.navigationEndpoint?.searchEndpoint) {
                     order.push('search');
                 }
             }
@@ -58,16 +60,27 @@ JSON.parse = function () {
             }
 
             const orderedItems = [];
+            const placed = new Set();
             for (const orderItem of order) {
                 const browseId = typeof orderItem === 'object' ? orderItem.browseId : orderItem;
                 const index = copiedItems.findIndex(item => {
-                    const itemBrowseId = item.guideEntryRenderer.navigationEndpoint?.browseEndpoint?.browseId;
-                    return itemBrowseId === browseId || (browseId === 'search' && item.guideEntryRenderer.navigationEndpoint?.searchEndpoint);
+                    const itemBrowseId = item.guideEntryRenderer?.navigationEndpoint?.browseEndpoint?.browseId;
+                    return itemBrowseId === browseId || (browseId === 'search' && item.guideEntryRenderer?.navigationEndpoint?.searchEndpoint);
                 });
                 if (index !== -1) {
                     orderedItems.push(copiedItems[index]);
+                    placed.add(index);
                 }
             }
+            // Entries the stored order knows nothing about must survive, after the
+            // ordered ones. The order is not scoped to a profile: it is learned from
+            // whichever profile loads first, and only from entries exposing a
+            // browseEndpoint.browseId. A YouTube Kids profile's guide entries don't,
+            // so they were neither learned above nor matched here — dropping them
+            // emptied the whole left menu on that profile (#643, #648).
+            copiedItems.forEach((item, index) => {
+                if (!placed.has(index)) orderedItems.push(item);
+            });
             r.items[0].guideSectionRenderer.items = orderedItems;
         }
     }
