@@ -1,0 +1,303 @@
+{
+    "__contributors": [
+        "Jamal Ali"
+    ],
+    "settings": {
+        "options": {
+            "socialMedia": {
+                "title": "Sosial media keçidləri",
+                "qrCodeScanMessage": "Aşağıdakı QR kodunu oxudaraq {{name}} səhifəsinə keçə bilərsən.",
+                "announcements": "Elanlar",
+                "group": "Qrup",
+                "website": "Veb sayt",
+                "githubSponsors": "GitHub Sponsors"
+            },
+            "adBlock": "Reklamların bloklanması",
+            "sponsorblock": {
+                "title": "SponsorBlock parametrləri",
+                "options": {
+                    "enableSB": "SponsorBlock funksiyasını aktivləşdir",
+                    "manualSkip": "SponsorBlock hissələrini əl ilə keçmə",
+                    "segments": "Hissələr",
+                    "categories": {
+                        "sponsor": "Sponsor hissələrini keç",
+                        "intro": "Giriş hissələrini keç",
+                        "outro": "Sonluq hissələrini keç",
+                        "interaction": "Qarşılıqlı əlaqə xatırlatmalarını keç",
+                        "selfpromo": "Özünüreklam hissələrini keç",
+                        "preview": "Önbaxış/xülasə hissələrini keç",
+                        "filler": "Mövzudan yayınmaları/zarafatları keç",
+                        "music_offtopic": "Mövzudan kənar musiqi hissələrini keç",
+                        "highlights": "Əsas məqamları aktivləşdir"
+                    },
+                    "showSBToasts": "SponsorBlock bildirişlərini göstər"
+                }
+            },
+            "dearrow": {
+                "title": "DeArrow parametrləri",
+                "options": {
+                    "enableDA": "DeArrow funksiyasını aktivləşdir",
+                    "enableDAThumbnails": "DeArrow miniatürlərini aktivləşdir"
+                }
+            },
+            "misc": {
+                "title": "Digər parametrlər",
+                "options": {
+                    "endScreenCards": "Son ekran kartlarını gizlət",
+                    "youThereRenderer": "“Hələ baxırsan?” bildirişini aktivləşdir",
+                    "paidPromoOverlay": "“Ödənişli reklam var” yazısını aktivləşdir",
+                    "whosWatching": {
+                        "title": "“Kim baxır?” menyusu",
+                        "options": {
+                            "enableWW": "“Kim baxır?” menyusunu aktivləşdir",
+                            "permaEnableWW": "“Kim baxır?” menyusunu daimi aktivləşdir",
+                            "enableWWOnExit": "Çıxışda “Kim baxır?” menyusunu aktivləşdir"
+                        }
+                    },
+                    "fixUI": "İnterfeysi düzəlt",
+                    "hqThumbnails": "Yüksək keyfiyyətli miniatürləri aktivləşdir",
+                    "longPress": "Uzun basma əməliyyatlarını aktivləşdir",
+                    "shorts": "Qısa videoları aktivləşdir",
+                    "videoPreviews": "Video önbaxışlarını aktivləşdir",
+                    "ttWelcomeMsg": "TizenTube salamlama mesajını göstər",
+                    "guestSignInReminder": "Qonağa giriş xatırlatmasını göstər",
+                    "reloadHomeOnStartup": "Başlanğıcda əsas səhifəni yenidən yüklə"
+                }
+            },
+            "subtitles": {
+                "title": "Subtitr parametrləri",
+                "options": {
+                    "showLocalSubtitle": "Yerli subtitri göstər",
+                    "showHiddenSubtitles": "Gizli subtitrləri göstər"
+                }
+            },
+            "videoPlayer": {
+                "title": "Video pleyerinin parametrləri",
+                "subtitle": "Video pleyerinin funksiyalarını tənzimlə",
+                "options": {
+                    "patching": {
+                        "title": "Video pleyerinin interfeysinin düzəlişi",
+                        "options": {
+                            "enableVPUIPatching": "Video pleyerinin interfeysinin düzəlişini aktivləşdir",
+                            "previousNextBtns": "Əvvəlki və növbəti düymələrini aktivləşdir",
+                            "showSuperThxBtn": "Böyük təşəkkür düyməsini göstər",
+                            "showAIAskBtn": "Sual ver düyməsini göstər",
+                            "showSpeedCtrlBtn": "Sürət idarəsi düyməsini göstər",
+                            "addMPBtn": "Kiçik pleyer düyməsini göstər",
+                            "swapMPWithPIP": "Kiçik pleyer düyməsini PiP düyməsi ilə əvəz et"
+                        }
+                    },
+                    "preferredVideoQuality": {
+                        "title": "Üstün tutulan video keyfiyyəti",
+                        "subtitle": "Oxutma üçün üstün tutulan və ya ona ən yaxın video keyfiyyətini seç"
+                    },
+                    "speedSettings": {
+                        "title": "Sürət dəyişmə addımı",
+                        "subtitle": "Video oxutma sürətinin dəyişmə addımını təyin et"
+                    },
+                    "preferredVideoCodec": {
+                        "title": "Üstün tutulan video kodeki",
+                        "subtitle": "Oxutma üçün üstün tutulan video kodekini seç"
+                    },
+                    "afr": "Avtomatik kadr tezliyi",
+                    "afrPauseDuration": {
+                        "title": "Avtomatik kadr tezliyi fasiləsi",
+                        "subtitle": "Kadr tezliyi dəyişərkən oxutma fasiləsini saniyə ilə təyin et"
+                    },
+                    "codecAny": "İstənilən",
+                    "qualityAuto": "Avtomatik",
+                    "hideRelatedVideosPlayer": "Əlaqəli videoları gizlət"
+                }
+            },
+            "time": {
+                "second": "{{count}} saniyə",
+                "seconds": "{{count}} saniyə",
+                "minute": "{{count}} dəqiqə",
+                "minutes": "{{count}} dəqiqə"
+            },
+            "uiSettings": {
+                "title": "İstifadəçi interfeysi parametrləri",
+                "subtitle": "İnterfeysi zövqünə uyğun tənzimlə",
+                "options": {
+                    "hideWatchedVideos": {
+                        "title": "Baxılmış videoların gizlədilməsi",
+                        "options": {
+                            "enableHideWatchedVideos": "Baxılmış videoların gizlədilməsini aktivləşdir",
+                            "watchedVideosThreshold": {
+                                "title": "Baxılmış video həddi",
+                                "subtitle": "Baxılmış videoları gizlətmək üçün faiz həddini təyin et"
+                            },
+                            "setPagesToHideWatchedVideos": "Baxılmış videoların gizlədiləcəyi səhifələri seç"
+                        }
+                    },
+                    "screenDimming": {
+                        "title": "Ekranın qaraldılması",
+                        "options": {
+                            "enableScreenDimming": "Ekranın qaraldılmasını aktivləşdir",
+                            "dimmingTimeout": {
+                                "title": "Qaralma gecikməsi",
+                                "subtitle": "Ekran qaralanadək fəaliyyətsizlik müddətini saniyə ilə təyin et"
+                            },
+                            "dimmingOpacity": {
+                                "title": "Qaralma səviyyəsi",
+                                "subtitle": "Ekranın qaralma səviyyəsini təyin et"
+                            }
+                        }
+                    },
+                    "disableSidebarContents": {
+                        "title": "Yan panel bölmələrinin söndürülməsi",
+                        "subtitle": "Söndürüləcək yan panel bölmələrini seç"
+                    },
+                    "sortSidebarContents": {
+                        "title": "Yan panel bölmələrinin sıralanması",
+                        "subtitle": "Yan panel bölmələrini istədiyin kimi sırala",
+                        "moveUp": {
+                            "title": "Yuxarı apar",
+                            "subtitle": "Bu elementi yan paneldə yuxarı apar"
+                        },
+                        "moveDown": {
+                            "title": "Aşağı apar",
+                            "subtitle": "Bu elementi yan paneldə aşağı apar"
+                        },
+                        "addToSidebar": "Kanalı yan panelə əlavə et",
+                        "removeFromSidebar": "Kanalı yan paneldən çıxar"
+                    },
+                    "launchToOnStartup": {
+                        "title": "Başlanğıc səhifəsi",
+                        "subtitle": "TizenTube başlayanda açılacaq standart səhifəni seç"
+                    },
+                    "categories": {
+                        "search": "Axtarış",
+                        "home": "Əsas səhifə",
+                        "sports": "İdman",
+                        "news": "Xəbərlər",
+                        "music": "Musiqi",
+                        "podcasts": "Podkastlar",
+                        "moviesAndTv": "Filmlər və televiziya",
+                        "live": "Canlı yayım",
+                        "gaming": "Oyunlar",
+                        "subscriptions": "Abunəliklər",
+                        "library": "Kitabxana",
+                        "more": "Daha çox",
+                        "shorts": "Qısa videolar",
+                        "searchResults": "Axtarış nəticələri"
+                    },
+                    "sortSubscriptionsByAlphabet": "Abunəlikləri əlifba sırası ilə düz",
+                    "disableChannelsOnSidebar": "Yan paneldə kanalları söndür",
+                    "clock": {
+                        "title": "Saat",
+                        "subtitle": "Ekranda saatı göstər",
+                        "options": {
+                            "enableClock": "Saatı aktivləşdir",
+                            "isClock12HourFormat": "Saatı 12 saatlıq formatda göstər",
+                            "clockShowSeconds": "Saatda saniyələri göstər",
+                            "clockHideWhenVideoPlaying": "Video oxudularkən saatı gizlət"
+                        }
+                    },
+                    "disableEnlargingThumbnails": "Böyüdülmüş miniatürləri söndür",
+                    "enableShrinkingThumbnails": "Kiçildilmiş miniatürləri aktivləşdir"
+                }
+            },
+            "updater": {
+                "title": "TizenTube Cobalt yeniləyicisi",
+                "menuSubtitle": "TizenTube Cobalt yeniləmələrini idarə et",
+                "versionSubtitle": "Cari versiya: {{version}}",
+                "options": {
+                    "checkForUpdates": "Yeniləmələri yoxla",
+                    "checkForUpdatesOnStartup": "Başlanğıcda yeniləmələri yoxla"
+                },
+                "updateAvailable": {
+                    "title": "Yeniləmə mövcuddur",
+                    "subtitle": "TizenTube Cobalt üçün yeni versiya: {{latestVersion}}, cari: {{currentVersion}}"
+                },
+                "releaseDate": "Buraxılış tarixi: {{date}}",
+                "updateNow": {
+                    "title": "İndi yenilə",
+                    "subtitle": "Son versiyanı yükləmək üçün bas."
+                },
+                "remindLater": {
+                    "title": "Sonra xatırlat",
+                    "subtitle": "Yeniləmələri sonra yoxla."
+                },
+                "upToDate": {
+                    "title": "TizenTube aktualdır",
+                    "subtitle": "TizenTube Cobalt tətbiqinin son versiyasından ({{version}}) istifadə edirsən."
+                },
+                "checkFailed": {
+                    "title": "TizenTube yeniləmələri yoxlanılmadı",
+                    "subtitle": "Yeniləmələri yoxlamaq mümkün olmadı."
+                },
+                "downloading": {
+                    "title": "TizenTube yeniləməsi",
+                    "subtitle": "Yeniləmə yüklənir, gözlə..."
+                }
+            }
+        },
+        "ttSettings": {
+            "title": "TizenTube parametrləri",
+            "madeByText": "Reis Can (reisxd) tərəfindən ❤️ ilə hazırlanıb",
+            "summary": "TizenTube parametrlərini aç"
+        },
+        "supportTT": {
+            "title": "TizenTube tətbiqinə dəstək ol",
+            "subtitle": "❤️ TizenTube tətbiqinə və inkişafına dəstək ol",
+            "content": {
+                "1": "TizenTube xoşuna gəlirsə və inkişafına dəstək olmaq istəyirsənsə, bunları edə bilərsən:",
+                "2": "1. Daha çox tanınması üçün GitHub repozitoriyasına ulduz ver.",
+                "3": "2. TizenTube tətbiqini başqaları ilə paylaş.",
+                "4": "Maddi dəstək üçün ianə edə bilərsən:",
+                "5": "- Buy Me A Coffee: https://www.buymeacoffee.com/reisxd (üstün tutulur)",
+                "6": "- GitHub Sponsors: https://github.com/sponsors/reisxd"
+            }
+        }
+    },
+    "welcomeMsg": {
+        "title": "TizenTube tətbiqinə xoş gəlmisən",
+        "subtitle": "Parametrlərə keç və “TizenTube parametrləri” bölməsini seç."
+    },
+    "sponsorblock": {
+        "segments": {
+            "sponsor": "sponsor hissəsi",
+            "intro": "giriş",
+            "outro": "sonluq",
+            "interaction": "qarşılıqlı əlaqə xatırlatması",
+            "selfpromo": "özünüreklam",
+            "preview": "xülasə və ya önbaxış",
+            "filler": "mövzudan yayınmalar",
+            "music_offtopic": "musiqisiz hissə",
+            "poi_highlight": "əsas məqam"
+        },
+        "toasts": {
+            "skipping": "{{segment}} keçilir",
+            "notSkipping": "{{segment}} keçilmir ({{count}} dəfə keçilib)",
+            "skip": "Keç: {{segment}}",
+            "skipToHighlight": "Əsas məqama keç"
+        }
+    },
+    "player": {
+        "playbackSpeed": {
+            "title": "Oxutma sürəti",
+            "button": "Sürət idarəsi",
+            "fixStuttering": "Donmaları düzəlt (1.0001x)"
+        },
+        "miniPlayer": "Kiçik pleyer",
+        "pictureInPicture": "Şəkil içində şəkil",
+        "previous": "Əvvəlkinə keç",
+        "next": "Növbətiyə keç",
+        "withTizenTube": "TizenTube ilə",
+        "share": {
+            "title": "Paylaşma",
+            "button": "Paylaş",
+            "qrCodeScanMessage": "Videonu paylaşmaq üçün aşağıdakı QR kodunu oxut."
+        },
+        "screenOff": "Ekranı söndür"
+    },
+    "toasts": {
+        "videoAddedToQueue": "Video növbəyə əlavə edildi.",
+        "videoQueueCleared": "Video növbəsi təmizləndi.",
+        "sidebarContentsUpdated": {
+            "title": "Yan panel bölmələri yeniləndi",
+            "subtitle": "Yan panel bölmələri yeniləndi."
+        }
+    }
+}
