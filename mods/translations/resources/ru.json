@@ -55,13 +55,13 @@
                         }
                     },
                     "fixUI": "Исправить интерфейс",
-                    "hqThumbnails": "Включить миниатюры высокого качества",
+                    "hqThumbnails": "Включить миниатюры HD",
                     "longPress": "Долгое нажатие",
                     "shorts": "Shorts",
                     "videoPreviews": "Предпросмотр видео",
                     "ttWelcomeMsg": "Приветственное сообщение",
-                    "guestSignInReminder": "Показывать напоминания о гостевом входе",
-                    "reloadHomeOnStartup": "Обновлять главную страницу при запуске"
+                    "guestSignInReminder": "Напоминания о гостевом входе",
+                    "reloadHomeOnStartup": "Обновлять главную при запуске"
                 }
             },
             "subtitles": {
@@ -76,10 +76,10 @@
                 "subtitle": "Настройка функций видеоплеера",
                 "options": {
                     "patching": {
-                        "title": "Патч интерфейса видеоплеера",
+                        "title": "Патч интерфейса",
                         "options": {
-                            "enableVPUIPatching": "Включить патч интерфейса видеоплеера",
-                            "previousNextBtns": "Кнопки «Предыдущее/Следующее»",
+                            "enableVPUIPatching": "Включить патч интерфейса",
+                            "previousNextBtns": "Кнопки Предыдущее/Следующее",
                             "showSuperThxBtn": "Кнопка Супер Спасибо",
                             "showAIAskBtn": "Показать кнопку Gemini",
                             "showSpeedCtrlBtn": "Кнопка скорости",
@@ -114,9 +114,9 @@
                 "subtitle": "Настройки интерфейса под себя",
                 "options": {
                     "hideWatchedVideos": {
-                        "title": "Скрывать просмотренные видео",
+                        "title": "Скрыть просмотренные видео",
                         "options": {
-                            "enableHideWatchedVideos": "Включить скрытие просмотренных видео",
+                            "enableHideWatchedVideos": "Включить скрытие",
                             "watchedVideosThreshold": {
                                 "title": "Порог скрытия видео",
                                 "subtitle": "Укажите процент, после которого видео будет скрываться"
@@ -165,9 +165,9 @@
                         "news": "Новости",
                         "music": "Музыка",
                         "podcasts": "Подкасты",
-                        "moviesAndTv": "Фильмы и ТВ",
+                        "moviesAndTv": "Фильмы",
                         "live": "Прямые трансляции",
-                        "gaming": "Игры",
+                        "gaming": "Видеоигры",
                         "subscriptions": "Подписки",
                         "library": "Библиотека",
                         "more": "Ещё",
@@ -235,7 +235,7 @@
         },
         "ttSettings": {
             "title": "Настройки TizenTube",
-            "madeByText": "Сделано Reis Can, перевод BlackFlux (reisxd) ❤️",
+            "madeByText": "By Reis Can, перевод BlackFlux (reisxd) ❤️",
             "summary": "Открыть настройки TizenTube"
         },
         "supportTT": {
