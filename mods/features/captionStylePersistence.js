@@ -1,5 +1,6 @@
 import { configRead, configWrite, configChangeEmitter } from '../config.js';
-import { EVENTS, onPlayer, refreshRawKeys } from '../utils/Captions.js';
+import { EVENTS, refreshRawKeys } from '../utils/Captions.js';
+import { onPlayer } from '../utils/Player.js'
 
 const CONFIG_KEYS = {
     ENABLED: 'enableCaptionStylePersistence',
@@ -44,8 +45,6 @@ class CaptionStyleHandler {
         this.#player.addEventListener(EVENTS.YT_CAPTIONS_SETTINGS_CHANGED, this.#handleSettingsChanged);
         this.#player.addEventListener(EVENTS.YT_CAPTIONS_TRACKLIST_CHANGED, this.#handleTrackListChanged);
         this.#player.addEventListener(EVENTS.YT_STATE_CHANGE, this.#handleStateChange);
-
-        this.#tryApplyStyle();
     }
 
     #setupConfigListener() {
@@ -93,10 +92,13 @@ class CaptionStyleHandler {
             console.info(`${LOG_PREFIX} #tryApplyStyle: style already applied, doing nothing`);
             return;
         }
-        if !configRead(CONFIG_KEYS.ENABLED)) return;
+        if (!configRead(CONFIG_KEYS.ENABLED)) return;
 
         const savedStyle = configRead(CONFIG_KEYS.STYLE);
         if (!savedStyle) return;
+        if (!this.#player) {
+            console.info(`${LOG_PREFIX} no player, not applying subtitle styles`);
+        }
 
         const settings = this.#player?.getSubtitlesUserSettings?.();
         if (!settings) {

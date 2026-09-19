@@ -69,8 +69,7 @@
                 "options": {
                     "showLocalSubtitle": "Show Local Subtitle",
                     "showHiddenSubtitles": "Show Hidden Subtitles",
-                    "persistCaptionStyle": "Remember Caption Style",
-                    "persistCaptionToggle": "Remember Captions On/Off"
+                    "persistCaptionStyle": "Remember Caption Style"
                 }
             },
             "videoPlayer": {

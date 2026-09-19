@@ -10,7 +10,7 @@ const EVENTS = {
     PLAYBACK_START: 'onPlaybackStartExternal',
 };
 
-PLAYER_POLL_MS = 100;
+const PLAYER_POLL_MS = 100;
 
 /** @type {Element|null} */
 let player = null;
