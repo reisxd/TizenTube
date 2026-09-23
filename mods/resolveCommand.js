@@ -5,7 +5,7 @@ import { speedSettings } from './ui/speedUI.js';
 import { showToast, buttonItem, showModal, QrCodeRenderer, overlayPanelItemListRenderer, overlayMessageRenderer } from './ui/ytUI.js';
 import checkForUpdates from './features/updater.js';
 import { t } from 'i18next';
-import { requestNextAndNavigateChannel } from './utils/innerTubeCalls.js';
+import { requestNextAndNavigateChannel, getFeedbackPanelTokens, sendFeedbackToken } from './utils/innerTubeCalls.js';
 import qrcode from 'qrcode-npm';
 import showGuideSettings from './ui/sidebarModification.js';
 
@@ -251,6 +251,24 @@ function customAction(action, parameters) {
         case 'GO_TO_CHANNEL':
             requestNextAndNavigateChannel(parameters);
             break;
+        case 'NOT_INTERESTED':
+            markFeedback(parameters, 0, true);
+            break;
+        case 'DONT_RECOMMEND_CHANNEL':
+            markFeedback(parameters, 1, false);
+            break;
+        case 'FEEDBACK_REASON':
+            sendFeedbackToken(parameters.token)
+                .then(() => {
+                    resolveCommand({
+                        signalAction: {
+                            signal: 'POPUP_BACK'
+                        }
+                    });
+                    showToast('TizenTube', t('toasts.feedbackSent'));
+                })
+                .catch(err => console.error('TizenTube: failed to send feedback:', err));
+            break;
         case 'SHARE':
             const videoPlayer = document.querySelector('.html5-video-player');
             const videoData = videoPlayer.getVideoData();
@@ -305,4 +323,54 @@ function customAction(action, parameters) {
             window.screenTurnedOffAt = Date.now();
             break;
     }
+}
+
+// YouTube moved the "Not interested" / "Don't recommend channel" feedback tokens
+// out of the long press menu into an engagement panel (see getFeedbackPanel in
+// adblock.js). Fetch the panel first, then send the feedback with the token it
+// returns (token 0 = "Not interested", token 1 = "Don't recommend channel").
+// If YouTube asks for a dismissal reason, present the reasons in a modal and send
+// the selected one (see FEEDBACK_REASON).
+async function markFeedback(parameters, tokenIndex, showReasons) {
+    try {
+        const tokens = await getFeedbackPanelTokens(parameters.panelId, parameters.params);
+        const token = tokens[tokenIndex];
+        if (!token) return;
+
+        const response = await sendFeedbackToken(token);
+        if (!showReasons) return;
+
+        const dismissal = response?.feedbackResponses?.[0]?.followUpDialog?.dismissalFollowUpRenderer;
+        const reasons = dismissal?.reasons;
+        if (!Array.isArray(reasons) || !reasons.length) return;
+
+        const buttons = reasons.map((reason) => buttonItem(
+            { title: extractText(reason.title) },
+            null,
+            [
+                {
+                    signalAction: {
+                        signal: 'POPUP_BACK'
+                    }
+                },
+                {
+                    customAction: {
+                        action: 'FEEDBACK_REASON',
+                        parameters: { token: reason.token }
+                    }
+                }
+            ]
+        ));
+        showModal(extractText(dismissal.dismissalReasonsPrompt), overlayPanelItemListRenderer(buttons), 'tt-feedback-reasons');
+    } catch (err) {
+        console.error('TizenTube: failed to mark feedback:', err);
+    }
+}
+
+function extractText(text) {
+    if (!text) return '';
+    if (text.simpleText) return text.simpleText;
+    if (text.content) return text.content;
+    if (Array.isArray(text.runs)) return text.runs.map((run) => run?.text ?? '').join('');
+    return String(text);
 }

@@ -292,9 +292,14 @@
         },
         "screenOff": "Turn off screen"
     },
+    "videoMenu": {
+        "notInterested": "Not interested",
+        "dontRecommendChannel": "Don't recommend channel"
+    },
     "toasts": {
         "videoAddedToQueue": "Video added to queue.",
         "videoQueueCleared": "Video queue cleared.",
+        "feedbackSent": "Feedback sent.",
         "sidebarContentsUpdated": {
             "title": "Sidebar Contents Updated",
             "subtitle": "The sidebar contents have been updated."
