@@ -298,6 +298,11 @@
         "sidebarContentsUpdated": {
             "title": "侧边栏内容已更新",
             "subtitle": "侧边栏内容已完成更新。"
-        }
+        },
+        "feedbackSent": "Feedback sent."
+    },
+    "videoMenu": {
+        "notInterested": "Not interested",
+        "dontRecommendChannel": "Don't recommend channel"
     }
 }

@@ -298,6 +298,11 @@
         "sidebarContentsUpdated": {
             "title": "Kenar Çubuğu İçerikleri Güncellendi",
             "subtitle": "Kenar çubuğu içerikleri güncellendi."
-        }
+        },
+        "feedbackSent": "Geri bildirim gönderildi."
+    },
+    "videoMenu": {
+        "notInterested": "İlgilenmiyorum",
+        "dontRecommendChannel": "Kanalı önerme"
     }
 }

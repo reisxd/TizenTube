@@ -299,6 +299,11 @@
         "sidebarContentsUpdated": {
             "title": "Nội dung thanh điều hướng đã được cập nhật",
             "subtitle": "Ờm thì cái thanh điều hướng được cập nhật thui mà."
-        }
+        },
+        "feedbackSent": "Feedback sent."
+    },
+    "videoMenu": {
+        "notInterested": "Not interested",
+        "dontRecommendChannel": "Don't recommend channel"
     }
 }
