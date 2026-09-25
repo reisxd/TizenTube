@@ -303,6 +303,6 @@
     },
     "videoMenu": {
         "notInterested": "興味がない",
-        "dontRecommendChannel": "チャンネルをおすすめに表示しない"
+        "dontRecommendChannel": "このチャンネルをおすすめに表示しません"
     }
 }
