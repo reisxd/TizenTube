@@ -2,6 +2,7 @@ import { configRead } from '../config.js';
 import Chapters from '../ui/chapters.js';
 import resolveCommand from '../resolveCommand.js';
 import { timelyAction, longPressData, MenuServiceItemRenderer, ShelfRenderer, TileRenderer, ButtonRenderer } from '../ui/ytUI.js';
+import { findFeedbackToken } from '../utils/innerTubeCalls.js';
 import { PatchSettings } from '../ui/customYTSettings.js';
 import { t } from 'i18next';
 
@@ -482,7 +483,10 @@ function addLongPress(items) {
           }
         }
       })
-      item.tileRenderer ? item.tileRenderer.onLongPressCommand.showMenuCommand.menu.menuRenderer.items.push(button) : item.lockupViewModel.rendererContext.commandContext.onLongPress.innertubeCommand.showMenuCommand.menu.menuRenderer.items.push(button);
+      const menuItems = item.tileRenderer ? item.tileRenderer.onLongPressCommand.showMenuCommand.menu.menuRenderer.items
+        : item.lockupViewModel.rendererContext.commandContext.onLongPress.innertubeCommand.showMenuCommand.menu.menuRenderer.items;
+      menuItems.push(button);
+      restoreFeedbackMenuItems(item, menuItems);
       continue;
     }
     if (!configRead('enableLongPress')) continue;
@@ -505,11 +509,68 @@ function addLongPress(items) {
       watchEndpointData: copiedItem?.tileRenderer?.onSelectCommand?.watchEndpoint || copiedItem?.lockupViewModel?.rendererContext?.commandContext?.onTap?.innertubeCommand?.watchEndpoint,
       item: copiedItem
     });
+    restoreFeedbackMenuItems(item, data.showMenuCommand.menu.menuRenderer.items);
     item.tileRenderer ? item.tileRenderer.onLongPressCommand = data
     : item.lockupViewModel.rendererContext.commandContext.onLongPress = {
       innertubeCommand: data
     };
   }
+}
+
+// YouTube moved the "Not interested" and "Don't recommend channel" items out of the
+// long press menu into an engagement panel (panelId + params) that has to be fetched
+// via /youtubei/v1/get_panel before the feedback tokens can be used. If the item
+// carries such a panel reference and the menu doesn't already contain feedback items,
+// add them back. The actual token fetching / feedback sending happens on click via
+// the NOT_INTERESTED / DONT_RECOMMEND_CHANNEL custom actions (see resolveCommand.js).
+function getFeedbackPanel(item) {
+  const onLongPress = item?.tileRenderer
+    ? item.tileRenderer.onLongPressCommand
+    : item?.lockupViewModel?.rendererContext?.commandContext?.onLongPress;
+  const endpoint = onLongPress?.showEngagementPanelEndpoint
+    ?? onLongPress?.innertubeCommand?.showEngagementPanelEndpoint;
+  if (endpoint?.identifier?.tag && endpoint?.globalConfiguration?.params) {
+    return {
+      panelId: endpoint.identifier.tag,
+      params: endpoint.globalConfiguration.params
+    };
+  }
+  return null;
+}
+
+function restoreFeedbackMenuItems(item, menuItems) {
+  const panel = getFeedbackPanel(item);
+  if (!panel || menuHasFeedbackItems(menuItems)) return;
+  for (const feedbackItem of feedbackMenuItems(panel)) {
+    menuItems.push(feedbackItem);
+  }
+}
+
+function menuHasFeedbackItems(menuItems) {
+  // Only look at the endpoints of the menu items themselves, not their
+  // parameters (which may embed a full copy of the video item).
+  return menuItems?.some((menuItem) =>
+    !!findFeedbackToken(menuItem?.menuServiceItemRenderer?.serviceEndpoint)
+      || !!findFeedbackToken(menuItem?.menuNavigationItemRenderer?.navigationEndpoint));
+}
+
+function feedbackMenuItems(panel) {
+  return [
+    MenuServiceItemRenderer(t('videoMenu.notInterested'), {
+      clickTrackingParams: null,
+      customAction: {
+        action: 'NOT_INTERESTED',
+        parameters: panel
+      }
+    }),
+    MenuServiceItemRenderer(t('videoMenu.dontRecommendChannel'), {
+      clickTrackingParams: null,
+      customAction: {
+        action: 'DONT_RECOMMEND_CHANNEL',
+        parameters: panel
+      }
+    })
+  ];
 }
 
 function hideVideo(items) {
