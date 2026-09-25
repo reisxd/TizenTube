@@ -106,7 +106,7 @@
                     },
                     "codecAny": "Будь-який",
                     "qualityAuto": "Авто",
-                    "hideRelatedVideosPlayer": "Hide Related Videos"
+                    "hideRelatedVideosPlayer": "Приховувати схожі відео"
                 }
             },
             "time": {
@@ -177,24 +177,24 @@
                             "enableClock": "Увімкнути годинник",
                             "isClock12HourFormat": "Використовувати 12-годинний формат",
                             "clockShowSeconds": "Показувати секунди",
-                            "clockHideWhenVideoPlaying": "Hide Clock While Video is Playing"
+                            "clockHideWhenVideoPlaying": "Приховувати годинник під час перегляду відео"
                         }
                     },
-                    "disableEnlargingThumbnails": "Disable Enlarged Thumbnails",
-                    "enableShrinkingThumbnails": "Enable Shrinked Thumbnails",
+                    "disableEnlargingThumbnails": "Вимкнути збільшення мініатюр",
+                    "enableShrinkingThumbnails": "Увімкнути зменшення мініатюр",
                     "sortSidebarContents": {
-                        "title": "Sort Sidebar Contents",
-                        "subtitle": "Reorder sidebar contents to your preference",
+                        "title": "Упорядкування бокового меню",
+                        "subtitle": "Налаштуйте порядок розділів бокового меню",
                         "moveUp": {
-                            "title": "Move Up",
-                            "subtitle": "Move this item up in the sidebar"
+                            "title": "Перемістити вище",
+                            "subtitle": "Перемістити цей елемент вище в боковому меню"
                         },
                         "moveDown": {
-                            "title": "Move Down",
-                            "subtitle": "Move this item down in the sidebar"
+                            "title": "Перемістити нижче",
+                            "subtitle": "Перемістити цей елемент нижче в боковому меню"
                         },
-                        "addToSidebar": "Add Channel to Sidebar",
-                        "removeFromSidebar": "Remove Channel from Sidebar"
+                        "addToSidebar": "Додати канал до бокового меню",
+                        "removeFromSidebar": "Видалити канал із бокового меню"
                     }
                 }
             },
@@ -229,7 +229,7 @@
                 },
                 "downloading": {
                     "title": "Оновлення TizenTube",
-                    "subtitle": "Завантаження оновлення, зачекайте..."
+                    "subtitle": "Оновлення завантажується. Зачекайте..."
                 }
             }
         },
@@ -286,18 +286,18 @@
         "next": "Наступне",
         "withTizenTube": "з TizenTube",
         "share": {
-            "title": "Share",
-            "button": "Share",
-            "qrCodeScanMessage": "Scan the QR code below to share this video."
+            "title": "Поділитися",
+            "button": "Поділитися",
+            "qrCodeScanMessage": "Відскануйте QR-код нижче, щоб поділитися цим відео."
         },
-        "screenOff": "Turn off screen"
+        "screenOff": "Вимкнути екран"
     },
     "toasts": {
         "videoAddedToQueue": "Відео додано до черги.",
         "videoQueueCleared": "Чергу відео очищено.",
         "sidebarContentsUpdated": {
-            "title": "Sidebar Contents Updated",
-            "subtitle": "The sidebar contents have been updated."
+            "title": "Бокове меню оновлено",
+            "subtitle": "Вміст бокового меню оновлено."
         }
     }
 }
