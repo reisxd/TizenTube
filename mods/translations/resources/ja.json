@@ -299,10 +299,10 @@
             "title": "サイドバーのコンテンツを更新しました",
             "subtitle": "サイドバーのコンテンツが更新されました"
         },
-        "feedbackSent": "Feedback sent."
+        "feedbackSent": "フィードバックを送信しました。"
     },
     "videoMenu": {
-        "notInterested": "Not interested",
-        "dontRecommendChannel": "Don't recommend channel"
+        "notInterested": "興味がない",
+        "dontRecommendChannel": "チャンネルをおすすめに表示しない"
     }
 }
