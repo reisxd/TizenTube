@@ -1,3 +1,4 @@
+import './features/fullAdBadge.js';
 import initPatches from "./features/standaloneUserscript.js";
 if (window.location.hostname === 'localhost') {
     initPatches();
