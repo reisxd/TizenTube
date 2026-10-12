@@ -162,8 +162,8 @@ app.all('*', (req, res) => {
                     text = text.replace(/"\/\/clients1\.google\.com/g, `"${proxyPrefix}https://clients1.google.com`);
 
                     text = text.replace('Set(["www.youtube.com","accounts.google.com"]);', 'Set(["www.youtube.com", "accounts.google.com", "localhost"]);');
-                    text = text.replace(/:document\.location\.toString\(\)/g, ':document.location.toString().replace("http://localhost:${PORT}", "https://www.youtube.com")');
-                    text = text.replace(/euri:[^,]+,/g, 'euri:document.location.toString().replace("http://localhost:${PORT}", "https://www.youtube.com"),')
+                    text = text.replace(/:document\.location\.toString\(\)/g, `:document.location.toString().replace("http://localhost:${PORT}", "https://www.youtube.com")`);
+                    text = text.replace(/euri:[^,]+,/g, `euri:document.location.toString().replace("http://localhost:${PORT}", "https://www.youtube.com"),`)
                     text = text.replace(/https:\/\/s\.youtube\.com/g, `${proxyPrefix}https://s.youtube.com`);
                     text = text.replace(/redirector.googlevideo.com/g, `${proxyPrefix}https://redirector.googlevideo.com`);
                     text = text.replace(/this.scheme="https"/, 'this.scheme="http"');
@@ -172,8 +172,8 @@ app.all('*', (req, res) => {
                     text = text.replace(/"\/\/yt3\.googleusercontent\.com/g, `"${proxyPrefix}https://yt3.googleusercontent.com`);
 
                     // In order to fix history not working
-                    text = text.replace(/=window\.location\.href;/, '=window.location.href.replace("http://localhost:${PORT}", "https://www.youtube.com");')
-                    text = text.replace(/=document\.location\.href/, '=document.location.href.replace("http://localhost:${PORT}", "https://www.youtube.com")')
+                    text = text.replace(/=window\.location\.href;/, `=window.location.href.replace("http://localhost:${PORT}", "https://www.youtube.com");`)
+                    text = text.replace(/=document\.location\.href/, `=document.location.href.replace("http://localhost:${PORT}", "https://www.youtube.com")`)
 
                     res.send(text);
                 });
