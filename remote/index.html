@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <style>
+        body {
+            background-color: #0f0f0f;
+            color: #FFFFFF;
+            font-family: Roboto, Arial, Helvetica, sans-serif;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        h1 {
+            font-size: 80px;
+            margin: 0;
+        }
+
+        #status {
+            font-size: 32px;
+            margin-top: 40px;
+            max-width: 1400px;
+            text-align: center;
+            white-space: pre-line;
+        }
+    </style>
+    <script>
+        "use strict";
+        // Launcher for TVs that can't run the TizenTube service (web.service = false).
+        // Opens YouTube TV through standalone/service/proxy-host.js running on another machine.
+
+        const PROXY_ORIGIN = "__PROXY_ORIGIN__";
+
+        tizen.tvinputdevice.registerKey("ColorF0Red");
+        tizen.tvinputdevice.registerKey("ColorF1Green");
+        tizen.tvinputdevice.registerKey("ColorF2Yellow");
+        tizen.tvinputdevice.registerKey("ColorF3Blue");
+
+        const keys = [
+            "MediaPlayPause",
+            "MediaPlay",
+            "MediaPause",
+            "MediaStop",
+            "MediaFastForward",
+            "MediaRewind",
+            "MediaTrackNext",
+            "MediaTrackPrevious"
+        ];
+
+        for (let i = 0; i < keys.length; i++) {
+            tizen.tvinputdevice.registerKey(keys[i]);
+        }
+
+        function setStatus(text) {
+            const el = document.getElementById("status");
+            if (el) el.textContent = text;
+        }
+
+        function open() {
+            setStatus("Connecting to " + PROXY_ORIGIN + " ...");
+            const timer = new Promise((resolve, reject) => setTimeout(() => reject(new Error("timed out")), 5000));
+            Promise.race([fetch(PROXY_ORIGIN + "/tizentube/ping").then(r => r.json()), timer])
+                .then(() => location.replace(PROXY_ORIGIN + "/tv"))
+                .catch(e => setStatus("Can't reach the TizenTube proxy at " + PROXY_ORIGIN + " (" + e.message + ").\n" +
+                    "Make sure proxy-host.js is running there.\n\nPress OK to try again."));
+        }
+
+        document.addEventListener("keydown", e => {
+            if (e.keyCode === 13) open();
+            else if (e.keyCode === 10009) tizen.application.getCurrentApplication().exit();
+        });
+        document.addEventListener("DOMContentLoaded", open);
+    </script>
+</head>
+
+<body>
+    <h1>TizenTube</h1>
+    <div id="status"></div>
+</body>
+
+</html>
