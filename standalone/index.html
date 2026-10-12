@@ -64,6 +64,60 @@
 
         const serviceId = pkgId + ".StandaloneService";
 
+        // The service on :8100 is retried by reloading (which also relaunches the service),
+        // but throttled and capped so a TV that can't run it shows why instead of looping forever.
+        const MAX_ATTEMPTS = 30;
+        let attempt = 0;
+        try {
+            attempt = Number(sessionStorage.getItem("serviceAttempt") || 0);
+        } catch (e) {
+            // Do nothing.
+        }
+
+        function showError(message) {
+            const render = () => {
+                document.querySelector(".progress-container").style.display = "none";
+                const p = document.createElement("p");
+                p.style.cssText = "color: #FFFFFF; font-size: 32px; font-family: Roboto,Arial,sans-serif; max-width: 1400px; text-align: center; white-space: pre-line;";
+                p.textContent = message + "\n\nPress OK to try again.";
+                document.body.appendChild(p);
+            };
+            if (document.body) render(); else document.addEventListener("DOMContentLoaded", render);
+            document.addEventListener("keydown", e => {
+                if (e.keyCode === 13) retryLater(0);
+            });
+        }
+
+        function serviceSupported() {
+            try {
+                return tizen.systeminfo.getCapability("http://tizen.org/feature/web.service");
+            } catch (e) {
+                return "unknown";
+            }
+        }
+
+        function retryLater(delay) {
+            try {
+                sessionStorage.setItem("serviceAttempt", String(delay === 0 ? 0 : attempt + 1));
+            } catch (e) {
+                // Do nothing.
+            }
+            setTimeout(() => window.location.reload(), delay);
+        }
+
+        function onServiceUnreachable() {
+            if (attempt < MAX_ATTEMPTS) return retryLater(1000);
+            try {
+                sessionStorage.removeItem("serviceAttempt");
+            } catch (e) {
+                // Do nothing.
+            }
+            const supported = serviceSupported();
+            showError(supported === false
+                ? "The TizenTube service could not be started.\nThis TV reports that it does not support Tizen web services (web.service = false), which TizenTube needs."
+                : "The TizenTube service did not respond on port 8100.\nTry restarting the TV, or reinstall TizenTube.");
+        }
+
         function useInjectorOrProxy() {
             const data = tizen.application.getCurrentApplication().getRequestedAppControl().appControl.data;
             let args;
@@ -76,11 +130,16 @@
             fetch('http://localhost:8100/tizentube/getState')
                 .then(r => r.json())
                 .then(res => {
+                    try {
+                        sessionStorage.removeItem("serviceAttempt");
+                    } catch (e) {
+                        // Do nothing.
+                    }
                     if (res.canConnectToDaemon && !res.isConnecting) {
                         fetch(`http://localhost:8100/tizentube/debugger${args ? `?${args}` : ''}`);
                         tizen.application.getCurrentApplication().exit();
                     } else if (!res.canConnectToDaemon) location.href = `http://localhost:8100/tv?additionalDataUrl=http%3A%2F%2Flocalhost%3A8100%2Fdial%2Fapps%2FYouTube${args ? `&${args}` : ''}`
-                }).catch(() => window.location.reload());
+                }).catch(onServiceUnreachable);
         }
 
         tizen.application.launchAppControl(
