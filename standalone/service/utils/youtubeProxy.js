@@ -145,7 +145,7 @@ function createYouTubeProxy(options) {
                         text = text.replace(/euri:[^,]+,/g, `euri:document.location.toString().replace("${publicOrigin}", "https://www.youtube.com"),`)
                         text = text.replace(/https:\/\/s\.youtube\.com/g, `${proxyPrefix}https://s.youtube.com`);
                         text = text.replace(/redirector.googlevideo.com/g, `${proxyPrefix}https://redirector.googlevideo.com`);
-                        text = text.replace(/this.scheme="https"/, 'this.scheme="http"');
+                        if (publicOrigin.indexOf('http:') === 0) text = text.replace(/this.scheme="https"/, 'this.scheme="http"');
                         text = text.replace(/https\:\/\/jnn-pa.googleapis.com/g, `${proxyPrefix}https://jnn-pa.googleapis.com`);
                         text = text.replace(/https:\/\/yt3\.googleusercontent\.com/g, `${proxyPrefix}https://yt3.googleusercontent.com`);
                         text = text.replace(/"\/\/yt3\.googleusercontent\.com/g, `"${proxyPrefix}https://yt3.googleusercontent.com`);

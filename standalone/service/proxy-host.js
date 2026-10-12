@@ -11,7 +11,12 @@
 //   PORT           listen port (default: the port in PUBLIC_ORIGIN, else 8100)
 //   HOST           listen address (default 0.0.0.0)
 //   CLIENT_LOG=1   relay the TV page's errors and console warnings to this console
+//   TLS_CERT, TLS_KEY  PEM files; serve HTTPS. Needed in practice: over plain http on a LAN
+//                  address the page is not a secure context (no crypto.subtle, no EME) and the
+//                  YouTube TV player fails before fetching any media. Use a certificate the TV
+//                  already trusts (e.g. Let's Encrypt for a name your local DNS points here).
 
+const fs = require('fs');
 const express = require('express');
 const URL = require('url');
 const createYouTubeProxy = require('./utils/youtubeProxy.js');
@@ -42,9 +47,16 @@ const clientLogScript = `<script>(function () {
         var original = console[level];
         console[level] = function () { send(level, arguments); return original.apply(console, arguments); };
     });
-    window.addEventListener('error', function (e) { send('onerror', [e.message + ' @ ' + e.filename + ':' + e.lineno]); });
-    window.addEventListener('unhandledrejection', function (e) { send('unhandledrejection', [e.reason]); });
-    send('info', ['page ' + location.href + ' secureContext=' + window.isSecureContext + ' UA ' + navigator.userAgent]);
+    function describe(err) {
+        if (!err || typeof err !== 'object') return String(err);
+        try { return JSON.stringify(err, Object.getOwnPropertyNames(err)).slice(0, 2000); } catch (e) { return String(err); }
+    }
+    window.addEventListener('error', function (e) { send('onerror', [e.message + ' @ ' + e.filename + ':' + e.lineno, describe(e.error)]); });
+    window.addEventListener('unhandledrejection', function (e) { send('unhandledrejection', [describe(e.reason)]); });
+    send('info', ['page ' + location.href + ' secureContext=' + window.isSecureContext +
+        ' crypto.subtle=' + !!(window.crypto && window.crypto.subtle) +
+        ' EME=' + !!navigator.requestMediaKeySystemAccess +
+        ' MSE=' + !!window.MediaSource + ' UA ' + navigator.userAgent]);
 })();</script>`;
 
 const app = express();
@@ -68,12 +80,47 @@ app.post('/tizentube/client-log', express.text({ type: '*/*', limit: '64kb' }), 
     res.status(204).end();
 });
 
+if (CLIENT_LOG) {
+    // Log what YouTube answers to the TV: playability verdicts and failed requests.
+    app.use((req, res, next) => {
+        const started = Date.now();
+        const isPlayer = req.path.indexOf('/youtubei/v1/player') !== -1;
+        if (isPlayer) {
+            const send = res.send.bind(res);
+            res.send = body => {
+                try {
+                    const status = JSON.parse(body).playabilityStatus || {};
+                    console.log(`[proxy] player playabilityStatus=${status.status} reason=${status.reason || ''} ${JSON.stringify(status.errorScreen || '').slice(0, 300)}`);
+                } catch (e) {
+                    console.log(`[proxy] player response not JSON (${String(body).slice(0, 120)})`);
+                }
+                return send(body);
+            };
+        }
+        res.on('finish', () => {
+            if (isPlayer || res.statusCode >= 400 || req.path.indexOf('videoplayback') !== -1) {
+                console.log(`[proxy] ${req.method} ${req.url.slice(0, 140)} -> ${res.statusCode} ${Date.now() - started}ms`);
+            }
+        });
+        next();
+    });
+}
+
 app.all('*', createYouTubeProxy({
     publicOrigin: PUBLIC_ORIGIN,
     cookieDomain: null,
     headScript: CLIENT_LOG ? clientLogScript : ''
 }));
 
-app.listen(PORT, HOST, () => {
-    console.log(`TizenTube proxy listening on ${HOST}:${PORT}, TV should open ${PUBLIC_ORIGIN.replace(/\/$/, '')}/tv`);
-});
+const useTls = Boolean(process.env.TLS_CERT && process.env.TLS_KEY);
+const onListening = () => {
+    console.log(`TizenTube proxy listening on ${HOST}:${PORT} (${useTls ? 'https' : 'http'}), TV should open ${PUBLIC_ORIGIN.replace(/\/$/, '')}/tv`);
+};
+if (useTls) {
+    require('https').createServer({
+        cert: fs.readFileSync(process.env.TLS_CERT),
+        key: fs.readFileSync(process.env.TLS_KEY)
+    }, app).listen(PORT, HOST, onListening);
+} else {
+    app.listen(PORT, HOST, onListening);
+}
