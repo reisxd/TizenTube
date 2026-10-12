@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <style>
+        body {
+            background: #0f0f0f;
+            color: #e0e0e0;
+            font: 20px/1.35 monospace;
+            margin: 24px 40px;
+        }
+
+        h1 {
+            font: bold 32px sans-serif;
+            margin: 0 0 8px;
+        }
+
+        #status div {
+            white-space: pre-wrap;
+        }
+
+        .ok { color: #7bd88f; }
+        .bad { color: #ff6b6b; }
+        .dim { color: #888; }
+
+        #log {
+            white-space: pre-wrap;
+            font-size: 16px;
+            border-top: 1px solid #333;
+            margin-top: 12px;
+            padding-top: 8px;
+            height: 640px;
+            overflow: hidden;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>TizenTube service diagnostics</h1>
+    <div class="dim">ENTER: relaunch service &nbsp; UP/DOWN: scroll log &nbsp; BACK: exit</div>
+    <div id="status"></div>
+    <div id="log"></div>
+    <script>
+        "use strict";
+        // Passive replacement for standalone/index.html: launches the service once and
+        // shows what happens, instead of reloading on every failed fetch.
+
+        var pkgId = tizen.application.getCurrentApplication().appInfo.packageId;
+        var serviceId = pkgId + ".StandaloneService";
+        var statusEl = document.getElementById("status");
+        var logEl = document.getElementById("log");
+        var mpLines = [];
+        var httpLog = "";
+        var scroll = 0;
+        var state = {};
+
+        function setStatus(key, text, cls) {
+            state[key] = { text: text, cls: cls || "" };
+            statusEl.innerHTML = "";
+            Object.keys(state).forEach(function (k) {
+                var d = document.createElement("div");
+                d.className = state[k].cls;
+                d.textContent = k + ": " + state[k].text;
+                statusEl.appendChild(d);
+            });
+        }
+
+        function renderLog() {
+            var all = (httpLog || mpLines.join("\n")).split("\n");
+            var end = Math.max(0, all.length - scroll);
+            logEl.textContent = all.slice(Math.max(0, end - 32), end).join("\n");
+        }
+
+        function cap(key) {
+            try { return String(tizen.systeminfo.getCapability(key)); } catch (e) { return "ERR " + e.message; }
+        }
+
+        setStatus("TV", cap("http://tizen.org/system/model_name") +
+            ", Tizen " + cap("http://tizen.org/feature/platform.version") +
+            ", web.service=" + cap("http://tizen.org/feature/web.service"));
+
+        try {
+            tizen.messageport.requestLocalMessagePort("ttdiag").addMessagePortListener(function (data) {
+                data.forEach(function (d) { if (d.key === "line") mpLines.push(d.value); });
+                if (mpLines.length > 2000) mpLines.splice(0, mpLines.length - 2000);
+                setStatus("message port", mpLines.length + " lines received", "ok");
+                renderLog();
+            });
+            setStatus("message port", "listening", "dim");
+        } catch (e) {
+            setStatus("message port", "FAILED " + e.name + ": " + e.message, "bad");
+        }
+
+        function launchService() {
+            var t = Date.now();
+            setStatus("service launch", "requesting " + serviceId + " ...", "dim");
+            try {
+                tizen.application.launchAppControl(
+                    new tizen.ApplicationControl("http://tizen.org/appcontrol/operation/service"),
+                    serviceId,
+                    function () { setStatus("service launch", "success callback after " + (Date.now() - t) + "ms (" + new Date().toLocaleTimeString() + ")", "ok"); },
+                    function (e) { setStatus("service launch", "ERROR " + e.name + ": " + e.message + " after " + (Date.now() - t) + "ms", "bad"); }
+                );
+            } catch (e) {
+                setStatus("service launch", "THREW " + e.name + ": " + e.message, "bad");
+            }
+        }
+
+        function fetchWithTimeout(url, ms) {
+            return new Promise(function (resolve, reject) {
+                var timer = setTimeout(function () { reject(new Error("timeout " + ms + "ms")); }, ms);
+                fetch(url).then(function (r) { return r.text(); }).then(function (t) {
+                    clearTimeout(timer); resolve(t);
+                }, function (e) { clearTimeout(timer); reject(e); });
+            });
+        }
+
+        // The service writes into the package's data folder, which is this app's "wgt-private".
+        function readPrivateFile(name) {
+            try {
+                if (tizen.filesystem.openFile) {
+                    var fh = tizen.filesystem.openFile("wgt-private/" + name, "r");
+                    try { return fh.readString(); } finally { fh.close(); }
+                }
+            } catch (e) {
+                if (e.name === "NotFoundError") return null;
+                return "READ ERROR " + e.name + ": " + e.message;
+            }
+            return "READ ERROR tizen.filesystem.openFile unavailable";
+        }
+
+        try {
+            var svcInfo = tizen.application.getAppInfo(serviceId);
+            setStatus("service appInfo", JSON.stringify({ id: svcInfo.id, name: svcInfo.name, version: svcInfo.version, show: svcInfo.show }), "dim");
+        } catch (e) {
+            setStatus("service appInfo", "ERROR " + e.name + ": " + e.message, "bad");
+        }
+
+        function poll() {
+            var alive = readPrivateFile("ttdiag-alive.txt");
+            if (alive === null) setStatus("service JS ran?", "NO (no ttdiag-alive.txt in data folder)", "bad");
+            else if (alive.indexOf("READ ERROR") === 0) setStatus("service JS ran?", alive, "bad");
+            else {
+                var runs = alive.trim().split("\n");
+                setStatus("service JS ran?", "YES, " + runs.length + " time(s); last: " + runs[runs.length - 1], "ok");
+            }
+
+            fetchWithTimeout("http://127.0.0.1:8199/log?file=1&tail=400", 3000).then(function (t) {
+                httpLog = t;
+                setStatus(":8199 diag server", "up", "ok");
+                renderLog();
+            }, function (e) {
+                setStatus(":8199 diag server", "DOWN (" + e.message + ")", "bad");
+                var fileLog = readPrivateFile("ttdiag.log");
+                if (fileLog && fileLog.indexOf("READ ERROR") !== 0) { httpLog = fileLog; renderLog(); }
+            });
+
+            fetchWithTimeout("http://127.0.0.1:8100/tizentube/getState", 3000).then(function (t) {
+                setStatus(":8100 TizenTube", "up: " + t.slice(0, 160), "ok");
+            }, function (e) {
+                setStatus(":8100 TizenTube", "DOWN (" + e.message + ")", "bad");
+            });
+
+            try {
+                tizen.application.getAppsContext(function (ctxs) {
+                    var mine = ctxs.filter(function (c) { return c.appId.indexOf(pkgId) === 0; })
+                        .map(function (c) { return c.appId.split(".")[1] + " (pid " + c.id + ")"; });
+                    var svcUp = mine.some(function (m) { return m.indexOf("StandaloneService") === 0; });
+                    setStatus("running", mine.join(", ") || "none", svcUp ? "ok" : "bad");
+                    // For comparison: are any other packages' services alive on this TV?
+                    var others = ctxs.filter(function (c) { return /service/i.test(c.appId) && c.appId.indexOf(pkgId) !== 0; })
+                        .map(function (c) { return c.appId; });
+                    setStatus("other services running", others.length + (others.length ? ": " + others.slice(0, 6).join(", ") : ""), "dim");
+                }, function (e) {
+                    setStatus("running", "getAppsContext ERROR " + e.message, "bad");
+                });
+            } catch (e) {
+                setStatus("running", "getAppsContext THREW " + e.message, "bad");
+            }
+        }
+
+        document.addEventListener("keydown", function (e) {
+            if (e.keyCode === 13) launchService();
+            else if (e.keyCode === 38) { scroll += 10; renderLog(); }
+            else if (e.keyCode === 40) { scroll = Math.max(0, scroll - 10); renderLog(); }
+            else if (e.keyCode === 10009) tizen.application.getCurrentApplication().exit();
+        });
+
+        launchService();
+        poll();
+        setInterval(poll, 2000);
+    </script>
+</body>
+
+</html>
