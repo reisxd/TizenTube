@@ -32,12 +32,14 @@ function connectToDebugger(host, port, args) {
     })
 }
 
-function canConnectToDaemon() {
+function canConnectToDaemon(attempt = 0) {
     return fetch('http://127.0.0.1:8001/api/v2/').then(res => res.json())
         .then(json => {
             return { canConnectToDaemon: (json.device.developerIP === '127.0.0.1' || json.device.developerIP === '1.0.0.127') && json.device.developerMode === '1', ip: json.device.ip, isConnecting }
         }).catch(e => {
-            return canConnectToDaemon();
+            // Retry with a delay instead of spinning; give up after ~5s so getState always answers.
+            if (attempt >= 20) return { canConnectToDaemon: false, ip: null, isConnecting };
+            return new Promise(resolve => setTimeout(resolve, 250)).then(() => canConnectToDaemon(attempt + 1));
         });
 }
 
