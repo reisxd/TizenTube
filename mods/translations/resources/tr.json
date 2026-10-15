@@ -290,7 +290,20 @@
             "button": "Paylaş",
             "qrCodeScanMessage": "Bu videoyu paylaşmak için aşağıdaki QR kodunu tarayın."
         },
-        "screenOff": "Ekranı Kapat"
+        "screenOff": "Ekranı Kapat",
+        "chapters": {
+            "title": "Chapters",
+            "enterNudge": "To view chapters, press the up arrow button",
+            "navNudge": "Navigate between chapters",
+            "navNudgeA11y": "Press the left or right arrow button to navigate between chapters"
+        },
+        "queue": {
+            "title": "Queued Videos",
+            "clear": "Clear Queue"
+        },
+        "subtitles": {
+            "otherLanguages": "Other Languages"
+        }
     },
     "toasts": {
         "videoAddedToQueue": "Video kuyruğa eklendi.",
@@ -303,6 +316,16 @@
     },
     "videoMenu": {
         "notInterested": "İlgilenmiyorum",
-        "dontRecommendChannel": "Kanalı önerme"
+        "dontRecommendChannel": "Kanalı önerme",
+        "play": "Play",
+        "saveToWatchLater": "Save to Watch Later",
+        "removeFromWatchLater": "Remove from Watch Later",
+        "saveToPlaylist": "Save to Playlist",
+        "addToQueue": "Add to Queue",
+        "goToChannel": "Go To Channel",
+        "videoOptions": "Video options"
+    },
+    "common": {
+        "back": "Back"
     }
 }

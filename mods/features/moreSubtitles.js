@@ -1,6 +1,7 @@
 // TizenTube Subtitle Localization Mod
 // Automatically adds user's local language to subtitle auto-translate menu if not present
 
+import { t } from 'i18next';
 import { configRead } from "../config.js";
 import languages from "../translations/language-names.js";
 
@@ -329,7 +330,7 @@ function patchSubtitleMenu() {
                     );
 
                     // Add section title
-                    items.push(createSectionTitle("Other Languages"));
+                    items.push(createSectionTitle(t('player.subtitles.otherLanguages')));
 
                     // Add all missing languages
                     missingLanguages.forEach(([code, name]) => {
