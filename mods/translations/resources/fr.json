@@ -184,128 +184,151 @@
                         }
                     },
                     "sortSidebarContents": {
-                        "title": "Sort Sidebar Contents",
-                        "subtitle": "Reorder sidebar contents to your preference",
+                        "title": "Trier le contenu de la barre latérale",
+                        "subtitle": "Réorganisez le contenu de la barre latérale à votre convenance",
                         "moveUp": {
-                            "title": "Move Up",
-                            "subtitle": "Move this item up in the sidebar"
+                            "title": "Déplacer vers le haut",
+                            "subtitle": "Déplacer cet élément vers le haut dans la barre latérale"
                         },
                         "moveDown": {
-                            "title": "Move Down",
-                            "subtitle": "Move this item down in the sidebar"
+                            "title": "Déplacer vers le bas",
+                            "subtitle": "Déplacer cet élément vers le bas dans la barre latérale"
                         },
-                        "addToSidebar": "Add Channel to Sidebar",
-                        "removeFromSidebar": "Remove Channel from Sidebar"
+                        "addToSidebar": "Ajouter la chaîne à la barre latérale",
+                        "removeFromSidebar": "Retirer la chaîne de la barre latérale"
                     },
-                    "disableEnlargingThumbnails": "Disable Enlarged Thumbnails",
-                    "enableShrinkingThumbnails": "Enable Shrinked Thumbnails"
+                    "disableEnlargingThumbnails": "Désactiver les miniatures agrandies",
+                    "enableShrinkingThumbnails": "Activer la réduction des miniatures"
                 }
             },
             "updater": {
-                "title": "TizenTube Cobalt Updater",
-                "menuSubtitle": "Manage TizenTube Cobalt updates",
-                "versionSubtitle": "Current version: {{version}}",
+                "title": "Mises à jour de TizenTube Cobalt",
+                "menuSubtitle": "Gérez les mises à jour de TizenTube Cobalt",
+                "versionSubtitle": "Version actuelle : {{version}}",
                 "options": {
-                    "checkForUpdates": "Check for updates",
-                    "checkForUpdatesOnStartup": "Check for updates on startup"
+                    "checkForUpdates": "Rechercher des mises à jour",
+                    "checkForUpdatesOnStartup": "Rechercher des mises à jour au démarrage"
                 },
                 "updateAvailable": {
-                    "title": "Update Available",
-                    "subtitle": "A new version of TizenTube Cobalt is available: {{latestVersion}}, current: {{currentVersion}}"
+                    "title": "Mise à jour disponible",
+                    "subtitle": "Une nouvelle version de TizenTube Cobalt est disponible : {{latestVersion}}, version actuelle : {{currentVersion}}"
                 },
-                "releaseDate": "Release Date: {{date}}",
+                "releaseDate": "Date de publication : {{date}}",
                 "updateNow": {
-                    "title": "Update Now",
-                    "subtitle": "Click to download the latest version."
+                    "title": "Mettre à jour maintenant",
+                    "subtitle": "Cliquez pour télécharger la dernière version."
                 },
                 "remindLater": {
-                    "title": "Remind Me Later",
-                    "subtitle": "Check for updates later."
+                    "title": "Me le rappeler plus tard",
+                    "subtitle": "Rechercher les mises à jour plus tard."
                 },
                 "upToDate": {
-                    "title": "TizenTube is up to date",
-                    "subtitle": "You are using the latest version ({{version}}) of TizenTube Cobalt."
+                    "title": "TizenTube est à jour",
+                    "subtitle": "Vous utilisez la dernière version ({{version}}) de TizenTube Cobalt."
                 },
                 "checkFailed": {
-                    "title": "TizenTube update check failed",
-                    "subtitle": "Could not check for updates."
+                    "title": "Échec de la recherche de mise à jour de TizenTube",
+                    "subtitle": "Impossible de rechercher les mises à jour."
                 },
                 "downloading": {
-                    "title": "TizenTube Update",
-                    "subtitle": "Downloading update, please wait..."
+                    "title": "Mise à jour de TizenTube",
+                    "subtitle": "Téléchargement de la mise à jour, veuillez patienter..."
                 }
             }
         },
         "ttSettings": {
-            "title": "TizenTube Settings",
-            "madeByText": "Made by Reis Can (reisxd) with ❤️",
-            "summary": "Open TizenTube Settings"
+            "title": "Paramètres de TizenTube",
+            "madeByText": "Réalisé par Reis Can (reisxd) avec ❤️",
+            "summary": "Ouvrir les paramètres de TizenTube"
         },
         "supportTT": {
-            "title": "Support TizenTube",
-            "subtitle": "❤️ Show support for TizenTube and its development",
+            "title": "Soutenir TizenTube",
+            "subtitle": "❤️ Soutenez TizenTube et son développement",
             "content": {
-                "1": "If you enjoy using TizenTube and would like to support its development, consider the following:",
-                "2": "1. Star the GitHub repository to help increase its visibility.",
-                "3": "2. Share TizenTube with others.",
-                "4": "If you would like to contribute financially, consider donating:",
-                "5": "- Buy Me A Coffee: https://www.buymeacoffee.com/reisxd (preferably)",
-                "6": "- GitHub Sponsors: https://github.com/sponsors/reisxd"
+                "1": "Si vous aimez utiliser TizenTube et souhaitez soutenir son développement, voici quelques possibilités :",
+                "2": "1. Ajoutez une étoile au dépôt GitHub pour améliorer sa visibilité.",
+                "3": "2. Faites connaître TizenTube autour de vous.",
+                "4": "Si vous souhaitez contribuer financièrement, vous pouvez faire un don :",
+                "5": "- Buy Me A Coffee : https://www.buymeacoffee.com/reisxd (de préférence)",
+                "6": "- GitHub Sponsors : https://github.com/sponsors/reisxd"
             }
         }
     },
     "welcomeMsg": {
-        "title": "Welcome to TizenTube",
-        "subtitle": "Go to settings and click on TizenTube Settings for settings."
+        "title": "Bienvenue dans TizenTube",
+        "subtitle": "Rendez-vous dans les paramètres et cliquez sur « Paramètres de TizenTube »."
     },
     "sponsorblock": {
         "segments": {
-            "sponsor": "sponsored segment",
-            "intro": "intro",
-            "outro": "outro",
-            "interaction": "interaction reminder",
-            "selfpromo": "self-promotion",
-            "preview": "recap or preview",
-            "filler": "tangents",
-            "music_offtopic": "non-music part",
-            "poi_highlight": "highlight"
+            "sponsor": "le segment sponsorisé",
+            "intro": "l'introduction",
+            "outro": "la conclusion",
+            "interaction": "le rappel d'interaction",
+            "selfpromo": "l'autopromotion",
+            "preview": "le récapitulatif ou l'aperçu",
+            "filler": "les digressions",
+            "music_offtopic": "la partie non musicale",
+            "poi_highlight": "le moment fort"
         },
         "toasts": {
-            "skipping": "Skipping {{segment}}",
-            "notSkipping": "Not skipping {{segment}} (was skipped {{count}} times)",
-            "skip": "Skip {{segment}}",
-            "skipToHighlight": "Skip to highlight"
+            "skipping": "Passage : {{segment}}",
+            "notSkipping": "Non ignoré : {{segment}} (déjà ignoré {{count}} fois)",
+            "skip": "Ignorer {{segment}}",
+            "skipToHighlight": "Passer au moment fort"
         }
     },
     "player": {
         "playbackSpeed": {
-            "title": "Playback Speed",
-            "button": "Speed Controls",
-            "fixStuttering": "Fix stuttering (1.0001x)"
+            "title": "Vitesse de lecture",
+            "button": "Contrôles de vitesse",
+            "fixStuttering": "Corriger les saccades (1,0001x)"
         },
-        "miniPlayer": "Mini Player",
-        "pictureInPicture": "Picture in Picture",
-        "previous": "Previous",
-        "next": "Next",
-        "withTizenTube": "with TizenTube",
+        "miniPlayer": "Mini lecteur",
+        "pictureInPicture": "Incrustation d'image",
+        "previous": "Précédent",
+        "next": "Suivant",
+        "withTizenTube": "avec TizenTube",
         "share": {
-            "title": "Share",
-            "button": "Share",
-            "qrCodeScanMessage": "Scan the QR code below to share this video."
+            "title": "Partager",
+            "button": "Partager",
+            "qrCodeScanMessage": "Scannez le code QR ci-dessous pour partager cette vidéo."
         },
-        "screenOff": "Turn off screen"
+        "screenOff": "Éteindre l'écran",
+        "chapters": {
+            "title": "Chapitres",
+            "enterNudge": "Pour afficher les chapitres, appuyez sur la flèche vers le haut",
+            "navNudge": "Naviguez entre les chapitres",
+            "navNudgeA11y": "Appuyez sur la flèche gauche ou droite pour naviguer entre les chapitres"
+        },
+        "queue": {
+            "title": "Vidéos en file d'attente",
+            "clear": "Vider la file d'attente"
+        },
+        "subtitles": {
+            "otherLanguages": "Autres langues"
+        }
     },
     "videoMenu": {
-        "notInterested": "Not interested",
-        "dontRecommendChannel": "Don't recommend channel"
+        "notInterested": "Pas intéressé",
+        "dontRecommendChannel": "Ne pas recommander la chaîne",
+        "play": "Lire",
+        "saveToWatchLater": "Ajouter à Regarder plus tard",
+        "removeFromWatchLater": "Retirer de Regarder plus tard",
+        "saveToPlaylist": "Enregistrer dans une playlist",
+        "addToQueue": "Ajouter à la file d'attente",
+        "goToChannel": "Voir la chaîne",
+        "videoOptions": "Options de la vidéo"
     },
     "toasts": {
-        "videoAddedToQueue": "Video added to queue.",
-        "videoQueueCleared": "Video queue cleared.",
-        "feedbackSent": "Feedback sent.",
+        "videoAddedToQueue": "Vidéo ajoutée à la file d'attente.",
+        "videoQueueCleared": "File d'attente vidée.",
+        "feedbackSent": "Commentaires envoyés.",
         "sidebarContentsUpdated": {
-            "title": "Sidebar Contents Updated",
-            "subtitle": "The sidebar contents have been updated."
+            "title": "Contenu de la barre latérale mis à jour",
+            "subtitle": "Le contenu de la barre latérale a été mis à jour."
         }
+    },
+    "common": {
+        "back": "Retour"
     }
 }
