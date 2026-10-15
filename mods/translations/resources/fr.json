@@ -227,7 +227,7 @@
                     "subtitle": "Vous utilisez la dernière version ({{version}}) de TizenTube Cobalt."
                 },
                 "checkFailed": {
-                    "title": "Échec de la recherche de mise à jour de TizenTube",
+                    "title": "Échec de la recherche de mises à jour de TizenTube",
                     "subtitle": "Impossible de rechercher les mises à jour."
                 },
                 "downloading": {
@@ -322,7 +322,7 @@
     "toasts": {
         "videoAddedToQueue": "Vidéo ajoutée à la file d'attente.",
         "videoQueueCleared": "File d'attente vidée.",
-        "feedbackSent": "Commentaires envoyés.",
+        "feedbackSent": "Retour envoyé.",
         "sidebarContentsUpdated": {
             "title": "Contenu de la barre latérale mis à jour",
             "subtitle": "Le contenu de la barre latérale a été mis à jour."
