@@ -312,11 +312,11 @@
             "title": "サイドバーのコンテンツを更新しました",
             "subtitle": "サイドバーのコンテンツが更新されました"
         },
-        "feedbackSent": "Feedback sent."
+        "feedbackSent": "フィードバックを送信しました。"
     },
     "videoMenu": {
-        "notInterested": "Not interested",
-        "dontRecommendChannel": "Don't recommend channel",
+        "notInterested": "興味がない",
+        "dontRecommendChannel": "このチャンネルをおすすめに表示しません",
         "play": "Play",
         "saveToWatchLater": "Save to Watch Later",
         "removeFromWatchLater": "Remove from Watch Later",

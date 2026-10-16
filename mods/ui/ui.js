@@ -58,6 +58,7 @@ function execute_once_dom_loaded() {
       window.tectonicConfig.featureSwitches.enableOnScrollLinearAnimation = true;
       window.tectonicConfig.featureSwitches.enableListAnimations = true;
       window.tectonicConfig.featureSwitches.supportsLongPress = true;
+      window.tectonicConfig.featureSwitches.enableCaptionsPersistence = true;
     } catch (e) { }
   }
 
