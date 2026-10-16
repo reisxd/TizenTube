@@ -317,15 +317,15 @@
     "videoMenu": {
         "notInterested": "İlgilenmiyorum",
         "dontRecommendChannel": "Kanalı önerme",
-        "play": "Play",
-        "saveToWatchLater": "Save to Watch Later",
-        "removeFromWatchLater": "Remove from Watch Later",
-        "saveToPlaylist": "Save to Playlist",
-        "addToQueue": "Add to Queue",
-        "goToChannel": "Go To Channel",
-        "videoOptions": "Video options"
+        "play": "Oynat",
+        "saveToWatchLater": "Sonra İzle'ye Kaydet",
+        "removeFromWatchLater": "Sonra İzle'den Kaldır",
+        "saveToPlaylist": "Oynatma Listesine Kaydet",
+        "addToQueue": "Kuyruğa Ekle",
+        "goToChannel": "Kanala Git",
+        "videoOptions": "Video Seçenekleri"
     },
     "common": {
-        "back": "Back"
+        "back": "Geri"
     }
 }

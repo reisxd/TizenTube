@@ -109,7 +109,7 @@ function applyPatches() {
                         buttonRenderer: ButtonRenderer(
                             false,
                             t('player.playbackSpeed.button'),
-                            'SLOW_MOTION_VIDEO',
+                            'SPEEDOMETER',
                             {
                                 customAction:
                                 {
