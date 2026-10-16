@@ -68,7 +68,8 @@
                 "title": "Felirat beállítások",
                 "options": {
                     "showLocalSubtitle": "Helyi feliratok megjelenítése",
-                    "showHiddenSubtitles": "Rejtett feliratok megjelenítése"
+                    "showHiddenSubtitles": "Rejtett feliratok megjelenítése",
+                    "persistCaptionStyle": "Remember Caption Style"
                 }
             },
             "videoPlayer": {

@@ -68,7 +68,8 @@
                 "title": "Ustawienia napisów",
                 "options": {
                     "showLocalSubtitle": "Pokaż lokalne napisy",
-                    "showHiddenSubtitles": "Pokaż ukryte napisy"
+                    "showHiddenSubtitles": "Pokaż ukryte napisy",
+                    "persistCaptionStyle": "Remember Caption Style"
                 }
             },
             "videoPlayer": {

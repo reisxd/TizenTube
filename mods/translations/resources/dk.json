@@ -68,7 +68,8 @@
                 "title": "Undertekstindstillinger",
                 "options": {
                     "showLocalSubtitle": "Vis Lokale Undertekster",
-                    "showHiddenSubtitles": "Vis Skjulte Undertekster"
+                    "showHiddenSubtitles": "Vis Skjulte Undertekster",
+                    "persistCaptionStyle": "Remember Caption Style"
                 }
             },
             "videoPlayer": {

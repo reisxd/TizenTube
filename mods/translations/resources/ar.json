@@ -68,7 +68,8 @@
                 "title": "إعدادات الترجمة",
                 "options": {
                     "showLocalSubtitle": "عرض الترجمات المحلية",
-                    "showHiddenSubtitles": "عرض الترجمات المخفية"
+                    "showHiddenSubtitles": "عرض الترجمات المخفية",
+                    "persistCaptionStyle": "Remember Caption Style"
                 }
             },
             "videoPlayer": {

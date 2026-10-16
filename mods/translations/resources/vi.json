@@ -69,7 +69,8 @@
                 "title": "Cài đặt phụ đề",
                 "options": {
                     "showLocalSubtitle": "Hiển thị phụ đề cục bộ",
-                    "showHiddenSubtitles": "Hiển thị phụ đề bị ẩn"
+                    "showHiddenSubtitles": "Hiển thị phụ đề bị ẩn",
+                    "persistCaptionStyle": "Remember Caption Style"
                 }
             },
             "videoPlayer": {

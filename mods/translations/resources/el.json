@@ -68,7 +68,8 @@
                 "title": "Ρυθμίσεις υπότιτλων",
                 "options": {
                     "showLocalSubtitle": "Εμφάνιση τοπικών υπότιτλων",
-                    "showHiddenSubtitles": "Εμφάνιση κρυφών υπότιτλων"
+                    "showHiddenSubtitles": "Εμφάνιση κρυφών υπότιτλων",
+                    "persistCaptionStyle": "Remember Caption Style"
                 }
             },
             "videoPlayer": {

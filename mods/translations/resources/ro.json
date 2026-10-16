@@ -70,7 +70,8 @@
                 "title": "Setări subtitrări",
                 "options": {
                     "showLocalSubtitle": "Afișează subtitrarea locală",
-                    "showHiddenSubtitles": "Afișează subtitrările ascunse"
+                    "showHiddenSubtitles": "Afișează subtitrările ascunse",
+                    "persistCaptionStyle": "Remember Caption Style"
                 }
             },
             "videoPlayer": {

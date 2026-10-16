@@ -68,7 +68,8 @@
                 "title": "Подешавања титлова",
                 "options": {
                     "showLocalSubtitle": "Прикажи локалне титлове",
-                    "showHiddenSubtitles": "Прикажи скривене титлове"
+                    "showHiddenSubtitles": "Прикажи скривене титлове",
+                    "persistCaptionStyle": "Remember Caption Style"
                 }
             },
             "videoPlayer": {

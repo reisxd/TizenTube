@@ -68,7 +68,8 @@
                 "title": "Subtitru iestatījumi",
                 "options": {
                     "showLocalSubtitle": "Rādīt vietējos subtitrus",
-                    "showHiddenSubtitles": "Rādīt slēptos subtitrus"
+                    "showHiddenSubtitles": "Rādīt slēptos subtitrus",
+                    "persistCaptionStyle": "Remember Caption Style"
                 }
             },
             "videoPlayer": {

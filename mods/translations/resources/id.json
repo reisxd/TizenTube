@@ -68,7 +68,8 @@
                 "title": "Pengaturan Subtitle",
                 "options": {
                     "showLocalSubtitle": "Tampilkan Subtitle Lokal",
-                    "showHiddenSubtitles": "Tampilkan Subtitle Tersembunyi"
+                    "showHiddenSubtitles": "Tampilkan Subtitle Tersembunyi",
+                    "persistCaptionStyle": "Remember Caption Style"
                 }
             },
             "videoPlayer": {

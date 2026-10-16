@@ -68,7 +68,8 @@
                 "title": "Subtitr parametrləri",
                 "options": {
                     "showLocalSubtitle": "Yerli subtitri göstər",
-                    "showHiddenSubtitles": "Gizli subtitrləri göstər"
+                    "showHiddenSubtitles": "Gizli subtitrləri göstər",
+                    "persistCaptionStyle": "Remember Caption Style"
                 }
             },
             "videoPlayer": {

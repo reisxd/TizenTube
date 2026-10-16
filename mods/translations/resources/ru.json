@@ -68,7 +68,8 @@
                 "title": "Субтитры",
                 "options": {
                     "showLocalSubtitle": "Показывать локальные субтитры",
-                    "showHiddenSubtitles": "Показывать скрытые субтитры"
+                    "showHiddenSubtitles": "Показывать скрытые субтитры",
+                    "persistCaptionStyle": "Запоминать стиль субтитров"
                 }
             },
             "videoPlayer": {

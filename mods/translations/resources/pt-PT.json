@@ -68,7 +68,8 @@
                 "title": "Definições de Legendas",
                 "options": {
                     "showLocalSubtitle": "Mostrar legendas locais",
-                    "showHiddenSubtitles": "Mostrar legendas ocultas"
+                    "showHiddenSubtitles": "Mostrar legendas ocultas",
+                    "persistCaptionStyle": "Remember Caption Style"
                 }
             },
             "videoPlayer": {

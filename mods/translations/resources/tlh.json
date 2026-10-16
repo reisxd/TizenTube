@@ -68,7 +68,8 @@
                 "title": "Ha'quj choHtaHghach",
                 "options": {
                     "showLocalSubtitle": "Ha'quj yIcha'",
-                    "showHiddenSubtitles": "So' Ha'quj yIcha'"
+                    "showHiddenSubtitles": "So' Ha'quj yIcha'",
+                    "persistCaptionStyle": "Remember Caption Style"
                 }
             },
             "videoPlayer": {

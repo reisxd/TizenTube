@@ -68,7 +68,8 @@
                 "title": "Altyazı Ayarları",
                 "options": {
                     "showLocalSubtitle": "Yerel Altyazıyı Göster",
-                    "showHiddenSubtitles": "Gizli Altyazıları Göster"
+                    "showHiddenSubtitles": "Gizli Altyazıları Göster",
+                    "persistCaptionStyle": "Altyazı Stili Ayarlarını Kalıcı Yap"
                 }
             },
             "videoPlayer": {

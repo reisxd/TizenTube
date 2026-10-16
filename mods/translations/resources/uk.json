@@ -68,7 +68,8 @@
                 "title": "Субтитри",
                 "options": {
                     "showLocalSubtitle": "Локальні субтитри",
-                    "showHiddenSubtitles": "Приховані субтитри"
+                    "showHiddenSubtitles": "Приховані субтитри",
+                    "persistCaptionStyle": "Remember Caption Style"
                 }
             },
             "videoPlayer": {

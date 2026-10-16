@@ -68,7 +68,8 @@
                 "title": "Nastavení Titulků",
                 "options": {
                     "showLocalSubtitle": "Zobrazovat Lokální Titulky",
-                    "showHiddenSubtitles": "Zobrazovat Skryté Titulky"
+                    "showHiddenSubtitles": "Zobrazovat Skryté Titulky",
+                    "persistCaptionStyle": "Remember Caption Style"
                 }
             },
             "videoPlayer": {

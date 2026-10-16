@@ -68,7 +68,8 @@
                 "title": "Impostazioni Sottotitoli",
                 "options": {
                     "showLocalSubtitle": "Mostra Sottotitoli Locali",
-                    "showHiddenSubtitles": "Mostra Sottotitoli Nascosti"
+                    "showHiddenSubtitles": "Mostra Sottotitoli Nascosti",
+                    "persistCaptionStyle": "Remember Caption Style"
                 }
             },
             "videoPlayer": {

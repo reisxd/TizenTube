@@ -68,7 +68,8 @@
                 "title": "字幕の設定",
                 "options": {
                     "showLocalSubtitle": "ローカルの字幕を表示する",
-                    "showHiddenSubtitles": "非表示されている字幕を表示する"
+                    "showHiddenSubtitles": "非表示されている字幕を表示する",
+                    "persistCaptionStyle": "Remember Caption Style"
                 }
             },
             "videoPlayer": {

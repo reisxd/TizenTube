@@ -68,7 +68,8 @@
                 "title": "Tekstitysasetukset",
                 "options": {
                     "showLocalSubtitle": "Näytä paikallinen tekstitys",
-                    "showHiddenSubtitles": "Näytä piilotetut tekstitykset"
+                    "showHiddenSubtitles": "Näytä piilotetut tekstitykset",
+                    "persistCaptionStyle": "Remember Caption Style"
                 }
             },
             "videoPlayer": {

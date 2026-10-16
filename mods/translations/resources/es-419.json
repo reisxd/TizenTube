@@ -68,7 +68,8 @@
                 "title": "Configuraciones de Subtítulos",
                 "options": {
                     "showLocalSubtitle": "Mostrar Subtítulos Locales",
-                    "showHiddenSubtitles": "Mostrar Subtítulos Ocultos"
+                    "showHiddenSubtitles": "Mostrar Subtítulos Ocultos",
+                    "persistCaptionStyle": "Remember Caption Style"
                 }
             },
             "videoPlayer": {
