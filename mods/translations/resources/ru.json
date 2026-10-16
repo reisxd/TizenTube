@@ -45,7 +45,7 @@
                 "options": {
                     "endScreenCards": "Скрыть карточки в конце видео",
                     "youThereRenderer": "Включить сообщение «Вы ещё смотрите?»",
-                    "paidPromoOverlay": "Включить уведомление «Содержит рекламу»",
+                    "paidPromoOverlay": "Включить сообщение «Содержит рекламу»",
                     "whosWatching": {
                         "title": "Меню «Кто смотрит?»",
                         "options": {
@@ -155,7 +155,7 @@
                             "enableClock": "Включить часы",
                             "isClock12HourFormat": "12-часовой формат",
                             "clockShowSeconds": "Показывать секунды",
-                            "clockHideWhenVideoPlaying": "Скрывать часы во время воспроизведения"
+                            "clockHideWhenVideoPlaying": "Скрыть часы при просмотре"
                         }
                     },
                     "categories": {
@@ -299,10 +299,10 @@
             "title": "Боковое меню обновлено",
             "subtitle": "Содержимое бокового меню обновлено."
         },
-        "feedbackSent": "Feedback sent."
+        "feedbackSent": "Отзыв отправлен."
     },
     "videoMenu": {
-        "notInterested": "Not interested",
-        "dontRecommendChannel": "Don't recommend channel"
+        "notInterested": "Неинтересно",
+        "dontRecommendChannel": "Не рекомендовать канал"
     }
 }
