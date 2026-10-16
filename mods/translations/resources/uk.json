@@ -17,27 +17,27 @@
                 "title": "Налаштування SponsorBlock",
                 "options": {
                     "enableSB": "Увімкнути SponsorBlock",
-                    "manualSkip": "Ручний пропуск сегментів",
+                    "manualSkip": "Пропускати вручну",
                     "segments": "Сегменти",
                     "categories": {
-                        "sponsor": "Пропускати спонсорські сегменти",
+                        "sponsor": "Пропускати спонсорські блоки",
                         "intro": "Пропускати вступ",
                         "outro": "Пропускати завершення",
                         "interaction": "Пропускати заклики до взаємодії",
                         "selfpromo": "Пропускати саморекламу",
-                        "preview": "Пропускати прев’ю/повтори",
+                        "preview": "Пропускати прев’ю та повтори",
                         "filler": "Пропускати офтоп/жарти",
                         "music_offtopic": "Пропускати нетематичну музику",
                         "highlights": "Увімкнути ключові моменти"
                     },
-                    "showSBToasts": "Показувати сповіщення SponsorBlock"
+                    "showSBToasts": "Сповіщення SponsorBlock"
                 }
             },
             "dearrow": {
                 "title": "Налаштування DeArrow",
                 "options": {
                     "enableDA": "Увімкнути DeArrow",
-                    "enableDAThumbnails": "Увімкнути мініатюри DeArrow"
+                    "enableDAThumbnails": "Мініатюри DeArrow"
                 }
             },
             "misc": {
@@ -55,20 +55,20 @@
                         }
                     },
                     "fixUI": "Виправлення інтерфейсу",
-                    "hqThumbnails": "Увімкнути мініатюри високої якості",
+                    "hqThumbnails": "Мініатюри високої якості",
                     "longPress": "Тривале натискання",
                     "shorts": "Shorts",
                     "videoPreviews": "Попередній перегляд відео",
                     "ttWelcomeMsg": "Вітальне повідомлення",
-                    "guestSignInReminder": "Показувати нагадування про гостьовий вхід",
-                    "reloadHomeOnStartup": "Оновлювати головну сторінку під час запуску"
+                    "guestSignInReminder": "Нагадування про гостьовий вхід",
+                    "reloadHomeOnStartup": "Оновлювати головну при запуску"
                 }
             },
             "subtitles": {
                 "title": "Субтитри",
                 "options": {
-                    "showLocalSubtitle": "Показувати локальні субтитри",
-                    "showHiddenSubtitles": "Показувати приховані субтитри"
+                    "showLocalSubtitle": "Локальні субтитри",
+                    "showHiddenSubtitles": "Приховані субтитри"
                 }
             },
             "videoPlayer": {
@@ -78,30 +78,30 @@
                     "patching": {
                         "title": "Патч інтерфейсу відеоплеєра",
                         "options": {
-                            "enableVPUIPatching": "Увімкнути патч інтерфейсу відеоплеєра",
+                            "enableVPUIPatching": "Патч інтерфейсу відеоплеєра",
                             "previousNextBtns": "Кнопки «Попереднє/Наступне»",
                             "showSuperThxBtn": "Кнопка Super Thanks",
-                            "showAIAskBtn": "Показувати кнопку «Запитати ШІ»",
-                            "showSpeedCtrlBtn": "Кнопка швидкості",
+                            "showAIAskBtn": "Кнопка «Запитати ШІ»",
+                            "showSpeedCtrlBtn": "Кнопка «Швидкість»",
                             "addMPBtn": "Кнопка мініплеєра",
-                            "swapMPWithPIP": "Замінити кнопку мініплеєра на кнопку PiP"
+                            "swapMPWithPIP": "Замінити мініплеєр на PiP"
                         }
                     },
                     "preferredVideoQuality": {
-                        "title": "Бажана якість відео",
-                        "subtitle": "Виберіть бажану або найближчу кращу якість відео під час запуску відтворення"
+                        "title": "Якість відео",
+                        "subtitle": "Вибирає найближчу доступну якість під час запуску"
                     },
                     "speedSettings": {
                         "title": "Крок зміни швидкості",
-                        "subtitle": "Установіть крок зміни швидкості для керування швидкістю відтворення"
+                        "subtitle": "Виберіть крок зміни швидкості відтворення"
                     },
                     "preferredVideoCodec": {
-                        "title": "Бажаний кодек",
+                        "title": "Відеокодек",
                         "subtitle": "Виберіть бажаний відеокодек"
                     },
                     "afr": "Auto Frame Rate",
                     "afrPauseDuration": {
-                        "title": "Тривалість паузи Auto Frame Rate",
+                        "title": "Пауза Auto Frame Rate",
                         "subtitle": "Встановіть тривалість паузи відтворення (у секундах) під час зміни частоти кадрів"
                     },
                     "codecAny": "Будь-який",
@@ -122,9 +122,9 @@
                     "hideWatchedVideos": {
                         "title": "Приховувати переглянуті відео",
                         "options": {
-                            "enableHideWatchedVideos": "Увімкнути приховування переглянутих відео",
+                            "enableHideWatchedVideos": "Приховувати переглянуті відео",
                             "watchedVideosThreshold": {
-                                "title": "Поріг приховування відео",
+                                "title": "Вважати переглянутим після",
                                 "subtitle": "Виберіть відсоток перегляду, після якого відео приховуватиметься"
                             },
                             "setPagesToHideWatchedVideos": "Де приховувати переглянуті відео"
@@ -133,23 +133,23 @@
                     "screenDimming": {
                         "title": "Затемнення екрана",
                         "options": {
-                            "enableScreenDimming": "Увімкнути затемнення екрана",
+                            "enableScreenDimming": "Затемнення екрана",
                             "dimmingTimeout": {
                                 "title": "Затримка затемнення",
                                 "subtitle": "Встановіть час бездіяльності (у секундах), після якого екран затемнюється"
                             },
                             "dimmingOpacity": {
                                 "title": "Рівень затемнення",
-                                "subtitle": "Встановіть рівень затемнення екрана"
+                                "subtitle": "Виберіть рівень затемнення"
                             }
                         }
                     },
                     "disableSidebarContents": {
-                        "title": "Приховати розділи бокового меню",
+                        "title": "Приховані розділи меню",
                         "subtitle": "Виберіть розділи бокового меню, які потрібно приховати"
                     },
                     "launchToOnStartup": {
-                        "title": "Відкривати при запуску",
+                        "title": "Сторінка запуску",
                         "subtitle": "Виберіть сторінку, яка відкриватиметься під час запуску TizenTube"
                     },
                     "categories": {
@@ -168,23 +168,23 @@
                         "shorts": "Shorts",
                         "searchResults": "Результати пошуку"
                     },
-                    "sortSubscriptionsByAlphabet": "Сортувати підписки в алфавітному порядку",
+                    "sortSubscriptionsByAlphabet": "Сортувати підписки за алфавітом",
                     "disableChannelsOnSidebar": "Приховати канали в боковому меню",
                     "clock": {
                         "title": "Годинник",
-                        "subtitle": "Показувати годинник на екрані",
+                        "subtitle": "Годинник на екрані",
                         "options": {
                             "enableClock": "Увімкнути годинник",
                             "isClock12HourFormat": "Використовувати 12-годинний формат",
-                            "clockShowSeconds": "Показувати секунди",
+                            "clockShowSeconds": "Секунди",
                             "clockHideWhenVideoPlaying": "Приховувати годинник під час перегляду відео"
                         }
                     },
-                    "disableEnlargingThumbnails": "Вимкнути збільшення мініатюр",
-                    "enableShrinkingThumbnails": "Увімкнути зменшення мініатюр",
+                    "disableEnlargingThumbnails": "Не збільшувати мініатюри",
+                    "enableShrinkingThumbnails": "Зменшувати мініатюри",
                     "sortSidebarContents": {
-                        "title": "Упорядкування бокового меню",
-                        "subtitle": "Налаштуйте порядок розділів бокового меню",
+                        "title": "Порядок бокового меню",
+                        "subtitle": "Змініть порядок розділів меню",
                         "moveUp": {
                             "title": "Перемістити вище",
                             "subtitle": "Перемістити цей елемент вище в боковому меню"
@@ -282,8 +282,8 @@
         },
         "miniPlayer": "Мініплеєр",
         "pictureInPicture": "Картинка в картинці (PiP)",
-        "previous": "Попереднє",
-        "next": "Наступне",
+        "previous": "Попереднє відео",
+        "next": "Наступне відео",
         "withTizenTube": "з TizenTube",
         "share": {
             "title": "Поділитися",
@@ -293,16 +293,16 @@
         "screenOff": "Вимкнути екран"
     },
     "toasts": {
-        "videoAddedToQueue": "Відео додано до черги.",
-        "videoQueueCleared": "Чергу відео очищено.",
+        "videoAddedToQueue": "Додано до черги відтворення.",
+        "videoQueueCleared": "Чергу відтворення очищено.",
         "sidebarContentsUpdated": {
             "title": "Бокове меню оновлено",
             "subtitle": "Вміст бокового меню оновлено."
         },
-        "feedbackSent": "Feedback sent."
+        "feedbackSent": "Відгук надіслано."
     },
     "videoMenu": {
-        "notInterested": "Not interested",
-        "dontRecommendChannel": "Don't recommend channel"
+        "notInterested": "Не цікавить",
+        "dontRecommendChannel": "Не рекомендувати канал"
     }
 }
