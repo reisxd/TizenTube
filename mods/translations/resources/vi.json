@@ -297,13 +297,13 @@
         "videoAddedToQueue": "Đã thêm video vào hàng chờ.",
         "videoQueueCleared": "Hàng chờ đã được dọn sạch.",
         "sidebarContentsUpdated": {
-            "title": "Nội dung thanh điều hướng đã được cập nhật",
-            "subtitle": "Ờm thì cái thanh điều hướng được cập nhật thui mà."
+            "title": "Thanh điều hướng đã được cập nhật",
+            "subtitle": "Các mục ở thanh điều hướng đã được tải lại."
         },
-        "feedbackSent": "Feedback sent."
+        "feedbackSent": "Đã gửi phản hồi."
     },
     "videoMenu": {
-        "notInterested": "Not interested",
-        "dontRecommendChannel": "Don't recommend channel"
+        "notInterested": "Không quan tâm lắm",
+        "dontRecommendChannel": "Không đề xuất kênh này nữa"
     }
 }
