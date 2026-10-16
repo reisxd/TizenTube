@@ -291,7 +291,20 @@
             "button": "Chia sẻ",
             "qrCodeScanMessage": "Quét mã QR ở dưới để chia sẻ video này."
         },
-        "screenOff": "Tắt màn hình"
+        "screenOff": "Tắt màn hình",
+        "chapters": {
+            "title": "Chapters",
+            "enterNudge": "To view chapters, press the up arrow button",
+            "navNudge": "Navigate between chapters",
+            "navNudgeA11y": "Press the left or right arrow button to navigate between chapters"
+        },
+        "queue": {
+            "title": "Queued Videos",
+            "clear": "Clear Queue"
+        },
+        "subtitles": {
+            "otherLanguages": "Other Languages"
+        }
     },
     "toasts": {
         "videoAddedToQueue": "Đã thêm video vào hàng chờ.",
@@ -304,6 +317,16 @@
     },
     "videoMenu": {
         "notInterested": "Không quan tâm lắm",
-        "dontRecommendChannel": "Không đề xuất kênh này nữa"
+        "dontRecommendChannel": "Không đề xuất kênh này nữa",
+        "play": "Play",
+        "saveToWatchLater": "Save to Watch Later",
+        "removeFromWatchLater": "Remove from Watch Later",
+        "saveToPlaylist": "Save to Playlist",
+        "addToQueue": "Add to Queue",
+        "goToChannel": "Go To Channel",
+        "videoOptions": "Video options"
+    },
+    "common": {
+        "back": "Back"
     }
 }

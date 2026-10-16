@@ -2,6 +2,9 @@
     "__contributors": [
         "reisxd"
     ],
+    "common": {
+        "back": "Back"
+    },
     "settings": {
         "options": {
             "socialMedia": {
@@ -291,11 +294,31 @@
             "button": "Share",
             "qrCodeScanMessage": "Scan the QR code below to share this video."
         },
-        "screenOff": "Turn off screen"
+        "screenOff": "Turn off screen",
+        "chapters": {
+            "title": "Chapters",
+            "enterNudge": "To view chapters, press the up arrow button",
+            "navNudge": "Navigate between chapters",
+            "navNudgeA11y": "Press the left or right arrow button to navigate between chapters"
+        },
+        "queue": {
+            "title": "Queued Videos",
+            "clear": "Clear Queue"
+        },
+        "subtitles": {
+            "otherLanguages": "Other Languages"
+        }
     },
     "videoMenu": {
         "notInterested": "Not interested",
-        "dontRecommendChannel": "Don't recommend channel"
+        "dontRecommendChannel": "Don't recommend channel",
+        "play": "Play",
+        "saveToWatchLater": "Save to Watch Later",
+        "removeFromWatchLater": "Remove from Watch Later",
+        "saveToPlaylist": "Save to Playlist",
+        "addToQueue": "Add to Queue",
+        "goToChannel": "Go To Channel",
+        "videoOptions": "Video options"
     },
     "toasts": {
         "videoAddedToQueue": "Video added to queue.",

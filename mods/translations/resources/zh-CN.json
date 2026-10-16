@@ -290,7 +290,20 @@
             "button": "分享",
             "qrCodeScanMessage": "扫描下方二维码分享此视频。"
         },
-        "screenOff": "关闭屏幕"
+        "screenOff": "关闭屏幕",
+        "chapters": {
+            "title": "Chapters",
+            "enterNudge": "To view chapters, press the up arrow button",
+            "navNudge": "Navigate between chapters",
+            "navNudgeA11y": "Press the left or right arrow button to navigate between chapters"
+        },
+        "queue": {
+            "title": "Queued Videos",
+            "clear": "Clear Queue"
+        },
+        "subtitles": {
+            "otherLanguages": "Other Languages"
+        }
     },
     "toasts": {
         "videoAddedToQueue": "视频已添加到播放队列。",
@@ -303,6 +316,16 @@
     },
     "videoMenu": {
         "notInterested": "Not interested",
-        "dontRecommendChannel": "Don't recommend channel"
+        "dontRecommendChannel": "Don't recommend channel",
+        "play": "Play",
+        "saveToWatchLater": "Save to Watch Later",
+        "removeFromWatchLater": "Remove from Watch Later",
+        "saveToPlaylist": "Save to Playlist",
+        "addToQueue": "Add to Queue",
+        "goToChannel": "Go To Channel",
+        "videoOptions": "Video options"
+    },
+    "common": {
+        "back": "Back"
     }
 }

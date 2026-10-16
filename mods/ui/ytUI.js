@@ -1,3 +1,4 @@
+import { t } from 'i18next';
 import resolveCommand from '../resolveCommand.js';
 
 function showToast(title, subtitle, thumbnails) {
@@ -66,7 +67,7 @@ function Modal(header, content, id, update) {
                                 buttonRenderer: {
                                     accessibilityData: {
                                         accessibilityData: {
-                                            label: 'Back'
+                                            label: t('common.back')
                                         }
                                     },
                                     command: {
@@ -213,11 +214,11 @@ function longPressData(data) {
             menu: {
                 menuRenderer: {
                     items: [
-                        MenuNavigationItemRenderer('Play', {
+                        MenuNavigationItemRenderer(t('videoMenu.play'), {
                             clickTrackingParams: null,
                             watchEndpoint: data.watchEndpointData
                         }),
-                        MenuServiceItemRenderer(isWatchLaterItem ? 'Remove from Watch Later' : 'Save to Watch Later', {
+                        MenuServiceItemRenderer(isWatchLaterItem ? t('videoMenu.removeFromWatchLater') : t('videoMenu.saveToWatchLater'), {
                             clickTrackingParams: null,
                             commandMetadata: {
                                 webCommandMetadata: {
@@ -230,13 +231,13 @@ function longPressData(data) {
                                 actions: [watchLaterAction]
                             }
                         }),
-                        MenuNavigationItemRenderer('Save to Playlist', {
+                        MenuNavigationItemRenderer(t('videoMenu.saveToPlaylist'), {
                             clickTrackingParams: null,
                             addToPlaylistEndpoint: {
                                 videoId: data.videoId
                             }
                         }),
-                        MenuServiceItemRenderer('Add to Queue', {
+                        MenuServiceItemRenderer(t('videoMenu.addToQueue'), {
                             clickTrackingParams: null,
                             playlistEditEndpoint: {
                                 customAction: {
@@ -245,7 +246,7 @@ function longPressData(data) {
                                 }
                             }
                         }),
-                        MenuServiceItemRenderer('Go To Channel', {
+                        MenuServiceItemRenderer(t('videoMenu.goToChannel'), {
                             clickTrackingParams: null,
                             playlistEditEndpoint: {
                                 customAction: {
@@ -258,7 +259,7 @@ function longPressData(data) {
                     trackingParams: null,
                     accessibility: {
                         accessibilityData: {
-                            label: 'Video options'
+                            label: t('videoMenu.videoOptions')
                         }
                     }
                 }

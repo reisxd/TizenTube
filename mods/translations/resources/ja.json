@@ -290,7 +290,20 @@
             "button": "共有",
             "qrCodeScanMessage": "下の QR コードをスキャンして、この動画を共有します"
         },
-        "screenOff": "画面をオフにする"
+        "screenOff": "画面をオフにする",
+        "chapters": {
+            "title": "Chapters",
+            "enterNudge": "To view chapters, press the up arrow button",
+            "navNudge": "Navigate between chapters",
+            "navNudgeA11y": "Press the left or right arrow button to navigate between chapters"
+        },
+        "queue": {
+            "title": "Queued Videos",
+            "clear": "Clear Queue"
+        },
+        "subtitles": {
+            "otherLanguages": "Other Languages"
+        }
     },
     "toasts": {
         "videoAddedToQueue": "動画をキューに追加しました",
@@ -303,6 +316,16 @@
     },
     "videoMenu": {
         "notInterested": "興味がない",
-        "dontRecommendChannel": "このチャンネルをおすすめに表示しません"
+        "dontRecommendChannel": "このチャンネルをおすすめに表示しません",
+        "play": "Play",
+        "saveToWatchLater": "Save to Watch Later",
+        "removeFromWatchLater": "Remove from Watch Later",
+        "saveToPlaylist": "Save to Playlist",
+        "addToQueue": "Add to Queue",
+        "goToChannel": "Go To Channel",
+        "videoOptions": "Video options"
+    },
+    "common": {
+        "back": "Back"
     }
 }

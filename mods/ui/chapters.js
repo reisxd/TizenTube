@@ -1,3 +1,5 @@
+import { t } from 'i18next';
+
 function parseTimestamps(input) {
     var lines = input.trim().split('\n');
     var result = [];
@@ -77,7 +79,7 @@ function markerEntity(videoID, markers) {
                     headerTitle: {
                         runs: [
                             {
-                                text: 'Chapters'
+                                text: t('player.chapters.title')
                             }
                         ]
                     },
@@ -94,19 +96,19 @@ function markerEntity(videoID, markers) {
                         enterNudgeText: {
                             runs: [
                                 {
-                                    text: 'To view chapters, press the up arrow button'
+                                    text: t('player.chapters.enterNudge')
                                 }
                             ]
                         },
-                        enterNudgeA11yText: 'To view chapters, press the up arrow button',
+                        enterNudgeA11yText: t('player.chapters.enterNudge'),
                         navNudgeText: {
                             runs: [
                                 {
-                                    text: 'Navigate between chapters'
+                                    text: t('player.chapters.navNudge')
                                 }
                             ]
                         },
-                        navNudgeA11yText: 'Press the left or right arrow button to navigate between chapters'
+                        navNudgeA11yText: t('player.chapters.navNudgeA11y')
                     },
                     loggingDirectives: {
                         trackingParams: null,
