@@ -9,10 +9,10 @@
             "socialMedia": {
                 "title": "Link-uri pentru rețelele de socializare",
                 "qrCodeScanMessage": "Poți vizita pagina {{name}} scanând codul QR de mai jos.",
-                "announcements": "Announcements",
-                "group": "Group",
-                "website": "Website",
-                "githubSponsors": "GitHub Sponsors"
+                "announcements": "Anunțuri",
+                "group": "Grup",
+                "website": "Site web",
+                "githubSponsors": "Sponsori pe GitHub"
             },
             "adBlock": "AdBlock",
             "sponsorblock": {
@@ -56,7 +56,7 @@
                             "enableWWOnExit": "Activează meniul 'Cine se uită?' la ieșirea din aplicație"
                         }
                     },
-                    "fixUI": "Remediază/Corectează interfața",
+                    "fixUI": "Corectează interfața",
                     "hqThumbnails": "Activează miniaturile de înaltă calitate",
                     "longPress": "Activează acțiunile la apăsare lungă",
                     "shorts": "Activează Shorts",
@@ -71,7 +71,7 @@
                 "options": {
                     "showLocalSubtitle": "Afișează subtitrarea locală",
                     "showHiddenSubtitles": "Afișează subtitrările ascunse",
-                    "persistCaptionStyle": "Remember Caption Style"
+                    "persistCaptionStyle": "Păstrează stilul subtitrărilor"
                 }
             },
             "videoPlayer": {
@@ -87,7 +87,7 @@
                             "showSpeedCtrlBtn": "Afișează butonul de control al vitezei",
                             "addMPBtn": "Afișează butonul pentru Mini Player",
                             "swapMPWithPIP": "Schimbă butonul Mini Player cu butonul PiP",
-                            "showAIAskBtn": "Show Ask Button"
+                            "showAIAskBtn": "Afișează butonul „Întreabă”"
                         }
                     },
                     "preferredVideoQuality": {
@@ -102,14 +102,14 @@
                         "title": "Codec video preferat",
                         "subtitle": "Alege codec-ul video preferat pentru redare"
                     },
-                    "afr": "Auto Frame Rate",
+                    "afr": "Rată de cadre automată",
                     "afrPauseDuration": {
                         "title": "Durata pauzei pentru rata de cadre automată",
                         "subtitle": "Setează durata (în secunde) pentru pauza redării video la ajustarea ratei de cadre"
                     },
-                    "codecAny": "Any",
-                    "qualityAuto": "Auto",
-                    "hideRelatedVideosPlayer": "Hide Related Videos"
+                    "codecAny": "Oricare",
+                    "qualityAuto": "Automat",
+                    "hideRelatedVideosPlayer": "Ascunde videoclipurile similare"
                 }
             },
             "uiSettings": {
@@ -158,40 +158,40 @@
                             "enableClock": "Activează ceasul",
                             "isClock12HourFormat": "Folosește formatul de 12 ore pentru ceas",
                             "clockShowSeconds": "Afișează secundele la ceas",
-                            "clockHideWhenVideoPlaying": "Hide Clock While Video is Playing"
+                            "clockHideWhenVideoPlaying": "Ascunde ceasul în timpul redării videoclipului"
                         }
                     },
                     "categories": {
-                        "search": "Search",
-                        "home": "Home",
-                        "sports": "Sports",
-                        "news": "News",
-                        "music": "Music",
-                        "podcasts": "Podcasts",
-                        "moviesAndTv": "Movies & TV",
-                        "live": "Live",
-                        "gaming": "Gaming",
-                        "subscriptions": "Subscriptions",
-                        "library": "Library",
-                        "more": "More",
+                        "search": "Căutare",
+                        "home": "Acasă",
+                        "sports": "Sport",
+                        "news": "Știri",
+                        "music": "Muzică",
+                        "podcasts": "Podcasturi",
+                        "moviesAndTv": "Filme și emisiuni TV",
+                        "live": "În direct",
+                        "gaming": "Jocuri",
+                        "subscriptions": "Abonamente",
+                        "library": "Bibliotecă",
+                        "more": "Mai multe",
                         "shorts": "Shorts",
-                        "searchResults": "Search Results"
+                        "searchResults": "Rezultatele căutării"
                     },
-                    "disableEnlargingThumbnails": "Disable Enlarged Thumbnails",
-                    "enableShrinkingThumbnails": "Enable Shrinked Thumbnails",
+                    "disableEnlargingThumbnails": "Dezactivează mărirea miniaturilor",
+                    "enableShrinkingThumbnails": "Activează micșorarea miniaturilor",
                     "sortSidebarContents": {
-                        "title": "Sort Sidebar Contents",
-                        "subtitle": "Reorder sidebar contents to your preference",
+                        "title": "Sortează conținutul barei laterale",
+                        "subtitle": "Reordonează conținutul barei laterale după preferințe",
                         "moveUp": {
-                            "title": "Move Up",
-                            "subtitle": "Move this item up in the sidebar"
+                            "title": "Mută în sus",
+                            "subtitle": "Mută acest element mai sus în bara laterală"
                         },
                         "moveDown": {
-                            "title": "Move Down",
-                            "subtitle": "Move this item down in the sidebar"
+                            "title": "Mută în jos",
+                            "subtitle": "Mută acest element mai jos în bara laterală"
                         },
-                        "addToSidebar": "Add Channel to Sidebar",
-                        "removeFromSidebar": "Remove Channel from Sidebar"
+                        "addToSidebar": "Adaugă canalul în bara laterală",
+                        "removeFromSidebar": "Elimină canalul din bara laterală"
                     }
                 }
             },
@@ -204,36 +204,36 @@
                     "checkForUpdatesOnStartup": "Verifică dacă există actualizări noi la pornire"
                 },
                 "updateAvailable": {
-                    "title": "Update Available",
-                    "subtitle": "A new version of TizenTube Cobalt is available: {{latestVersion}}, current: {{currentVersion}}"
+                    "title": "Actualizare disponibilă",
+                    "subtitle": "Este disponibilă o versiune nouă de TizenTube Cobalt: {{latestVersion}}. Versiunea actuală: {{currentVersion}}"
                 },
-                "releaseDate": "Release Date: {{date}}",
+                "releaseDate": "Data lansării: {{date}}",
                 "updateNow": {
-                    "title": "Update Now",
-                    "subtitle": "Click to download the latest version."
+                    "title": "Actualizează acum",
+                    "subtitle": "Apasă pentru a descărca cea mai recentă versiune."
                 },
                 "remindLater": {
-                    "title": "Remind Me Later",
-                    "subtitle": "Check for updates later."
+                    "title": "Amintește-mi mai târziu",
+                    "subtitle": "Verifică dacă există actualizări mai târziu."
                 },
                 "upToDate": {
-                    "title": "TizenTube is up to date",
-                    "subtitle": "You are using the latest version ({{version}}) of TizenTube Cobalt."
+                    "title": "TizenTube este actualizat",
+                    "subtitle": "Folosești cea mai recentă versiune ({{version}}) de TizenTube Cobalt."
                 },
                 "checkFailed": {
-                    "title": "TizenTube update check failed",
-                    "subtitle": "Could not check for updates."
+                    "title": "Verificarea actualizărilor TizenTube a eșuat",
+                    "subtitle": "Nu s-a putut verifica dacă există actualizări."
                 },
                 "downloading": {
-                    "title": "TizenTube Update",
-                    "subtitle": "Downloading update, please wait..."
+                    "title": "Actualizare TizenTube",
+                    "subtitle": "Se descarcă actualizarea. Te rugăm să aștepți..."
                 }
             },
             "time": {
-                "second": "{{count}} second",
-                "seconds": "{{count}} seconds",
-                "minute": "{{count}} minute",
-                "minutes": "{{count}} minutes"
+                "second": "{{count}} secundă",
+                "seconds": "{{count}} secunde",
+                "minute": "{{count}} minut",
+                "minutes": "{{count}} minute"
             }
         },
         "ttSettings": {
@@ -249,8 +249,8 @@
                 "2": "1. Oferă un star repository-ului de pe GitHub pentru a-i crește vizibilitatea.",
                 "3": "2. Distribuie TizenTube altora.",
                 "4": "Dacă dorești să contribui financiar, ia în considerare donațiile:",
-                "5": "- Buy Me A Coffee: https://www.buymeacoffee.com/reisxd (preferabil)",
-                "6": "- GitHub Sponsors: https://github.com/sponsors/reisxd"
+                "5": "- Cumpără-mi o cafea: https://www.buymeacoffee.com/reisxd (preferabil)",
+                "6": "- Sponsori pe GitHub: https://github.com/sponsors/reisxd"
             }
         }
     },
@@ -262,13 +262,13 @@
         "segments": {
             "sponsor": "Segment sponsorizat",
             "intro": "Introducere",
-            "outro": "Final",
-            "interaction": "Reamintire de interacțiune",
-            "selfpromo": "Auto-promovare",
+            "outro": "Secvență de final",
+            "interaction": "Memento de interacțiune",
+            "selfpromo": "Autopromovare",
             "preview": "Rezumat sau previzualizare",
-            "filler": "Tangențe",
+            "filler": "Abateri de la subiect",
             "music_offtopic": "Secțiune non-muzicală",
-            "poi_highlight": "Moment de interes"
+            "poi_highlight": "Moment important"
         },
         "toasts": {
             "skipping": "Se omite {{segment}}",
@@ -279,56 +279,56 @@
     },
     "player": {
         "playbackSpeed": {
-            "title": "Playback Speed",
-            "button": "Speed Controls",
-            "fixStuttering": "Fix stuttering (1.0001x)"
+            "title": "Viteza de redare",
+            "button": "Controlul vitezei",
+            "fixStuttering": "Remediază redarea sacadată (1.0001x)"
         },
         "miniPlayer": "Mini Player",
-        "pictureInPicture": "Picture in Picture",
-        "previous": "Previous",
-        "next": "Next",
-        "withTizenTube": "with TizenTube",
+        "pictureInPicture": "Imagine în imagine",
+        "previous": "Anterior",
+        "next": "Următor",
+        "withTizenTube": "cu TizenTube",
         "share": {
-            "title": "Share",
-            "button": "Share",
-            "qrCodeScanMessage": "Scan the QR code below to share this video."
+            "title": "Partajare",
+            "button": "Partajează",
+            "qrCodeScanMessage": "Scanează codul QR de mai jos pentru a partaja acest videoclip."
         },
-        "screenOff": "Turn off screen",
+        "screenOff": "Oprește ecranul",
         "chapters": {
-            "title": "Chapters",
-            "enterNudge": "To view chapters, press the up arrow button",
-            "navNudge": "Navigate between chapters",
-            "navNudgeA11y": "Press the left or right arrow button to navigate between chapters"
+            "title": "Capitole",
+            "enterNudge": "Pentru a vedea capitolele, apasă butonul săgeată în sus",
+            "navNudge": "Navighează între capitole",
+            "navNudgeA11y": "Apasă butonul săgeată stânga sau dreapta pentru a naviga între capitole"
         },
         "queue": {
-            "title": "Queued Videos",
-            "clear": "Clear Queue"
+            "title": "Lista de redare",
+            "clear": "Golește lista"
         },
         "subtitles": {
-            "otherLanguages": "Other Languages"
+            "otherLanguages": "Alte limbi"
         }
     },
     "toasts": {
-        "videoAddedToQueue": "Video added to queue.",
-        "videoQueueCleared": "Video queue cleared.",
+        "videoAddedToQueue": "Videoclip adăugat în lista de redare.",
+        "videoQueueCleared": "Lista de redare a fost golită.",
         "sidebarContentsUpdated": {
-            "title": "Sidebar Contents Updated",
-            "subtitle": "The sidebar contents have been updated."
+            "title": "Conținutul barei laterale actualizat",
+            "subtitle": "Conținutul barei laterale a fost actualizat."
         },
-        "feedbackSent": "Feedback sent."
+        "feedbackSent": "Feedbackul a fost trimis."
     },
     "videoMenu": {
-        "notInterested": "Not interested",
-        "dontRecommendChannel": "Don't recommend channel",
-        "play": "Play",
-        "saveToWatchLater": "Save to Watch Later",
-        "removeFromWatchLater": "Remove from Watch Later",
-        "saveToPlaylist": "Save to Playlist",
-        "addToQueue": "Add to Queue",
-        "goToChannel": "Go To Channel",
-        "videoOptions": "Video options"
+        "notInterested": "Nu mă interesează",
+        "dontRecommendChannel": "Nu recomanda acest canal",
+        "play": "Redă",
+        "saveToWatchLater": "Adaugă la «Vizionează mai târziu»",
+        "removeFromWatchLater": "Elimină din «Vizionează mai târziu»",
+        "saveToPlaylist": "Adaugă la playlist",
+        "addToQueue": "Adaugă la lista de redare",
+        "goToChannel": "Accesează canalul",
+        "videoOptions": "Opțiuni video"
     },
     "common": {
-        "back": "Back"
+        "back": "Înapoi"
     }
 }
