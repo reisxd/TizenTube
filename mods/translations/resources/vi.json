@@ -70,7 +70,7 @@
                 "options": {
                     "showLocalSubtitle": "Hiển thị phụ đề cục bộ",
                     "showHiddenSubtitles": "Hiển thị phụ đề bị ẩn",
-                    "persistCaptionStyle": "Remember Caption Style"
+                    "persistCaptionStyle": "Ghi nhớ kiểu phụ đề"
                 }
             },
             "videoPlayer": {
@@ -182,8 +182,8 @@
                         "title": "Sắp xếp các mục ở thanh điều hướng",
                         "subtitle": "Di chuyển các mục theo sở thích của bạn",
                         "moveUp": {
-                            "title": "Đi lên",
-                            "subtitle": "Cho mục này đi lên ở trong thanh điều hướng"
+                            "title": "Nâng lên",
+                            "subtitle": "Cho mục này nâng lên ở trong thanh điều hướng"
                         },
                         "moveDown": {
                             "title": "Hạ xuống",
@@ -270,7 +270,7 @@
             "poi_highlight": "đoạn nổi bật"
         },
         "toasts": {
-            "skipping": "Đang bỏ qua {{segment}}...",
+            "skipping": "Đã bỏ qua {{segment}}...",
             "notSkipping": "Không bỏ qua {{segment}} (đã bỏ qua {{count}} lần)",
             "skip": "Bỏ qua {{segment}}",
             "skipToHighlight": "Chuyển đến đoạn nổi bật"
@@ -294,17 +294,17 @@
         },
         "screenOff": "Tắt màn hình",
         "chapters": {
-            "title": "Chapters",
-            "enterNudge": "To view chapters, press the up arrow button",
-            "navNudge": "Navigate between chapters",
-            "navNudgeA11y": "Press the left or right arrow button to navigate between chapters"
+            "title": "Chương",
+            "enterNudge": "Để hiện các chương, nhấn nút mũi tên lên",
+            "navNudge": "Di chuyển giữa các chương",
+            "navNudgeA11y": "Ấn nút trái hoặc phải để di chuyển giữa các chương"
         },
         "queue": {
-            "title": "Queued Videos",
-            "clear": "Clear Queue"
+            "title": "Các video trong hàng chờ",
+            "clear": "Xoá hết video trong hàng chờ"
         },
         "subtitles": {
-            "otherLanguages": "Other Languages"
+            "otherLanguages": "Ngôn ngữ khác"
         }
     },
     "toasts": {
@@ -319,15 +319,15 @@
     "videoMenu": {
         "notInterested": "Không quan tâm lắm",
         "dontRecommendChannel": "Không đề xuất kênh này nữa",
-        "play": "Play",
-        "saveToWatchLater": "Save to Watch Later",
-        "removeFromWatchLater": "Remove from Watch Later",
-        "saveToPlaylist": "Save to Playlist",
-        "addToQueue": "Add to Queue",
-        "goToChannel": "Go To Channel",
-        "videoOptions": "Video options"
+        "play": "Phát",
+        "saveToWatchLater": "Lưu vào xem sau",
+        "removeFromWatchLater": "Xoá khỏi xem sau",
+        "saveToPlaylist": "Lưu vào danh sách phát",
+        "addToQueue": "Thêm vào hàng chờ",
+        "goToChannel": "Đi tới kênh",
+        "videoOptions": "Cài đặt video"
     },
     "common": {
-        "back": "Back"
+        "back": "Quay lại"
     }
 }
