@@ -60,7 +60,7 @@ function isVideoTile(item) {
 }
 
 // Library, history and playlist pages show items the user chose on purpose.
-const EXEMPT_PAGES = /FElibrary|FEhistory|FEplaylist|playlist|[?&]list=/i;
+const EXEMPT_PAGES = /FElibrary|FEhistory|FEplaylist|\/playlist|[?&]list=/i;
 
 // Drops video tiles of blocked channels and hidden videos from a list of renderer items.
 export function removeBlocked(items) {
@@ -79,15 +79,17 @@ function filterBlocked(items) {
   const hidden = new Set(configRead('hiddenVideos'));
   if (!blockedKeys.length && !hidden.size) return items;
   const blockedIds = new Set(blockedKeys.filter((k) => k.startsWith('id:')));
-  // An id-blocked channel must also match tiles that carry no channel id.
   const names = configRead('blockedChannelNames');
-  const blockedNames = new Set(blockedKeys.map((k) => k.startsWith('name:') ? k : (names[k] ? nameKey(names[k]) : null)).filter(Boolean));
+  const blockedNameOnly = new Set(blockedKeys.filter((k) => k.startsWith('name:')));
+  // Names of id-blocked channels, used only for tiles that carry no channel id.
+  const blockedIdNames = new Set(blockedKeys.filter((k) => k.startsWith('id:') && names[k]).map((k) => nameKey(names[k])));
   return items.filter((item) => {
     if (!isVideoTile(item)) return true;
     if (hidden.has(getVideoId(item))) return false;
     const channel = getChannelInfo(item);
     if (!channel) return true;
-    return !((channel.id && blockedIds.has(idKey(channel.id)))
-      || (channel.name && blockedNames.has(nameKey(channel.name))));
+    const nameBlocked = channel.name && (blockedNameOnly.has(nameKey(channel.name))
+      || (!channel.id && blockedIdNames.has(nameKey(channel.name))));
+    return !(channel.id && blockedIds.has(idKey(channel.id))) && !nameBlocked;
   });
 }
