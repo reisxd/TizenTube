@@ -123,6 +123,11 @@
                 "title": "User Interface Settings",
                 "subtitle": "Customize the UI to your liking",
                 "options": {
+                    "blockedChannels": {
+                        "title": "Blocked Channels",
+                        "subtitle": "Checked channels are hidden. Uncheck a channel to unblock it.",
+                        "none": "No channels are blocked. Use \"Block channel\" in a video's menu to add one."
+                    },
                     "hideWatchedVideos": {
                         "title": "Hide Watched Videos",
                         "options": {
@@ -312,6 +317,7 @@
     "videoMenu": {
         "notInterested": "Not interested",
         "dontRecommendChannel": "Don't recommend channel",
+        "blockChannel": "Block channel",
         "play": "Play",
         "saveToWatchLater": "Save to Watch Later",
         "removeFromWatchLater": "Remove from Watch Later",
@@ -322,6 +328,9 @@
     },
     "toasts": {
         "videoAddedToQueue": "Video added to queue.",
+        "videoHidden": "Video hidden. It disappears after the page refreshes.",
+        "channelNotRecommended": "Channel won't be recommended anymore.",
+        "channelBlocked": "{{name}} blocked. Its videos disappear after the page refreshes.",
         "videoQueueCleared": "Video queue cleared.",
         "feedbackSent": "Feedback sent.",
         "sidebarContentsUpdated": {

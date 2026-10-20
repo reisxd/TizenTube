@@ -71,6 +71,9 @@ const defaultConfig = {
   disableEnlargingThumbnails: false,
   enableShrinkingThumbnails: false,
   hideRelatedVideosPlayer: false,
+  blockedChannels: [],
+  blockedChannelNames: {},
+  hiddenVideos: [],
 };
 
 let localConfig;

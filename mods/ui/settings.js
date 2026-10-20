@@ -470,6 +470,39 @@ export default function modernUI(update, parameters) {
                 subtitle: t('settings.options.uiSettings.subtitle')
             },
             options: [
+                (() => {
+                    const blockedChannels = configRead('blockedChannels');
+                    const names = configRead('blockedChannelNames');
+                    const title = t('settings.options.uiSettings.options.blockedChannels.title');
+                    const subtitle = t('settings.options.uiSettings.options.blockedChannels.subtitle');
+                    if (!blockedChannels.length) {
+                        return {
+                            name: title,
+                            icon: 'BLOCK',
+                            value: null,
+                            options: {
+                                title,
+                                subtitle,
+                                content: scrollPaneRenderer([
+                                    overlayMessageRenderer(t('settings.options.uiSettings.options.blockedChannels.none'))
+                                ])
+                            }
+                        };
+                    }
+                    return {
+                        name: title,
+                        icon: 'BLOCK',
+                        value: null,
+                        menuId: 'tt-blocked-channels',
+                        arrayToEdit: 'blockedChannels',
+                        menuHeader: { title, subtitle },
+                        options: blockedChannels.map((key) => ({
+                            name: names[key] || key.replace(/^(id|name):/, ''),
+                            icon: 'BLOCK',
+                            value: key
+                        }))
+                    };
+                })(),
                 {
                     name: t('settings.options.uiSettings.options.hideWatchedVideos.title'),
                     icon: 'VISIBILITY_OFF',
