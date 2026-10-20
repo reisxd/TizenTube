@@ -2,6 +2,9 @@
     "__contributors": [
         "Re*Index.(ot_inc)"
     ],
+    "common": {
+        "back": "戻る"
+    },
     "settings": {
         "options": {
             "socialMedia": {
@@ -69,7 +72,7 @@
                 "options": {
                     "showLocalSubtitle": "ローカルの字幕を表示する",
                     "showHiddenSubtitles": "非表示されている字幕を表示する",
-                    "persistCaptionStyle": "Remember Caption Style"
+                    "persistCaptionStyle": "字幕スタイルを記憶する"
                 }
             },
             "videoPlayer": {
@@ -278,7 +281,7 @@
     "player": {
         "playbackSpeed": {
             "title": "再生速度",
-            "button": "速度のコントロール",
+            "button": "再生速度",
             "fixStuttering": "スタッタリングを修正 (1.0001x)"
         },
         "miniPlayer": "ミニプレーヤー",
@@ -293,40 +296,37 @@
         },
         "screenOff": "画面をオフにする",
         "chapters": {
-            "title": "Chapters",
-            "enterNudge": "To view chapters, press the up arrow button",
-            "navNudge": "Navigate between chapters",
-            "navNudgeA11y": "Press the left or right arrow button to navigate between chapters"
+            "title": "チャプター",
+            "enterNudge": "上ボタンを押してチャプターを切り替えます",
+            "navNudge": "チャプター間の移動",
+            "navNudgeA11y": "左右のボタンを押してチャプターを切り替えます"
         },
         "queue": {
-            "title": "Queued Videos",
-            "clear": "Clear Queue"
+            "title": "キューに追加済みの動画",
+            "clear": "キューを消去"
         },
         "subtitles": {
-            "otherLanguages": "Other Languages"
+            "otherLanguages": "その他の言語"
         }
-    },
-    "toasts": {
-        "videoAddedToQueue": "動画をキューに追加しました",
-        "videoQueueCleared": "動画のキューを削除しました",
-        "sidebarContentsUpdated": {
-            "title": "サイドバーのコンテンツを更新しました",
-            "subtitle": "サイドバーのコンテンツが更新されました"
-        },
-        "feedbackSent": "フィードバックを送信しました。"
     },
     "videoMenu": {
         "notInterested": "興味がない",
         "dontRecommendChannel": "このチャンネルをおすすめに表示しません",
-        "play": "Play",
-        "saveToWatchLater": "Save to Watch Later",
-        "removeFromWatchLater": "Remove from Watch Later",
-        "saveToPlaylist": "Save to Playlist",
-        "addToQueue": "Add to Queue",
-        "goToChannel": "Go To Channel",
-        "videoOptions": "Video options"
+        "play": "再生",
+        "saveToWatchLater": "後で見るに保存",
+        "removeFromWatchLater": "後で見るから削除",
+        "saveToPlaylist": "再生リストに保存",
+        "addToQueue": "キューに追加",
+        "goToChannel": "チャンネルに移動",
+        "videoOptions": "動画のオプション"
     },
-    "common": {
-        "back": "Back"
+    "toasts": {
+        "videoAddedToQueue": "動画をキューに追加しました",
+        "videoQueueCleared": "動画のキューを削除しました",
+        "feedbackSent": "フィードバックを送信しました。",
+        "sidebarContentsUpdated": {
+            "title": "サイドバーのコンテンツを更新しました",
+            "subtitle": "サイドバーのコンテンツが更新されました"
+        }
     }
 }
