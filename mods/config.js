@@ -88,7 +88,8 @@ try {
 export function configRead(key) {
   if (localConfig[key] === undefined) {
     console.warn('Populating key', key, 'with default value', defaultConfig[key]);
-    localConfig[key] = defaultConfig[key];
+    const fallback = defaultConfig[key];
+    localConfig[key] = typeof fallback === 'object' && fallback !== null ? JSON.parse(JSON.stringify(fallback)) : fallback;
   }
 
   return localConfig[key];

@@ -5,8 +5,8 @@ const MAX_HIDDEN_VIDEOS = 1000;
 function textOf(text) {
   if (!text) return '';
   if (typeof text === 'string') return text;
-  if (text.simpleText) return text.simpleText;
-  if (text.content) return text.content;
+  if (text.simpleText) return String(text.simpleText);
+  if (text.content) return String(text.content);
   if (Array.isArray(text.runs)) return text.runs.map((run) => run?.text ?? '').join('');
   return '';
 }
@@ -28,10 +28,12 @@ export function getVideoId(item) {
 
 // The first metadata line of a video tile is the channel name.
 export function getChannelInfo(item) {
-  const name = textOf(item?.tileRenderer
+  const nameNode = item?.tileRenderer
     ? item.tileRenderer.metadata?.tileMetadataRenderer?.lines?.[0]?.lineRenderer?.items?.[0]?.lineItemRenderer?.text
-    : item?.lockupViewModel?.metadata?.lockupMetadataViewModel?.metadata?.contentMetadataViewModel?.metadataRows?.[0]?.metadataParts?.[0]?.text).trim();
-  const id = findChannelId(item);
+    : item?.lockupViewModel?.metadata?.lockupMetadataViewModel?.metadata?.contentMetadataViewModel?.metadataRows?.[0]?.metadataParts?.[0]?.text;
+  const name = textOf(nameNode).trim();
+  // Prefer the id attached to the channel name itself over any other id in the tile.
+  const id = findChannelId(nameNode) ?? findChannelId(item);
   if (!name && !id) return null;
   return { id, name };
 }
@@ -52,19 +54,40 @@ export function hideVideoLocally(videoId) {
   configWrite('hiddenVideos', [...hidden, videoId].slice(-MAX_HIDDEN_VIDEOS));
 }
 
-// Drops tiles of blocked channels and hidden videos from a list of renderer items.
+function isVideoTile(item) {
+  return item?.tileRenderer?.style === 'TILE_STYLE_YTLR_DEFAULT'
+    || item?.lockupViewModel?.contentType === 'LOCKUP_CONTENT_TYPE_VIDEO';
+}
+
+// Library, history and playlist pages show items the user chose on purpose.
+const EXEMPT_PAGES = /FElibrary|FEhistory|FEplaylist|playlist|[?&]list=/i;
+
+// Drops video tiles of blocked channels and hidden videos from a list of renderer items.
 export function removeBlocked(items) {
+  try {
+    return filterBlocked(items);
+  } catch (err) {
+    console.error('TizenTube: failed to filter blocked items:', err);
+    return items;
+  }
+}
+
+function filterBlocked(items) {
   if (!Array.isArray(items)) return items;
-  const blocked = new Set(configRead('blockedChannels'));
+  if (EXEMPT_PAGES.test(window.location?.hash ?? '')) return items;
+  const blockedKeys = configRead('blockedChannels');
   const hidden = new Set(configRead('hiddenVideos'));
-  if (!blocked.size && !hidden.size) return items;
+  if (!blockedKeys.length && !hidden.size) return items;
+  const blockedIds = new Set(blockedKeys.filter((k) => k.startsWith('id:')));
+  // An id-blocked channel must also match tiles that carry no channel id.
+  const names = configRead('blockedChannelNames');
+  const blockedNames = new Set(blockedKeys.map((k) => k.startsWith('name:') ? k : (names[k] ? nameKey(names[k]) : null)).filter(Boolean));
   return items.filter((item) => {
-    if (!item?.tileRenderer && !item?.lockupViewModel) return true;
+    if (!isVideoTile(item)) return true;
     if (hidden.has(getVideoId(item))) return false;
-    if (!blocked.size) return true;
     const channel = getChannelInfo(item);
     if (!channel) return true;
-    return !((channel.id && blocked.has(idKey(channel.id)))
-      || (channel.name && blocked.has(nameKey(channel.name))));
+    return !((channel.id && blockedIds.has(idKey(channel.id)))
+      || (channel.name && blockedNames.has(nameKey(channel.name))));
   });
 }
