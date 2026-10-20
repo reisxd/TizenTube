@@ -359,23 +359,31 @@ async function markFeedback(parameters, tokenIndex, showReasons) {
         const reasons = dismissal?.reasons;
         if (!Array.isArray(reasons) || !reasons.length) return;
 
-        const buttons = reasons.map((reason) => buttonItem(
-            { title: extractText(reason.title) },
-            null,
-            [
-                {
-                    signalAction: {
-                        signal: 'POPUP_BACK'
+        const buttons = reasons
+            .map((reason) => reason?.dismissalReasonTextRenderer ?? reason)
+            .map((reason) => ({
+                title: extractText(reason.text ?? reason.title),
+                token: reason.feedback?.feedbackEndpoint?.feedbackToken ?? reason.token
+            }))
+            .filter((reason) => reason.title && reason.token)
+            .map((reason) => buttonItem(
+                { title: reason.title },
+                null,
+                [
+                    {
+                        signalAction: {
+                            signal: 'POPUP_BACK'
+                        }
+                    },
+                    {
+                        customAction: {
+                            action: 'FEEDBACK_REASON',
+                            parameters: { token: reason.token }
+                        }
                     }
-                },
-                {
-                    customAction: {
-                        action: 'FEEDBACK_REASON',
-                        parameters: { token: reason.token }
-                    }
-                }
-            ]
-        ));
+                ]
+            ));
+        if (!buttons.length) return;
         showModal(extractText(dismissal.dismissalReasonsPrompt), overlayPanelItemListRenderer(buttons), 'tt-feedback-reasons');
     } catch (err) {
         console.error('TizenTube: failed to mark feedback:', err);
