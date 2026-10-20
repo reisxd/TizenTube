@@ -30,12 +30,45 @@ export function findFunction(funcName) {
 
 // Patch resolveCommand to be able to change TizenTube settings
 
+// The sidebar's Shorts entry carries a reelWatchEndpoint that the client runs as soon as
+// the entry is focused, so just moving past it opens the Shorts player. Hold the command
+// back and run it when OK is pressed on the entry. The client resolves the reel command
+// again while opening it, so replayUntil lets those nested calls through.
+let pendingShortsCommand = null;
+let selectListenerAdded = false;
+let replayUntil = 0;
+
+function guardShortsKeys() {
+    if (selectListenerAdded) return;
+    selectListenerAdded = true;
+    window.addEventListener('keydown', (e) => {
+        if (e.keyCode === 13 && pendingShortsCommand) {
+            const pending = pendingShortsCommand;
+            pendingShortsCommand = null;
+            replayUntil = Date.now() + 3000;
+            setTimeout(pending, 150);
+        } else if (e.keyCode !== 13) {
+            pendingShortsCommand = null;
+            replayUntil = 0;
+        }
+    }, true);
+}
+
+function isShortsPivotCommand(cmd) {
+    return cmd?.reelWatchEndpoint?.watchEndpointSource === 'REEL_WATCH_ENDPOINT_SOURCE_SHORTS_PIVOT_BAR';
+}
+
 export function patchResolveCommand() {
+    guardShortsKeys();
     for (const key in window._yttv) {
         if (window._yttv[key] && window._yttv[key].instance && window._yttv[key].instance.resolveCommand) {
 
             const ogResolve = window._yttv[key].instance.resolveCommand;
             window._yttv[key].instance.resolveCommand = function (cmd, _) {
+                if (isShortsPivotCommand(cmd) && Date.now() > replayUntil) {
+                    pendingShortsCommand = () => ogResolve.call(this, cmd, _);
+                    return true;
+                }
                 if (cmd.setClientSettingEndpoint) {
                     // Command to change client settings. Use TizenTube configuration to change settings.
                     for (const settings of cmd.setClientSettingEndpoint.settingDatas) {

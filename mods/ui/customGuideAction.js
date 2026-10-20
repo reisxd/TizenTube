@@ -6,6 +6,10 @@ const origParse = JSON.parse;
 JSON.parse = function () {
     const r = origParse.apply(this, arguments);
     const guideSection = r.items?.[0]?.guideSectionRenderer;
+    if (guideSection && !configRead('enableShorts')) {
+        guideSection.items = guideSection.items.filter(item =>
+            item.guideEntryRenderer?.navigationEndpoint?.reelWatchEndpoint?.watchEndpointSource !== 'REEL_WATCH_ENDPOINT_SOURCE_SHORTS_PIVOT_BAR');
+    }
     const order = configRead('sidebarContentsOrder');
     if (guideSection && Array.isArray(order)) {
         let orderChanged = false;
