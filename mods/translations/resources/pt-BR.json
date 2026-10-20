@@ -6,7 +6,7 @@
     "options": {
       "socialMedia": {
         "title": "Redes Sociais",
-        "qrCodeScanMessage": "Você pode acessar a página {{name}} lendo o código QR abaixo.",
+        "qrCodeScanMessage": "Você pode acessar a página {{name}} escaneando o código QR abaixo.",
         "announcements": "Avisos",
         "group": "Grupo",
         "website": "Site Oficial",
@@ -56,7 +56,7 @@
           },
           "fixUI": "Corrigir Interface",
           "hqThumbnails": "Ativar Miniaturas de Alta Qualidade",
-          "longPress": "Ativar Ações de Toque Longo",
+          "longPress": "Ativar Ações ao Pressionar e Segurar",
           "shorts": "Ativar Shorts",
           "videoPreviews": "Ativar Pré-visualizações de Vídeo",
           "ttWelcomeMsg": "Mostrar Mensagem de Boas-vindas do TT",
@@ -67,7 +67,7 @@
       "subtitles": {
         "title": "Configurações das Legendas",
         "options": {
-          "showLocalSubtitle": "Mostrar Legendas Locais",
+          "showLocalSubtitle": "Mostrar Legenda no Idioma Local",
           "showHiddenSubtitles": "Mostrar Legendas Ocultas",
           "persistCaptionStyle": "Memorizar Estilo das Legendas"
         }
@@ -77,10 +77,10 @@
         "subtitle": "Personalizar recursos do reprodutor de vídeo",
         "options": {
           "patching": {
-            "title": "Corrigir Interface do Reprodutor de Vídeo",
+            "title": "Modificar Interface do Reprodutor de Vídeo",
             "options": {
-              "enableVPUIPatching": "Ativar Correção da Interface do Reprodutor de Vídeo",
-              "previousNextBtns": "Ativar Botões de Avançar/Retroceder",
+              "enableVPUIPatching": "Ativar Modificações na Interface do Reprodutor de Vídeo",
+              "previousNextBtns": "Ativar Botões de Anterior e Próximo",
               "showSuperThxBtn": "Mostrar Botão de Valeu Demais",
               "showAIAskBtn": "Mostrar Botão 'Perguntar' (IA)",
               "showSpeedCtrlBtn": "Mostrar Botão de Controle de Velocidade",
@@ -94,7 +94,7 @@
           },
           "speedSettings": {
             "title": "Intervalos do Ajuste de Velocidade",
-            "subtitle": "Defina os incrementos de velocidade para ajustar a velocidade de reprodução do vídeo"
+            "subtitle": "Defina os intervalos usados ao ajustar a velocidade de reprodução do vídeo"
           },
           "preferredVideoCodec": {
             "title": "Codec de Vídeo Preferido",
@@ -146,8 +146,8 @@
             }
           },
           "disableSidebarContents": {
-            "title": "Desativar Conteúdos da Barra Lateral",
-            "subtitle": "Selecione os conteúdos da barra lateral para ocultar"
+            "title": "Desativar Itens da Barra Lateral",
+            "subtitle": "Selecione os itens da barra lateral para desativar"
           },
           "launchToOnStartup": {
             "title": "Página Inicial ao Abrir",
@@ -270,7 +270,7 @@
     },
     "toasts": {
       "skipping": "Pulando {{segment}}",
-      "notSkipping": "Não pulando {{segment}} (foi pulado {{count}} vezes)",
+      "notSkipping": "Sem pular {{segment}} (já pulado {{count}} vezes)",
       "skip": "Pular {{segment}}",
       "skipToHighlight": "Pular para o destaque"
     }
