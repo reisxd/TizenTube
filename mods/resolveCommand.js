@@ -8,6 +8,7 @@ import { t } from 'i18next';
 import { requestNextAndNavigateChannel, getFeedbackPanelTokens, sendFeedbackToken } from './utils/innerTubeCalls.js';
 import qrcode from 'qrcode-npm';
 import showGuideSettings from './ui/sidebarModification.js';
+import { blockChannel, hideVideoLocally } from './utils/blocklist.js';
 
 export default function resolveCommand(cmd, _) {
     // resolveCommand function is pretty OP, it can do from opening modals, changing client settings and way more.
@@ -253,10 +254,27 @@ function customAction(action, parameters) {
             requestNextAndNavigateChannel(parameters);
             break;
         case 'NOT_INTERESTED':
-            markFeedback(parameters, 0, true);
+            hideVideoLocally(parameters.videoId);
+            if (parameters.panel) markFeedback(parameters.panel, 0, true);
+            showToast('TizenTube', t('toasts.videoHidden'));
             break;
         case 'DONT_RECOMMEND_CHANNEL':
-            markFeedback(parameters, 1, false);
+            if (parameters.panel) {
+                markFeedback(parameters.panel, 1, false);
+                showToast('TizenTube', t('toasts.channelNotRecommended'));
+            } else if (parameters.channel) {
+                // No feedback panel on this item, so YouTube can't be told; block locally instead.
+                blockChannel(parameters.channel);
+                showToast('TizenTube', t('toasts.channelBlocked', { name: parameters.channel.name || parameters.channel.id }));
+            }
+            break;
+        case 'CLEAR_HIDDEN_VIDEOS':
+            configWrite('hiddenVideos', []);
+            showToast('TizenTube', t('toasts.hiddenVideosCleared'));
+            break;
+        case 'BLOCK_CHANNEL':
+            blockChannel(parameters);
+            showToast('TizenTube', t('toasts.channelBlocked', { name: parameters.name || parameters.id }));
             break;
         case 'FEEDBACK_REASON':
             sendFeedbackToken(parameters.token)
@@ -345,23 +363,31 @@ async function markFeedback(parameters, tokenIndex, showReasons) {
         const reasons = dismissal?.reasons;
         if (!Array.isArray(reasons) || !reasons.length) return;
 
-        const buttons = reasons.map((reason) => buttonItem(
-            { title: extractText(reason.title) },
-            null,
-            [
-                {
-                    signalAction: {
-                        signal: 'POPUP_BACK'
+        const buttons = reasons
+            .map((reason) => reason?.dismissalReasonTextRenderer ?? reason)
+            .map((reason) => ({
+                title: extractText(reason.text ?? reason.title),
+                token: reason.feedback?.feedbackEndpoint?.feedbackToken ?? reason.token
+            }))
+            .filter((reason) => reason.title && reason.token)
+            .map((reason) => buttonItem(
+                { title: reason.title },
+                null,
+                [
+                    {
+                        signalAction: {
+                            signal: 'POPUP_BACK'
+                        }
+                    },
+                    {
+                        customAction: {
+                            action: 'FEEDBACK_REASON',
+                            parameters: { token: reason.token }
+                        }
                     }
-                },
-                {
-                    customAction: {
-                        action: 'FEEDBACK_REASON',
-                        parameters: { token: reason.token }
-                    }
-                }
-            ]
-        ));
+                ]
+            ));
+        if (!buttons.length) return;
         showModal(extractText(dismissal.dismissalReasonsPrompt), overlayPanelItemListRenderer(buttons), 'tt-feedback-reasons');
     } catch (err) {
         console.error('TizenTube: failed to mark feedback:', err);

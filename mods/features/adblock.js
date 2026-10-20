@@ -3,6 +3,7 @@ import Chapters from '../ui/chapters.js';
 import resolveCommand from '../resolveCommand.js';
 import { timelyAction, longPressData, MenuServiceItemRenderer, ShelfRenderer, TileRenderer, ButtonRenderer } from '../ui/ytUI.js';
 import { findFeedbackToken } from '../utils/innerTubeCalls.js';
+import { getVideoId, getChannelInfo, removeBlocked } from '../utils/blocklist.js';
 import { PatchSettings } from '../ui/customYTSettings.js';
 import { t } from 'i18next';
 
@@ -91,7 +92,9 @@ JSON.parse = function () {
       r?.contents?.tvBrowseRenderer?.content?.tvSurfaceContentRenderer?.content
         ?.gridRenderer?.items
     ) {
-      addLongPress(r.contents.tvBrowseRenderer.content.tvSurfaceContentRenderer.content.gridRenderer.items);
+      const gridContent = r.contents.tvBrowseRenderer.content.tvSurfaceContentRenderer.content.gridRenderer;
+      addLongPress(gridContent.items);
+      gridContent.items = removeBlocked(gridContent.items);
     }
 
     if (r.endscreen && configRead('enableHideEndScreenCards')) {
@@ -136,6 +139,7 @@ JSON.parse = function () {
 
     if (r?.continuationContents?.gridContinuation?.items) {
       addLongPress(r.continuationContents.gridContinuation.items);
+      r.continuationContents.gridContinuation.items = removeBlocked(r.continuationContents.gridContinuation.items);
     }
 
     if (r?.contents?.tvBrowseRenderer?.content?.tvSecondaryNavRenderer?.sections) {
@@ -162,6 +166,7 @@ JSON.parse = function () {
           }
           if (content?.gridRenderer?.items) {
             addLongPress(content.gridRenderer.items);
+            content.gridRenderer.items = removeBlocked(content.gridRenderer.items);
           }
         }
       }
@@ -486,7 +491,7 @@ function addLongPress(items) {
       const menuItems = item.tileRenderer ? item.tileRenderer.onLongPressCommand.showMenuCommand.menu.menuRenderer.items
         : item.lockupViewModel.rendererContext.commandContext.onLongPress.innertubeCommand.showMenuCommand.menu.menuRenderer.items;
       menuItems.push(button);
-      restoreFeedbackMenuItems(item, menuItems);
+      addFeedbackMenuItems(item, menuItems);
       continue;
     }
     if (!configRead('enableLongPress')) continue;
@@ -509,7 +514,7 @@ function addLongPress(items) {
       watchEndpointData: copiedItem?.tileRenderer?.onSelectCommand?.watchEndpoint || copiedItem?.lockupViewModel?.rendererContext?.commandContext?.onTap?.innertubeCommand?.watchEndpoint,
       item: copiedItem
     });
-    restoreFeedbackMenuItems(item, data.showMenuCommand.menu.menuRenderer.items);
+    addFeedbackMenuItems(item, data.showMenuCommand.menu.menuRenderer.items);
     item.tileRenderer ? item.tileRenderer.onLongPressCommand = data
     : item.lockupViewModel.rendererContext.commandContext.onLongPress = {
       innertubeCommand: data
@@ -538,11 +543,27 @@ function getFeedbackPanel(item) {
   return null;
 }
 
-function restoreFeedbackMenuItems(item, menuItems) {
+function addFeedbackMenuItems(item, menuItems) {
+  const hasBlockItem = menuItems?.some((menuItem) =>
+    menuItem?.menuServiceItemRenderer?.serviceEndpoint?.playlistEditEndpoint?.customAction?.action === 'BLOCK_CHANNEL');
+  if (hasBlockItem) return;
   const panel = getFeedbackPanel(item);
-  if (!panel || menuHasFeedbackItems(menuItems)) return;
-  for (const feedbackItem of feedbackMenuItems(panel)) {
-    menuItems.push(feedbackItem);
+  const channel = getChannelInfo(item);
+  if (!menuHasFeedbackItems(menuItems)) {
+    for (const feedbackItem of feedbackMenuItems(panel, getVideoId(item), channel)) {
+      menuItems.push(feedbackItem);
+    }
+  }
+  if (channel) {
+    menuItems.push(MenuServiceItemRenderer(t('videoMenu.blockChannel'), {
+      clickTrackingParams: null,
+      playlistEditEndpoint: {
+        customAction: {
+          action: 'BLOCK_CHANNEL',
+          parameters: channel
+        }
+      }
+    }));
   }
 }
 
@@ -554,27 +575,31 @@ function menuHasFeedbackItems(menuItems) {
       || !!findFeedbackToken(menuItem?.menuNavigationItemRenderer?.navigationEndpoint));
 }
 
-function feedbackMenuItems(panel) {
+function feedbackMenuItems(panel, videoId, channel) {
   return [
     MenuServiceItemRenderer(t('videoMenu.notInterested'), {
       clickTrackingParams: null,
-      customAction: {
-        action: 'NOT_INTERESTED',
-        parameters: panel
+      playlistEditEndpoint: {
+        customAction: {
+          action: 'NOT_INTERESTED',
+          parameters: { panel, videoId }
+        }
       }
     }),
     MenuServiceItemRenderer(t('videoMenu.dontRecommendChannel'), {
       clickTrackingParams: null,
-      customAction: {
-        action: 'DONT_RECOMMEND_CHANNEL',
-        parameters: panel
+      playlistEditEndpoint: {
+        customAction: {
+          action: 'DONT_RECOMMEND_CHANNEL',
+          parameters: { panel, channel }
+        }
       }
     })
   ];
 }
 
 function hideVideo(items) {
-  return items.filter(item => {
+  return removeBlocked(items).filter(item => {
     if (!item.tileRenderer) return true;
     const progressBar = item?.tileRenderer ? item.tileRenderer.header?.tileHeaderRenderer?.thumbnailOverlays?.find(overlay => overlay.thumbnailOverlayResumePlaybackRenderer)?.thumbnailOverlayResumePlaybackRenderer
     : item.lockupViewModel?.contentImage?.thumbnailViewModel?.overlays?.find(overlay => overlay.thumbnailBottomOverlayViewModel?.progressBar)?.thumbnailBottomOverlayViewModel?.progressBar. thumbnailOverlayProgressBarViewModel;
