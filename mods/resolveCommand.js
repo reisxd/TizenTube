@@ -268,6 +268,10 @@ function customAction(action, parameters) {
                 showToast('TizenTube', t('toasts.channelBlocked', { name: parameters.channel.name || parameters.channel.id }));
             }
             break;
+        case 'CLEAR_HIDDEN_VIDEOS':
+            configWrite('hiddenVideos', []);
+            showToast('TizenTube', t('toasts.hiddenVideosCleared'));
+            break;
         case 'BLOCK_CHANNEL':
             blockChannel(parameters);
             showToast('TizenTube', t('toasts.channelBlocked', { name: parameters.name || parameters.id }));

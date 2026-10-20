@@ -128,6 +128,13 @@
                         "subtitle": "Checked channels are hidden. Uncheck a channel to unblock it.",
                         "none": "No channels are blocked. Use \"Block channel\" in a video's menu to add one."
                     },
+                    "hiddenVideos": {
+                        "title": "Hidden Videos",
+                        "subtitle": "Videos hidden with \"Not interested\" are kept in a local list.",
+                        "count_one": "{{count}} video hidden",
+                        "count_other": "{{count}} videos hidden",
+                        "clear": "Show all hidden videos again"
+                    },
                     "hideWatchedVideos": {
                         "title": "Hide Watched Videos",
                         "options": {
@@ -330,6 +337,7 @@
         "videoAddedToQueue": "Video added to queue.",
         "videoHidden": "Video hidden. It disappears after the page refreshes.",
         "channelNotRecommended": "Channel won't be recommended anymore.",
+        "hiddenVideosCleared": "Hidden videos cleared. They reappear after the page refreshes.",
         "channelBlocked": "{{name}} blocked. Its videos disappear after the page refreshes.",
         "videoQueueCleared": "Video queue cleared.",
         "feedbackSent": "Feedback sent.",

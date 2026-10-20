@@ -504,6 +504,30 @@ export default function modernUI(update, parameters) {
                     };
                 })(),
                 {
+                    name: t('settings.options.uiSettings.options.hiddenVideos.title'),
+                    icon: 'VISIBILITY_OFF',
+                    value: null,
+                    menuId: 'tt-hidden-videos',
+                    menuHeader: {
+                        title: t('settings.options.uiSettings.options.hiddenVideos.title'),
+                        subtitle: t('settings.options.uiSettings.options.hiddenVideos.subtitle')
+                    },
+                    subtitle: t('settings.options.uiSettings.options.hiddenVideos.count', { count: configRead('hiddenVideos').length }),
+                    options: [
+                        buttonItem(
+                            { title: t('settings.options.uiSettings.options.hiddenVideos.clear') },
+                            { icon: 'VISIBILITY' },
+                            [
+                                {
+                                    customAction: {
+                                        action: 'CLEAR_HIDDEN_VIDEOS'
+                                    }
+                                }
+                            ]
+                        )
+                    ]
+                },
+                {
                     name: t('settings.options.uiSettings.options.hideWatchedVideos.title'),
                     icon: 'VISIBILITY_OFF',
                     value: null,
