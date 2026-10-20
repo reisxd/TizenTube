@@ -545,7 +545,7 @@ function getFeedbackPanel(item) {
 
 function addFeedbackMenuItems(item, menuItems) {
   const hasBlockItem = menuItems?.some((menuItem) =>
-    menuItem?.menuServiceItemRenderer?.serviceEndpoint?.customAction?.action === 'BLOCK_CHANNEL');
+    menuItem?.menuServiceItemRenderer?.serviceEndpoint?.playlistEditEndpoint?.customAction?.action === 'BLOCK_CHANNEL');
   if (hasBlockItem) return;
   const panel = getFeedbackPanel(item);
   const channel = getChannelInfo(item);
@@ -557,9 +557,11 @@ function addFeedbackMenuItems(item, menuItems) {
   if (channel) {
     menuItems.push(MenuServiceItemRenderer(t('videoMenu.blockChannel'), {
       clickTrackingParams: null,
-      customAction: {
-        action: 'BLOCK_CHANNEL',
-        parameters: channel
+      playlistEditEndpoint: {
+        customAction: {
+          action: 'BLOCK_CHANNEL',
+          parameters: channel
+        }
       }
     }));
   }
@@ -577,16 +579,20 @@ function feedbackMenuItems(panel, videoId, channel) {
   return [
     MenuServiceItemRenderer(t('videoMenu.notInterested'), {
       clickTrackingParams: null,
-      customAction: {
-        action: 'NOT_INTERESTED',
-        parameters: { panel, videoId }
+      playlistEditEndpoint: {
+        customAction: {
+          action: 'NOT_INTERESTED',
+          parameters: { panel, videoId }
+        }
       }
     }),
     MenuServiceItemRenderer(t('videoMenu.dontRecommendChannel'), {
       clickTrackingParams: null,
-      customAction: {
-        action: 'DONT_RECOMMEND_CHANNEL',
-        parameters: { panel, channel }
+      playlistEditEndpoint: {
+        customAction: {
+          action: 'DONT_RECOMMEND_CHANNEL',
+          parameters: { panel, channel }
+        }
       }
     })
   ];
