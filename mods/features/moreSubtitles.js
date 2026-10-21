@@ -3,6 +3,7 @@
 
 import { t } from 'i18next';
 import { configRead } from "../config.js";
+import { onLoad } from "../utils/onLoad.js";
 import languages from "../translations/language-names.js";
 
 const LANGUAGE_CODES = [
@@ -368,11 +369,7 @@ const interval = setInterval(() => {
 }, 1000);
 
 // Also try to patch when DOM is loaded
-if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", patchSubtitleMenu);
-} else {
-    patchSubtitleMenu();
-}
+onLoad(patchSubtitleMenu);
 
 console.log(
     "TizenTube Subtitle Localization: Module loaded, waiting for YouTube TV..."
