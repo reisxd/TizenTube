@@ -117,6 +117,12 @@ JSON.parse = function () {
       PatchSettings(r);
     }
 
+    // Refreshing the home feed returns a continuation instead of tvBrowseRenderer,
+    // so the filtering above never sees its ad slots.
+    if (adBlockEnabled && (r?.continuationContents || r?.onResponseReceivedActions || r?.contents)) {
+      stripAdSlots(r);
+    }
+
     // DeArrow Implementation. I think this is the best way to do it. (DOM manipulation would be a pain)
 
     if (r?.contents?.sectionListRenderer?.contents) {
@@ -589,4 +595,15 @@ function hideVideo(items) {
       progressBar?.startPercent || 0);
     return percentWatched <= configRead('hideWatchedVideosThreshold');
   });
+}
+
+function stripAdSlots(node) {
+  if (Array.isArray(node)) {
+    for (let i = node.length - 1; i >= 0; i--) {
+      if (node[i]?.adSlotRenderer) node.splice(i, 1);
+      else stripAdSlots(node[i]);
+    }
+  } else if (node && typeof node === 'object') {
+    for (const key in node) stripAdSlots(node[key]);
+  }
 }
