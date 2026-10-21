@@ -155,3 +155,8 @@ div[idomkey="shadow"] {
 .ytContribIconHost::before {
     font-family: "YouTube Icons Outlined";
 }
+
+/* Narrow only the expanded guide variant to avoid overlapping page content. */
+ytlr-guide-response.RYo6Fb[aria-hidden="false"] .hsdF6b {
+  width: 17rem !important;
+}
