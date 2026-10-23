@@ -4,7 +4,19 @@ const path = require('path');
 const { XMLParser, XMLBuilder } = require('fast-xml-parser');
 
 async function build() {
-    const { code } = await ncc(path.join(__dirname, 'transpiled/index.js'), {
+    if (!fs.existsSync(path.join(__dirname, '../../dist/service.js'))) {
+        throw new Error('Build the DIAL service first: cd service && npm install && npx rollup -c rollup.config.js');
+    }
+    const scriptFile = path.join(__dirname, '../../dist/userScript.js');
+    if (!fs.existsSync(scriptFile)) {
+        throw new Error('Build the userscript first: cd mods && npm install && npm run build');
+    }
+    const source = fs.readFileSync(scriptFile, 'utf8');
+    if (!source.trim()) throw new Error('The built userscript is empty.');
+    // Package the userscript built from this checkout, including first-run fixes.
+    // No CDN request should race the first YouTube player response.
+    fs.writeFileSync(path.join(__dirname, 'userscript.json'), JSON.stringify({ source }));
+    const { code } = await ncc(path.join(__dirname, 'index.js'), {
         minify: false
     });
 
@@ -19,9 +31,19 @@ async function build() {
     const outDir = path.join(__dirname, 'dist');
     if (!fs.existsSync(outDir)) fs.mkdirSync(outDir);
 
-    fs.writeFileSync(path.join(outDir, 'index.js'), fixedCode);
-
-    fs.rmSync(path.join(__dirname, 'transpiled'), { recursive: true, force: true });
+    // Transform the complete bundle, including dependency code and ncc's wrapper.
+    // A source-only transform can leave newer syntax in the shipped service.
+    const babel = await import('@babel/core');
+    const preset = await import('@babel/preset-env');
+    const result = await babel.transformAsync(fixedCode, {
+        configFile: false,
+        babelrc: false,
+        sourceType: 'script',
+        presets: [[preset.default, { targets: { node: '4.4.3' } }]],
+        comments: false,
+        compact: false
+    });
+    fs.writeFileSync(path.join(outDir, 'index.js'), result.code);
 }
 
 if (process.argv[2] === 'remove-cobalt-flags') {
@@ -82,4 +104,7 @@ if (process.argv[2] === 'remove-cobalt-flags') {
     const configXml = fs.readFileSync(path.join(__dirname, '../config.xml'), 'utf8');
     fs.writeFileSync(path.join(__dirname, '../config.xml.bak'), configXml);
     fs.writeFileSync(path.join(__dirname, '../config.xml'), configXml.replace('http://127.0.0.2:8101', 'http://tizentube:8101'));
-} else build();
+} else build().catch(error => {
+    console.error(error);
+    process.exitCode = 1;
+});

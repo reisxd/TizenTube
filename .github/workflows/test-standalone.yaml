@@ -1,0 +1,45 @@
+name: Test standalone startup
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/test-standalone.yaml'
+      - 'standalone/**'
+      - 'service/**'
+      - 'mods/**'
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Build DIAL service
+        working-directory: service
+        run: |
+          npm install
+          npx rollup -c rollup.config.js
+      - name: Build userscript
+        working-directory: mods
+        run: |
+          npm install
+          npm run build
+      - name: Build and test standalone service
+        working-directory: standalone/service
+        run: |
+          npm install
+          npm run build
+          npm test
+      - name: Check actual Node 4.4.3 compatibility
+        working-directory: standalone/service
+        run: |
+          curl --fail --location https://nodejs.org/download/release/v4.4.3/node-v4.4.3-linux-x64.tar.xz --output "$RUNNER_TEMP/node4.tar.xz"
+          echo "7d8919fa7c6fa927c0fe295fcb16c7025c974b717350e97ddbd7a46d3b60fbef  $RUNNER_TEMP/node4.tar.xz" | sha256sum --check
+          tar -xJf "$RUNNER_TEMP/node4.tar.xz" -C "$RUNNER_TEMP"
+          "$RUNNER_TEMP/node-v4.4.3-linux-x64/bin/node" test/node4-parse.cjs dist/index.js
+          "$RUNNER_TEMP/node-v4.4.3-linux-x64/bin/node" test/node4-smoke.cjs entry.js

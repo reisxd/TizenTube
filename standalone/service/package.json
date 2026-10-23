@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "babel . --out-dir transpiled --copy-files && node build-service.js"
+    "build": "node build-service.js",
+    "test": "node --test entry.test.cjs injector.test.cjs userscript.test.cjs"
   },
   "keywords": [],
   "author": "",
@@ -22,6 +23,7 @@
     "@babel/core": "^8.0.1",
     "@babel/preset-env": "^8.0.2",
     "@vercel/ncc": "^0.44.1",
-    "fast-xml-parser": "^5.11.1"
+    "fast-xml-parser": "^5.11.1",
+    "jsdom": "^29.1.1"
   }
 }

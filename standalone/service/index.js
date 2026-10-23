@@ -6,10 +6,7 @@ const express = require('express');
 const app = express();
 const PORT = 8100;
 const fetch = require('node-fetch');
-const cobaltSetup = require('./utils/cobaltSetup.js');
-const startServer = require('./utils/cobaltProxyServer.js');
 const URL = require('url');
-const path = require('path');
 const injector = require('./utils/injector.js');
 
 app.use((req, res, next) => {
@@ -25,21 +22,30 @@ app.use((req, res, next) => {
 app.get('/tizentube/getState', (req, res) => {
     injector.canConnectToDaemon().then(r => {
         res.json(r);
-    });
+    }).catch(error => res.status(503).json({ error: error.message }));
 });
 
 app.get('/tizentube/debugger', (req, res) => {
     const args = req.originalUrl.split('?')[1] || '';
+    let fired = false;
+    let checks = 0;
     const interval = setInterval(() => {
+        if (++checks > 200) {
+            clearInterval(interval);
+            return;
+        }
         tizen.application.getAppsContext((appsContext) => {
+            if (fired) return;
             const packageId = tizen.application.getAppInfo().packageId;
             const app = appsContext.find(app => app.appId === `${packageId}.TizenTubeStandalone`);
             if (!app) {
-                injector.startDebugger(args);
-                clearInterval(interval)
+                fired = true;
+                clearInterval(interval);
+                injector.startDebugger(args).catch(error => console.error('TizenTube startup:', error));
             }
         });
     }, 50);
+    res.json({ accepted: true });
 });
 
 app.all('*', (req, res) => {
@@ -197,12 +203,13 @@ app.all('*', (req, res) => {
 app.listen(PORT, '127.0.0.1');
 
 
-if (cobaltSetup()) {
-    startServer();
+// Native Cobalt requires Tizen 6+. Older TVs use the on-device debugger.
+const platformVersion = parseFloat(tizen.systeminfo.getCapability('http://tizen.org/feature/platform.version'));
+if (platformVersion >= 6 && require('./utils/cobaltSetup.js')()) {
+    require('./utils/cobaltProxyServer.js')();
 } else {
-    // Start the DIAL server
     global.isTizenTube = true;
-    require(path.join(__dirname, '../../../dist/service.js'));
+    require('../../dist/service.js');
 }
 
 // To avoid issues on newer versions of Tizen.
