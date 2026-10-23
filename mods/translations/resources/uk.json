@@ -69,7 +69,7 @@
                 "options": {
                     "showLocalSubtitle": "Локальні субтитри",
                     "showHiddenSubtitles": "Приховані субтитри",
-                    "persistCaptionStyle": "Remember Caption Style"
+                    "persistCaptionStyle": "Запам'ятовувати стиль субтитрів"
                 }
             },
             "videoPlayer": {
@@ -293,17 +293,17 @@
         },
         "screenOff": "Вимкнути екран",
         "chapters": {
-            "title": "Chapters",
-            "enterNudge": "To view chapters, press the up arrow button",
-            "navNudge": "Navigate between chapters",
-            "navNudgeA11y": "Press the left or right arrow button to navigate between chapters"
+            "title": "Розділи",
+            "enterNudge": "Щоб переглянути розділи, натисніть стрілку вгору",
+            "navNudge": "Переміщення між розділами",
+            "navNudgeA11y": "Для переходу між розділами натискайте стрілки вліво або вправо"
         },
         "queue": {
-            "title": "Queued Videos",
-            "clear": "Clear Queue"
+            "title": "Відео в черзі",
+            "clear": "Очистити чергу"
         },
         "subtitles": {
-            "otherLanguages": "Other Languages"
+            "otherLanguages": "Інші мови"
         }
     },
     "toasts": {
@@ -318,15 +318,15 @@
     "videoMenu": {
         "notInterested": "Не цікавить",
         "dontRecommendChannel": "Не рекомендувати канал",
-        "play": "Play",
-        "saveToWatchLater": "Save to Watch Later",
-        "removeFromWatchLater": "Remove from Watch Later",
-        "saveToPlaylist": "Save to Playlist",
-        "addToQueue": "Add to Queue",
-        "goToChannel": "Go To Channel",
-        "videoOptions": "Video options"
+        "play": "Відтворити",
+        "saveToWatchLater": "Переглянути пізніше",
+        "removeFromWatchLater": "Вилучити зі списку «Переглянути пізніше»",
+        "saveToPlaylist": "Додати в плейлист",
+        "addToQueue": "Додати в чергу",
+        "goToChannel": "Перейти на канал",
+        "videoOptions": "Параметри відео"
     },
     "common": {
-        "back": "Back"
+        "back": "Назад"
     }
 }
