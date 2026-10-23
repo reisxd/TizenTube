@@ -15,6 +15,11 @@ jobs:
         with:
           fetch-depth: 0 # fetch full history for tags
           fetch-tags: true
+
+      - name: Set up Node for Babel and tests
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
       
       - name: Fetch tags (safety)
         run: |
@@ -45,12 +50,19 @@ jobs:
           npm install
           npx rollup -c rollup.config.js
 
+      - name: Build the bundled userscript
+        working-directory: mods
+        run: |
+          npm install
+          npm run build
+
       - name: Install modules, transpile service and build service
         working-directory: standalone/service
         run: |
           npm install
           npm install -g @vercel/ncc https://github.com/reisxd/tizen.js/tarball/main
           npm run build
+          npm test
 
       - name: Prepare Tizen Certificate
         run: |

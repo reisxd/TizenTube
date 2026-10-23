@@ -33,7 +33,7 @@
     <tizen:metadata key="http://samsung.com/tv/metadata/native.userdata" value="--base_url=https://www.youtube.com/tv --proxy=http://127.0.0.2:8101 --content=/home/owner/share/tizentube-content --dial_name=TizenTube --use_eden"/>
     <tizen:profile name="tv-samsung"/>
     <tizen:service id="xvvl3S1TT1.StandaloneService" auto-restart="true" on-boot="true">
-        <tizen:content src="service/dist/index.js"/>
+        <tizen:content src="service/entry.js"/>
         <tizen:name>StandaloneService</tizen:name>
         <tizen:description>StandaloneService</tizen:description>
     </tizen:service>

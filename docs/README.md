@@ -32,6 +32,8 @@ There are two versions of TizenTube available for installation, one for newer Ti
 
 ## Troubleshooting
 
+For the Old build, see [older-TV startup diagnostics and a verified Tizen 5 device](legacy-standalone.md).
+
 If you've installed TizenTube Cobalt and you get "A network error has occured" while launching the app, it means that your TV is unable to connect to the TizenTube proxy server. This could happen because:
 - You didn't enable "Force Samsung Certificate" and "Partner Signing" in Apps2Samsung while installing TizenTube Cobalt.
 - Your TV is unable to resolve the default proxy server address `http://127.0.0.2:8101`. In this case, you can try using the TizenTubeCobaltTizenTubeProxyAddress.wgt version of TizenTube Cobalt, which uses `http://tizentube:8101` as the proxy server address. Make sure that your DNS resolves `tizentube` to your TV's IP address. You can do this by adding a DNS entry in your router or using a DNS service that allows custom entries. Note that the IP must be static as it can change.

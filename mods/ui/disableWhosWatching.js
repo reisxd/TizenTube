@@ -3,14 +3,30 @@ import { configChangeEmitter, configRead } from '../config.js';
 configChangeEmitter.addEventListener('configChange', (event) => {
     const { key, value } = event.detail;
     if (key === 'enableWhoIsWatchingMenu') {
+        retries = 0;
         disableWhosWatching(value);
     }
 });
 
 let interval;
+let retryTimer;
+let retries = 0;
 
 function disableWhosWatching(value) {
-    const LeanbackRecurringActions = JSON.parse(localStorage['yt.leanback.default::recurring_actions']);
+    clearTimeout(retryTimer);
+    let LeanbackRecurringActions;
+    try {
+        LeanbackRecurringActions = JSON.parse(localStorage['yt.leanback.default::recurring_actions']);
+    } catch (_) {
+        // YouTube creates this storage record after its first startup.
+    }
+    if (!LeanbackRecurringActions?.data?.data?.whos_watching_fullscreen_zero_accounts) {
+        if (retries++ < 40) {
+            retryTimer = setTimeout(() => disableWhosWatching(configRead('enableWhoIsWatchingMenu')), 250);
+        }
+        return;
+    }
+    retries = 0;
     const shouldPermanentlyEnable = configRead('permanentlyEnableWhoIsWatchingMenu');
     const date = new Date();
     if (!value) {

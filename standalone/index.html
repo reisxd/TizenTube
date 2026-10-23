@@ -64,35 +64,112 @@
 
         const serviceId = pkgId + ".StandaloneService";
 
+        let failed = false;
+        let waitingSince = 0;
+        let requestFailures = 0;
+        let retryRequested = false;
+        let serviceStatus = null;
+
+        try {
+            tizen.messageport.requestLocalMessagePort('TizenTubeStartup').addMessagePortListener(data => {
+                const item = data.find(item => item.key === 'status');
+                if (!item) return;
+                try {
+                    serviceStatus = JSON.parse(item.value);
+                    if (serviceStatus.phase === 'error') {
+                        showError('Service boot failed (' + serviceStatus.runtime + '): ' + serviceStatus.error);
+                    }
+                } catch (error) {
+                    console.error('Invalid service startup status:', error);
+                }
+            });
+        } catch (error) {
+            console.error('Startup diagnostics unavailable:', error);
+        }
+
+        function showError(message) {
+            failed = true;
+            document.getElementById('startup-status').textContent = message + ' Press OK to retry.';
+            document.querySelector('.progress-container').style.display = 'none';
+        }
+
+        function fetchJson(url) {
+            return new Promise((resolve, reject) => {
+                const timer = setTimeout(() => reject(new Error('The TizenTube service did not respond.')), 2500);
+                fetch(url).then(response => {
+                    if (!response.ok) throw new Error('The TizenTube service returned HTTP ' + response.status);
+                    return response.json();
+                }).then(value => {
+                    clearTimeout(timer);
+                    resolve(value);
+                }).catch(error => {
+                    clearTimeout(timer);
+                    reject(error);
+                });
+            });
+        }
+
         function useInjectorOrProxy() {
-            const data = tizen.application.getCurrentApplication().getRequestedAppControl().appControl.data;
+            if (serviceStatus && serviceStatus.phase === 'error') return;
             let args;
             try {
+                const data = tizen.application.getCurrentApplication().getRequestedAppControl().appControl.data;
                 const parsedData = JSON.parse(data[0].value[0]);
                 args = parsedData.args;
             } catch (e) {
                 // Do nothing.
             }
-            fetch('http://localhost:8100/tizentube/getState')
-                .then(r => r.json())
+            fetchJson('http://localhost:8100/tizentube/getState')
                 .then(res => {
-                    if (res.canConnectToDaemon && !res.isConnecting) {
-                        fetch(`http://localhost:8100/tizentube/debugger${args ? `?${args}` : ''}`);
-                        tizen.application.getCurrentApplication().exit();
-                    } else if (!res.canConnectToDaemon) location.href = `http://localhost:8100/tv?additionalDataUrl=http%3A%2F%2Flocalhost%3A8100%2Fdial%2Fapps%2FYouTube${args ? `&${args}` : ''}`
-                }).catch(() => window.location.reload());
+                    if (serviceStatus && serviceStatus.phase === 'error') return;
+                    requestFailures = 0;
+                    if (!res.canConnectToDaemon) {
+                        showError('Set Developer Mode Host PC IP to 127.0.0.1 and restart the TV.');
+                    } else if (res.phase === 'error' && !retryRequested) {
+                        showError(res.lastError || 'The TV debugger could not start.');
+                    } else if (!res.isConnecting && (res.phase !== 'running' || retryRequested)) {
+                        retryRequested = false;
+                        fetchJson(`http://localhost:8100/tizentube/debugger${args ? `?${args}` : ''}`)
+                            .then(() => {
+                                if (!serviceStatus || serviceStatus.phase !== 'error') tizen.application.getCurrentApplication().exit();
+                            })
+                            .catch(error => {
+                                if (!serviceStatus || serviceStatus.phase !== 'error') showError(error.message);
+                            });
+                    } else if (Date.now() - waitingSince < 65000) {
+                        setTimeout(useInjectorOrProxy, 500);
+                    } else showError('Timed out while starting TizenTube.');
+                }).catch(() => {
+                    if (serviceStatus && serviceStatus.phase === 'error') return;
+                    if (++requestFailures < 20) setTimeout(useInjectorOrProxy, 500);
+                    else showError('The TizenTube service did not respond. Startup: ' +
+                        (serviceStatus ? serviceStatus.phase + ' (' + serviceStatus.runtime + ')' : 'no lifecycle callback received'));
+                });
         }
 
-        tizen.application.launchAppControl(
-            new tizen.ApplicationControl("http://tizen.org/appcontrol/operation/service"),
-            serviceId,
-            function () {
-                useInjectorOrProxy();
-            },
-            function (e) {
-                alert("Launch Service failed: " + e.message);
+        function start() {
+            failed = false;
+            waitingSince = Date.now();
+            requestFailures = 0;
+            document.getElementById('startup-status').textContent = '';
+            document.querySelector('.progress-container').style.display = '';
+            tizen.application.launchAppControl(
+                new tizen.ApplicationControl("http://tizen.org/appcontrol/operation/service"),
+                serviceId,
+                useInjectorOrProxy,
+                error => {
+                    if (!serviceStatus || serviceStatus.phase !== 'error') showError('Launch service failed: ' + error.message);
+                }
+            );
+        }
+
+        window.addEventListener('DOMContentLoaded', start);
+        window.addEventListener('keydown', event => {
+            if (failed && event.keyCode === 13) {
+                retryRequested = true;
+                start();
             }
-        );
+        });
     </script>
 </head>
 
@@ -105,6 +182,7 @@
     <div class="progress-container">
         <div class="progress-bar"></div>
     </div>
+    <p id="startup-status" role="status" style="color: #ddd; max-width: 900px; font: 24px Arial; text-align: center;"></p>
 </body>
 
 </html>
