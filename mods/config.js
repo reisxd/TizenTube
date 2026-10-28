@@ -71,6 +71,14 @@ const defaultConfig = {
   disableEnlargingThumbnails: false,
   enableShrinkingThumbnails: false,
   hideRelatedVideosPlayer: false,
+  enableHomeScreenRows: true,
+  homeScreenSources: ['recommended', 'recentlyUploaded', 'live', 'subscriptions', 'fresh', 'history', 'watchLater', 'topChannels', 'home'],
+  homeScreenHomeShelves: 3,
+  homeScreenRefreshMinutes: 30,
+  homeScreenRowSize: 20,
+  homeScreenFreshHours: 6,
+  enableHomeScreenWatchNext: true,
+  enableHomeScreenShorts: false,
 };
 
 let localConfig;

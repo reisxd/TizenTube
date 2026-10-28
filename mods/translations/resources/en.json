@@ -235,6 +235,60 @@
                     "title": "TizenTube Update",
                     "subtitle": "Downloading update, please wait..."
                 }
+            },
+            "homeScreen": {
+                "title": "Android Home Screen Rows",
+                "subtitle": "Show YouTube rows and Continue Watching on your TV's home screen",
+                "options": {
+                    "enable": "Show Rows on the Home Screen",
+                    "refreshNow": "Refresh Rows Now",
+                    "sources": {
+                        "title": "Rows to Show",
+                        "subtitle": "Each row appears as its own channel in your launcher; turn it on there once"
+                    },
+                    "homeShelves": {
+                        "title": "More Home Rows",
+                        "subtitle": "How many extra rows to fill with other shelves from YouTube Home"
+                    },
+                    "rowSize": {
+                        "title": "Videos per Row",
+                        "subtitle": "The most cards each row carries"
+                    },
+                    "freshHours": {
+                        "title": "Fresh Uploads Window",
+                        "subtitle": "How recent a subscription upload must be to appear in Fresh"
+                    },
+                    "hours": "{{count}} hours",
+                    "hour": "{{count}} hour",
+                    "watchNext": "Add Continue Watching",
+                    "shorts": "Include Shorts in Rows",
+                    "refreshEvery": {
+                        "title": "Refresh Every",
+                        "subtitle": "How often rows update while TizenTube is open"
+                    },
+                    "minutes": "{{count}} minutes"
+                },
+                "rows": {
+                    "recommended": "Recommended",
+                    "recentlyUploaded": "Recently Uploaded",
+                    "live": "Live Now",
+                    "subscriptions": "Subscriptions",
+                    "fresh": "Fresh from Subscriptions",
+                    "history": "History",
+                    "watchLater": "Watch Later",
+                    "topChannels": "Top Channels You Watch",
+                    "home": "More from Home",
+                    "variable1": "Suggested for You",
+                    "variable2": "More to Explore",
+                    "variable3": "Worth a Watch",
+                    "variable4": "Picked for You",
+                    "variable5": "Discover More"
+                },
+                "toasts": {
+                    "refreshing": "Refreshing home screen rows",
+                    "refreshed": "Home screen rows updated ({{count}} rows)",
+                    "failed": "Couldn't refresh home screen rows"
+                }
             }
         },
         "ttSettings": {

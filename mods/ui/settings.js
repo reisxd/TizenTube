@@ -3,6 +3,7 @@ import { showModal, buttonItem, overlayPanelItemListRenderer, scrollPaneRenderer
 import qrcode from 'qrcode-npm';
 import { t } from 'i18next';
 import resolveCommand from '../resolveCommand.js';
+import { homeScreenSupported } from '../features/homeScreenRows.js';
 
 const qrcodes = {};
 
@@ -461,6 +462,123 @@ export default function modernUI(update, parameters) {
                 } : null
             ]
         },
+        homeScreenSupported() ? {
+            name: t('settings.options.homeScreen.title'),
+            icon: 'TV',
+            value: null,
+            menuHeader: {
+                title: t('settings.options.homeScreen.title'),
+                subtitle: t('settings.options.homeScreen.subtitle')
+            },
+            options: [
+                {
+                    name: t('settings.options.homeScreen.options.enable'),
+                    icon: 'TV',
+                    value: 'enableHomeScreenRows'
+                },
+                buttonItem(
+                    { title: t('settings.options.homeScreen.options.refreshNow') },
+                    { icon: 'SYSTEM_UPDATE' },
+                    [{ customAction: { action: 'HOME_SCREEN_REFRESH' } }]
+                ),
+                {
+                    name: t('settings.options.homeScreen.options.sources.title'),
+                    icon: 'WHAT_TO_WATCH',
+                    value: null,
+                    arrayToEdit: 'homeScreenSources',
+                    menuId: 'tt-home-screen-sources',
+                    menuHeader: {
+                        title: t('settings.options.homeScreen.options.sources.title'),
+                        subtitle: t('settings.options.homeScreen.options.sources.subtitle')
+                    },
+                    options: ['recommended', 'recentlyUploaded', 'live', 'subscriptions', 'fresh', 'history', 'watchLater', 'topChannels', 'home'].map((source) => {
+                        return {
+                            name: t('settings.options.homeScreen.rows.' + source),
+                            value: source
+                        }
+                    })
+                },
+                {
+                    name: t('settings.options.homeScreen.options.homeShelves.title'),
+                    icon: 'YOUTUBE_MUSIC',
+                    value: null,
+                    menuId: 'tt-home-screen-home-shelves',
+                    menuHeader: {
+                        title: t('settings.options.homeScreen.options.homeShelves.title'),
+                        subtitle: t('settings.options.homeScreen.options.homeShelves.subtitle')
+                    },
+                    options: [1, 2, 3, 4, 5].map((count) => {
+                        return {
+                            name: `${count}`,
+                            key: 'homeScreenHomeShelves',
+                            value: count
+                        }
+                    })
+                },
+                {
+                    name: t('settings.options.homeScreen.options.rowSize.title'),
+                    icon: 'TAB_LIBRARY',
+                    value: null,
+                    menuId: 'tt-home-screen-row-size',
+                    menuHeader: {
+                        title: t('settings.options.homeScreen.options.rowSize.title'),
+                        subtitle: t('settings.options.homeScreen.options.rowSize.subtitle')
+                    },
+                    options: [10, 15, 20, 30, 40, 50].map((size) => {
+                        return {
+                            name: `${size}`,
+                            key: 'homeScreenRowSize',
+                            value: size
+                        }
+                    })
+                },
+                {
+                    name: t('settings.options.homeScreen.options.freshHours.title'),
+                    icon: 'TIMER',
+                    value: null,
+                    menuId: 'tt-home-screen-fresh-hours',
+                    menuHeader: {
+                        title: t('settings.options.homeScreen.options.freshHours.title'),
+                        subtitle: t('settings.options.homeScreen.options.freshHours.subtitle')
+                    },
+                    options: [1, 6, 24].map((hours) => {
+                        return {
+                            name: t(hours === 1 ? 'settings.options.homeScreen.options.hour' : 'settings.options.homeScreen.options.hours', { count: hours }),
+                            key: 'homeScreenFreshHours',
+                            value: hours
+                        }
+                    })
+                },
+                {
+                    name: t('settings.options.homeScreen.options.refreshEvery.title'),
+                    icon: 'TIMER',
+                    value: null,
+                    menuId: 'tt-home-screen-refresh-every',
+                    menuHeader: {
+                        title: t('settings.options.homeScreen.options.refreshEvery.title'),
+                        subtitle: t('settings.options.homeScreen.options.refreshEvery.subtitle')
+                    },
+                    options: [15, 30, 60, 120].map((minutes) => {
+                        return {
+                            name: minutes < 60 ? t('settings.options.homeScreen.options.minutes', { count: minutes })
+                                : t(minutes === 60 ? 'settings.options.homeScreen.options.hour' : 'settings.options.homeScreen.options.hours', { count: minutes / 60 }),
+                            key: 'homeScreenRefreshMinutes',
+                            value: minutes
+                        }
+                    })
+                },
+                {
+                    name: t('settings.options.homeScreen.options.watchNext'),
+                    icon: 'WATCH_HISTORY',
+                    value: 'enableHomeScreenWatchNext'
+                },
+                {
+                    name: t('settings.options.homeScreen.options.shorts'),
+                    icon: 'YOUTUBE_SHORTS_FILL_24',
+                    value: 'enableHomeScreenShorts'
+                }
+            ]
+        } : null,
         {
             name: t('settings.options.uiSettings.title'),
             icon: 'SETTINGS',
