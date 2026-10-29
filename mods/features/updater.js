@@ -3,6 +3,7 @@
 import { buttonItem, showModal, showToast, overlayPanelItemListRenderer, scrollPaneRenderer, overlayMessageRenderer } from '../ui/ytUI.js';
 import { configRead } from '../config.js';
 import { t } from 'i18next';
+import { compareVersions, getCompatibleApkUrl } from '../utils/updateRelease.js';
 
 // If TizenTube is not running on Cobalt, do nothing
 // Add a timeout since reloading the home page while the updater pop up is shown causes the pop up to instantly disappear.
@@ -29,27 +30,20 @@ function checkForUpdates(showNoUpdateToast) {
     const currentAppVersion = window.h5vcc.tizentube.GetVersion();
     const currentEpoch = Math.floor(Date.now() / 1000);
 
-    getLatestRelease()
+    return getLatestRelease()
         .then(release => {
-            const latestVersion = release.tag_name.replace('v', '');
+            const latestVersion = release.tag_name.replace(/^v/, '');
             const releaseDate = new Date(release.published_at).getTime() / 1000;
 
-            let architecture;
-            let downloadUrl;
-
-            if (window.h5vcc.tizentube.GetArchitecture) {
-                architecture = window.h5vcc.tizentube.GetArchitecture();
-            }
-
-            if (architecture) {
-                if (architecture === 'arm64-v8a') {
-                    downloadUrl = release.assets.find(asset => asset.name.includes('arm64.apk')).browser_download_url;
-                } else {
-                    downloadUrl = release.assets.find(asset => asset.name.includes('arm.apk')).browser_download_url;
+            if (compareVersions(latestVersion, currentAppVersion) > 0) {
+                const architecture = window.h5vcc.tizentube.GetArchitecture
+                    ? window.h5vcc.tizentube.GetArchitecture() : null;
+                const downloadUrl = getCompatibleApkUrl(release.assets, architecture);
+                if (!downloadUrl) {
+                    console.error('No compatible update APK available for architecture:', architecture);
+                    showToast(t('settings.options.updater.checkFailed.title'), t('settings.options.updater.noCompatibleApk'), null);
+                    return;
                 }
-            } else downloadUrl = release.assets[0].browser_download_url;
-
-            if (latestVersion !== currentAppVersion) {
                 console.info(`New version available: ${latestVersion} (current: ${currentAppVersion})`);
                 const msg = `${t('settings.options.updater.releaseDate', { date: new Date(releaseDate * 1000).toLocaleString() })}\n${release.body}`.replace(/#/g, '').replace(/\*/g, '').trim();
 

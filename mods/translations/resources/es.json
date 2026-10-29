@@ -218,13 +218,18 @@
                     "title": "TizenTube is up to date",
                     "subtitle": "You are using the latest version ({{version}}) of TizenTube Cobalt."
                 },
+                "noCompatibleApk": "No hay un APK de actualización compatible con este dispositivo.",
                 "checkFailed": {
                     "title": "TizenTube update check failed",
                     "subtitle": "Could not check for updates."
                 },
                 "downloading": {
-                    "title": "TizenTube Update",
-                    "subtitle": "Downloading update, please wait..."
+                    "title": "Preparando actualización",
+                    "subtitle": "Abriendo el gestor de descarga e instalación."
+                },
+                "startFailed": {
+                    "title": "No se pudo iniciar la actualización",
+                    "subtitle": "Vuelve a intentarlo."
                 }
             },
             "time": {

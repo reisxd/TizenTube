@@ -4,6 +4,7 @@ import modernUI, { optionShow } from './ui/settings.js';
 import { speedSettings } from './ui/speedUI.js';
 import { showToast, buttonItem, showModal, QrCodeRenderer, overlayPanelItemListRenderer, overlayMessageRenderer } from './ui/ytUI.js';
 import checkForUpdates from './features/updater.js';
+import { startUpdate } from './features/updateDownload.js';
 import { t } from 'i18next';
 import { requestNextAndNavigateChannel, getFeedbackPanelTokens, sendFeedbackToken } from './utils/innerTubeCalls.js';
 import qrcode from 'qrcode-npm';
@@ -222,8 +223,7 @@ function customAction(action, parameters) {
             configWrite('dontCheckUpdateUntil', parameters);
             break;
         case 'UPDATE_DOWNLOAD':
-            window.h5vcc.tizentube.InstallAppFromURL(parameters);
-            showToast(t('settings.options.updater.downloading.title'), t('settings.options.updater.downloading.subtitle'));
+            startUpdate(parameters);
             break;
         case 'SET_PLAYER_SPEED':
             const speed = Number(parameters);
