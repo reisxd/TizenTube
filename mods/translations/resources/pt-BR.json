@@ -6,10 +6,10 @@
     "options": {
       "socialMedia": {
         "title": "Redes sociais",
-        "qrCodeScanMessage": "Você pode acessar a página {{name}} lendo o código QR abaixo.",
+        "qrCodeScanMessage": "Você pode acessar a página {{name}} escaneando o código QR abaixo.",
         "announcements": "Avisos",
         "group": "Grupo",
-        "website": "Site oficial",
+        "website": "Site",
         "githubSponsors": "GitHub Sponsors"
       },
       "adBlock": "Bloqueador de anúncios",
@@ -27,7 +27,7 @@
             "selfpromo": "Pular segmentos de autopromoção",
             "preview": "Pular segmentos de prévia/resumo",
             "filler": "Pular assuntos paralelos/piadas",
-            "music_offtopic": "Pular segmentos não musicais",
+            "music_offtopic": "Pular segmentos de música fora do tema",
             "highlights": "Ativar destaques"
           },
           "showSBToasts": "Mostrar notificações do SponsorBlock"
@@ -67,7 +67,7 @@
       "subtitles": {
         "title": "Configurações das legendas",
         "options": {
-          "showLocalSubtitle": "Mostrar legenda no idioma local",
+          "showLocalSubtitle": "Mostrar legenda local",
           "showHiddenSubtitles": "Mostrar legendas ocultas",
           "persistCaptionStyle": "Memorizar estilo das legendas"
         }
@@ -84,8 +84,8 @@
               "showSuperThxBtn": "Mostrar botão de Valeu Demais",
               "showAIAskBtn": "Mostrar botão 'Perguntar' (IA)",
               "showSpeedCtrlBtn": "Mostrar botão de controle de velocidade",
-              "addMPBtn": "Mostrar botão do Mini Player",
-              "swapMPWithPIP": "Substituir botão do Mini Player pelo botão de PiP"
+              "addMPBtn": "Mostrar botão do Miniplayer",
+              "swapMPWithPIP": "Substituir botão do Miniplayer pelo botão de PiP"
             }
           },
           "preferredVideoQuality": {
@@ -289,7 +289,7 @@
     "share": {
       "title": "Compartilhar",
       "button": "Compartilhar",
-      "qrCodeScanMessage": "Leia o código QR abaixo para compartilhar este vídeo."
+      "qrCodeScanMessage": "Escaneie o código QR abaixo para compartilhar este vídeo."
     },
     "screenOff": "Desligar tela",
     "chapters": {
