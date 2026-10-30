@@ -100,7 +100,7 @@
             "title": "Codec de vídeo preferido",
             "subtitle": "Escolha o codec de vídeo preferido para reprodução"
           },
-          "afr": "Taxa de Quadros Automática (AFR)",
+          "afr": "Taxa de quadros automática (AFR)",
           "afrPauseDuration": {
             "title": "Duração da pausa da taxa de quadros automática",
             "subtitle": "Defina a duração (em segundos) da pausa na reprodução do vídeo ao ajustar a taxa de quadros"
@@ -126,7 +126,7 @@
               "enableHideWatchedVideos": "Ativar ocultação de vídeos assistidos",
               "watchedVideosThreshold": {
                 "title": "Percentual mínimo assistido",
-                "subtitle": "Defina o percentual mínimo assistido para ocultar vídeos já vistos."
+                "subtitle": "Defina o percentual mínimo assistido para ocultar vídeos já vistos"
               },
               "setPagesToHideWatchedVideos": "Definir páginas para ocultar vídeos assistidos"
             }
@@ -150,12 +150,12 @@
             "subtitle": "Selecione os itens da barra lateral para desativar"
           },
           "launchToOnStartup": {
-            "title": "Abrir em",
+            "title": "Página ao iniciar",
             "subtitle": "Escolha a página padrão que o TizenTube abrirá ao iniciar"
           },
           "sortSidebarContents": {
             "title": "Ordenar itens da barra lateral",
-            "subtitle": "Reorganize o conteúdo da barra lateral conforme sua preferência",
+            "subtitle": "Reorganize os itens da barra lateral conforme sua preferência",
             "moveUp": {
               "title": "Mover para cima",
               "subtitle": "Mover este item para cima na barra lateral"
@@ -310,7 +310,7 @@
     "notInterested": "Não tenho interesse",
     "dontRecommendChannel": "Não recomendar canal",
     "play": "Reproduzir",
-    "saveToWatchLater": "Salvar para assistir mais tarde",
+    "saveToWatchLater": "Salvar em Assistir mais tarde",
     "removeFromWatchLater": "Remover de Assistir mais tarde",
     "saveToPlaylist": "Salvar na playlist",
     "addToQueue": "Adicionar à fila",
