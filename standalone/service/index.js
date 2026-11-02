@@ -12,6 +12,51 @@ const URL = require('url');
 const path = require('path');
 const injector = require('./utils/injector.js');
 
+// The token the page last used for its own API calls. YouTube's history reports are sent as image and
+// beacon requests, which cannot carry an Authorization header, so they get this one (see the handler).
+let lastAuthorization = null;
+
+// YouTube's player sends its history reports (/api/stats/playback, /watchtime and /qoe) to
+// //www.youtube.com. From a page served by this proxy that is a plain http request straight to YouTube,
+// without the account, so nothing is recorded. This sends them through the proxy instead.
+const historyReportsScript = String.raw`<script>(function () {
+  function route(u) {
+    try {
+      var s = String(u);
+      if (s.indexOf('/api/stats/') === -1) return u;
+      var a = document.createElement('a');
+      a.href = s;
+      if (a.host !== location.host && /(^|\.)youtube\.com$/.test(a.hostname)) {
+        return location.origin + a.pathname + a.search;
+      }
+    } catch (e) {}
+    return u;
+  }
+  var open = XMLHttpRequest.prototype.open;
+  XMLHttpRequest.prototype.open = function (method, url) {
+    arguments[1] = route(url);
+    return open.apply(this, arguments);
+  };
+  if (window.fetch) {
+    var fetchOriginal = window.fetch;
+    window.fetch = function (input, init) {
+      return fetchOriginal.call(this, typeof input === 'string' ? route(input) : input, init);
+    };
+  }
+  if (navigator.sendBeacon) {
+    var beacon = navigator.sendBeacon.bind(navigator);
+    navigator.sendBeacon = function (url, data) { return beacon(route(url), data); };
+  }
+  var src = Object.getOwnPropertyDescriptor(HTMLImageElement.prototype, 'src');
+  if (src && src.set) {
+    Object.defineProperty(HTMLImageElement.prototype, 'src', {
+      configurable: true,
+      get: src.get,
+      set: function (value) { src.set.call(this, route(value)); }
+    });
+  }
+})();</script>`;
+
 app.use((req, res, next) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
@@ -80,6 +125,15 @@ app.all('*', (req, res) => {
 
     headers['accept-encoding'] = 'gzip, deflate';
 
+    // History reports cannot carry an Authorization header themselves, so give them the token
+    // the page used for its own API calls.
+    if (req.path.indexOf('/youtubei/') === 0 && headers['authorization']) {
+        lastAuthorization = headers['authorization'];
+    }
+    if (req.path.indexOf('/api/stats/') === 0 && !headers['authorization'] && lastAuthorization) {
+        headers['authorization'] = lastAuthorization;
+    }
+
     const hasBody = ['POST', 'PUT', 'PATCH'].indexOf(req.method) !== -1;
     const fetchOptions = {
         method: req.method,
@@ -141,6 +195,7 @@ app.all('*', (req, res) => {
                     if (req.url.indexOf('/tv') === 0 && req.url.indexOf('/tv_config') === -1) {
                         // Insert the userscript for TizenTube
                         text += `<script src="https://cdn.jsdelivr.net/npm/@foxreis/tizentube/dist/userScript.js?ver=${Date.now()}"></script>`;
+                        text += historyReportsScript;
                     }
 
                     const proxyPrefix = `http://localhost:${PORT}/cors-bypass/`;
