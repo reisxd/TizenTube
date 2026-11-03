@@ -84,8 +84,8 @@
               "showSuperThxBtn": "Mostrar botão de Valeu Demais",
               "showAIAskBtn": "Mostrar botão 'Perguntar' (IA)",
               "showSpeedCtrlBtn": "Mostrar botão de controle de velocidade",
-              "addMPBtn": "Mostrar botão do Mini Player",
-              "swapMPWithPIP": "Substituir botão do Mini Player pelo botão de PiP"
+              "addMPBtn": "Mostrar botão do Miniplayer",
+              "swapMPWithPIP": "Substituir botão do Miniplayer pelo botão de PiP"
             }
           },
           "preferredVideoQuality": {
@@ -281,7 +281,7 @@
       "button": "Controles de velocidade",
       "fixStuttering": "Corrigir engasgos (1.0001x)"
     },
-    "miniPlayer": "Mini Player",
+    "miniPlayer": "Miniplayer",
     "pictureInPicture": "Picture-in-Picture (PiP)",
     "previous": "Anterior",
     "next": "Próximo",
