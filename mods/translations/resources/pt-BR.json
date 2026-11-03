@@ -73,19 +73,19 @@
         }
       },
       "videoPlayer": {
-        "title": "Configurações do reprodutor de vídeo",
-        "subtitle": "Personalizar recursos do reprodutor de vídeo",
+        "title": "Configurações do player de vídeo",
+        "subtitle": "Personalizar recursos do player de vídeo",
         "options": {
           "patching": {
-            "title": "Modificar interface do reprodutor de vídeo",
+            "title": "Modificar interface do player de vídeo",
             "options": {
-              "enableVPUIPatching": "Ativar modificações na interface do reprodutor de vídeo",
+              "enableVPUIPatching": "Ativar modificações na interface do player de vídeo",
               "previousNextBtns": "Ativar botões de anterior e próximo",
               "showSuperThxBtn": "Mostrar botão de Valeu Demais",
               "showAIAskBtn": "Mostrar botão 'Perguntar' (IA)",
               "showSpeedCtrlBtn": "Mostrar botão de controle de velocidade",
-              "addMPBtn": "Mostrar botão do Miniplayer",
-              "swapMPWithPIP": "Substituir botão do Miniplayer pelo botão de PiP"
+              "addMPBtn": "Mostrar botão do Mini Player",
+              "swapMPWithPIP": "Substituir botão do Mini Player pelo botão de PiP"
             }
           },
           "preferredVideoQuality": {
@@ -230,7 +230,7 @@
         },
         "downloading": {
           "title": "Atualização do TizenTube",
-          "subtitle": "Baixando atualização, aguarde..."
+          "subtitle": "Baixando atualização, aguarde…"
         }
       }
     },
@@ -281,7 +281,7 @@
       "button": "Controles de velocidade",
       "fixStuttering": "Corrigir engasgos (1.0001x)"
     },
-    "miniPlayer": "Miniplayer",
+    "miniPlayer": "Mini Player",
     "pictureInPicture": "Picture-in-Picture (PiP)",
     "previous": "Anterior",
     "next": "Próximo",
