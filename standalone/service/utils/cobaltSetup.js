@@ -35,12 +35,32 @@ function copyCobaltContent() {
     }
 }
 
+// Generates the key pair without blocking the event loop: node-forge uses the
+// native async generator where Node.js has one, and otherwise falls back to
+// pure JavaScript in short chunks.
+function generateKeyPair() {
+    return new Promise((resolve, reject) => {
+        pki.rsa.generateKeyPair({ bits: 2048, workers: -1 }, (err, keys) => {
+            if (err) reject(err);
+            else resolve(keys);
+        });
+    });
+}
+
 function createX509Certificate() {
     try {
         if (existsSync('/home/owner/share/tizentube-ca.crt') && existsSync('/home/owner/share/tizentube-ca.key')) {
-            return pki.certificateFromPem(readFileSync('/home/owner/share/tizentube-ca.crt', 'utf8'));
+            return Promise.resolve(pki.certificateFromPem(readFileSync('/home/owner/share/tizentube-ca.crt', 'utf8')));
         }
-        const keys = pki.rsa.generateKeyPair(2048);
+    } catch (err) {
+        return Promise.resolve(false);
+    }
+
+    return generateKeyPair().then(keys => signCaCertificate(keys)).catch(() => false);
+}
+
+function signCaCertificate(keys) {
+    try {
         const caCert = pki.createCertificate();
 
         caCert.publicKey = keys.publicKey;
@@ -158,17 +178,19 @@ function copyCertToCertFolder(ca, maxSlots = 5) {
     }
 }
 
+// Resolves to true when the Cobalt proxy can be used, false otherwise.
 function checkAndSetupCobaltContent() {
     if (!copyCobaltContent()) {
-        return false;
+        return Promise.resolve(false);
     }
 
-    const caCert = createX509Certificate();
-    if (!caCert) {
-        return false;
-    }
+    return createX509Certificate().then(caCert => {
+        if (!caCert) {
+            return false;
+        }
 
-    return copyCertToCertFolder(caCert);
+        return copyCertToCertFolder(caCert);
+    });
 }
 
 module.exports = checkAndSetupCobaltContent;

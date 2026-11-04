@@ -77,10 +77,41 @@
                 .then(r => r.json())
                 .then(res => {
                     if (res.canConnectToDaemon && !res.isConnecting) {
-                        fetch(`http://localhost:8100/tizentube/debugger${args ? `?${args}` : ''}`);
-                        tizen.application.getCurrentApplication().exit();
+                        // If the previous debug relaunch failed, the relaunched app is
+                        // gone and nobody saw why. Show it now instead of retrying blind.
+                        fetchServiceErrors().then(report => {
+                            const failures = report ? report.errors.filter(err => err.stage.indexOf('info') !== 0) : [];
+                            if (failures.length) {
+                                showReport('TizenTube: the previous attempt failed (OK = clear and retry)',
+                                    platformLines().concat([''], formatServiceErrors(report)));
+                                document.addEventListener('keydown', ev => {
+                                    if (ev.keyCode === 13) fetch('http://127.0.0.1:8099/tizentube/error?clear=1')
+                                        .then(() => location.reload(), () => location.reload());
+                                });
+                                return;
+                            }
+                            fetch(`http://localhost:8100/tizentube/debugger${args ? `?${args}` : ''}`);
+                            tizen.application.getCurrentApplication().exit();
+                        });
                     } else if (!res.canConnectToDaemon) location.href = `http://localhost:8100/tv?additionalDataUrl=http%3A%2F%2Flocalhost%3A8100%2Fdial%2Fapps%2FYouTube${args ? `&${args}` : ''}`
-                }).catch(() => window.location.reload());
+                    else waitForDebugger(Date.now());
+                }).catch(() => reportIfServiceFailed(() => window.location.reload()));
+        }
+
+        // We are the app the service relaunched in debug mode. Once the
+        // debugger attaches, the service navigates this page to YouTube, which
+        // unloads this script. Show a report only if the service recorded a
+        // failure, or if YouTube has not replaced this page within 45 s.
+        function waitForDebugger(startedAt) {
+            setTimeout(() => {
+                fetchServiceErrors().then(report => {
+                    const failures = report ? report.errors.filter(err => err.stage.indexOf('info') !== 0) : [];
+                    const timedOut = Date.now() - startedAt >= 45000;
+                    if (!failures.length && !timedOut) return waitForDebugger(startedAt);
+                    showReport(failures.length ? 'TizenTube: debugger attach failed' : 'TizenTube: YouTube did not open within 45 s',
+                        platformLines().concat([''], formatServiceErrors(report)));
+                });
+            }, 1000);
         }
 
         tizen.application.launchAppControl(
@@ -90,9 +121,123 @@
                 useInjectorOrProxy();
             },
             function (e) {
-                alert("Launch Service failed: " + e.message);
+                showLaunchFailure(e);
             }
         );
+
+        // ---- Diagnostics: a full-screen report instead of a one-line alert ----
+
+        function showReport(title, lines) {
+            const box = document.createElement('pre');
+            box.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;margin:0;padding:48px;z-index:99999;' +
+                'background:#0f0f0f;color:#fff;font:26px/1.4 monospace;white-space:pre-wrap;' +
+                'word-break:break-word;overflow:auto;';
+            box.textContent = title + '\n\n' + lines.join('\n') +
+                '\n\nPress Back to close. Take a photo of this screen for the bug report.';
+            (document.body || document.documentElement).appendChild(box);
+            // Back (10009) closes the app.
+            document.addEventListener('keydown', ev => {
+                if (ev.keyCode === 10009) tizen.application.getCurrentApplication().exit();
+            });
+        }
+
+        function safe(fn) {
+            try { return fn(); } catch (err) { return '(' + err.name + ': ' + err.message + ')'; }
+        }
+
+        // The service reports its own startup errors and crashes on port 8099.
+        function fetchServiceErrors() {
+            return fetch('http://127.0.0.1:8099/tizentube/error')
+                .then(r => r.json())
+                .catch(() => null);
+        }
+
+        // Failures first, with their stack traces; info entries one line each.
+        function formatServiceErrors(report) {
+            if (!report) return ['Service error server: not reachable (the service never started)'];
+            const lines = ['Service Node.js: ' + report.node];
+            if (report.status) lines.push('Service state: ' + report.status.state +
+                (report.status.appLoadMs !== null ? ' (app.js loaded in ' + report.status.appLoadMs + ' ms)' : ''));
+            const isInfo = err => err.stage.indexOf('info') === 0;
+            const failures = report.errors.filter(err => !isInfo(err));
+            const info = report.errors.filter(isInfo);
+            lines.push('', 'Failures: ' + (failures.length ? failures.length : 'none'));
+            failures.forEach(err => {
+                lines.push('', '[' + err.stage + '] ' + err.name + ': ' + err.message, err.stack);
+            });
+            if (info.length) {
+                lines.push('', 'Info:');
+                info.forEach(err => lines.push('  [' + err.stage.replace(/^info: /, '') + '] ' + err.message));
+            }
+            return lines;
+        }
+
+        function platformLines() {
+            const cap = key => safe(() => tizen.systeminfo.getCapability(key));
+            return [
+                'Tizen: ' + cap('http://tizen.org/feature/platform.version') +
+                    '  Model: ' + cap('http://tizen.org/system/model_name'),
+                'UI app: ' + safe(() => tizen.application.getCurrentApplication().appInfo.id),
+                'Service app: ' + safe(() => {
+                    const info = tizen.application.getAppInfo(serviceId);
+                    return info.id + ' (registered)';
+                })
+            ];
+        }
+
+        function runningLines() {
+            return new Promise(resolve => {
+                try {
+                    tizen.application.getAppsContext(contexts => {
+                        const ours = contexts.filter(c => c.appId.indexOf(pkgId) === 0).map(c => c.appId);
+                        resolve(['Running: ' + (ours.length ? ours.join(', ') : 'nothing from ' + pkgId)]);
+                    }, err => resolve(['Running: (' + err.name + ': ' + err.message + ')']));
+                } catch (err) {
+                    resolve(['Running: (' + err.name + ': ' + err.message + ')']);
+                }
+            });
+        }
+
+        // Wait for the service's API on port 8100, up to timeoutMs.
+        function waitForService(startedAt, timeoutMs, done) {
+            fetch('http://localhost:8100/tizentube/getState-ready', { method: 'OPTIONS' })
+                .then(() => done(true))
+                .catch(() => {
+                    if (Date.now() - startedAt > timeoutMs) return done(false);
+                    setTimeout(() => waitForService(startedAt, timeoutMs, done), 500);
+                });
+        }
+
+        function showLaunchFailure(e) {
+            const lines = [
+                'Error name: ' + (e && e.name),
+                'Message: ' + (e && e.message),
+                'Code: ' + (e && e.code),
+                ''
+            ].concat(platformLines());
+            const startedAt = Date.now();
+            // Tizen gives up on a slow service even when its process is up.
+            // If it is, wait for it to answer and carry on as if the launch worked.
+            waitForService(startedAt, 60000, ready => {
+                if (ready) return useInjectorOrProxy();
+                Promise.all([runningLines(), fetchServiceErrors()]).then(results => {
+                    showReport('TizenTube: Launch Service failed',
+                        lines.concat(results[0], ['Waited ' + Math.round((Date.now() - startedAt) / 1000) + ' s for the service'],
+                            [''], formatServiceErrors(results[1])));
+                });
+            });
+        }
+
+        // The service launched but its API does not answer: show its errors, if any.
+        function reportIfServiceFailed(otherwise) {
+            fetchServiceErrors().then(report => {
+                if (report && report.errors.length) {
+                    showReport('TizenTube: the service crashed', platformLines().concat([''], formatServiceErrors(report)));
+                } else {
+                    otherwise();
+                }
+            });
+        }
     </script>
 </head>
 
