@@ -6,11 +6,11 @@ const express = require('express');
 const app = express();
 const PORT = 8100;
 const fetch = require('node-fetch');
-const cobaltSetup = require('./utils/cobaltSetup.js');
-const startServer = require('./utils/cobaltProxyServer.js');
 const URL = require('url');
 const path = require('path');
+const fs = require('fs');
 const injector = require('./utils/injector.js');
+const { EARLY_HOOK } = require('./utils/earlyAdblock.js');
 
 app.use((req, res, next) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
@@ -30,16 +30,10 @@ app.get('/tizentube/getState', (req, res) => {
 
 app.get('/tizentube/debugger', (req, res) => {
     const args = req.originalUrl.split('?')[1] || '';
-    const interval = setInterval(() => {
-        tizen.application.getAppsContext((appsContext) => {
-            const packageId = tizen.application.getAppInfo().packageId;
-            const app = appsContext.find(app => app.appId === `${packageId}.TizenTubeStandalone`);
-            if (!app) {
-                injector.startDebugger(args);
-                clearInterval(interval)
-            }
-        });
-    }, 50);
+    // The injector waits for this app to exit, then relaunches it in debug mode.
+    // A request while a launch is in progress is ignored.
+    injector.requestDebugLaunch(args);
+    res.end();
 });
 
 app.all('*', (req, res) => {
@@ -139,6 +133,16 @@ app.all('*', (req, res) => {
 
                 return response.text().then((text) => {
                     if (req.url.indexOf('/tv') === 0 && req.url.indexOf('/tv_config') === -1) {
+                        // The ad blocker must hook JSON.parse before YouTube's own
+                        // scripts run, so put the early hook first in <head>.
+                        const earlyHook = `<script>${EARLY_HOOK}</script>`;
+                        const headAt = text.search(/<head[^>]*>/i);
+                        if (headAt !== -1) {
+                            const headEnd = text.indexOf('>', headAt) + 1;
+                            text = text.slice(0, headEnd) + earlyHook + text.slice(headEnd);
+                        } else {
+                            text = earlyHook + text;
+                        }
                         // Insert the userscript for TizenTube
                         text += `<script src="https://cdn.jsdelivr.net/npm/@foxreis/tizentube/dist/userScript.js?ver=${Date.now()}"></script>`;
                     }
@@ -196,18 +200,32 @@ app.all('*', (req, res) => {
 
 app.listen(PORT, '127.0.0.1');
 
-
-if (cobaltSetup()) {
-    startServer();
-} else {
-    // Start the DIAL server
+function startDialServer() {
     global.isTizenTube = true;
     require(path.join(__dirname, '../../../dist/service.js'));
 }
 
-// To avoid issues on newer versions of Tizen.
-module.exports = {
-    onStart: () => {},
-    onRequest: () => {},
-    onStop: () => {}
-};
+// The Old Tizen build has the Cobalt flags stripped from config.xml, so the
+// Cobalt proxy can never be used there. build-service.js drops this marker
+// next to the bundled service when it strips the flags.
+const isCobaltBuild = !fs.existsSync(path.join(__dirname, 'no-cobalt'));
+
+// Defer the rest of the startup work until after this module has finished
+// loading. Cobalt setup can copy the Cobalt content folder and generate an
+// RSA key in pure JavaScript, which takes a long time on older TVs. Doing it
+// synchronously here blocks the service from reporting that it started, and
+// the launch from the UI app fails with "Launch Service failed: Unknown error".
+setTimeout(() => {
+    if (!isCobaltBuild) {
+        startDialServer();
+        return;
+    }
+
+    // Loaded only here: node-forge needs Node.js 6.13 or newer and is used
+    // only for the Cobalt proxy, so the Old Tizen build must never load it.
+    const cobaltSetup = require('./utils/cobaltSetup.js');
+    cobaltSetup().then(isReady => {
+        if (isReady) require('./utils/cobaltProxyServer.js')();
+        else startDialServer();
+    }).catch(() => startDialServer());
+}, 0);
