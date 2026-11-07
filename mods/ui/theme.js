@@ -21,6 +21,10 @@ function updateStyle() {
     }
 };
 
-document.head.appendChild(style);
+if (document.head) {
+    document.head.appendChild(style);
+} else {
+    document.addEventListener('DOMContentLoaded', () => document.head.appendChild(style));
+}
 updateStyle();
 export default updateStyle;
