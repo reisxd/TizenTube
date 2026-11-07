@@ -6,7 +6,10 @@ window.isPipPlaying = false;
 let PlayerService = null;
 
 function pipLoad() {
-    const mappings = Object.values(window._yttv).find(a => a && a.mappings);
+    const mappings = Object.values(window._yttv || {}).find(a => a && a.mappings);
+    if (!mappings || typeof mappings.get !== 'function' || !mappings.get('PlayerService') || !mappings.get('PlaybackPreviewService')) {
+        return setTimeout(pipLoad, 250);
+    }
     PlayerService = mappings.get('PlayerService');
     const PlaybackPreviewService = mappings.get('PlaybackPreviewService');
     const PlaybackPreviewServiceStart = PlaybackPreviewService.start;
@@ -190,7 +193,15 @@ const observerPipEnter = new MutationObserver(() => {
     }
 });
 
-observerPipEnter.observe(document.body, { childList: true, subtree: true });
+function observePipEnter() {
+    observerPipEnter.observe(document.body, { childList: true, subtree: true });
+}
+
+if (document.body) {
+    observePipEnter();
+} else {
+    document.addEventListener('DOMContentLoaded', observePipEnter);
+}
 
 export {
     enablePip,
