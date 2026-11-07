@@ -41,6 +41,11 @@
     window.Element.prototype.focusableAreas = focusableAreas;
     window.Element.prototype.getSpatialNavigationContainer = getSpatialNavigationContainer;
 
+    if (!document.documentElement) {
+      document.addEventListener('DOMContentLoaded', initiateSpatialNavigation);
+      return;
+    }
+
     /*
      * CSS.registerProperty() from the Properties and Values API
      * Reference: https://drafts.css-houdini.org/css-properties-values-api/#the-registerproperty-function

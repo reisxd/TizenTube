@@ -39,7 +39,7 @@ function page(stage, storedActions, config = {}) {
     const document = {
         ...eventTarget(),
         readyState: stage === 'loaded' ? 'complete' : 'loading',
-        documentElement: element(),
+        documentElement: stage === 'empty' ? null : element(),
         head: stage === 'empty' ? null : element(),
         body: ['empty', 'head'].includes(stage) ? null : element(),
         createElement: element,
@@ -48,6 +48,7 @@ function page(stage, storedActions, config = {}) {
     };
     const timers = [];
     const observations = [];
+    const registeredProperties = [];
     const storage = { 'ytaf-configuration': JSON.stringify(config) };
     if (storedActions !== undefined) storage[actionsKey] = storedActions;
     const context = vm.createContext({
@@ -69,10 +70,15 @@ function page(stage, storedActions, config = {}) {
             }
         },
         Element: class {},
+        CSS: { registerProperty(property) { registeredProperties.push(property.name); } },
+        getComputedStyle(target) {
+            assert.ok(target, 'getComputedStyle needs a DOM element');
+            return { getPropertyValue: () => '' };
+        },
     });
     vm.runInContext('window = self = globalThis;', context);
     bundle.runInContext(context);
-    return { context, document, timers, observations, storage };
+    return { context, document, timers, observations, storage, registeredProperties };
 }
 
 function assertCoreFeatures(context) {
@@ -121,14 +127,18 @@ for (const stage of ['empty', 'head', 'body', 'loaded']) {
 }
 
 test('early injection attaches the theme and PiP observer when the DOM arrives', () => {
-    const { context, document, observations } = page('empty');
+    const { context, document, observations, registeredProperties } = page('empty');
     assert.equal(observations.length, 0);
+    assert.equal(registeredProperties.length, 0);
+    assert.ok(context.__spatialNavigation__, 'navigation APIs are available before the DOM');
+    document.documentElement = element();
     document.head = element();
     document.body = element();
     document.readyState = 'interactive';
     document.dispatch('DOMContentLoaded');
     assert.ok(observations.includes(document.body));
     assert.ok(document.head.children.some(child => child.textContent.includes('#container')));
+    assert.equal(registeredProperties.length, 3, 'navigation CSS registers after the root element exists');
     context.dispatch('load');
     assertCoreFeatures(context);
 });
