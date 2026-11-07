@@ -6,12 +6,21 @@ const fetch = require('node-fetch');
 
 
 var isConnecting = false;
+var isDebuggerAttached = false;
 const isTizen3 = tizen.systeminfo.getCapability('http://tizen.org/feature/platform.version').startsWith('3.0');
 
-function connectToDebugger(host, port, args) {
-    fetch(`http://${host}:${port}`).then(_ => {
-        CDP({ host, port, local: true }, client => {
+// With the Developer Mode host set to 127.0.0.1, some TVs (e.g. Tizen 5.0) only expose the
+// inspector on loopback, so try 127.0.0.1 first and alternate with the TV's own IP on retry.
+function connectToDebugger(host, port, args, altHost) {
+    const retry = () => setTimeout(() => connectToDebugger(altHost || host, port, args, host), 250);
+
+    fetch(`http://${host}:${port}/json`).then(_ => {
+        const cdp = CDP({ host, port, local: true }, client => {
             isConnecting = false;
+            isDebuggerAttached = true;
+            client.on('disconnect', () => {
+                isDebuggerAttached = false;
+            });
             client.Runtime.enable();
             client.Page.enable();
 
@@ -26,16 +35,15 @@ function connectToDebugger(host, port, args) {
             client.Page.navigate({ url: `https://youtube.com/tv?additionalDataUrl=http%3A%2F%2Flocalhost%3A8085%2Fdial%2Fapps%2FYouTube${args ? `&${args}` : ''}` });
 
             client.Page.setBypassCSP({ enabled: true });
-        })
-    }).catch(e => {
-        return setTimeout(() => connectToDebugger(host, port, args), 100);
-    })
+        });
+        cdp.on('error', retry);
+    }).catch(retry);
 }
 
 function canConnectToDaemon() {
     return fetch('http://127.0.0.1:8001/api/v2/').then(res => res.json())
         .then(json => {
-            return { canConnectToDaemon: (json.device.developerIP === '127.0.0.1' || json.device.developerIP === '1.0.0.127') && json.device.developerMode === '1', ip: json.device.ip, isConnecting }
+            return { canConnectToDaemon: (json.device.developerIP === '127.0.0.1' || json.device.developerIP === '1.0.0.127') && json.device.developerMode === '1', ip: json.device.ip, isConnecting, isDebuggerAttached }
         }).catch(e => {
             return canConnectToDaemon();
         });
@@ -54,7 +62,7 @@ function startDebugger(args) {
                 const dataString = data.toString();
                 if (dataString.includes('debug')) {
                     const port = Number(dataString.substr(dataString.indexOf(':') + 1, 6).replace(' ', ''));
-                    connectToDebugger(res.ip, port, args);
+                    connectToDebugger('127.0.0.1', port, args, res.ip);
                     setTimeout(() => client._stream.end(), 1000);
                 }
             });

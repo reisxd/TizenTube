@@ -76,23 +76,59 @@
             fetch('http://localhost:8100/tizentube/getState')
                 .then(r => r.json())
                 .then(res => {
-                    if (res.canConnectToDaemon && !res.isConnecting) {
+                    if (res.isDebuggerAttached) {
+                        // Relaunched in debug mode with the injector attached. The service's own
+                        // Page.navigate can be lost while this page is still loading, so navigate here;
+                        // the userscript is injected into every new execution context.
+                        location.href = `https://youtube.com/tv?additionalDataUrl=http%3A%2F%2Flocalhost%3A8085%2Fdial%2Fapps%2FYouTube${args ? `&${args}` : ''}`;
+                    } else if (res.canConnectToDaemon && !res.isConnecting) {
                         fetch(`http://localhost:8100/tizentube/debugger${args ? `?${args}` : ''}`);
                         tizen.application.getCurrentApplication().exit();
-                    } else if (!res.canConnectToDaemon) location.href = `http://localhost:8100/tv?additionalDataUrl=http%3A%2F%2Flocalhost%3A8100%2Fdial%2Fapps%2FYouTube${args ? `&${args}` : ''}`
+                    } else if (!res.canConnectToDaemon) {
+                        location.href = `http://localhost:8100/tv?additionalDataUrl=http%3A%2F%2Flocalhost%3A8100%2Fdial%2Fapps%2FYouTube${args ? `&${args}` : ''}`
+                    } else {
+                        // The service is still attaching the debugger.
+                        setTimeout(useInjectorOrProxy, 1000);
+                    }
                 }).catch(() => window.location.reload());
+        }
+
+        // On a cold start (e.g. Tizen 5.0) the service can take longer to come up than the platform's
+        // launch timeout, which then reports "Unknown error" although the service does start.
+        // Keep polling it for a while instead of giving up.
+        const serviceWaitMs = 60000;
+        const serviceDeadline = Date.now() + serviceWaitMs;
+        let serviceReady = false;
+
+        function onServiceReady() {
+            if (serviceReady) return;
+            serviceReady = true;
+            useInjectorOrProxy();
+        }
+
+        function waitForService(launchError) {
+            if (serviceReady) return;
+            fetch('http://localhost:8100/tizentube/getState')
+                .then(() => onServiceReady())
+                .catch(() => {
+                    if (Date.now() < serviceDeadline) setTimeout(() => waitForService(launchError), 1000);
+                    else alert("Launch Service failed: " + (launchError || "the service did not respond"));
+                });
         }
 
         tizen.application.launchAppControl(
             new tizen.ApplicationControl("http://tizen.org/appcontrol/operation/service"),
             serviceId,
             function () {
-                useInjectorOrProxy();
+                onServiceReady();
             },
             function (e) {
-                alert("Launch Service failed: " + e.message);
+                waitForService(e.message);
             }
         );
+
+        // The launch callback may also never fire while the service is starting.
+        setTimeout(() => waitForService(), 2000);
     </script>
 </head>
 
