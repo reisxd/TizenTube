@@ -219,7 +219,7 @@ function startServer() {
         const hostname = reqUrl[0];
         const port = reqUrl[1] || 443;
 
-        if (hostname !== 'youtube.com' && !hostname.endsWith('.youtube.com')) {
+        if (hostname !== 'youtube.com' && hostname !== 'www.youtube.com') {
             return tunnel(
                 hostname,
                 Number(port),
@@ -236,7 +236,7 @@ function startServer() {
         );
     });
 
-    proxyServer.listen(proxyPort, '0.0.0.0');
+    return proxyServer.listen(proxyPort, '0.0.0.0');
 }
 
 module.exports = startServer;
