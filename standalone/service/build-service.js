@@ -3,6 +3,18 @@ const fs = require('fs');
 const path = require('path');
 const { XMLParser, XMLBuilder } = require('fast-xml-parser');
 
+// Tizen 9/10 run web services in a Node 20 embedded in Chromium (wrt-service) and evaluate the
+// file through a vm wrapper that does not always define the CommonJS globals. ncc's runtime reads
+// __dirname and module at load time, so the service would throw before it starts listening.
+const runtimeCompatBanner = [
+    '/* Tizen 9/10 service runtime: provide the CommonJS globals the ncc runtime expects */',
+    "if (typeof __dirname === 'undefined') { try { global.__dirname = process.cwd(); } catch (e) { global.__dirname = '.'; } }",
+    "if (typeof __filename === 'undefined') { global.__filename = __dirname + '/index.js'; }",
+    "if (typeof module === 'undefined') { global.module = { exports: {} }; }",
+    "if (typeof exports === 'undefined') { global.exports = module.exports; }",
+    ''
+].join('\n');
+
 async function build() {
     const { code } = await ncc(path.join(__dirname, 'transpiled/index.js'), {
         minify: false
@@ -19,7 +31,7 @@ async function build() {
     const outDir = path.join(__dirname, 'dist');
     if (!fs.existsSync(outDir)) fs.mkdirSync(outDir);
 
-    fs.writeFileSync(path.join(outDir, 'index.js'), fixedCode);
+    fs.writeFileSync(path.join(outDir, 'index.js'), runtimeCompatBanner + fixedCode);
 
     fs.rmSync(path.join(__dirname, 'transpiled'), { recursive: true, force: true });
 }

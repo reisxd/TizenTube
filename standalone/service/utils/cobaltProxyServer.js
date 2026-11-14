@@ -193,6 +193,12 @@ function startServer() {
     }
 
     const proxyServer = http.createServer((request, response) => {
+        // Health check for TizenTube Starter, which waits for the proxy before opening TizenTube.
+        if (request.url === '/__tizentube/ping') {
+            response.writeHead(200, { 'Content-Type': 'text/plain', 'Access-Control-Allow-Origin': '*' });
+            return response.end('ok');
+        }
+
         const targetUrl = url.parse(request.url);
 
         const targetRequest = http.request({
