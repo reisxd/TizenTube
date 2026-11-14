@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>TizenTube Starter</title>
+<style>
+  html, body { margin: 0; height: 100%; background: #0f0f0f; color: #fff; font-family: Roboto, Arial, sans-serif; }
+  #main { height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+  h1 { font-size: 72px; margin: 0; }
+  #status { font-size: 32px; color: #bbb; margin-top: 28px; text-align: center; max-width: 1600px; white-space: pre-line; }
+</style>
+</head>
+<body>
+<div id="main">
+  <h1>TizenTube</h1>
+  <div id="status">Starting…</div>
+</div>
+<script>
+// TizenTube Starter: starts the TizenTube proxy service, waits for it, then opens TizenTube Cobalt.
+//
+// TizenTube Cobalt opens Samsung's native YouTube (Cobalt) app directly, so no page of its own
+// ever runs, and it relies on its service starting at boot. Tizen 9/10 (2025/2026 TVs) ignore
+// on-boot services, and launchAppControl reports success for a web service without starting it;
+// those TVs start web services through the Service class of the wrt:service module instead.
+"use strict";
+var SERVICE = tizen.application.getCurrentApplication().appInfo.packageId + ".ProxyService";
+var APP = "xvvl3S1TT1.TizenTubeStandalone";
+// 127.0.0.2: default build. tizentube: TizenTubeProxyAddress build (resolves to the TV's own IP).
+var HOSTS = ["127.0.0.2", "tizentube", "127.0.0.1"];
+var TIMEOUT_MS = 30000;
+var statusEl = document.getElementById("status");
+var busy = false;
+var launchLog = [];
+
+function status(t) { statusEl.textContent = t; }
+function note(t) { launchLog.push(t); }
+
+function withTimeout(p, ms) {
+  return new Promise(function (resolve, reject) {
+    var timer = setTimeout(function () { reject(new Error("timeout")); }, ms);
+    p.then(function (v) { clearTimeout(timer); resolve(v); }, function (e) { clearTimeout(timer); reject(e); });
+  });
+}
+
+// Resolves with the first host whose proxy answers on :8101, or null.
+function proxyHost() {
+  var i = 0;
+  function next() {
+    if (i >= HOSTS.length) return Promise.resolve(null);
+    var h = HOSTS[i++];
+    return withTimeout(fetch("http://" + h + ":8101/__tizentube/ping", { mode: "no-cors", cache: "no-store" }), 1500)
+      .then(function () { return h; }, next);
+  }
+  return next();
+}
+
+// The module script at the end of the page sets window.__wrtService on Tizen 9/10.
+function wrtReady() {
+  return new Promise(function (resolve) {
+    if (window.__wrtDone) return resolve();
+    var timer = setTimeout(resolve, 3000);
+    window.addEventListener("wrt-ready", function () { clearTimeout(timer); resolve(); });
+  });
+}
+
+function startViaWrt(id) {
+  if (!window.__wrtService) return Promise.reject(new Error("Service class not available"));
+  return Promise.resolve().then(function () { return new window.__wrtService(id).start(); });
+}
+
+function startViaAppControl(id) {
+  return new Promise(function (resolve, reject) {
+    try {
+      tizen.application.launchAppControl(
+        new tizen.ApplicationControl("http://tizen.org/appcontrol/operation/service"), id,
+        function () { resolve(); },
+        function (e) { reject(new Error(e.name + " " + e.message)); });
+    } catch (e) { reject(e); }
+  });
+}
+
+function startService(id) {
+  return wrtReady().then(function () {
+    if (launchLog.length === 0) note(window.__wrtInfo || "wrt:service: no answer within 3 s");
+    return withTimeout(startViaWrt(id), 8000).then(function () {
+      note("wrt:service start(" + id + "): OK");
+    }, function (e) {
+      note("wrt:service start(" + id + "): " + e.message);
+      return startViaAppControl(id).then(function () {
+        note("launchAppControl(" + id + "): OK");
+      }, function (e2) {
+        note("launchAppControl(" + id + "): " + e2.message);
+      });
+    });
+  });
+}
+
+// The starter stays in the background after opening TizenTube: on Tizen 10 a service started
+// through wrt:service may be tied to the page that started it.
+function openTizenTube(host) {
+  status("Proxy ready (" + host + ":8101). Opening TizenTube…");
+  tizen.application.launch(APP, function () {
+    busy = false;
+    status("TizenTube is open. Reopen TizenTube Starter to start it again.");
+  }, function (e) {
+    busy = false;
+    status("Could not open TizenTube: " + e.message + "\nPress OK to retry.");
+  });
+}
+
+function waitForProxy(startedAt) {
+  proxyHost().then(function (h) {
+    if (h) return openTizenTube(h);
+    var elapsed = Date.now() - startedAt;
+    if (elapsed > TIMEOUT_MS) {
+      busy = false;
+      return status("TizenTube's service did not answer on port 8101 after 30 s.\n" +
+        launchLog.join("\n") + "\nPress OK to retry.");
+    }
+    status("Waiting for the TizenTube service… " + Math.round(elapsed / 1000) + " s");
+    setTimeout(function () { waitForProxy(startedAt); }, 700);
+  });
+}
+
+function start() {
+  if (busy) return;
+  busy = true;
+  launchLog = [];
+  status("Starting TizenTube…");
+  proxyHost().then(function (h) {
+    if (h) return openTizenTube(h);
+    status("Starting the TizenTube service…");
+    startService(SERVICE).then(function () { waitForProxy(Date.now()); });
+  });
+}
+
+document.addEventListener("keydown", function (e) {
+  if (e.keyCode === 13) start();                                                   // OK: retry
+  else if (e.keyCode === 10009) tizen.application.getCurrentApplication().exit(); // Back
+});
+document.addEventListener("visibilitychange", function () {
+  if (!document.hidden) start();
+});
+
+start();
+</script>
+<script type="module">
+// Tizen 9/10 start web services through wrt:service; older TVs don't have the module.
+try {
+  const m = await import("wrt:service");
+  window.__wrtService = m.Service || (m.default && m.default.Service) || null;
+  window.__wrtInfo = "wrt:service loaded";
+} catch (e) {
+  window.__wrtInfo = "wrt:service not available (" + e.message + ")";
+}
+window.__wrtDone = true;
+window.dispatchEvent(new Event("wrt-ready"));
+</script>
+</body>
+</html>
