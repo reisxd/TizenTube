@@ -4,6 +4,14 @@ import qrcode from 'qrcode-npm';
 import { t } from 'i18next';
 import resolveCommand from '../resolveCommand.js';
 
+function serverOption(key) {
+    return {
+        name: t('settings.servers.' + key),
+        value: null,
+        action: { customAction: { action: 'EDIT_SERVER', parameters: key } }
+    };
+}
+
 const qrcodes = {};
 
 export default function modernUI(update, parameters) {
@@ -102,6 +110,7 @@ export default function modernUI(update, parameters) {
                 subtitle: 'https://sponsor.ajay.app/'
             },
             options: [
+                serverOption('sponsorBlockServer'),
                 {
                     name: t('settings.options.sponsorblock.options.enableSB'),
                     icon: 'MONEY_HAND',
@@ -212,6 +221,8 @@ export default function modernUI(update, parameters) {
                 subtitle: 'https://dearrow.ajay.app/'
             },
             options: [
+                serverOption('sponsorBlockServer'),
+                serverOption('deArrowThumbnailServer'),
                 {
                     name: t('settings.options.dearrow.options.enableDA'),
 

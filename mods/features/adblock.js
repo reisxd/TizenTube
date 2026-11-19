@@ -1,3 +1,4 @@
+import { fetchBranding, thumbnailSource } from '../utils/serviceServers.js';
 import { configRead } from '../config.js';
 import Chapters from '../ui/chapters.js';
 import resolveCommand from '../resolveCommand.js';
@@ -404,39 +405,33 @@ function deArrowify(items) {
       items.splice(index, 1);
       continue;
     }
-    if (!item.tileRenderer && item.lockupViewModel) continue;
-    if (!item?.lockupViewModel?.contentType !== 'LOCKUP_CONTENT_TYPE_VIDEO') continue;
-    if (configRead('enableDeArrow')) {
-      const videoID = item.tileRenderer.contentId || item.lockupViewModel.contentId;
-      fetch(`https://sponsor.ajay.app/api/branding?videoID=${videoID}`).then(res => res.json()).then(data => {
-        if (data.titles.length > 0) {
-          const mostVoted = data.titles.reduce((max, title) => max.votes > title.votes ? max : title);
-          item.tileRenderer ?
-            item.tileRenderer.metadata.tileMetadataRenderer.title.simpleText = mostVoted.title
-            : item.lockupViewModel.metadata.lockupMetadataViewModel.title.content = mostVoted.title;
+    if (!configRead('enableDeArrow')) continue;
+    const tile = item.tileRenderer;
+    const lockup = item.lockupViewModel;
+    if (!tile?.onSelectCommand?.watchEndpoint && lockup?.contentType !== 'LOCKUP_CONTENT_TYPE_VIDEO') continue;
+    const videoID = tile?.contentId || tile?.onSelectCommand?.watchEndpoint?.videoId || lockup?.contentId;
+    if (!videoID) continue;
+
+    fetchBranding(videoID)
+      .then(async data => {
+        if (data?.titles?.length) {
+          const best = data.titles[0]; // The API ranks locked submissions first.
+          const title = tile?.metadata?.tileMetadataRenderer?.title || lockup?.metadata?.lockupMetadataViewModel?.title;
+          if (title && best.title && !best.original) title[tile ? 'simpleText' : 'content'] = best.title;
         }
 
-        if (data.thumbnails.length > 0 && configRead('enableDeArrowThumbnails')) {
-          const mostVotedThumbnail = data.thumbnails.reduce((max, thumbnail) => max.votes > thumbnail.votes ? max : thumbnail);
-          if (mostVotedThumbnail.timestamp) {
-            item.tileRenderer ?
-              item.tileRenderer.header.tileHeaderRenderer.thumbnail.thumbnails = [
-                {
-                  url: `https://dearrow-thumb.ajay.app/api/v1/getThumbnail?videoID=${videoID}&time=${mostVotedThumbnail.timestamp}`,
-                  width: 1280,
-                  height: 640
-                }
-              ] : item.lockupViewModel.contentImage.thumbnailViewModel.image.sources = [
-                {
-                  url: `https://dearrow-thumb.ajay.app/api/v1/getThumbnail?videoID=${videoID}&time=${mostVotedThumbnail.timestamp}`,
-                  width: 1280,
-                  height: 640
-                }
-              ]
-          }
-        }
+        if (!data?.thumbnails?.length || !configRead('enableDeArrowThumbnails')) return;
+        const best = data.thumbnails[0];
+        const thumbnail = tile?.header?.tileHeaderRenderer?.thumbnail || lockup?.contentImage?.thumbnailViewModel?.image;
+        if (!thumbnail || best.original || !Number.isFinite(best.timestamp)) return;
+        const source = await thumbnailSource(videoID, best.timestamp);
+        if (!source) return;
+        const image = new Image();
+        image.onload = () => {
+          thumbnail[tile ? 'thumbnails' : 'sources'] = [{ url: image.src, width: 1280, height: 640 }];
+        };
+        image.src = source;
       }).catch(() => { });
-    }
   }
 }
 

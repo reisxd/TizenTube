@@ -6,6 +6,16 @@
         "back": "Back"
     },
     "settings": {
+        "servers": {
+            "sponsorBlockServer": "SponsorBlock and DeArrow API server",
+            "deArrowThumbnailServer": "DeArrow thumbnail server",
+            "invalid": "Enter an HTTP or HTTPS base URL without credentials, a query or a fragment.",
+            "pending": "Save to confirm this server on your TV.",
+            "unconfirmed": "Server change was not confirmed.",
+            "save": "Save",
+            "cancel": "Cancel",
+            "reset": "Use default server"
+        },
         "options": {
             "socialMedia": {
                 "title": "Social Media Links",

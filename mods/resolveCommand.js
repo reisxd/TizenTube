@@ -1,3 +1,4 @@
+import { editServer } from './ui/serverEditor.js';
 import { configWrite, configRead } from './config.js';
 import { enablePip } from './features/pictureInPicture.js';
 import modernUI, { optionShow } from './ui/settings.js';
@@ -199,6 +200,9 @@ function customAction(action, parameters) {
     switch (action) {
         case 'SETTINGS_UPDATE':
             modernUI(true, parameters);
+            break;
+        case 'EDIT_SERVER':
+            editServer(parameters);
             break;
         case 'OPTIONS_SHOW':
             optionShow(parameters, parameters.update);
