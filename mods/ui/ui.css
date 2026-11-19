@@ -155,3 +155,18 @@ div[idomkey="shadow"] {
 .ytContribIconHost::before {
     font-family: "YouTube Icons Outlined";
 }
+
+.tt-server-editor {
+  position: fixed;
+  top: 8%;
+  left: 10%;
+  width: 80%;
+  height: 77%;
+  border: none;
+  z-index: 2147483647;
+  background: #161616;
+}
+
+.tt-dearrow-image {
+  background-image: var(--tt-dearrow-image) !important;
+}

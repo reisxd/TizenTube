@@ -1,3 +1,4 @@
+import { fetchSegments } from '../utils/serviceServers.js';
 import sha256 from '../tiny-sha256.js';
 import { configRead } from '../config.js';
 import { showToast } from '../ui/ytUI.js';
@@ -52,8 +53,6 @@ const barTypes = {
   }
 };
 
-const sponsorblockAPI = 'https://sponsor.ajay.app/api';
-
 class SponsorBlockHandler {
   video = null;
   active = true;
@@ -76,23 +75,8 @@ class SponsorBlockHandler {
 
   async init() {
     const videoHash = sha256(this.videoID).substring(0, 4);
-    const categories = [
-      'sponsor',
-      'intro',
-      'outro',
-      'interaction',
-      'selfpromo',
-      'preview',
-      'filler',
-      'music_offtopic',
-      'poi_highlight'
-    ];
-    const resp = await fetch(
-      `${sponsorblockAPI}/skipSegments/${videoHash}?categories=${encodeURIComponent(
-        JSON.stringify(categories)
-      )}`
-    );
-    const results = await resp.json();
+    const results = await fetchSegments(videoHash);
+    if (!Array.isArray(results) || !this.active) return;
 
     const result = results.find((v) => v.videoID === this.videoID);
     console.info(this.videoID, 'Got it:', result);
@@ -397,41 +381,41 @@ class SponsorBlockHandler {
 // shows my lack of understanding of javascript. (or both)
 window.sponsorblock = null;
 
-window.addEventListener(
-  'hashchange',
-  () => {
-    const newURL = new URL(location.hash.substring(1), location.href);
-    // A hack, but it works, so...
-    const videoID = newURL.search.replace('?v=', '').split('&')[0];
-    const needsReload =
-      videoID &&
-      (!window.sponsorblock || window.sponsorblock.videoID != videoID);
+function handleVideoNavigation() {
+  if (!location.hash) return;
+  const newURL = new URL(location.hash.substring(1), location.href);
+  // A hack, but it works, so...
+  const videoID = newURL.search.match(/[?&]v=([\w-]+)(?:&|$)/)?.[1];
+  const needsReload =
+    videoID &&
+    (!window.sponsorblock || window.sponsorblock.videoID != videoID);
 
-    console.info(
-      'hashchange',
-      videoID,
-      window.sponsorblock,
-      window.sponsorblock ? window.sponsorblock.videoID : null,
-      needsReload
-    );
+  console.info(
+    'SponsorBlock navigation',
+    videoID,
+    window.sponsorblock,
+    window.sponsorblock ? window.sponsorblock.videoID : null,
+    needsReload
+  );
 
-    if (needsReload) {
-      if (window.sponsorblock) {
-        try {
-          window.sponsorblock.destroy();
-        } catch (err) {
-          console.warn('window.sponsorblock.destroy() failed!', err);
-        }
-        window.sponsorblock = null;
+  if (needsReload) {
+    if (window.sponsorblock) {
+      try {
+        window.sponsorblock.destroy();
+      } catch (err) {
+        console.warn('window.sponsorblock.destroy() failed!', err);
       }
-
-      if (configRead('enableSponsorBlock')) {
-        window.sponsorblock = new SponsorBlockHandler(videoID);
-        window.sponsorblock.init();
-      } else {
-        console.info('SponsorBlock disabled, not loading');
-      }
+      window.sponsorblock = null;
     }
-  },
-  false
-);
+
+    if (configRead('enableSponsorBlock')) {
+      window.sponsorblock = new SponsorBlockHandler(videoID);
+      window.sponsorblock.init().catch(err => console.warn('SponsorBlock lookup failed:', err));
+    } else {
+      console.info('SponsorBlock disabled, not loading');
+    }
+  }
+}
+
+window.addEventListener('hashchange', handleVideoNavigation);
+handleVideoNavigation();
