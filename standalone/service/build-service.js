@@ -91,7 +91,11 @@ if (process.argv[2] === 'remove-cobalt-flags') {
 
     fs.writeFileSync(path.join(__dirname, '../config.xml'), updatedConfigXml);
 } else if (process.argv[2] === 'set-cobalt-proxy') {
+    // node build-service.js set-cobalt-proxy [url]: default http://tizentube:8101. On Tizen 10, Cobalt
+    // cannot reach 127.0.0.2; give the TV's own address, e.g. http://192.168.1.50:8101 (keep it fixed).
+    const proxy = process.argv[3] || 'http://tizentube:8101';
+    if (!/^http:\/\/[^\s/:]+:\d+$/.test(proxy)) throw new Error('set-cobalt-proxy: expected http://<host>:<port>, got ' + proxy);
     const configXml = fs.readFileSync(path.join(__dirname, '../config.xml'), 'utf8');
     fs.writeFileSync(path.join(__dirname, '../config.xml.bak'), configXml);
-    fs.writeFileSync(path.join(__dirname, '../config.xml'), configXml.replace('http://127.0.0.2:8101', 'http://tizentube:8101'));
+    fs.writeFileSync(path.join(__dirname, '../config.xml'), configXml.replace('http://127.0.0.2:8101', proxy));
 } else build();

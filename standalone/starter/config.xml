@@ -12,6 +12,8 @@
     <tizen:privilege name="http://developer.samsung.com/privilege/network.public"/>
     <tizen:privilege name="http://tizen.org/privilege/application.launch"/>
     <tizen:privilege name="http://tizen.org/privilege/application.info"/>
+    <!-- Closes big apps left in the background before TizenTube opens (Partner level). -->
+    <tizen:privilege name="http://tizen.org/privilege/appmanager.kill"/>
     <tizen:profile name="tv-samsung"/>
     <!-- Tizen 9/10 ignore TizenTube's on-boot service and a package cannot start another package's
          service, so the starter ships its own copy of the proxy service (copied in at build time). -->
@@ -20,5 +22,6 @@
         <tizen:name>ProxyService</tizen:name>
         <tizen:description>TizenTube proxy service started by TizenTube Starter</tizen:description>
     </tizen:service>
-    <tizen:setting screen-orientation="landscape" context-menu="enable" background-support="disable" encryption="disable" install-location="auto" hwkey-event="enable"/>
+    <!-- Lets the page close itself a few seconds after opening TizenTube, while hidden. -->
+    <tizen:setting screen-orientation="landscape" context-menu="enable" background-support="enable" encryption="disable" install-location="auto" hwkey-event="enable"/>
 </widget>
