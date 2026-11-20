@@ -3,6 +3,18 @@ const fs = require('fs');
 const path = require('path');
 const { XMLParser, XMLBuilder } = require('fast-xml-parser');
 
+// Tizen 9/10 run web services in a Node 20 embedded in Chromium (wrt-service) and evaluate the
+// file through a vm wrapper that does not always define the CommonJS globals. ncc's runtime reads
+// __dirname and module at load time, so the service would throw before it starts listening.
+const runtimeCompatBanner = [
+    '/* Tizen 9/10 service runtime: provide the CommonJS globals the ncc runtime expects */',
+    "if (typeof __dirname === 'undefined') { try { global.__dirname = process.cwd(); } catch (e) { global.__dirname = '.'; } }",
+    "if (typeof __filename === 'undefined') { global.__filename = __dirname + '/index.js'; }",
+    "if (typeof module === 'undefined') { global.module = { exports: {} }; }",
+    "if (typeof exports === 'undefined') { global.exports = module.exports; }",
+    ''
+].join('\n');
+
 async function build() {
     const { code } = await ncc(path.join(__dirname, 'transpiled/index.js'), {
         minify: false
@@ -19,7 +31,7 @@ async function build() {
     const outDir = path.join(__dirname, 'dist');
     if (!fs.existsSync(outDir)) fs.mkdirSync(outDir);
 
-    fs.writeFileSync(path.join(outDir, 'index.js'), fixedCode);
+    fs.writeFileSync(path.join(outDir, 'index.js'), runtimeCompatBanner + fixedCode);
 
     fs.rmSync(path.join(__dirname, 'transpiled'), { recursive: true, force: true });
 }
@@ -79,7 +91,11 @@ if (process.argv[2] === 'remove-cobalt-flags') {
 
     fs.writeFileSync(path.join(__dirname, '../config.xml'), updatedConfigXml);
 } else if (process.argv[2] === 'set-cobalt-proxy') {
+    // node build-service.js set-cobalt-proxy [url]: default http://tizentube:8101. On Tizen 10, Cobalt
+    // cannot reach 127.0.0.2; give the TV's own address, e.g. http://192.168.1.50:8101 (keep it fixed).
+    const proxy = process.argv[3] || 'http://tizentube:8101';
+    if (!/^http:\/\/[^\s/:]+:\d+$/.test(proxy)) throw new Error('set-cobalt-proxy: expected http://<host>:<port>, got ' + proxy);
     const configXml = fs.readFileSync(path.join(__dirname, '../config.xml'), 'utf8');
     fs.writeFileSync(path.join(__dirname, '../config.xml.bak'), configXml);
-    fs.writeFileSync(path.join(__dirname, '../config.xml'), configXml.replace('http://127.0.0.2:8101', 'http://tizentube:8101'));
+    fs.writeFileSync(path.join(__dirname, '../config.xml'), configXml.replace('http://127.0.0.2:8101', proxy));
 } else build();

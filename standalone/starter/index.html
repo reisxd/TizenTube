@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>TizenTube Starter</title>
+<style>
+  html, body { margin: 0; height: 100%; background: #0f0f0f; color: #fff; font-family: Roboto, Arial, sans-serif; }
+  #main { height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+  h1 { font-size: 72px; margin: 0; }
+  #status { font-size: 32px; color: #bbb; margin-top: 28px; text-align: center; max-width: 1600px; white-space: pre-line; }
+</style>
+</head>
+<body>
+<div id="main">
+  <h1>TizenTube</h1>
+  <div id="status">Starting…</div>
+</div>
+<script>
+// TizenTube Starter: starts the TizenTube proxy service, waits for it, then opens TizenTube Cobalt.
+//
+// TizenTube Cobalt opens Samsung's native YouTube (Cobalt) app directly, so no page of its own
+// ever runs, and it relies on its service starting at boot. Tizen 9/10 (2025/2026 TVs) ignore
+// on-boot services, and launchAppControl reports success for a web service without starting it;
+// those TVs start web services through the Service class of the wrt:service module instead.
+//
+// What a 2026 TV (Tizen 10.0) showed on top of that:
+// - The Service object must stay referenced while this page runs: once the one that started the
+//   service is garbage collected, the TV stops the service.
+// - Never call Service.stop(): on a service the TV already dropped it hangs the shared web runtime,
+//   and the TV then closes every web app at once (this page and any other web app that is open).
+// - start() can take ~10 s to resolve, or be refused for a while as the TV winds an old instance
+//   down, so success is judged by the proxy answering, not by start().
+// - With a big app left in the background (Netflix, Prime Video, a preloaded stock YouTube, another
+//   web app…) the TV closed TizenTube and its proxy within seconds for lack of memory: those apps are
+//   closed first. Web apps among them through the TV's REST API, not tizen.application.kill().
+// - A starter page left running in the background was the problem, not the cure: the TV dropped the
+//   proxy as soon as another app came to the front, and that page could not start it again. Once this
+//   page has closed itself, the proxy keeps running behind any app, and the next opening of the
+//   starter is a new page that starts it if needed. So the starter closes itself after opening TizenTube.
+"use strict";
+var SERVICE = tizen.application.getCurrentApplication().appInfo.packageId + ".ProxyService";
+var APP = "xvvl3S1TT1.TizenTubeStandalone";
+// 127.0.0.1 first: the proxy runs on this TV and listens on all addresses, so the loopback answers
+// without a DNS lookup. 127.0.0.2 (default build) and tizentube (TizenTubeProxyAddress build) follow.
+var HOSTS = ["127.0.0.1", "127.0.0.2", "tizentube"];
+var TIMEOUT_MS = 30000;
+var RETRY_START_MS = 5000;
+// Apps closed before TizenTube opens (only while they are not on screen, which is always the case here).
+// Add the ids of other big apps you leave open.
+var CLOSE_BEFORE_OPEN = [
+  "org.tizen.netflix-app", "org.tizen.primevideo", "9Ur5IzDKqV.TizenYouTube", "com.samsung.tv.cobalt-yt",
+  "com.samsung.tv.aria-video", "MCmYXNxgcu.DisneyPlus", "HEPsqFNie0.tvplusstandalone"
+];
+var statusEl = document.getElementById("status");
+var busy = false;
+var launchLog = [];
+var svc = null;   // the wrt:service Service object, kept for the life of the page
+var closeTimer = null;
+
+function status(t) { statusEl.textContent = t; }
+function note(t) { launchLog.push(t); }
+
+function withTimeout(p, ms) {
+  return new Promise(function (resolve, reject) {
+    var timer = setTimeout(function () { reject(new Error("timeout")); }, ms);
+    p.then(function (v) { clearTimeout(timer); resolve(v); }, function (e) { clearTimeout(timer); reject(e); });
+  });
+}
+
+// Resolves with the first host whose proxy answers on :8101, or null.
+function proxyHost() {
+  var i = 0;
+  function next() {
+    if (i >= HOSTS.length) return Promise.resolve(null);
+    var h = HOSTS[i++];
+    return withTimeout(fetch("http://" + h + ":8101/__tizentube/ping", { mode: "no-cors", cache: "no-store" }), 1500)
+      .then(function () { return h; }, next);
+  }
+  return next();
+}
+
+// The module script at the end of the page sets window.__wrtService on Tizen 9/10.
+function wrtReady() {
+  return new Promise(function (resolve) {
+    if (window.__wrtDone) return resolve();
+    var timer = setTimeout(resolve, 3000);
+    window.addEventListener("wrt-ready", function () { clearTimeout(timer); resolve(); });
+  });
+}
+
+function startViaAppControl(id) {
+  return new Promise(function (resolve, reject) {
+    try {
+      tizen.application.launchAppControl(
+        new tizen.ApplicationControl("http://tizen.org/appcontrol/operation/service"), id,
+        function () { resolve(); },
+        function (e) { reject(new Error(e.name + " " + e.message)); });
+    } catch (e) { reject(e); }
+  });
+}
+
+// Ask for the service: start() through wrt:service (Tizen 9/10), launchAppControl on older TVs.
+function askForService() {
+  if (!window.__wrtService) return startViaAppControl(SERVICE);
+  return withTimeout(Promise.resolve().then(function () {
+    svc = svc || new window.__wrtService(SERVICE);
+    return svc.start();
+  }), 15000);
+}
+
+function startService() {
+  return wrtReady().then(function () {
+    if (launchLog.length === 0) note(window.__wrtInfo || "wrt:service: no answer within 3 s");
+    askForService().then(function () { note("service start: OK"); },
+                         function (e) { note("service start: " + (e && e.message || e) + " (waiting for the proxy anyway)"); });
+  });
+}
+
+// Web apps are closed through the TV's REST API, the way the TV closes them itself: killing a web app's
+// context with tizen.application.kill() took the TizenTube proxy service down with it on a 2026 TV.
+// Native apps (org.tizen.*, com.samsung.*), which the REST API does not know, are killed.
+var NATIVE = /^(org\.tizen\.|com\.samsung\.)/;
+function closeViaApi(appId) {
+  return new Promise(function (resolve) {
+    try {
+      var x = new XMLHttpRequest();
+      x.open("DELETE", "http://127.0.0.1:8001/api/v2/applications/" + encodeURIComponent(appId));
+      x.timeout = 2000;
+      x.onload = function () { resolve(x.status === 200); };
+      x.onerror = x.ontimeout = function () { resolve(false); };
+      x.send();
+    } catch (e) { resolve(false); }
+  });
+}
+function closeContext(c) {
+  if (!NATIVE.test(c.appId)) return closeViaApi(c.appId);
+  return new Promise(function (resolve) {
+    try { tizen.application.kill(c.id, function () { resolve(true); }, function () { resolve(false); }); }
+    catch (e) { resolve(false); }
+  });
+}
+function closeContexts(ids) {
+  return new Promise(function (resolve) {
+    try {
+      tizen.application.getAppsContext(function (list) {
+        var running = list.filter(function (c) { return ids.indexOf(c.appId) >= 0; });
+        Promise.all(running.map(function (c) {
+          return closeContext(c).then(function (ok) { return ok ? c.appId : null; });
+        })).then(function (r) { resolve(r.filter(Boolean)); });
+      }, function () { resolve([]); });
+    } catch (e) { resolve([]); }
+  });
+}
+
+function closeBigApps() {
+  return closeContexts(CLOSE_BEFORE_OPEN).then(function (closed) {
+    if (!closed.length) return;
+    note("closed in the background: " + closed.join(", "));
+    return new Promise(function (resolve) { setTimeout(resolve, 800); });   // let the TV take the memory back
+  });
+}
+
+// Opens TizenTube, then closes this page (see the notes at the top). The proxy service stays.
+function openTizenTube(host) {
+  status("Proxy ready (" + host + ":8101). Opening TizenTube…");
+  tizen.application.launch(APP, function () {
+    busy = false;
+    status("TizenTube is open.");
+    // Runs while hidden (background-support): a page the TV suspended would only close when shown again.
+    closeTimer = setTimeout(function () { tizen.application.getCurrentApplication().exit(); }, 5000);
+  }, function (e) {
+    busy = false;
+    status("Could not open TizenTube: " + e.message + "\nPress OK to retry.");
+  });
+}
+
+function waitForProxy(startedAt, lastAsk) {
+  proxyHost().then(function (h) {
+    if (h) return openTizenTube(h);
+    var now = Date.now(), elapsed = now - startedAt;
+    if (elapsed > TIMEOUT_MS) {
+      busy = false;
+      return status("TizenTube's service did not answer on port 8101 after 30 s.\n" + launchLog.join("\n") +
+        "\nPress Back, then open TizenTube Starter again.");
+    }
+    if (now - lastAsk >= RETRY_START_MS) { lastAsk = now; askForService().catch(function () {}); }
+    status("Waiting for the TizenTube service… " + Math.round(elapsed / 1000) + " s");
+    setTimeout(function () { waitForProxy(startedAt, lastAsk); }, 700);
+  });
+}
+
+function start() {
+  if (closeTimer) { clearTimeout(closeTimer); closeTimer = null; }
+  if (busy) return;
+  busy = true;
+  launchLog = [];
+  status("Starting TizenTube…");
+  closeBigApps().then(proxyHost).then(function (h) {
+    if (h) return openTizenTube(h);
+    status("Starting the TizenTube service…");
+    startService().then(function () { waitForProxy(Date.now(), Date.now()); });
+  });
+}
+
+
+document.addEventListener("keydown", function (e) {
+  if (e.keyCode === 13) start();                                                   // OK: retry
+  else if (e.keyCode === 10009) tizen.application.getCurrentApplication().exit(); // Back
+});
+document.addEventListener("visibilitychange", function () {
+  if (!document.hidden) start();
+});
+
+start();
+</script>
+<script type="module">
+// Tizen 9/10 start web services through wrt:service; older TVs don't have the module.
+try {
+  const m = await import("wrt:service");
+  window.__wrtService = m.Service || (m.default && m.default.Service) || null;
+  window.__wrtInfo = "wrt:service loaded";
+} catch (e) {
+  window.__wrtInfo = "wrt:service not available (" + e.message + ")";
+}
+window.__wrtDone = true;
+window.dispatchEvent(new Event("wrt-ready"));
+</script>
+</body>
+</html>

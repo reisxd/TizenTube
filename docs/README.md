@@ -30,10 +30,26 @@ There are two versions of TizenTube available for installation, one for newer Ti
 8. Click **Install** and wait for the installation to complete. You should see a success message once the installation is finished.
 9. If you're on an older Tizen version, you may need to set the developer mode Host PC IP to `127.0.0.1` and reboot your TV after installation. Otherwise there could be playback issues.
 
+### Tizen 9 and 10 (2025 and 2026 TVs)
+
+These TVs don't start TizenTube's proxy service at boot, so TizenTube Cobalt shows "A network error has occured". Install **TizenTubeStarter.wgt** too, with the same Apps2Samsung settings (Force Samsung Certificate and Partner Signing), and open **TizenTube Starter** instead of TizenTube. It:
+
+- closes big apps left in the background (Netflix, Prime Video, a preloaded stock YouTube, Apple TV, Disney+, Samsung TV Plus), since with one of them resident a 2026 TV closed TizenTube and its proxy within seconds for lack of memory;
+- starts the proxy service, waits for it and opens TizenTube;
+- closes itself a few seconds later; the proxy keeps running. After you used another app, open TizenTube Starter again rather than TizenTube: it starts the proxy again if the TV dropped it.
+
+On Tizen 10, Cobalt can't reach the default proxy address `127.0.0.2`. Either use **TizenTubeCobaltTizenTubeProxyAddress.wgt** and make `tizentube` resolve to your TV's IP address as described in step 5, or build TizenTube with your TV's address: run `node build-service.js set-cobalt-proxy http://<TV IP>:8101` in `standalone/service` before packaging. Either way the TV's IP address must not change (reserve it in your router).
+
+TizenTube runs on its own Cobalt app (`com.samsung.tv.cobalt-app-test`), so a stock YouTube that Samsung preloads in the background can no longer open in its place. Sign in to YouTube once more after updating.
+
+Tested on a Samsung UE55M1EHAUXXN (2026, Tizen 10.0).
+
 ## Troubleshooting
 
 If you've installed TizenTube Cobalt and you get "A network error has occured" while launching the app, it means that your TV is unable to connect to the TizenTube proxy server. This could happen because:
 - You didn't enable "Force Samsung Certificate" and "Partner Signing" in Apps2Samsung while installing TizenTube Cobalt.
+- Your TV runs Tizen 9 or 10 (2025 or 2026) and you opened TizenTube directly. Install TizenTubeStarter.wgt and open TizenTube Starter instead (see "Tizen 9 and 10" above).
+- TizenTube closes a few seconds after it opens, or the error shows after you used another app: open TizenTube Starter again. If you leave another big app open, add its app id to `CLOSE_BEFORE_OPEN` in `standalone/starter/index.html`.
 - Your TV is unable to resolve the default proxy server address `http://127.0.0.2:8101`. In this case, you can try using the TizenTubeCobaltTizenTubeProxyAddress.wgt version of TizenTube Cobalt, which uses `http://tizentube:8101` as the proxy server address. Make sure that your DNS resolves `tizentube` to your TV's IP address. You can do this by adding a DNS entry in your router or using a DNS service that allows custom entries. Note that the IP must be static as it can change.
 - Your TV is running Tizen 5.5 or earlier, which doesn't support TizenTube Cobalt. In this case, you can try using the TizenTubeOld.wgt version of TizenTube, which is compatible with older Tizen versions.
 - You're not connected to the internet.

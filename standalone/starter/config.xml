@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<widget xmlns:tizen="http://tizen.org/ns/widgets" xmlns="http://www.w3.org/ns/widgets" id="http://local/tizentubestarter" version="1.0.0" viewmodes="maximized">
+    <access origin="*" subdomains="true"></access>
+    <tizen:allow-navigation href="*"/>
+    <tizen:application id="xvvl3S1TTL.TizenTubeStarter" package="xvvl3S1TTL" required_version="3.0"/>
+    <content src="index.html"/>
+    <feature name="http://tizen.org/feature/screen.size.all"/>
+    <feature name="http://tizen.org/feature/web.service"/>
+    <icon src="icon.png"/>
+    <name>TizenTube Starter</name>
+    <tizen:privilege name="http://tizen.org/privilege/internet"/>
+    <tizen:privilege name="http://developer.samsung.com/privilege/network.public"/>
+    <tizen:privilege name="http://tizen.org/privilege/application.launch"/>
+    <tizen:privilege name="http://tizen.org/privilege/application.info"/>
+    <!-- Closes big apps left in the background before TizenTube opens (Partner level). -->
+    <tizen:privilege name="http://tizen.org/privilege/appmanager.kill"/>
+    <tizen:profile name="tv-samsung"/>
+    <!-- Tizen 9/10 ignore TizenTube's on-boot service and a package cannot start another package's
+         service, so the starter ships its own copy of the proxy service (copied in at build time). -->
+    <tizen:service id="xvvl3S1TTL.ProxyService" auto-restart="true" on-boot="true">
+        <tizen:content src="service/dist/index.js"/>
+        <tizen:name>ProxyService</tizen:name>
+        <tizen:description>TizenTube proxy service started by TizenTube Starter</tizen:description>
+    </tizen:service>
+    <!-- Lets the page close itself a few seconds after opening TizenTube, while hidden. -->
+    <tizen:setting screen-orientation="landscape" context-menu="enable" background-support="enable" encryption="disable" install-location="auto" hwkey-event="enable"/>
+</widget>
